@@ -2,8 +2,7 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Text } from '@polkadot/types';
 
 /**
- * The Mangata class defines the `getInstance` method that lets clients access
- * the unique singleton instance.
+ * The Mangata class defines the `getInstance` method that lets clients access the unique singleton instance. Design pattern Singleton Promise is used.
  */
 export class Mangata {
   private static instance: Mangata;
@@ -13,13 +12,15 @@ export class Mangata {
   /**
    * The Mangata's constructor is private to prevent direct
    * construction calls with the `new` operator.
-   * Initialised via isReady & new with specific provider
    */
   private constructor(uri: string) {
     this.apiPromise = null;
     this.uri = uri;
   }
 
+  /**
+   * Initialised via isReady & new with specific provider
+   */
   private async connect() {
     if (!this.apiPromise) {
       const provider = new WsProvider(this.uri);
