@@ -1,15 +1,14 @@
 {
   "include": ["src"],
   "exclude": [
-        "tests",
+        "test",
         "dist",
         "node_modules"
     ],
   "compilerOptions": {
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    // I chose ES5 here because I target nodeJS
-    "target": "es5",
+    "target": "es6",
     "noImplicitAny": true,
      // I use commonJS / nodeJS as its the module system on NodeJS
     "module": "commonjs",
