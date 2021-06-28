@@ -1,7 +1,10 @@
 module.exports = {
-  plugins: ['prettier'],
-  extends: ['standard', 'prettier'],
-  parser: 'babel-eslint',
+  plugins: ['prettier', '@typescript-eslint'],
+  extends: ['prettier'],
+  parser: '@typescript-eslint/parser',
+  env: {
+    jest: true,
+  },
   rules: {
     'no-var': 'warn',
     'prefer-const': 'warn',

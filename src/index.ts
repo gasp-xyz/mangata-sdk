@@ -1,21 +1,21 @@
-import { ApiPromise, WsProvider } from '@polkadot/api';
-import { Text } from '@polkadot/types';
+import { ApiPromise, WsProvider } from '@polkadot/api'
+import { options } from './options'
 
 /**
  * The Mangata class defines the `getInstance` method that lets clients access the unique singleton instance. Design pattern Singleton Promise is used.
  */
 export class Mangata {
-  private static instance: Mangata;
-  private apiPromise: Promise<ApiPromise> | null;
-  private uri: string;
+  private static instance: Mangata
+  private apiPromise: Promise<ApiPromise> | null
+  private uri: string
 
   /**
    * The Mangata's constructor is private to prevent direct
    * construction calls with the `new` operator.
    */
   private constructor(uri: string) {
-    this.apiPromise = null;
-    this.uri = uri;
+    this.apiPromise = null
+    this.uri = uri
   }
 
   /**
@@ -23,11 +23,11 @@ export class Mangata {
    */
   private async connect() {
     if (!this.apiPromise) {
-      const provider = new WsProvider(this.uri);
-      this.apiPromise = new ApiPromise({ provider }).isReady;
+      const provider = new WsProvider(this.uri)
+      this.apiPromise = new ApiPromise(options({ provider })).isReady
     }
 
-    return this.apiPromise;
+    return this.apiPromise
   }
 
   /**
@@ -35,39 +35,39 @@ export class Mangata {
    */
   public static getInstance(uri: string): Mangata {
     if (!Mangata.instance) {
-      Mangata.instance = new Mangata(uri);
+      Mangata.instance = new Mangata(uri)
     }
 
-    return Mangata.instance;
+    return Mangata.instance
   }
 
   /**
    * Retrieve the chain name
    */
 
-  public async getChain(): Promise<Text> {
-    const api = await this.connect();
-    const chain = await api.rpc.system.chain();
-    return chain;
+  public async getChain(): Promise<string> {
+    const api = await this.connect()
+    const chain = await api.rpc.system.chain()
+    return chain.toHuman()
   }
 
   /**
    * Retrieve the node name
    */
 
-  public async getNodeName(): Promise<Text> {
-    const api = await this.connect();
-    const name = await api.rpc.system.name();
-    return name;
+  public async getNodeName(): Promise<string> {
+    const api = await this.connect()
+    const name = await api.rpc.system.name()
+    return name.toHuman()
   }
 
   /**
    * Retrieve the node version
    */
 
-  public async getNodeVersion(): Promise<Text> {
-    const api = await this.connect();
-    const version = await api.rpc.system.version();
-    return version;
+  public async getNodeVersion(): Promise<string> {
+    const api = await this.connect()
+    const version = await api.rpc.system.version()
+    return version.toHuman()
   }
 }
