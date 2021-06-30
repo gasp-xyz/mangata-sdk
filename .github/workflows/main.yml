@@ -11,10 +11,9 @@ jobs:
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Install
-        uses: yarn
+      - uses: actions/checkout@v2
+      - name: install
+        run: yarn
 
       - name: Use Node ${{ matrix.node }}
         uses: actions/setup-node@v1
