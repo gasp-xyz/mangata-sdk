@@ -2,6 +2,12 @@ module.exports = {
   plugins: ['prettier', '@typescript-eslint'],
   extends: ['prettier'],
   parser: '@typescript-eslint/parser',
+  'prettier/prettier': [
+    'error',
+    {
+      endOfLine: 'auto',
+    },
+  ],
   env: {
     jest: true,
   },
