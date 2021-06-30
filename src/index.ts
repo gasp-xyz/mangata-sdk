@@ -1,5 +1,6 @@
 import { ApiPromise, WsProvider } from '@polkadot/api'
-import { options } from './options'
+import { options } from './utils/options'
+import { RPC } from './services/Rpc'
 
 /**
  * The Mangata class defines the `getInstance` method that lets clients access the unique singleton instance. Design pattern Singleton Promise is used.
@@ -42,13 +43,19 @@ export class Mangata {
   }
 
   /**
+   * Retrieve the underlying API
+   */
+  public async getApi(): Promise<ApiPromise> {
+    return await this.connect()
+  }
+
+  /**
    * Retrieve the chain name
    */
 
   public async getChain(): Promise<string> {
     const api = await this.connect()
-    const chain = await api.rpc.system.chain()
-    return chain.toHuman()
+    return RPC.getChain(api)
   }
 
   /**
@@ -57,8 +64,7 @@ export class Mangata {
 
   public async getNodeName(): Promise<string> {
     const api = await this.connect()
-    const name = await api.rpc.system.name()
-    return name.toHuman()
+    return RPC.getNodeName(api)
   }
 
   /**
@@ -67,7 +73,6 @@ export class Mangata {
 
   public async getNodeVersion(): Promise<string> {
     const api = await this.connect()
-    const version = await api.rpc.system.version()
-    return version.toHuman()
+    return RPC.getNodeVersion(api)
   }
 }
