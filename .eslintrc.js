@@ -2,12 +2,6 @@ module.exports = {
   plugins: ['prettier', '@typescript-eslint'],
   extends: ['prettier'],
   parser: '@typescript-eslint/parser',
-  'prettier/prettier': [
-    'error',
-    {
-      endOfLine: 'auto',
-    },
-  ],
   env: {
     jest: true,
   },
@@ -20,5 +14,11 @@ module.exports = {
     'prefer-arrow-callback': 'off',
     'prettier/prettier': ['error', { singleQuote: true }],
     semi: 0,
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto',
+      },
+    ],
   },
 }
