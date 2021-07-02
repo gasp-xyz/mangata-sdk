@@ -29,8 +29,6 @@ const { Mangata } = require('mangata-sdk');
 async function main () {
   // Connect to the local node (also testnet, mainnet)
   const mangata = Mangata.getInstance('ws://127.0.0.1:9944')
-  
-  cont chain = await mangata.getChain()
 
   // Retrieve the chainName, nodeName & nodeVersion information
   const [chain, nodeName, nodeVersion] = await Promise.all([
