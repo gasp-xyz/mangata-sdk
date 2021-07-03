@@ -50,7 +50,6 @@
   },
   "dependencies": {
     "@polkadot/api": "^4.16.2",
-    "@polkadot/types": "^4.16.2",
-    "bn.js": "^5.2.0"
+    "@polkadot/types": "^4.16.2"
   }
 }
