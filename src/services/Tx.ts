@@ -1,5 +1,6 @@
 import { ApiPromise } from '@polkadot/api'
 import { AddressOrPair, SubmittableExtrinsic } from '@polkadot/api/types'
+import BN from 'bn.js'
 import { bnToBn } from '@polkadot/util'
 import { Query } from './Query'
 
@@ -8,9 +9,9 @@ type Itx = {
     api: ApiPromise,
     address: string,
     firstAssetId: string,
-    firstAssetAmount: number,
+    firstAssetAmount: BN,
     secondAssetId: string,
-    secondAssetAmount: number
+    secondAssetAmount: BN
   ): Promise<void>
 }
 
@@ -26,17 +27,12 @@ const createPool = async (
   api: ApiPromise,
   address: string,
   firstAssetId: string,
-  firstAssetAmount: number,
+  firstAssetAmount: BN,
   secondAssetId: string,
-  secondAssetAmount: number
+  secondAssetAmount: BN
 ): Promise<void> => {
   signTx(
-    api.tx.xyk.createPool(
-      bnToBn(firstAssetId),
-      bnToBn(firstAssetAmount),
-      bnToBn(secondAssetId),
-      bnToBn(secondAssetAmount)
-    ),
+    api.tx.xyk.createPool(firstAssetId, firstAssetAmount, secondAssetId, secondAssetAmount),
     address,
     await Query.getCurrentNonce(api, address)
   )

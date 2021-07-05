@@ -1,4 +1,5 @@
 import { ApiPromise, WsProvider } from '@polkadot/api'
+import BN from 'bn.js'
 import { options } from './utils/options'
 import { RPC } from './services/Rpc'
 import { TX } from './services/Tx'
@@ -84,9 +85,9 @@ export class Mangata {
   public async createPool(
     address: string,
     firstAssetId: string,
-    firstAssetAmount: number,
+    firstAssetAmount: BN,
     secondAssetId: string,
-    secondAssetAmount: number
+    secondAssetAmount: BN
   ) {
     const api = await this.connect()
     await TX.createPool(
