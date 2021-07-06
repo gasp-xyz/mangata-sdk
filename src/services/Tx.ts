@@ -7,7 +7,7 @@ import { Query } from './Query'
 type Itx = {
   createPool(
     api: ApiPromise,
-    account: KeyringPair,
+    address: string,
     firstAssetId: string,
     firstAssetAmount: BN,
     secondAssetId: string,
@@ -15,13 +15,13 @@ type Itx = {
   ): Promise<void>
 }
 
-const signTx = async (tx: SubmittableExtrinsic<'promise'>, account: KeyringPair, nonce: string) => {
-  await tx.signAndSend(account, { nonce })
+const signTx = async (tx: SubmittableExtrinsic<'promise'>, address: string, nonce: string) => {
+  await tx.signAndSend(address, { nonce })
 }
 
 const createPool = async (
   api: ApiPromise,
-  account: KeyringPair,
+  address: string,
   firstAssetId: string,
   firstAssetAmount: BN,
   secondAssetId: string,
@@ -29,8 +29,8 @@ const createPool = async (
 ): Promise<void> => {
   signTx(
     api.tx.xyk.createPool(firstAssetId, firstAssetAmount, secondAssetId, secondAssetAmount),
-    account,
-    await Query.getCurrentNonce(api, account.address)
+    address,
+    await Query.getCurrentNonce(api, address)
   )
 }
 

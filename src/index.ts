@@ -84,7 +84,7 @@ export class Mangata {
    */
 
   public async createPool(
-    account: KeyringPair,
+    address: string,
     firstAssetId: string,
     firstAssetAmount: BN,
     secondAssetId: string,
@@ -93,7 +93,7 @@ export class Mangata {
     const api = await this.connect()
     await TX.createPool(
       api,
-      account,
+      address,
       firstAssetId,
       firstAssetAmount,
       secondAssetId,
