@@ -1,6 +1,6 @@
 import { Mangata } from '../src'
-
 require('dotenv').config()
+
 const uri = process.env.API_URL ? process.env.API_URL : 'ws://127.0.0.1:9944'
 const m = Mangata.getInstance(uri)
 
