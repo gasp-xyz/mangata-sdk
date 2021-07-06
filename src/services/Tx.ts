@@ -1,5 +1,4 @@
 import { ApiPromise } from '@polkadot/api'
-import { KeyringPair } from '@polkadot/keyring/types'
 import { SubmittableExtrinsic } from '@polkadot/api/types'
 import BN from 'bn.js'
 import { Query } from './Query'

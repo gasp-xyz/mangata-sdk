@@ -1,5 +1,4 @@
 import { ApiPromise, WsProvider } from '@polkadot/api'
-import { KeyringPair } from '@polkadot/keyring/types'
 import BN from 'bn.js'
 import { options } from './utils/options'
 import { RPC } from './services/Rpc'
