@@ -1,13 +1,13 @@
 import { ApiPromise } from '@polkadot/api'
-import { AddressOrPair, SubmittableExtrinsic } from '@polkadot/api/types'
+import { KeyringPair } from '@polkadot/keyring/types'
+import { SubmittableExtrinsic } from '@polkadot/api/types'
 import BN from 'bn.js'
-import { bnToBn } from '@polkadot/util'
 import { Query } from './Query'
 
 type Itx = {
   createPool(
     api: ApiPromise,
-    address: string,
+    account: KeyringPair,
     firstAssetId: string,
     firstAssetAmount: BN,
     secondAssetId: string,
@@ -15,17 +15,13 @@ type Itx = {
   ): Promise<void>
 }
 
-const signTx = async (
-  tx: SubmittableExtrinsic<'promise'>,
-  address: AddressOrPair,
-  nonce: string
-) => {
-  await tx.signAndSend(address, { nonce: bnToBn(nonce) })
+const signTx = async (tx: SubmittableExtrinsic<'promise'>, account: KeyringPair, nonce: string) => {
+  await tx.signAndSend(account, { nonce })
 }
 
 const createPool = async (
   api: ApiPromise,
-  address: string,
+  account: KeyringPair,
   firstAssetId: string,
   firstAssetAmount: BN,
   secondAssetId: string,
@@ -33,8 +29,8 @@ const createPool = async (
 ): Promise<void> => {
   signTx(
     api.tx.xyk.createPool(firstAssetId, firstAssetAmount, secondAssetId, secondAssetAmount),
-    address,
-    await Query.getCurrentNonce(api, address)
+    account,
+    await Query.getCurrentNonce(api, account.address)
   )
 }
 
