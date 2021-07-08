@@ -24,6 +24,5 @@ describe('test singleton instance', () => {
 })
 
 afterAll(async () => {
-  const api = await m.getApi()
-  api.disconnect()
+  await m.disconnect()
 })

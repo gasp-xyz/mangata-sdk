@@ -14,7 +14,7 @@ type Itx = {
   ): Promise<void>
 }
 
-const signTx = async (tx: SubmittableExtrinsic<'promise'>, address: string, nonce: string) => {
+const signTx = async (tx: SubmittableExtrinsic<'promise'>, address: string, nonce?: BN) => {
   await tx.signAndSend(address, { nonce })
 }
 
@@ -29,7 +29,7 @@ const createPool = async (
   signTx(
     api.tx.xyk.createPool(firstAssetId, firstAssetAmount, secondAssetId, secondAssetAmount),
     address,
-    await Query.getCurrentNonce(api, address)
+    await Query.getNonce(api, address)
   )
 }
 

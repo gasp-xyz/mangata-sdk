@@ -1,15 +1,33 @@
 import { ApiPromise } from '@polkadot/api'
 import { AccountInfo } from '@polkadot/types/interfaces'
+import BN from 'bn.js'
+import memoryDatabase from '../utils/MemoryDatabase'
 
 type Iquery = {
-  getCurrentNonce(api: ApiPromise, address: string): Promise<string>
+  getNonce(api: ApiPromise, address: string): Promise<BN>
 }
 
-const getCurrentNonce = async (api: ApiPromise, address: string): Promise<string> => {
+const getNonce = async (api: ApiPromise, address: string): Promise<BN> => {
   const accountInfo: AccountInfo = await api.query.system.account(address)
-  return accountInfo.nonce.toString()
+  const onchainNonce: BN = accountInfo.nonce.toBn()
+
+  let nonce: BN
+
+  if (!memoryDatabase.hasAddressNonce(address)) {
+    nonce = onchainNonce
+  } else {
+    nonce = memoryDatabase.getNonce(address)
+  }
+
+  if (onchainNonce.gt(nonce)) {
+    nonce = onchainNonce
+  }
+
+  const nextNonce: BN = nonce.addn(1)
+  memoryDatabase.setNonce(address, nextNonce)
+  return nonce
 }
 
 export const Query: Iquery = {
-  getCurrentNonce,
+  getNonce,
 }

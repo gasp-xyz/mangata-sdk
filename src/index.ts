@@ -3,6 +3,7 @@ import BN from 'bn.js'
 import { options } from './utils/options'
 import { RPC } from './services/Rpc'
 import { TX } from './services/Tx'
+import { Query } from './services/Query'
 
 /**
  * The Mangata class defines the `getInstance` method that lets clients access the unique singleton instance. Design pattern Singleton Promise is used.
@@ -76,6 +77,24 @@ export class Mangata {
   public async getNodeVersion(): Promise<string> {
     const api = await this.connect()
     return RPC.getNodeVersion(api)
+  }
+
+  /**
+   * Retrieve the current nonce
+   */
+
+  public async getNonce(address: string): Promise<BN> {
+    const api = await this.connect()
+    return Query.getNonce(api, address)
+  }
+
+  /**
+   * Disconnect
+   */
+
+  public async disconnect(): Promise<void> {
+    const api = await this.connect()
+    api.disconnect()
   }
 
   /**
