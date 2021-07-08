@@ -16,7 +16,12 @@ type Itx = {
   ): Promise<void>
 }
 
-const signTx = async (tx: SubmittableExtrinsic<'promise'>, address: string, onChainNonce?: BN) => {
+const signTx = async (
+  api: ApiPromise,
+  tx: SubmittableExtrinsic<'promise'>,
+  address: string,
+  onChainNonce?: BN
+) => {
   let nonce: BN
   if (onChainNonce && !memoryDatabase.hasAddressNonce(address)) {
     nonce = onChainNonce
@@ -31,7 +36,7 @@ const signTx = async (tx: SubmittableExtrinsic<'promise'>, address: string, onCh
   const nextNonce: BN = nonce.addn(1)
   memoryDatabase.setNonce(address, nextNonce)
 
-  await tx.signAndSend(address, { nonce }, ({ status, isError }) => {
+  await tx.signAndSend(address, { nonce }, async ({ status, isError }) => {
     console.log('Transaction status:', status.type)
     if (status.isInBlock) {
       console.log('Included at block hash', status.asInBlock.toHex())
@@ -39,7 +44,8 @@ const signTx = async (tx: SubmittableExtrinsic<'promise'>, address: string, onCh
       console.log('Finalized block hash', status.asFinalized.toHex())
     } else if (isError) {
       console.log('Transaction error')
-      memoryDatabase.setNonce(address, nextNonce)
+      const currentNonce: BN = await Query.getNonce(api, address)
+      memoryDatabase.setNonce(address, currentNonce)
     }
   })
 }
@@ -53,6 +59,7 @@ const createPool = async (
   secondAssetAmount: BN
 ): Promise<void> => {
   signTx(
+    api,
     api.tx.xyk.createPool(firstAssetId, firstAssetAmount, secondAssetId, secondAssetAmount),
     address,
     await Query.getNonce(api, address)
