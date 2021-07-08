@@ -52,6 +52,42 @@ export default {
           type: 'Balance',
         },
       ],
+      type: 'RPCAmountsResult<Balance>',
+    },
+    calculate_sell_price_id: {
+      description: '',
+      params: [
+        {
+          name: 'sold_token_id',
+          type: 'TokenId',
+        },
+        {
+          name: 'bought_token_id',
+          type: 'TokenId',
+        },
+        {
+          name: 'sell_amount',
+          type: 'Balance',
+        },
+      ],
+      type: 'RpcResult<Balance>',
+    },
+    calculate_buy_price_id: {
+      description: '',
+      params: [
+        {
+          name: 'sold_token_id',
+          type: 'TokenId',
+        },
+        {
+          name: 'bought_token_id',
+          type: 'TokenId',
+        },
+        {
+          name: 'buy_amount',
+          type: 'Balance',
+        },
+      ],
       type: 'RpcResult<Balance>',
     },
   },
