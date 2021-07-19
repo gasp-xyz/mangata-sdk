@@ -14,6 +14,22 @@ type Itx = {
     secondAssetId: string,
     secondAssetAmount: BN
   ): Promise<void>
+  sellAsset(
+    api: ApiPromise,
+    address: string,
+    soldAssetId: string,
+    boughtAssetId: string,
+    amount: BN,
+    minAmountOut: BN
+  ): Promise<void>
+  buyAsset(
+    api: ApiPromise,
+    address: string,
+    soldAssetId: string,
+    boughtAssetId: string,
+    amount: BN,
+    maxAmountIn: BN
+  ): Promise<void>
 }
 
 const signTx = async (
@@ -66,6 +82,40 @@ const createPool = async (
   )
 }
 
+const sellAsset = async (
+  api: ApiPromise,
+  address: string,
+  soldAssetId: string,
+  boughtAssetId: string,
+  amount: BN,
+  minAmountOut: BN
+): Promise<void> => {
+  signTx(
+    api,
+    api.tx.xyk.sellAsset(soldAssetId, boughtAssetId, amount, minAmountOut),
+    address,
+    await Query.getNonce(api, address)
+  )
+}
+
+const buyAsset = async (
+  api: ApiPromise,
+  address: string,
+  soldAssetId: string,
+  boughtAssetId: string,
+  amount: BN,
+  maxAmountIn: BN
+): Promise<void> => {
+  signTx(
+    api,
+    api.tx.xyk.buyAsset(soldAssetId, boughtAssetId, amount, maxAmountIn),
+    address,
+    await Query.getNonce(api, address)
+  )
+}
+
 export const TX: Itx = {
   createPool,
+  sellAsset,
+  buyAsset,
 }

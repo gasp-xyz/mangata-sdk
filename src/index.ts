@@ -118,4 +118,32 @@ export class Mangata {
       secondAssetAmount
     )
   }
+
+  /**
+   * Sell asset
+   */
+  public async sellAsset(
+    address: string,
+    soldAssetId: string,
+    boughtAssetId: string,
+    amount: BN,
+    minAmountOut: BN
+  ) {
+    const api = await this.connect()
+    await TX.sellAsset(api, address, soldAssetId, boughtAssetId, amount, minAmountOut)
+  }
+
+  /**
+   * Buy asset
+   */
+  public async buyAsset(
+    address: string,
+    soldAssetId: string,
+    boughtAssetId: string,
+    amount: BN,
+    maxAmountIn: BN
+  ) {
+    const api = await this.connect()
+    await TX.sellAsset(api, address, soldAssetId, boughtAssetId, amount, maxAmountIn)
+  }
 }
