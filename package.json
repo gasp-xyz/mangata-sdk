@@ -29,7 +29,7 @@
     "sdk"
   ],
   "author": "Mangata Finance",
-  "license": "ISC",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/mangata-finance/mangata-SDK/issues"
   },
