@@ -30,6 +30,21 @@ type Itx = {
     amount: BN,
     maxAmountIn: BN
   ): Promise<void>
+  mintLiquidity(
+    api: ApiPromise,
+    address: string,
+    firstAssetId: string,
+    secondAssetId: string,
+    firstAssetAmount: BN,
+    expectedSecondAssetAmount: BN
+  ): Promise<void>
+  burnLiquidity(
+    api: ApiPromise,
+    address: string,
+    firstAssetId: string,
+    secondAssetId: string,
+    liquidityAssetAmount: BN
+  ): Promise<void>
 }
 
 const signTx = async (
@@ -114,8 +129,46 @@ const buyAsset = async (
   )
 }
 
+const mintLiquidity = async (
+  api: ApiPromise,
+  address: string,
+  firstAssetId: string,
+  secondAssetId: string,
+  firstAssetAmount: BN,
+  expectedSecondAssetAmount: BN = new BN(Number.MAX_SAFE_INTEGER)
+) => {
+  signTx(
+    api,
+    api.tx.xyk.mintLiquidity(
+      firstAssetId,
+      secondAssetId,
+      firstAssetAmount,
+      expectedSecondAssetAmount
+    ),
+    address,
+    await Query.getNonce(api, address)
+  )
+}
+
+const burnLiquidity = async (
+  api: ApiPromise,
+  address: string,
+  firstAssetId: string,
+  secondAssetId: string,
+  liquidityAssetAmount: BN
+) => {
+  signTx(
+    api,
+    api.tx.xyk.burnLiquidity(firstAssetId, secondAssetId, liquidityAssetAmount),
+    address,
+    await Query.getNonce(api, address)
+  )
+}
+
 export const TX: Itx = {
   createPool,
   sellAsset,
   buyAsset,
+  mintLiquidity,
+  burnLiquidity,
 }

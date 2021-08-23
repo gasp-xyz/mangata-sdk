@@ -134,6 +134,40 @@ export class Mangata {
   }
 
   /**
+   * Mint liquidity
+   */
+  public async mintLiquidity(
+    address: string,
+    firstAssetId: string,
+    secondAssetId: string,
+    firstAssetAmount: BN,
+    expectedSecondAssetAmount: BN
+  ) {
+    const api = await this.connect()
+    await TX.mintLiquidity(
+      api,
+      address,
+      firstAssetId,
+      secondAssetId,
+      firstAssetAmount,
+      expectedSecondAssetAmount
+    )
+  }
+
+  /**
+   * Burn liquidity
+   */
+  public async burnLiquidity(
+    address: string,
+    firstAssetId: string,
+    secondAssetId: string,
+    liquidityAssetAmount: BN
+  ) {
+    const api = await this.connect()
+    await TX.burnLiquidity(api, address, firstAssetId, secondAssetId, liquidityAssetAmount)
+  }
+
+  /**
    * Buy asset
    */
   public async buyAsset(
