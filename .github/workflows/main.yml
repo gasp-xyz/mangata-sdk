@@ -11,7 +11,7 @@ jobs:
       TEST_SUDO_NAME: ${{ secrets.TEST_SUDO_NAME }}
 
     steps:
-        name: set registry
+      - name: set registry
         run: yarn config set registry https://registry.npmjs.org  
 
       - uses: actions/checkout@v2
