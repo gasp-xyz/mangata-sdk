@@ -1,9 +1,13 @@
 import { ApiPromise, WsProvider } from '@polkadot/api'
+import type { DefinitionRpc, DefinitionRpcSub, RegistryTypes } from '@polkadot/types/types'
 import BN from 'bn.js'
 import { options } from './utils/options'
+import rpcOptions from './utils/mangata-rpc'
+import typesOptions from './utils/mangata-types'
 import { RPC } from './services/Rpc'
 import { TX } from './services/Tx'
 import { Query } from './services/Query'
+import { ApiOptions } from '@polkadot/api/types'
 
 /**
  * The Mangata class defines the `getInstance` method that lets clients access the unique singleton instance. Design pattern Singleton Promise is used.
@@ -117,5 +121,28 @@ export class Mangata {
       secondAssetId,
       secondAssetAmount
     )
+  }
+}
+
+export class MangataApi {
+  /**
+   * Get api Options
+   */
+  public getApiOptions(provider: WsProvider): ApiOptions {
+    return options({ provider })
+  }
+
+  /**
+   * Get api rpc Options
+   */
+  public getMangataRpc(): Record<string, Record<string, DefinitionRpc | DefinitionRpcSub>> {
+    return rpcOptions
+  }
+
+  /**
+   * Get api types Options
+   */
+  public getMangataTypes(): RegistryTypes {
+    return typesOptions
   }
 }

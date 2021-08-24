@@ -1,4 +1,6 @@
-export default {
+import type { DefinitionRpc, DefinitionRpcSub } from '@polkadot/types/types'
+
+const rpcOptions: Record<string, Record<string, DefinitionRpc | DefinitionRpcSub>> = {
   xyk: {
     calculate_buy_price: {
       description: '',
@@ -92,3 +94,5 @@ export default {
     },
   },
 }
+
+export default rpcOptions

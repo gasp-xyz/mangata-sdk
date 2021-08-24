@@ -1,4 +1,6 @@
-export default {
+import type { RegistryTypes } from '@polkadot/types/types'
+
+const typesOptions: RegistryTypes = {
   CurrencyIdOf: 'u32',
   CurrencyId: 'u32',
   Balance: 'u128',
@@ -61,4 +63,14 @@ export default {
   Bloom: {
     _: '[u8; 256]',
   },
+  BalanceLock: {
+    id: '[u8; 8]',
+    amount: 'Balance',
+  },
+  Valuation: {
+    liquidity_token_amount: 'Balance',
+    mng_valuation: 'Balance',
+  },
 }
+
+export default typesOptions
