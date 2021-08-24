@@ -11,7 +11,8 @@ jobs:
         with:
           node-version: 14
           registry-url: https://registry.npmjs.org/
-      - run: yarn
+      - run: yarn config set registry https://registry.npmjs.org
+      - run: yarn --network-timeout 100000
       - run: yarn build
       - run: yarn test
       - run: yarn publish --access public
