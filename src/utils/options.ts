@@ -1,10 +1,10 @@
 import { ApiOptions } from '@polkadot/api/types'
-import mangataRpc from './mangata-rpc'
-import mangataTypes from './mangata-types'
+import rpcOptions from './mangata-rpc'
+import typesOptions from './mangata-types'
 
 export const defaultOptions: ApiOptions = {
-  types: mangataTypes,
-  rpc: mangataRpc,
+  types: typesOptions,
+  rpc: rpcOptions,
 }
 
 export const options = ({
@@ -13,11 +13,11 @@ export const options = ({
   ...otherOptions
 }: ApiOptions = {}): ApiOptions => ({
   types: {
-    ...mangataTypes,
+    ...typesOptions,
     ...types,
   },
   rpc: {
-    ...mangataRpc,
+    ...rpcOptions,
     ...rpc,
   },
   ...otherOptions,
