@@ -1,6 +1,10 @@
 import type { RegistryTypes } from '@polkadot/types/types'
 
 const typesOptions: RegistryTypes = {
+  SeedType: {
+    seed: '[u8;32]',
+    proof: '[u8;64]',
+  },
   CurrencyIdOf: 'u32',
   CurrencyId: 'u32',
   Balance: 'u128',
@@ -10,6 +14,10 @@ const typesOptions: RegistryTypes = {
 
   RpcResult: {
     price: 'Balance',
+  },
+  RPCAmountsResult: {
+    firstAssetAmount: 'Balance',
+    secondAssetAmount: 'Balance',
   },
 
   // mapping the actual specified address format
