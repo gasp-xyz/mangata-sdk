@@ -10,13 +10,13 @@ describe('test singleton instance', () => {
     expect(chain).toEqual('Development')
   })
 
-  it('should match version 2.0.0 node version when calling getNodeVersion method', async () => {
-    const version = '2.0.0'
+  it('should match version 0.1.0 node version when calling getNodeVersion method', async () => {
+    const version = '0.1.0'
     const nodeVersion = await m.getNodeVersion()
     expect(nodeVersion).toMatch(new RegExp(`^${version}?`))
   })
 
-  it('should match version 2.0.0 node version when calling getNodeVersion method', async () => {
+  it('should match name when calling getNodeName method', async () => {
     const name = 'Substrate'
     const nodeName = await m.getNodeName()
     expect(nodeName).toMatch(new RegExp(`^${name}?`))

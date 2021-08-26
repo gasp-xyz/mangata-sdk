@@ -1,4 +1,10 @@
-export default {
+import type { RegistryTypes } from '@polkadot/types/types'
+
+const typesOptions: RegistryTypes = {
+  SeedType: {
+    seed: '[u8;32]',
+    proof: '[u8;64]',
+  },
   CurrencyIdOf: 'u32',
   CurrencyId: 'u32',
   Balance: 'u128',
@@ -8,6 +14,10 @@ export default {
 
   RpcResult: {
     price: 'Balance',
+  },
+  RPCAmountsResult: {
+    firstAssetAmount: 'Balance',
+    secondAssetAmount: 'Balance',
   },
 
   // mapping the actual specified address format
@@ -61,4 +71,14 @@ export default {
   Bloom: {
     _: '[u8; 256]',
   },
+  BalanceLock: {
+    id: '[u8; 8]',
+    amount: 'Balance',
+  },
+  Valuation: {
+    liquidity_token_amount: 'Balance',
+    mng_valuation: 'Balance',
+  },
 }
+
+export default typesOptions
