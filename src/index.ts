@@ -1,4 +1,6 @@
 import { ApiPromise, WsProvider } from '@polkadot/api'
+import { GenericEvent } from '@polkadot/types'
+import { KeyringPair } from '@polkadot/keyring/types'
 import type { DefinitionRpc, DefinitionRpcSub, RegistryTypes } from '@polkadot/types/types'
 import { ApiOptions } from '@polkadot/api/types'
 import BN from 'bn.js'
@@ -108,17 +110,17 @@ export class Mangata {
    */
 
   public async createPool(
-    address: string,
+    keyRingPair: KeyringPair,
     firstAssetId: string,
     firstAssetAmount: BN,
     secondAssetId: string,
     secondAssetAmount: BN,
     txOptions?: txOptions
-  ) {
+  ): Promise<GenericEvent[]> {
     const api = await this.connect()
-    await TX.createPool(
+    return await TX.createPool(
       api,
-      address,
+      keyRingPair,
       firstAssetId,
       firstAssetAmount,
       secondAssetId,
@@ -131,32 +133,40 @@ export class Mangata {
    * Sell asset
    */
   public async sellAsset(
-    address: string,
+    keyRingPair: KeyringPair,
     soldAssetId: string,
     boughtAssetId: string,
     amount: BN,
     minAmountOut: BN,
     txOptions?: txOptions
-  ) {
+  ): Promise<GenericEvent[]> {
     const api = await this.connect()
-    await TX.sellAsset(api, address, soldAssetId, boughtAssetId, amount, minAmountOut, txOptions)
+    return await TX.sellAsset(
+      api,
+      keyRingPair,
+      soldAssetId,
+      boughtAssetId,
+      amount,
+      minAmountOut,
+      txOptions
+    )
   }
 
   /**
    * Mint liquidity
    */
   public async mintLiquidity(
-    address: string,
+    keyRingPair: KeyringPair,
     firstAssetId: string,
     secondAssetId: string,
     firstAssetAmount: BN,
     expectedSecondAssetAmount: BN,
     txOptions?: txOptions
-  ) {
+  ): Promise<GenericEvent[]> {
     const api = await this.connect()
-    await TX.mintLiquidity(
+    return await TX.mintLiquidity(
       api,
-      address,
+      keyRingPair,
       firstAssetId,
       secondAssetId,
       firstAssetAmount,
@@ -169,16 +179,16 @@ export class Mangata {
    * Burn liquidity
    */
   public async burnLiquidity(
-    address: string,
+    keyRingPair: KeyringPair,
     firstAssetId: string,
     secondAssetId: string,
     liquidityAssetAmount: BN,
     txOptions?: txOptions
-  ) {
+  ): Promise<GenericEvent[]> {
     const api = await this.connect()
-    await TX.burnLiquidity(
+    return await TX.burnLiquidity(
       api,
-      address,
+      keyRingPair,
       firstAssetId,
       secondAssetId,
       liquidityAssetAmount,
@@ -190,15 +200,33 @@ export class Mangata {
    * Buy asset
    */
   public async buyAsset(
-    address: string,
+    keyRingPair: KeyringPair,
     soldAssetId: string,
     boughtAssetId: string,
     amount: BN,
     maxAmountIn: BN,
     txOptions?: txOptions
-  ) {
+  ): Promise<GenericEvent[]> {
     const api = await this.connect()
-    await TX.sellAsset(api, address, soldAssetId, boughtAssetId, amount, maxAmountIn, txOptions)
+    return await TX.sellAsset(
+      api,
+      keyRingPair,
+      soldAssetId,
+      boughtAssetId,
+      amount,
+      maxAmountIn,
+      txOptions
+    )
+  }
+
+  public async createToken(
+    targetAddress: string,
+    sudoKeyringPair: KeyringPair,
+    currencyValue: BN,
+    txOptions?: txOptions
+  ): Promise<GenericEvent[]> {
+    const api = await this.connect()
+    return await TX.createToken(api, targetAddress, sudoKeyringPair, currencyValue, txOptions)
   }
 
   public async waitNewBlock(forceWait = false) {
