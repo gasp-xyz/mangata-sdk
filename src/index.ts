@@ -200,6 +200,19 @@ export class Mangata {
     const api = await this.connect()
     await TX.sellAsset(api, address, soldAssetId, boughtAssetId, amount, maxAmountIn, txOptions)
   }
+
+  public async waitNewBlock(forceWait = false) {
+    const api = await this.connect()
+    let count = 0
+    return new Promise(async (resolve) => {
+      const unsubscribe = await api.rpc.chain.subscribeNewHeads(() => {
+        if (!forceWait || ++count === 2) {
+          unsubscribe()
+          resolve(true)
+        }
+      })
+    })
+  }
 }
 
 export const getApiOptions = (provider: WsProvider): ApiOptions => {

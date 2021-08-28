@@ -6,7 +6,7 @@ import memoryDatabase from '../utils/MemoryDatabase'
 import { Query } from './Query'
 import { Itx, txOptions } from './types'
 
-const signTx = async (
+export const signTx = async (
   api: ApiPromise,
   tx: SubmittableExtrinsic<'promise'>,
   address: string,

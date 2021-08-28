@@ -38,6 +38,7 @@
     "@babel/preset-env": "^7.14.7",
     "@types/jest": "^26.0.23",
     "@types/jest-when": "^2.7.3",
+    "@types/uuid": "^8.3.1",
     "@typescript-eslint/eslint-plugin": "^4.28.0",
     "@typescript-eslint/parser": "^4.28.0",
     "babel-eslint": "^10.1.0",
@@ -51,7 +52,9 @@
     "prettier": "^2.3.2",
     "standard-version": "^9.3.1",
     "ts-jest": "^27.0.3",
-    "typescript": "^4.3.4"
+    "typescript": "^4.3.4",
+    "uuid": "^8.3.2",
+    "xoshiro": "^2.0.3"
   },
   "dependencies": {
     "@polkadot/api": "^2.1.1",
