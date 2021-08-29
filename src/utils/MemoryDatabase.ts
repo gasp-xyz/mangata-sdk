@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import BN from 'bn.js'
 
 interface Database {
@@ -21,7 +22,7 @@ class InMemoryDatabase implements Database {
   }
 
   public hasAddressNonce = (address: string): boolean => {
-    return this.db[address] ? false : true
+    return this.db[address] ? true : false
   }
 
   public setNonce = (address: string, nonce: BN): void => {
@@ -31,6 +32,10 @@ class InMemoryDatabase implements Database {
   public getNonce = (address: string): BN => {
     return this.db[address]
   }
+}
+
+export const sleep = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 export default InMemoryDatabase.getInstance()

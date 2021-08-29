@@ -57,17 +57,17 @@ export const signTx = async (
   keyringPair: KeyringPair,
   txOptions?: txOptions
 ): Promise<GenericEvent[]> => {
-  return new Promise<GenericEvent[]>(async (resolve, reject) => {
+  return new Promise<GenericEvent[]>(async (resolve) => {
     let result: GenericEvent[] = []
     let nonce: BN
     if (txOptions && txOptions.nonce) {
       nonce = txOptions.nonce
     } else {
       const onChainNonce = await Query.getNonce(api, keyringPair.address)
-      if (!memoryDatabase.hasAddressNonce(keyringPair.address)) {
-        nonce = onChainNonce
-      } else {
+      if (memoryDatabase.hasAddressNonce(keyringPair.address)) {
         nonce = memoryDatabase.getNonce(keyringPair.address)
+      } else {
+        nonce = onChainNonce
       }
 
       if (onChainNonce && onChainNonce.gt(nonce)) {
@@ -77,7 +77,6 @@ export const signTx = async (
 
     const nextNonce: BN = nonce.addn(1)
     memoryDatabase.setNonce(keyringPair.address, nextNonce)
-
     const unsub = await tx.signAndSend(keyringPair, { nonce }, async ({ status, isError }) => {
       console.log('Transaction status:', status.type)
       if (status.isInBlock) {
@@ -245,6 +244,22 @@ const burnLiquidity = async (
   )
 }
 
+const mintAsset = async (
+  api: ApiPromise,
+  sudo: KeyringPair,
+  assetId: BN,
+  targetAddress: string,
+  amount: BN,
+  txOptions?: txOptions
+): Promise<GenericEvent[]> => {
+  return await signTx(
+    api,
+    api.tx.sudo.sudo(api.tx.tokens.mint(assetId, targetAddress, amount)),
+    sudo,
+    txOptions
+  )
+}
+
 export const TX: Itx = {
   createPool,
   sellAsset,
@@ -252,4 +267,5 @@ export const TX: Itx = {
   mintLiquidity,
   burnLiquidity,
   createToken,
+  mintAsset,
 }

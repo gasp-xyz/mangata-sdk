@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
-import xoshiro from 'xoshiro'
-import { GenericExtrinsic, GenericEvent } from '@polkadot/types'
+import { GenericEvent } from '@polkadot/types'
 import { AnyJson } from '@polkadot/types/types'
 import BN from 'bn.js'
 
@@ -78,7 +77,7 @@ export const getEventResultFromTxWait = (
   return new EventResult(-1, 'ERROR: NO TX FOUND')
 }
 
-enum ExtrinsicResult {
+export enum ExtrinsicResult {
   ExtrinsicSuccess,
   ExtrinsicFailed,
   ExtrinsicUndefined,

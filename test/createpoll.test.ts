@@ -3,11 +3,15 @@ import { Keyring } from '@polkadot/api'
 import { Mangata } from '../src'
 import { User } from './User'
 import BN from 'bn.js'
-import { addUserCurrencies } from './Assets'
+import { addUserCurrencies, ExtrinsicResult, getEventResultFromTxWait } from './Assets'
+import { sleep } from '../src/utils/MemoryDatabase'
 require('dotenv').config()
 
 const uri = process.env.API_URL ? process.env.API_URL : 'ws://127.0.0.1:9944'
-const m = Mangata.getInstance(uri)
+let m: Mangata
+beforeAll(() => {
+  m = Mangata.getInstance(uri)
+})
 
 describe('test create pool', () => {
   const first_asset_amount = new BN(50000)
@@ -29,12 +33,25 @@ describe('test create pool', () => {
       [defaultCurrecyValue, defaultCurrecyValue.add(new BN(1))],
       sudoUser
     )
-    console.log(currencies)
-    console.log(testUser)
-    console.log(sudoUser)
+    await testUser.addMGAToken(sudoUser, testUser)
+    await m.waitNewBlock()
+    const result = await m.createPool(
+      testUser.keyRingPair,
+      currencies[0].toString(),
+      first_asset_amount,
+      currencies[1].toString(),
+      second_asset_amount
+    )
+    const eventResult = getEventResultFromTxWait(result, [
+      'xyk',
+      'PoolCreated',
+      testUser.keyRingPair.address,
+    ])
+    expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
   })
 })
 
 afterAll(async () => {
   await m.disconnect()
+  sleep(10000)
 })

@@ -59,4 +59,12 @@ export type Itx = {
     currencyValue: BN,
     txOptions?: txOptions
   ): Promise<GenericEvent[]>
+  mintAsset(
+    api: ApiPromise,
+    sudo: KeyringPair,
+    assetId: BN,
+    targetAddress: string,
+    amount: BN,
+    txOptions?: txOptions
+  ): Promise<GenericEvent[]>
 }

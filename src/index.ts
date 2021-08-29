@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ApiPromise, WsProvider } from '@polkadot/api'
 import { GenericEvent } from '@polkadot/types'
 import { KeyringPair } from '@polkadot/keyring/types'
@@ -18,7 +19,7 @@ import { txOptions } from './services/types'
  */
 export class Mangata {
   private static instance: Mangata
-  private apiPromise: Promise<ApiPromise> | null
+  private api: ApiPromise | null
   private uri: string
 
   /**
@@ -26,7 +27,7 @@ export class Mangata {
    * construction calls with the `new` operator.
    */
   private constructor(uri: string) {
-    this.apiPromise = null
+    this.api = null
     this.uri = uri
   }
 
@@ -34,12 +35,12 @@ export class Mangata {
    * Initialised via isReady & new with specific provider
    */
   private async connect() {
-    if (!this.apiPromise) {
+    if (!this.api) {
       const provider = new WsProvider(this.uri)
-      this.apiPromise = new ApiPromise(options({ provider })).isReady
+      this.api = await ApiPromise.create(options({ provider }))
     }
 
-    return this.apiPromise
+    return this.api
   }
 
   /**
@@ -117,6 +118,7 @@ export class Mangata {
     secondAssetAmount: BN,
     txOptions?: txOptions
   ): Promise<GenericEvent[]> {
+    console.log('I AM HERE')
     const api = await this.connect()
     return await TX.createPool(
       api,
@@ -227,6 +229,17 @@ export class Mangata {
   ): Promise<GenericEvent[]> {
     const api = await this.connect()
     return await TX.createToken(api, targetAddress, sudoKeyringPair, currencyValue, txOptions)
+  }
+
+  public async mintAsset(
+    sudo: KeyringPair,
+    assetId: BN,
+    targetAddress: string,
+    amount: BN,
+    txOptions?: txOptions
+  ): Promise<GenericEvent[]> {
+    const api = await this.connect()
+    return await TX.mintAsset(api, sudo, assetId, targetAddress, amount, txOptions)
   }
 
   public async waitNewBlock(forceWait = false) {
