@@ -7,6 +7,12 @@ export type txOptions = Partial<{
   nonce: BN
 }>
 
+export enum ExtrinsicResult {
+  ExtrinsicSuccess,
+  ExtrinsicFailed,
+  ExtrinsicUndefined,
+}
+
 export type Itx = {
   createPool(
     api: ApiPromise,

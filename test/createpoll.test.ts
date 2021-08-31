@@ -1,57 +1,48 @@
 /* eslint-disable no-console */
-import { Keyring } from '@polkadot/api'
-import { Mangata } from '../src'
-import { User } from './User'
 import BN from 'bn.js'
-import { addUserCurrencies, ExtrinsicResult, getEventResultFromTxWait } from './Assets'
-import { sleep } from '../src/utils/MemoryDatabase'
-require('dotenv').config()
 
-const uri = process.env.API_URL ? process.env.API_URL : 'ws://127.0.0.1:9944'
-let m: Mangata
-beforeAll(() => {
-  m = Mangata.getInstance(uri)
-})
+import { mangataInstance } from './mangataInstanceCreation'
+import { MangataHelpers } from '../src'
+import { ExtrinsicResult } from '../src/services/types'
+require('dotenv').config()
 
 describe('test create pool', () => {
   const first_asset_amount = new BN(50000)
   const second_asset_amount = new BN(50000)
-  const defaultCurrecyValue = new BN(250000)
+  const defaultCurrecyValue = new BN(500000)
   const sudoUserName = process.env.TEST_SUDO_NAME
-
-  it('should retrive chain name when calling getChain method', async () => {
-    await m.waitNewBlock()
-    const keyring = new Keyring({ type: 'sr25519' })
-    const testUser = new User(m, keyring)
-    const sudoUser = new User(m, keyring, sudoUserName)
-    keyring.addPair(testUser.keyRingPair)
-    keyring.addPair(sudoUser.keyRingPair)
-
-    const currencies = await addUserCurrencies(
-      m,
-      testUser,
-      [defaultCurrecyValue, defaultCurrecyValue.add(new BN(1))],
-      sudoUser
+  it('should create pool', async () => {
+    await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
+    const keyring = MangataHelpers.createKeyring('sr25519')
+    const testUser = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring)
+    const sudoUser = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(
+      keyring,
+      sudoUserName
     )
-    await testUser.addMGAToken(sudoUser, testUser)
-    await m.waitNewBlock()
-    const result = await m.createPool(
-      testUser.keyRingPair,
+    const currencies = await MangataHelpers.addAccountCurrencies(
+      mangataInstance,
+      testUser,
+      sudoUser,
+      [defaultCurrecyValue, defaultCurrecyValue.add(new BN(1))]
+    )
+    await MangataHelpers.addMGAToken(mangataInstance, sudoUser, testUser)
+    await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
+    const result = await mangataInstance.createPool(
+      testUser,
       currencies[0].toString(),
       first_asset_amount,
       currencies[1].toString(),
       second_asset_amount
     )
-    const eventResult = getEventResultFromTxWait(result, [
+    const eventResult = MangataHelpers.getEventResultFromTxWait(result, [
       'xyk',
       'PoolCreated',
-      testUser.keyRingPair.address,
+      testUser.address,
     ])
     expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
   })
 })
 
 afterAll(async () => {
-  await m.disconnect()
-  sleep(10000)
+  await mangataInstance.disconnect()
 })

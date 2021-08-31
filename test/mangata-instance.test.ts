@@ -1,35 +1,26 @@
 /* eslint-disable no-console */
-import { Mangata } from '../src'
-import { sleep } from '../src/utils/MemoryDatabase'
 require('dotenv').config()
-
-const uri = process.env.API_URL ? process.env.API_URL : 'ws://127.0.0.1:9944'
-let m: Mangata
-
-beforeAll(() => {
-  m = Mangata.getInstance(uri)
-})
+import { mangataInstance } from './mangataInstanceCreation'
 
 describe('test singleton instance', () => {
   it('should retrive chain name when calling getChain method', async () => {
-    const chain = await m.getChain()
+    const chain = await mangataInstance.getChain()
     expect(chain).toEqual('Development')
   })
 
   it('should match version 0.1.0 node version when calling getNodeVersion method', async () => {
     const version = '0.1.0'
-    const nodeVersion = await m.getNodeVersion()
+    const nodeVersion = await mangataInstance.getNodeVersion()
     expect(nodeVersion).toMatch(new RegExp(`^${version}?`))
   })
 
   it('should match name when calling getNodeName method', async () => {
     const name = 'Substrate'
-    const nodeName = await m.getNodeName()
+    const nodeName = await mangataInstance.getNodeName()
     expect(nodeName).toMatch(new RegExp(`^${name}?`))
   })
 })
 
 afterAll(async () => {
-  await m.disconnect()
-  sleep(10000)
+  await mangataInstance.disconnect()
 })
