@@ -120,7 +120,6 @@ export class Mangata {
     secondAssetAmount: BN,
     txOptions?: txOptions
   ): Promise<GenericEvent[]> {
-    console.log('I AM HERE')
     const api = await this.connect()
     return await TX.createPool(
       api,
@@ -223,6 +222,17 @@ export class Mangata {
     )
   }
 
+  /**
+   * Calculate buy price
+   */
+  public async calculateBuyPrice(soldTokenId: BN, boughtTokenId: BN, buyAmount: BN) {
+    const api = await this.connect()
+    return await RPC.calculateBuyPrice(api, soldTokenId, boughtTokenId, buyAmount)
+  }
+
+  /**
+   * Create Token
+   */
   public async createToken(
     targetAddress: string,
     sudoKeyringPair: KeyringPair,
@@ -233,6 +243,9 @@ export class Mangata {
     return await TX.createToken(api, targetAddress, sudoKeyringPair, currencyValue, txOptions)
   }
 
+  /**
+   * Mint Asset
+   */
   public async mintAsset(
     sudo: KeyringPair,
     assetId: BN,
