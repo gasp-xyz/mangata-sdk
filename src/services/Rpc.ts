@@ -11,6 +11,12 @@ type Irpc = {
     outputReserve: BN,
     buyAmount: BN
   ): Promise<BN>
+  calculateSellPrice(
+    api: ApiPromise,
+    inputReserve: BN,
+    outputReserve: BN,
+    sellAmount: BN
+  ): Promise<BN>
 }
 
 const getChain = async (api: ApiPromise): Promise<string> => {
@@ -39,7 +45,21 @@ const calculateBuyPrice = async (
     outputReserve,
     buyAmount
   )
-  return new BN(result.price.toString())
+  return new BN(result.price)
+}
+
+const calculateSellPrice = async (
+  api: ApiPromise,
+  inputReserve: BN,
+  outputReserve: BN,
+  sellAmount: BN
+): Promise<BN> => {
+  const result = await (api.rpc as any).xyk.calculate_sell_price(
+    inputReserve,
+    outputReserve,
+    sellAmount
+  )
+  return new BN(result.price)
 }
 
 export const RPC: Irpc = {
@@ -47,4 +67,5 @@ export const RPC: Irpc = {
   getNodeName,
   getNodeVersion,
   calculateBuyPrice,
+  calculateSellPrice,
 }

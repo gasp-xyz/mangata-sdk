@@ -219,9 +219,21 @@ export class Mangata {
   /**
    * Calculate buy price
    */
-  public async calculateBuyPrice(inputReserve: BN, outputReserve: BN, buyAmount: BN) {
+  public async calculateBuyPrice(inputReserve: BN, outputReserve: BN, buyAmount: BN): Promise<BN> {
     const api = await this.connect()
     return await RPC.calculateBuyPrice(api, inputReserve, outputReserve, buyAmount)
+  }
+
+  /**
+   * Calculate sell price
+   */
+  public async calculateSellPrice(
+    inputReserve: BN,
+    outputReserve: BN,
+    sellAmount: BN
+  ): Promise<BN> {
+    const api = await this.connect()
+    return await RPC.calculateSellPrice(api, inputReserve, outputReserve, sellAmount)
   }
 
   /**

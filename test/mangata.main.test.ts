@@ -140,10 +140,24 @@ describe('test burn liquidity', () => {
       new BN(10000)
     )
 
-    console.log('BURNLIQUIDITY: ' + result)
-
     const eventResult = MangataHelpers.getEventResultFromTxWait(result)
     expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
+  })
+})
+
+describe('test create token', () => {
+  it('should create token', async () => {
+    const result = await mangataInstance.createToken(
+      testUser.address,
+      sudoUser,
+      new BN(firstCurrency)
+    )
+    const eventResult = MangataHelpers.getEventResultFromTxWait(result, [
+      'tokens',
+      'Issued',
+      testUser.address,
+    ])
+    expect(eventResult.data).not.toBeNull()
   })
 })
 
