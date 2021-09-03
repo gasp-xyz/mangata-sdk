@@ -211,7 +211,7 @@ export class Mangata {
     txOptions?: txOptions
   ): Promise<GenericEvent[]> {
     const api = await this.connect()
-    return await TX.sellAsset(
+    return await TX.buyAsset(
       api,
       keyRingPair,
       soldAssetId,

@@ -29,24 +29,23 @@ beforeEach(async () => {
   await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
 })
 
-// describe('Test Mangata Instace methods', () => {
-//   describe('test create pool', () => {
-//     it('should create pool', async () => {
-//       const result = await mangataInstance.createPool(
-//         testUser,
-//         firstCurrency,
-//         new BN(50000),
-//         secondCurrency,
-//         new BN(50000)
-//       )
-//       const eventResult = MangataHelpers.getEventResultFromTxWait(result, [
-//         'xyk',
-//         'PoolCreated',
-//         testUser.address,
-//       ])
-//       expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
-//     })
-//   })
+describe('test create pool', () => {
+  it('should create pool', async () => {
+    const result = await mangataInstance.createPool(
+      testUser,
+      firstCurrency,
+      new BN(50000),
+      secondCurrency,
+      new BN(50000)
+    )
+    const eventResult = MangataHelpers.getEventResultFromTxWait(result, [
+      'xyk',
+      'PoolCreated',
+      testUser.address,
+    ])
+    expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
+  })
+})
 
 describe('test buy asset', () => {
   it('should buy asset', async () => {
@@ -76,59 +75,59 @@ describe('test buy asset', () => {
     ])
     expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
   })
+})
 
-  // describe('test sell asset', () => {
-  //   it('should sell asset', async () => {
-  //     console.log(secondCurrency)
-  //     await mangataInstance.createPool(
-  //       testUser,
-  //       firstCurrency,
-  //       new BN(50000),
-  //       secondCurrency,
-  //       new BN(25000)
-  //     )
-  //     await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
-  //     const result = await mangataInstance.sellAsset(
-  //       testUser,
-  //       firstCurrency,
-  //       secondCurrency,
-  //       new BN(10000),
-  //       new BN(100)
-  //     )
-  //     console.log('SELLASSET: ' + result)
-  //     const eventResult = MangataHelpers.getEventResultFromTxWait(result, [
-  //       'xyk',
-  //       'AssetsSwapped',
-  //       testUser.address,
-  //     ])
-  //     expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
-  //   })
-  // })
+describe('test sell asset', () => {
+  it('should sell asset', async () => {
+    console.log(secondCurrency)
+    await mangataInstance.createPool(
+      testUser,
+      firstCurrency,
+      new BN(50000),
+      secondCurrency,
+      new BN(25000)
+    )
+    await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
+    const result = await mangataInstance.sellAsset(
+      testUser,
+      firstCurrency,
+      secondCurrency,
+      new BN(10000),
+      new BN(100)
+    )
+    console.log('SELLASSET: ' + result)
+    const eventResult = MangataHelpers.getEventResultFromTxWait(result, [
+      'xyk',
+      'AssetsSwapped',
+      testUser.address,
+    ])
+    expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
+  })
+})
 
-  // describe('test mint liquidity', () => {
-  //   it('should mint liquidity', async () => {
-  //     await mangataInstance.createPool(
-  //       testUser,
-  //       firstCurrency,
-  //       new BN(50000),
-  //       secondCurrency,
-  //       new BN(25000)
-  //     )
-  //     await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
-  //     const result = await mangataInstance.mintLiquidity(
-  //       testUser,
-  //       firstCurrency,
-  //       secondCurrency,
-  //       new BN(10000),
-  //       new BN(5001)
-  //     )
+describe('test mint liquidity', () => {
+  it('should mint liquidity', async () => {
+    await mangataInstance.createPool(
+      testUser,
+      firstCurrency,
+      new BN(50000),
+      secondCurrency,
+      new BN(25000)
+    )
+    await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
+    const result = await mangataInstance.mintLiquidity(
+      testUser,
+      firstCurrency,
+      secondCurrency,
+      new BN(10000),
+      new BN(5001)
+    )
 
-  //     console.log('MINTLIQUIDITY: ' + result)
+    console.log('MINTLIQUIDITY: ' + result)
 
-  //     const eventResult = MangataHelpers.getEventResultFromTxWait(result)
-  //     expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
-  //   })
-  // })
+    const eventResult = MangataHelpers.getEventResultFromTxWait(result)
+    expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
+  })
 })
 
 afterAll(async () => {
