@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 import BN from 'bn.js'
+import { KeyringPair } from '@polkadot/keyring/types'
 
 import { mangataInstance, SUDO_USER_NAME } from './mangataInstanceCreation'
 import { MangataHelpers } from '../src'
 import { ExtrinsicResult } from '../src/services/types'
-import { KeyringPair } from '@polkadot/keyring/types'
 
 let testUser: KeyringPair
 let sudoUser: KeyringPair
@@ -49,14 +49,13 @@ describe('test create pool', () => {
 
 describe('test buy asset', () => {
   it('should buy asset', async () => {
-    const pool = await mangataInstance.createPool(
+    await mangataInstance.createPool(
       testUser,
       firstCurrency,
       new BN(50000),
       secondCurrency,
       new BN(25000)
     )
-    console.log('POOL: ' + pool)
     await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
     const result = await mangataInstance.buyAsset(
       testUser,
@@ -65,8 +64,6 @@ describe('test buy asset', () => {
       new BN(1000),
       new BN(60000)
     )
-
-    console.log('BUYASSET: ' + result)
 
     const eventResult = MangataHelpers.getEventResultFromTxWait(result, [
       'xyk',
@@ -79,7 +76,6 @@ describe('test buy asset', () => {
 
 describe('test sell asset', () => {
   it('should sell asset', async () => {
-    console.log(secondCurrency)
     await mangataInstance.createPool(
       testUser,
       firstCurrency,
@@ -95,7 +91,6 @@ describe('test sell asset', () => {
       new BN(10000),
       new BN(100)
     )
-    console.log('SELLASSET: ' + result)
     const eventResult = MangataHelpers.getEventResultFromTxWait(result, [
       'xyk',
       'AssetsSwapped',
@@ -123,7 +118,29 @@ describe('test mint liquidity', () => {
       new BN(5001)
     )
 
-    console.log('MINTLIQUIDITY: ' + result)
+    const eventResult = MangataHelpers.getEventResultFromTxWait(result)
+    expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
+  })
+})
+
+describe('test burn liquidity', () => {
+  it('should burn liquidity', async () => {
+    await mangataInstance.createPool(
+      testUser,
+      firstCurrency,
+      new BN(50000),
+      secondCurrency,
+      new BN(25000)
+    )
+    await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
+    const result = await mangataInstance.burnLiquidity(
+      testUser,
+      firstCurrency,
+      secondCurrency,
+      new BN(10000)
+    )
+
+    console.log('BURNLIQUIDITY: ' + result)
 
     const eventResult = MangataHelpers.getEventResultFromTxWait(result)
     expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)

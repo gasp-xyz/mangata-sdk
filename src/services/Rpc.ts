@@ -5,7 +5,12 @@ type Irpc = {
   getChain(api: ApiPromise): Promise<string>
   getNodeName(api: ApiPromise): Promise<string>
   getNodeVersion(api: ApiPromise): Promise<string>
-  calculateBuyPrice(api: ApiPromise, soldTokenId: BN, boughtTokenId: BN, buyAmount: BN): Promise<BN>
+  calculateBuyPrice(
+    api: ApiPromise,
+    inputReserve: BN,
+    outputReserve: BN,
+    buyAmount: BN
+  ): Promise<BN>
 }
 
 const getChain = async (api: ApiPromise): Promise<string> => {
@@ -25,13 +30,13 @@ const getNodeVersion = async (api: ApiPromise): Promise<string> => {
 
 const calculateBuyPrice = async (
   api: ApiPromise,
-  soldTokenId: BN,
-  boughtTokenId: BN,
+  inputReserve: BN,
+  outputReserve: BN,
   buyAmount: BN
 ): Promise<BN> => {
   const result = await (api.rpc as any).xyk.calculate_buy_price(
-    soldTokenId,
-    boughtTokenId,
+    inputReserve,
+    outputReserve,
     buyAmount
   )
   return new BN(result.price.toString())
