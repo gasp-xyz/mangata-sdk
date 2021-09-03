@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
-require('dotenv').config()
+
 import { mangataInstance } from './mangataInstanceCreation'
 
-describe('test singleton instance', () => {
+describe('test chain name, node version and node name', () => {
   it('should retrive chain name when calling getChain method', async () => {
     const chain = await mangataInstance.getChain()
     expect(chain).toEqual('Development')
