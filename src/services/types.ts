@@ -1,10 +1,12 @@
 import { ApiPromise } from '@polkadot/api'
 import { GenericEvent } from '@polkadot/types'
 import { KeyringPair } from '@polkadot/keyring/types'
+import { Signer } from '@polkadot/types/types'
 import BN from 'bn.js'
 
 export type txOptions = Partial<{
   nonce: BN
+  signer: Signer
 }>
 
 export enum ExtrinsicResult {

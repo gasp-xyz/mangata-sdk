@@ -77,66 +77,71 @@ export const signTx = async (
 
     const nextNonce: BN = nonce.addn(1)
     memoryDatabase.setNonce(keyringPair.address, nextNonce)
-    const unsub = await tx.signAndSend(keyringPair, { nonce }, async ({ status, isError }) => {
-      console.log('Transaction status:', status.type)
-      if (status.isInBlock) {
-        console.log('Included at block hash', status.asInBlock.toHex())
-        const unsub_new_heads = await api.derive.chain.subscribeNewHeads(async (lastHeader) => {
-          if (lastHeader.parentHash.toString() === status.asInBlock.toString()) {
-            unsub_new_heads()
-            const prev_block_extrinsics = (await api.rpc.chain.getBlock(lastHeader.parentHash))
-              .block.extrinsics
-            const curr_block_extrinsics = (await api.rpc.chain.getBlock(lastHeader.hash)).block
-              .extrinsics
-            const curr_block_events = await api.query.system.events.at(lastHeader.hash)
+    const unsub = await tx.signAndSend(
+      keyringPair,
+      { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
+      async ({ status, isError }) => {
+        console.log('Transaction status:', status.type)
+        if (status.isInBlock) {
+          console.log('Included at block hash', status.asInBlock.toHex())
+          const unsub_new_heads = await api.derive.chain.subscribeNewHeads(async (lastHeader) => {
+            if (lastHeader.parentHash.toString() === status.asInBlock.toString()) {
+              unsub_new_heads()
+              const prev_block_extrinsics = (await api.rpc.chain.getBlock(lastHeader.parentHash))
+                .block.extrinsics
+              const curr_block_extrinsics = (await api.rpc.chain.getBlock(lastHeader.hash)).block
+                .extrinsics
+              const curr_block_events = await api.query.system.events.at(lastHeader.hash)
 
-            const extrinsic_with_seed = curr_block_extrinsics.find((e) => {
-              return e.method.method === 'set' && e.method.section === 'random'
-            })
-            if (!extrinsic_with_seed) {
-              return
-            }
+              const extrinsic_with_seed = curr_block_extrinsics.find((e) => {
+                return e.method.method === 'set' && e.method.section === 'random'
+              })
+              if (!extrinsic_with_seed) {
+                return
+              }
 
-            const json_response = JSON.parse(extrinsic_with_seed.method.args[0].toString())
-            const seed_bytes = Uint8Array.from(
-              Buffer.from(json_response['seed'].substring(2), 'hex')
-            )
-            const shuffled_extrinsics = recreateExtrinsicsOrder(prev_block_extrinsics, seed_bytes)
-
-            // filter extrinsic triggered by current request
-            const index = shuffled_extrinsics.findIndex((e) => {
-              return (
-                e.isSigned &&
-                e.signer.toString() === keyringPair.address &&
-                e.nonce.toString() === nonce.toString()
+              const json_response = JSON.parse(extrinsic_with_seed.method.args[0].toString())
+              const seed_bytes = Uint8Array.from(
+                Buffer.from(json_response['seed'].substring(2), 'hex')
               )
-            })
-            if (index < 0) {
-              return
-            }
+              const shuffled_extrinsics = recreateExtrinsicsOrder(prev_block_extrinsics, seed_bytes)
 
-            const req_events = curr_block_events
-              .filter((event) => {
+              // filter extrinsic triggered by current request
+              const index = shuffled_extrinsics.findIndex((e) => {
                 return (
-                  event.phase.isApplyExtrinsic && event.phase.asApplyExtrinsic.toNumber() === index
+                  e.isSigned &&
+                  e.signer.toString() === keyringPair.address &&
+                  e.nonce.toString() === nonce.toString()
                 )
               })
-              .map(({ event }) => {
-                return event
-              })
-            result = result.concat(req_events)
-          }
-        })
-      } else if (status.isFinalized) {
-        console.log('Finalized block hash', status.asFinalized.toHex())
-        unsub()
-        resolve(result)
-      } else if (isError) {
-        console.log('Transaction error')
-        const currentNonce: BN = await Query.getNonce(api, keyringPair.address)
-        memoryDatabase.setNonce(keyringPair.address, currentNonce)
+              if (index < 0) {
+                return
+              }
+
+              const req_events = curr_block_events
+                .filter((event) => {
+                  return (
+                    event.phase.isApplyExtrinsic &&
+                    event.phase.asApplyExtrinsic.toNumber() === index
+                  )
+                })
+                .map(({ event }) => {
+                  return event
+                })
+              result = result.concat(req_events)
+            }
+          })
+        } else if (status.isFinalized) {
+          console.log('Finalized block hash', status.asFinalized.toHex())
+          unsub()
+          resolve(result)
+        } else if (isError) {
+          console.log('Transaction error')
+          const currentNonce: BN = await Query.getNonce(api, keyringPair.address)
+          memoryDatabase.setNonce(keyringPair.address, currentNonce)
+        }
       }
-    })
+    )
   })
 }
 
