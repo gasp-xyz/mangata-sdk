@@ -262,4 +262,92 @@ export class Mangata {
     const api = await this.connect()
     return await TX.mintAsset(api, sudo, assetId, targetAddress, amount, txOptions)
   }
+
+  // TODO: not exposed in NODE: I cannot write test for this method
+  /**
+   * Get tokens required for minting
+   */
+  public async getTokensRequiredForMinting(
+    liquidityAssetId: BN,
+    liquidityAssetAmount: BN
+  ): Promise<any> {
+    const api = await this.connect()
+    return await RPC.getTokensRequiredForMinting(api, liquidityAssetId, liquidityAssetAmount)
+  }
+
+  /**
+   * Get burn amount
+   */
+  public async getBurnAmount(
+    firstAssetId: BN,
+    secondAssetId: BN,
+    liquidityAssetAmount: BN
+  ): Promise<any> {
+    const api = await this.connect()
+    return await RPC.getBurnAmount(api, firstAssetId, secondAssetId, liquidityAssetAmount)
+  }
+
+  // TODO: return bought asset amount .. why it is called sell price ID
+  /**
+   * Calculate sell price ID
+   */
+
+  public async calculateSellPriceId(
+    soldTokenId: BN,
+    boughtTokenId: BN,
+    sellAmount: BN
+  ): Promise<BN> {
+    const api = await this.connect()
+    return await RPC.calculateSellPriceId(api, soldTokenId, boughtTokenId, sellAmount)
+  }
+
+  /**
+   * Calculate buy price ID
+   */
+
+  public async calculateBuyPriceId(soldTokenId: BN, boughtTokenId: BN, buyAmount: BN): Promise<BN> {
+    const api = await this.connect()
+    return await RPC.calculateBuyPriceId(api, soldTokenId, boughtTokenId, buyAmount)
+  }
+
+  /**
+   * Get liquidity asset (NOT EXPOSED: I cannot write test for this function)
+   */
+
+  public async getLiquidityAsset(firstTokenId: BN, secondTokenId: BN): Promise<any> {
+    const api = await this.connect()
+    return await RPC.getLiquidityAsset(api, firstTokenId, secondTokenId)
+  }
+
+  /**
+   * Get amount of token id in pool
+   */
+  public async getAmountOfTokenIdInPool(firstTokenId: BN, secondTokenId: BN): Promise<BN> {
+    const api = await this.connect()
+    return await Query.getAmountOfTokenIdInPool(api, firstTokenId, secondTokenId)
+  }
+
+  /**
+   * Get liquidity asset id
+   */
+  public async getLiquidityAssetId(firstTokenId: BN, secondTokenId: BN): Promise<BN> {
+    const api = await this.connect()
+    return await Query.getLiquidityAssetId(api, firstTokenId, secondTokenId)
+  }
+
+  /**
+   * Get liquidity pool
+   */
+  public async getLiquidityPool(liquidityAssetId: BN): Promise<BN[]> {
+    const api = await this.connect()
+    return await Query.getLiquidityPool(api, liquidityAssetId)
+  }
+
+  /**
+   * Get treasury
+   */
+  public async getTreasury(currencyId: BN): Promise<BN> {
+    const api = await this.connect()
+    return await Query.getTreasury(api, currencyId)
+  }
 }
