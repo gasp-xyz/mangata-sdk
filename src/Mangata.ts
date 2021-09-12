@@ -350,4 +350,58 @@ export class Mangata {
     const api = await this.connect()
     return await Query.getTreasury(api, currencyId)
   }
+
+  /**
+   * Get treasury burn
+   */
+  public async getTreasuryBurn(currencyId: BN): Promise<BN> {
+    const api = await this.connect()
+    return await Query.getTreasuryBurn(api, currencyId)
+  }
+
+  /**
+   * Extrinsic that transfers TokenId in value amount, from origin to dest
+   */
+
+  public async transferToken(
+    account: KeyringPair,
+    tokenId: BN,
+    targetAddress: string,
+    amount: BN,
+    txOptions?: txOptions
+  ): Promise<GenericEvent[]> {
+    const api = await this.connect()
+    return await TX.transferToken(api, account, tokenId, targetAddress, amount, txOptions)
+  }
+
+  /**
+   * Extrinsic that transfers all token_id from origin to dest
+   */
+
+  public async transferTokenAll(
+    account: KeyringPair,
+    tokenId: BN,
+    targetAddress: string,
+    txOptions?: txOptions
+  ): Promise<GenericEvent[]> {
+    const api = await this.connect()
+    return await TX.transferAllToken(api, account, tokenId, targetAddress, txOptions)
+  }
+
+  /**
+   * Returns total issuance of CurrencyId
+   */
+
+  public async getTotalIssuanceOfTokenId(tokenId: BN): Promise<BN> {
+    const api = await this.connect()
+    return await Query.getTotalIssuanceOfTokenId(api, tokenId)
+  }
+
+  /**
+   * Returns vec of locked tokenId of an specified account Id Address and tokenId
+   */
+  public async getLock(address: string, tokenId: BN) {
+    const api = await this.connect()
+    return await Query.getLock(api, address, tokenId)
+  }
 }

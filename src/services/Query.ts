@@ -8,6 +8,9 @@ type Iquery = {
   getLiquidityAssetId(api: ApiPromise, firstTokenId: BN, secondTokenId: BN): Promise<BN>
   getLiquidityPool(api: ApiPromise, liquidityAssetId: BN): Promise<BN[]>
   getTreasury(api: ApiPromise, currencyId: BN): Promise<BN>
+  getTreasuryBurn(api: ApiPromise, currencyId: BN): Promise<BN>
+  getTotalIssuanceOfTokenId(api: ApiPromise, tokenId: BN): Promise<BN>
+  getLock(api: ApiPromise, address: string, tokenId: BN): any
 }
 
 const getNonce = async (api: ApiPromise, address: string): Promise<BN> => {
@@ -46,10 +49,29 @@ const getTreasury = async (api: ApiPromise, currencyId: BN): Promise<BN> => {
   return new BN(treasuryBalance.toString())
 }
 
+const getTreasuryBurn = async (api: ApiPromise, currencyId: BN): Promise<BN> => {
+  const treasuryBalance = await api.query.xyk.treasuryBurn(currencyId)
+  return new BN(treasuryBalance.toString())
+}
+
+const getTotalIssuanceOfTokenId = async (api: ApiPromise, tokenId: BN): Promise<BN> => {
+  const tokenSupply = await api.query.tokens.totalIssuance(tokenId.toString())
+  return new BN(tokenSupply.toString())
+}
+
+const getLock = async (api: ApiPromise, address: string, tokenId: BN) => {
+  const locksResponse = await api.query.tokens.locks(address, tokenId)!
+  const decodedlocks = JSON.parse(JSON.stringify(locksResponse.toHuman()))
+  return decodedlocks
+}
+
 export const Query: Iquery = {
   getNonce,
   getAmountOfTokenIdInPool,
   getLiquidityAssetId,
   getLiquidityPool,
   getTreasury,
+  getTreasuryBurn,
+  getTotalIssuanceOfTokenId,
+  getLock,
 }

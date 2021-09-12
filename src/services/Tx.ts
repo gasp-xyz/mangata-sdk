@@ -265,6 +265,32 @@ const mintAsset = async (
   )
 }
 
+const transferToken = async (
+  api: ApiPromise,
+  account: KeyringPair,
+  tokenId: BN,
+  targetAddress: string,
+  amount: BN,
+  txOptions?: txOptions
+): Promise<GenericEvent[]> => {
+  return await signTx(
+    api,
+    api.tx.tokens.transfer(targetAddress, tokenId, amount),
+    account,
+    txOptions
+  )
+}
+
+const transferAllToken = async (
+  api: ApiPromise,
+  account: KeyringPair,
+  tokenId: BN,
+  targetAddress: string,
+  txOptions?: txOptions
+): Promise<GenericEvent[]> => {
+  return await signTx(api, api.tx.tokens.transferAll(targetAddress, tokenId), account, txOptions)
+}
+
 export const TX: Itx = {
   createPool,
   sellAsset,
@@ -273,4 +299,6 @@ export const TX: Itx = {
   burnLiquidity,
   createToken,
   mintAsset,
+  transferToken,
+  transferAllToken,
 }

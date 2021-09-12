@@ -75,4 +75,19 @@ export type Itx = {
     amount: BN,
     txOptions?: txOptions
   ): Promise<GenericEvent[]>
+  transferToken(
+    api: ApiPromise,
+    account: KeyringPair,
+    assetId: BN,
+    targetAddress: string,
+    amount: BN,
+    txOptions?: txOptions
+  ): Promise<GenericEvent[]>
+  transferAllToken(
+    api: ApiPromise,
+    account: KeyringPair,
+    assetId: BN,
+    targetAddress: string,
+    txOptions?: txOptions
+  ): Promise<GenericEvent[]>
 }
