@@ -4,7 +4,8 @@ import { KeyringPair } from '@polkadot/keyring/types'
 
 import { mangataInstance, SUDO_USER_NAME } from './mangataInstanceCreation'
 import { MangataHelpers } from '../src'
-import { ExtrinsicResult } from '../src/services/types'
+import { ExtrinsicResult } from '../src/types'
+import { addAccountCurrencies, addMGAToken, getEventResultFromTxWait } from './utility'
 
 let testUser: KeyringPair
 let sudoUser: KeyringPair
@@ -17,15 +18,13 @@ beforeEach(async () => {
   testUser = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring)
   sudoUser = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring, SUDO_USER_NAME)
   await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
-  const currencies = await MangataHelpers.addAccountCurrencies(
-    mangataInstance,
-    testUser,
-    sudoUser,
-    [new BN(500000), new BN(500000).add(new BN(1))]
-  )
+  const currencies = await addAccountCurrencies(mangataInstance, testUser, sudoUser, [
+    new BN(500000),
+    new BN(500000).add(new BN(1)),
+  ])
   firstCurrency = currencies[0].toString()
   secondCurrency = currencies[1].toString()
-  await MangataHelpers.addMGAToken(mangataInstance, sudoUser, testUser)
+  await addMGAToken(mangataInstance, sudoUser, testUser)
   await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
 })
 
@@ -38,11 +37,7 @@ describe('test create pool', () => {
       secondCurrency,
       new BN(50000)
     )
-    const eventResult = MangataHelpers.getEventResultFromTxWait(result, [
-      'xyk',
-      'PoolCreated',
-      testUser.address,
-    ])
+    const eventResult = getEventResultFromTxWait(result, ['xyk', 'PoolCreated', testUser.address])
     expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
   })
 })
@@ -65,11 +60,7 @@ describe('test buy asset', () => {
       new BN(60000)
     )
 
-    const eventResult = MangataHelpers.getEventResultFromTxWait(result, [
-      'xyk',
-      'AssetsSwapped',
-      testUser.address,
-    ])
+    const eventResult = getEventResultFromTxWait(result, ['xyk', 'AssetsSwapped', testUser.address])
     expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
   })
 })
@@ -91,11 +82,7 @@ describe('test sell asset', () => {
       new BN(10000),
       new BN(100)
     )
-    const eventResult = MangataHelpers.getEventResultFromTxWait(result, [
-      'xyk',
-      'AssetsSwapped',
-      testUser.address,
-    ])
+    const eventResult = getEventResultFromTxWait(result, ['xyk', 'AssetsSwapped', testUser.address])
     expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
   })
 })
@@ -118,7 +105,7 @@ describe('test mint liquidity', () => {
       new BN(5001)
     )
 
-    const eventResult = MangataHelpers.getEventResultFromTxWait(result)
+    const eventResult = getEventResultFromTxWait(result)
     expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
   })
 })
@@ -140,7 +127,7 @@ describe('test burn liquidity', () => {
       new BN(10000)
     )
 
-    const eventResult = MangataHelpers.getEventResultFromTxWait(result)
+    const eventResult = getEventResultFromTxWait(result)
     expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
   })
 })
@@ -152,11 +139,7 @@ describe('test create token', () => {
       sudoUser,
       new BN(firstCurrency)
     )
-    const eventResult = MangataHelpers.getEventResultFromTxWait(result, [
-      'tokens',
-      'Issued',
-      testUser.address,
-    ])
+    const eventResult = getEventResultFromTxWait(result, ['tokens', 'Issued', testUser.address])
     expect(eventResult.data).not.toBeNull()
   })
 })
