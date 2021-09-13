@@ -7,7 +7,7 @@ import BN from 'bn.js'
 import xoshiro from 'xoshiro'
 import memoryDatabase from '../utils/MemoryDatabase'
 import { Query } from './Query'
-import { Itx, txOptions } from './types'
+import { Itx, txOptions } from '../types'
 
 export const fisher_yates_shuffle = <K>(objects: K[], seed: Uint8Array) => {
   const prng = xoshiro.create('256+', seed)

@@ -8,7 +8,7 @@ import { options } from './utils/options'
 import { RPC } from './services/Rpc'
 import { TX } from './services/Tx'
 import { Query } from './services/Query'
-import { txOptions } from './services/types'
+import { txOptions } from './types'
 
 /**
  * The Mangata class defines the `getInstance` method that lets clients access the unique singleton instance. Design pattern Singleton Promise is used.

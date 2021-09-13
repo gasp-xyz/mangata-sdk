@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-
 import { mangataInstance } from './mangataInstanceCreation'
 
 describe('test chain name, node version and node name', () => {
