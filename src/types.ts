@@ -18,7 +18,7 @@ export enum ExtrinsicResult {
 export interface Itx {
   createPool(
     api: ApiPromise,
-    keyRingPair: KeyringPair,
+    keyringPair: KeyringPair,
     firstAssetId: string,
     firstAssetAmount: BN,
     secondAssetId: string,
@@ -27,7 +27,7 @@ export interface Itx {
   ): Promise<GenericEvent[]>
   sellAsset(
     api: ApiPromise,
-    keyRingPair: KeyringPair,
+    keyringPair: KeyringPair,
     soldAssetId: string,
     boughtAssetId: string,
     amount: BN,
@@ -36,7 +36,7 @@ export interface Itx {
   ): Promise<GenericEvent[]>
   buyAsset(
     api: ApiPromise,
-    keyRingPair: KeyringPair,
+    keyringPair: KeyringPair,
     soldAssetId: string,
     boughtAssetId: string,
     amount: BN,
@@ -45,7 +45,7 @@ export interface Itx {
   ): Promise<GenericEvent[]>
   mintLiquidity(
     api: ApiPromise,
-    keyRingPair: KeyringPair,
+    keyringPair: KeyringPair,
     firstAssetId: string,
     secondAssetId: string,
     firstAssetAmount: BN,
@@ -54,7 +54,7 @@ export interface Itx {
   ): Promise<GenericEvent[]>
   burnLiquidity(
     api: ApiPromise,
-    keyRingPair: KeyringPair,
+    keyringPair: KeyringPair,
     firstAssetId: string,
     secondAssetId: string,
     liquidityAssetAmount: BN,

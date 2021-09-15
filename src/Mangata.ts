@@ -107,7 +107,7 @@ export class Mangata {
    */
 
   public async createPool(
-    keyRingPair: KeyringPair,
+    keyringPair: KeyringPair,
     firstAssetId: string,
     firstAssetAmount: BN,
     secondAssetId: string,
@@ -117,7 +117,7 @@ export class Mangata {
     const api = await this.connect()
     return await TX.createPool(
       api,
-      keyRingPair,
+      keyringPair,
       firstAssetId,
       firstAssetAmount,
       secondAssetId,
@@ -130,7 +130,7 @@ export class Mangata {
    * Sell asset
    */
   public async sellAsset(
-    keyRingPair: KeyringPair,
+    keyringPair: KeyringPair,
     soldAssetId: string,
     boughtAssetId: string,
     amount: BN,
@@ -140,7 +140,7 @@ export class Mangata {
     const api = await this.connect()
     return await TX.sellAsset(
       api,
-      keyRingPair,
+      keyringPair,
       soldAssetId,
       boughtAssetId,
       amount,
@@ -153,7 +153,7 @@ export class Mangata {
    * Mint liquidity
    */
   public async mintLiquidity(
-    keyRingPair: KeyringPair,
+    keyringPair: KeyringPair,
     firstAssetId: string,
     secondAssetId: string,
     firstAssetAmount: BN,
@@ -163,7 +163,7 @@ export class Mangata {
     const api = await this.connect()
     return await TX.mintLiquidity(
       api,
-      keyRingPair,
+      keyringPair,
       firstAssetId,
       secondAssetId,
       firstAssetAmount,
@@ -176,7 +176,7 @@ export class Mangata {
    * Burn liquidity
    */
   public async burnLiquidity(
-    keyRingPair: KeyringPair,
+    keyringPair: KeyringPair,
     firstAssetId: string,
     secondAssetId: string,
     liquidityAssetAmount: BN,
@@ -185,7 +185,7 @@ export class Mangata {
     const api = await this.connect()
     return await TX.burnLiquidity(
       api,
-      keyRingPair,
+      keyringPair,
       firstAssetId,
       secondAssetId,
       liquidityAssetAmount,
@@ -197,7 +197,7 @@ export class Mangata {
    * Buy asset
    */
   public async buyAsset(
-    keyRingPair: KeyringPair,
+    keyringPair: KeyringPair,
     soldAssetId: string,
     boughtAssetId: string,
     amount: BN,
@@ -207,7 +207,7 @@ export class Mangata {
     const api = await this.connect()
     return await TX.buyAsset(
       api,
-      keyRingPair,
+      keyringPair,
       soldAssetId,
       boughtAssetId,
       amount,
