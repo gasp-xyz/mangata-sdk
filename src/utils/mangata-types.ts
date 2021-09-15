@@ -79,6 +79,18 @@ const typesOptions: RegistryTypes = {
     liquidity_token_amount: 'Balance',
     mng_valuation: 'Balance',
   },
+  ShufflingSeed: {
+    seed: 'H256',
+    proof: 'H512',
+  },
+  Header: {
+    parentHash: 'Hash',
+    number: 'Compact<BlockNumber>',
+    stateRoot: 'Hash',
+    extrinsicsRoot: 'Hash',
+    digest: 'Digest',
+    seed: 'ShufflingSeed',
+  },
 }
 
 export default typesOptions
