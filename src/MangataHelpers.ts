@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api'
 import { KeypairType } from '@polkadot/util-crypto/types'
+import { KeyringPair } from '@polkadot/keyring/types'
 import type { DefinitionRpc, DefinitionRpcSub, RegistryTypes } from '@polkadot/types/types'
 import { ApiOptions } from '@polkadot/api/types'
 import { v4 as uuid } from 'uuid'
@@ -39,7 +40,10 @@ export class MangataHelpers {
     return new Keyring({ type })
   }
 
-  public static createKeyPairFromNameAndStoreAccountToKeyring(keyring: Keyring, name: string = '') {
+  public static createKeyPairFromNameAndStoreAccountToKeyring(
+    keyring: Keyring,
+    name: string = ''
+  ): KeyringPair {
     const userName: string = name ? name : '//testUser_' + uuid()
     const account = keyring.createFromUri(userName)
     keyring.addPair(account)

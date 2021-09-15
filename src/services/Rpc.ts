@@ -1,64 +1,36 @@
 import { ApiPromise } from '@polkadot/api'
 import BN from 'bn.js'
 
-type Irpc = {
-  getChain(api: ApiPromise): Promise<string>
-  getNodeName(api: ApiPromise): Promise<string>
-  getNodeVersion(api: ApiPromise): Promise<string>
-  calculateBuyPrice(
-    api: ApiPromise,
-    inputReserve: BN,
-    outputReserve: BN,
-    buyAmount: BN
-  ): Promise<BN>
-  calculateSellPrice(
-    api: ApiPromise,
-    inputReserve: BN,
-    outputReserve: BN,
-    sellAmount: BN
-  ): Promise<BN>
-  getTokensRequiredForMinting(
-    api: ApiPromise,
-    liquidityAssetId: BN,
-    liquidityAssetAmount: BN
-  ): Promise<any>
-  getBurnAmount(
-    api: ApiPromise,
-    firstAssetId: BN,
-    secondAssetId: BN,
-    liquidityAssetAmount: BN
-  ): Promise<any>
-  calculateSellPriceId(
-    api: ApiPromise,
-    soldTokenId: BN,
-    boughtTokenId: BN,
-    sellAmount: BN
-  ): Promise<BN>
-  calculateBuyPriceId(
-    api: ApiPromise,
-    soldTokenId: BN,
-    boughtTokenId: BN,
-    buyAmount: BN
-  ): Promise<BN>
-  getLiquidityAsset(api: ApiPromise, firstTokenId: BN, secondTokenId: BN): Promise<any>
-}
+import {
+  BurnAmountType,
+  CalculateBuyPriceType,
+  CalculateSellPriceType,
+  CalculateSellPriceIdType,
+  ChainType,
+  Irpc,
+  LiquidityAssetType,
+  NodeNameType,
+  NodeVersionType,
+  TokensRequiredForMintingType,
+} from '../types'
 
-const getChain = async (api: ApiPromise): Promise<string> => {
+const getChain: ChainType = async (api: ApiPromise): Promise<string> => {
   const chain = await api.rpc.system.chain()
   return chain.toHuman()
 }
 
-const getNodeName = async (api: ApiPromise): Promise<string> => {
+const getNodeName: NodeNameType = async (api: ApiPromise): Promise<string> => {
   const name = await api.rpc.system.name()
   return name.toHuman()
 }
 
-const getNodeVersion = async (api: ApiPromise): Promise<string> => {
+const getNodeVersion: NodeVersionType = async (api: ApiPromise): Promise<string> => {
   const version = await api.rpc.system.version()
   return version.toHuman()
 }
 
-const getTokensRequiredForMinting = async (
+// TODO: need to figure out what is the return  value from this method
+const getTokensRequiredForMinting: TokensRequiredForMintingType = async (
   api: ApiPromise,
   liquidityAssetId: BN,
   liquidityAssetAmount: BN
@@ -70,7 +42,7 @@ const getTokensRequiredForMinting = async (
   return result.toHuman()
 }
 
-const calculateBuyPrice = async (
+const calculateBuyPrice: CalculateBuyPriceType = async (
   api: ApiPromise,
   inputReserve: BN,
   outputReserve: BN,
@@ -84,7 +56,7 @@ const calculateBuyPrice = async (
   return new BN(result.price)
 }
 
-const calculateSellPrice = async (
+const calculateSellPrice: CalculateSellPriceType = async (
   api: ApiPromise,
   inputReserve: BN,
   outputReserve: BN,
@@ -98,7 +70,8 @@ const calculateSellPrice = async (
   return new BN(result.price)
 }
 
-const getBurnAmount = async (
+// TODO: Need to figure out the return value from this method
+const getBurnAmount: BurnAmountType = async (
   api: ApiPromise,
   firstAssetId: BN,
   secondAssetId: BN,
@@ -112,7 +85,7 @@ const getBurnAmount = async (
   return result.toHuman()
 }
 
-const calculateSellPriceId = async (
+const calculateSellPriceId: CalculateSellPriceIdType = async (
   api: ApiPromise,
   soldTokenId: BN,
   boughtTokenId: BN,
@@ -126,7 +99,7 @@ const calculateSellPriceId = async (
   return new BN(result.price)
 }
 
-const calculateBuyPriceId = async (
+const calculateBuyPriceId: CalculateSellPriceIdType = async (
   api: ApiPromise,
   soldTokenId: BN,
   boughtTokenId: BN,
@@ -140,7 +113,8 @@ const calculateBuyPriceId = async (
   return new BN(result.price)
 }
 
-const getLiquidityAsset = async (
+// TODO: Need to figure out what is the return value from this method
+const getLiquidityAsset: LiquidityAssetType = async (
   api: ApiPromise,
   firstTokenId: BN,
   secondTokenId: BN

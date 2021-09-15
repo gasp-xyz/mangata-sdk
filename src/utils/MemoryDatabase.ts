@@ -1,11 +1,6 @@
 /* eslint-disable no-console */
 import BN from 'bn.js'
-
-interface Database {
-  hasAddressNonce(address: string): boolean
-  setNonce(address: string, nonce: BN): void
-  getNonce(address: string): BN
-}
+import { Database } from '../types'
 
 class InMemoryDatabase implements Database {
   static instance: InMemoryDatabase

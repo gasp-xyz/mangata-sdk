@@ -8,7 +8,7 @@ import { options } from './utils/options'
 import { RPC } from './services/Rpc'
 import { TX } from './services/Tx'
 import { Query } from './services/Query'
-import { txOptions } from './types'
+import { TxOptions } from './types'
 
 /**
  * The Mangata class defines the `getInstance` method that lets clients access the unique singleton instance. Design pattern Singleton Promise is used.
@@ -112,7 +112,7 @@ export class Mangata {
     firstAssetAmount: BN,
     secondAssetId: string,
     secondAssetAmount: BN,
-    txOptions?: txOptions
+    txOptions?: TxOptions
   ): Promise<GenericEvent[]> {
     const api = await this.connect()
     return await TX.createPool(
@@ -135,7 +135,7 @@ export class Mangata {
     boughtAssetId: string,
     amount: BN,
     minAmountOut: BN,
-    txOptions?: txOptions
+    txOptions?: TxOptions
   ): Promise<GenericEvent[]> {
     const api = await this.connect()
     return await TX.sellAsset(
@@ -158,7 +158,7 @@ export class Mangata {
     secondAssetId: string,
     firstAssetAmount: BN,
     expectedSecondAssetAmount: BN,
-    txOptions?: txOptions
+    txOptions?: TxOptions
   ): Promise<GenericEvent[]> {
     const api = await this.connect()
     return await TX.mintLiquidity(
@@ -180,7 +180,7 @@ export class Mangata {
     firstAssetId: string,
     secondAssetId: string,
     liquidityAssetAmount: BN,
-    txOptions?: txOptions
+    txOptions?: TxOptions
   ): Promise<GenericEvent[]> {
     const api = await this.connect()
     return await TX.burnLiquidity(
@@ -202,7 +202,7 @@ export class Mangata {
     boughtAssetId: string,
     amount: BN,
     maxAmountIn: BN,
-    txOptions?: txOptions
+    txOptions?: TxOptions
   ): Promise<GenericEvent[]> {
     const api = await this.connect()
     return await TX.buyAsset(
@@ -243,7 +243,7 @@ export class Mangata {
     targetAddress: string,
     sudoKeyringPair: KeyringPair,
     currencyValue: BN,
-    txOptions?: txOptions
+    txOptions?: TxOptions
   ): Promise<GenericEvent[]> {
     const api = await this.connect()
     return await TX.createToken(api, targetAddress, sudoKeyringPair, currencyValue, txOptions)
@@ -257,7 +257,7 @@ export class Mangata {
     assetId: BN,
     targetAddress: string,
     amount: BN,
-    txOptions?: txOptions
+    txOptions?: TxOptions
   ): Promise<GenericEvent[]> {
     const api = await this.connect()
     return await TX.mintAsset(api, sudo, assetId, targetAddress, amount, txOptions)
@@ -368,7 +368,7 @@ export class Mangata {
     tokenId: BN,
     targetAddress: string,
     amount: BN,
-    txOptions?: txOptions
+    txOptions?: TxOptions
   ): Promise<GenericEvent[]> {
     const api = await this.connect()
     return await TX.transferToken(api, account, tokenId, targetAddress, amount, txOptions)
@@ -382,7 +382,7 @@ export class Mangata {
     account: KeyringPair,
     tokenId: BN,
     targetAddress: string,
-    txOptions?: txOptions
+    txOptions?: TxOptions
   ): Promise<GenericEvent[]> {
     const api = await this.connect()
     return await TX.transferAllToken(api, account, tokenId, targetAddress, txOptions)
