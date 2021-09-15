@@ -7,7 +7,7 @@ import BN from 'bn.js'
 import xoshiro from 'xoshiro'
 import memoryDatabase from '../utils/MemoryDatabase'
 import { Query } from './Query'
-import { Itx, txOptions } from '../types'
+import { Itx, TxOptions } from '../types'
 
 export const fisher_yates_shuffle = <K>(objects: K[], seed: Uint8Array) => {
   const prng = xoshiro.create('256+', seed)
@@ -55,7 +55,7 @@ export const signTx = async (
   api: ApiPromise,
   tx: SubmittableExtrinsic<'promise'>,
   keyringPair: KeyringPair,
-  txOptions?: txOptions
+  txOptions?: TxOptions
 ): Promise<GenericEvent[]> => {
   return new Promise<GenericEvent[]>(async (resolve) => {
     let result: GenericEvent[] = []
@@ -145,12 +145,95 @@ export const signTx = async (
   })
 }
 
-const createToken = async (
+export type CreateTokenType = (
   api: ApiPromise,
   targetAddress: string,
   sudoKeyringPair: KeyringPair,
   currencyValue: BN,
-  txOptions?: txOptions
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+export type CreatePoolType = (
+  api: ApiPromise,
+  keyRingPair: KeyringPair,
+  firstAssetId: string,
+  firstAssetAmount: BN,
+  secondAssetId: string,
+  secondAssetAmount: BN,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+export type SellAssetType = (
+  api: ApiPromise,
+  keyRingPair: KeyringPair,
+  soldAssetId: string,
+  boughtAssetId: string,
+  amount: BN,
+  minAmountOut: BN,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+export type BuyAssetType = (
+  api: ApiPromise,
+  keyRingPair: KeyringPair,
+  soldAssetId: string,
+  boughtAssetId: string,
+  amount: BN,
+  maxAmountIn: BN,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+export type MintLiquidityType = (
+  api: ApiPromise,
+  keyRingPair: KeyringPair,
+  firstAssetId: string,
+  secondAssetId: string,
+  firstAssetAmount: BN,
+  expectedSecondAssetAmount: BN,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+export type BurnLiquidityType = (
+  api: ApiPromise,
+  keyRingPair: KeyringPair,
+  firstAssetId: string,
+  secondAssetId: string,
+  liquidityAssetAmount: BN,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+export type MintAssetType = (
+  api: ApiPromise,
+  sudo: KeyringPair,
+  assetId: BN,
+  targetAddress: string,
+  amount: BN,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+export type TransferTokenType = (
+  api: ApiPromise,
+  account: KeyringPair,
+  tokenId: BN,
+  targetAddress: string,
+  amount: BN,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+export type TransferAllTokenType = (
+  api: ApiPromise,
+  account: KeyringPair,
+  tokenId: BN,
+  targetAddress: string,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+const createToken: CreateTokenType = async (
+  api: ApiPromise,
+  targetAddress: string,
+  sudoKeyringPair: KeyringPair,
+  currencyValue: BN,
+  txOptions?: TxOptions
 ): Promise<GenericEvent[]> => {
   return await signTx(
     api,
@@ -160,14 +243,14 @@ const createToken = async (
   )
 }
 
-const createPool = async (
+const createPool: CreatePoolType = async (
   api: ApiPromise,
   keyRingPair: KeyringPair,
   firstAssetId: string,
   firstAssetAmount: BN,
   secondAssetId: string,
   secondAssetAmount: BN,
-  txOptions?: txOptions
+  txOptions?: TxOptions
 ): Promise<GenericEvent[]> => {
   return await signTx(
     api,
@@ -177,14 +260,14 @@ const createPool = async (
   )
 }
 
-const sellAsset = async (
+const sellAsset: SellAssetType = async (
   api: ApiPromise,
   keyRingPair: KeyringPair,
   soldAssetId: string,
   boughtAssetId: string,
   amount: BN,
   minAmountOut: BN,
-  txOptions?: txOptions
+  txOptions?: TxOptions
 ): Promise<GenericEvent[]> => {
   return await signTx(
     api,
@@ -194,14 +277,14 @@ const sellAsset = async (
   )
 }
 
-const buyAsset = async (
+const buyAsset: BuyAssetType = async (
   api: ApiPromise,
   keyRingPair: KeyringPair,
   soldAssetId: string,
   boughtAssetId: string,
   amount: BN,
   maxAmountIn: BN,
-  txOptions?: txOptions
+  txOptions?: TxOptions
 ): Promise<GenericEvent[]> => {
   return await signTx(
     api,
@@ -211,14 +294,14 @@ const buyAsset = async (
   )
 }
 
-const mintLiquidity = async (
+const mintLiquidity: MintLiquidityType = async (
   api: ApiPromise,
   keyRingPair: KeyringPair,
   firstAssetId: string,
   secondAssetId: string,
   firstAssetAmount: BN,
   expectedSecondAssetAmount: BN = new BN(Number.MAX_SAFE_INTEGER),
-  txOptions?: txOptions
+  txOptions?: TxOptions
 ): Promise<GenericEvent[]> => {
   return await signTx(
     api,
@@ -233,13 +316,13 @@ const mintLiquidity = async (
   )
 }
 
-const burnLiquidity = async (
+const burnLiquidity: BurnLiquidityType = async (
   api: ApiPromise,
   keyRingPair: KeyringPair,
   firstAssetId: string,
   secondAssetId: string,
   liquidityAssetAmount: BN,
-  txOptions?: txOptions
+  txOptions?: TxOptions
 ): Promise<GenericEvent[]> => {
   return await signTx(
     api,
@@ -249,13 +332,13 @@ const burnLiquidity = async (
   )
 }
 
-const mintAsset = async (
+const mintAsset: MintAssetType = async (
   api: ApiPromise,
   sudo: KeyringPair,
   assetId: BN,
   targetAddress: string,
   amount: BN,
-  txOptions?: txOptions
+  txOptions?: TxOptions
 ): Promise<GenericEvent[]> => {
   return await signTx(
     api,
@@ -265,13 +348,13 @@ const mintAsset = async (
   )
 }
 
-const transferToken = async (
+const transferToken: TransferTokenType = async (
   api: ApiPromise,
   account: KeyringPair,
   tokenId: BN,
   targetAddress: string,
   amount: BN,
-  txOptions?: txOptions
+  txOptions?: TxOptions
 ): Promise<GenericEvent[]> => {
   return await signTx(
     api,
@@ -281,12 +364,12 @@ const transferToken = async (
   )
 }
 
-const transferAllToken = async (
+const transferAllToken: TransferAllTokenType = async (
   api: ApiPromise,
   account: KeyringPair,
   tokenId: BN,
   targetAddress: string,
-  txOptions?: txOptions
+  txOptions?: TxOptions
 ): Promise<GenericEvent[]> => {
   return await signTx(api, api.tx.tokens.transferAll(targetAddress, tokenId), account, txOptions)
 }
