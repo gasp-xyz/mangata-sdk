@@ -84,7 +84,7 @@ export const signTx = async (
         console.log('Transaction status:', status.type)
         if (status.isInBlock) {
           console.log('Included at block hash', status.asInBlock.toHex())
-          const unsub_new_heads = await api.derive.chain.subscribeNewHeads(async (lastHeader) => {
+          const unsub_new_heads = await api.rpc.chain.subscribeNewHeads(async (lastHeader) => {
             if (lastHeader.parentHash.toString() === status.asInBlock.toString()) {
               unsub_new_heads()
               const prev_block_extrinsics = (await api.rpc.chain.getBlock(lastHeader.parentHash))
@@ -93,16 +93,9 @@ export const signTx = async (
                 .extrinsics
               const curr_block_events = await api.query.system.events.at(lastHeader.hash)
 
-              const extrinsic_with_seed = curr_block_extrinsics.find((e) => {
-                return e.method.method === 'set' && e.method.section === 'random'
-              })
-              if (!extrinsic_with_seed) {
-                return
-              }
-
-              const json_response = JSON.parse(extrinsic_with_seed.method.args[0].toString())
+              const json_response = JSON.parse(lastHeader.toString())
               const seed_bytes = Uint8Array.from(
-                Buffer.from(json_response['seed'].substring(2), 'hex')
+                Buffer.from(json_response['seed']['seed'].substring(2), 'hex')
               )
               const shuffled_extrinsics = recreateExtrinsicsOrder(prev_block_extrinsics, seed_bytes)
 
@@ -162,7 +155,7 @@ const createToken = async (
 
 const createPool = async (
   api: ApiPromise,
-  keyRingPair: KeyringPair,
+  keyringPair: KeyringPair,
   firstAssetId: string,
   firstAssetAmount: BN,
   secondAssetId: string,
@@ -172,14 +165,14 @@ const createPool = async (
   return await signTx(
     api,
     api.tx.xyk.createPool(firstAssetId, firstAssetAmount, secondAssetId, secondAssetAmount),
-    keyRingPair,
+    keyringPair,
     txOptions
   )
 }
 
 const sellAsset = async (
   api: ApiPromise,
-  keyRingPair: KeyringPair,
+  keyringPair: KeyringPair,
   soldAssetId: string,
   boughtAssetId: string,
   amount: BN,
@@ -189,14 +182,14 @@ const sellAsset = async (
   return await signTx(
     api,
     api.tx.xyk.sellAsset(soldAssetId, boughtAssetId, amount, minAmountOut),
-    keyRingPair,
+    keyringPair,
     txOptions
   )
 }
 
 const buyAsset = async (
   api: ApiPromise,
-  keyRingPair: KeyringPair,
+  keyringPair: KeyringPair,
   soldAssetId: string,
   boughtAssetId: string,
   amount: BN,
@@ -206,14 +199,14 @@ const buyAsset = async (
   return await signTx(
     api,
     api.tx.xyk.buyAsset(soldAssetId, boughtAssetId, amount, maxAmountIn),
-    keyRingPair,
+    keyringPair,
     txOptions
   )
 }
 
 const mintLiquidity = async (
   api: ApiPromise,
-  keyRingPair: KeyringPair,
+  keyringPair: KeyringPair,
   firstAssetId: string,
   secondAssetId: string,
   firstAssetAmount: BN,
@@ -228,14 +221,14 @@ const mintLiquidity = async (
       firstAssetAmount,
       expectedSecondAssetAmount
     ),
-    keyRingPair,
+    keyringPair,
     txOptions
   )
 }
 
 const burnLiquidity = async (
   api: ApiPromise,
-  keyRingPair: KeyringPair,
+  keyringPair: KeyringPair,
   firstAssetId: string,
   secondAssetId: string,
   liquidityAssetAmount: BN,
@@ -244,7 +237,7 @@ const burnLiquidity = async (
   return await signTx(
     api,
     api.tx.xyk.burnLiquidity(firstAssetId, secondAssetId, liquidityAssetAmount),
-    keyRingPair,
+    keyringPair,
     txOptions
   )
 }
