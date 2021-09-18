@@ -92,8 +92,6 @@ export const signTx = async (
               unsub_new_heads()
               const prev_block_extrinsics = (await api.rpc.chain.getBlock(lastHeader.parentHash))
                 .block.extrinsics
-              const curr_block_extrinsics = (await api.rpc.chain.getBlock(lastHeader.hash)).block
-                .extrinsics
               const curr_block_events = await api.query.system.events.at(lastHeader.hash)
 
               const json_response = JSON.parse(lastHeader.toString())
