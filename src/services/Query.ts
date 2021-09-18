@@ -1,13 +1,16 @@
 import { ApiPromise } from '@polkadot/api'
 import { AccountInfo } from '@polkadot/types/interfaces'
+import { AccountData } from '@polkadot/types/interfaces/balances'
 import BN from 'bn.js'
 
 import {
   AmountOfTokenIdInPoolType,
+  BalanceAssetType,
   Iquery,
   LiquidityAssetIdType,
   LiquidityPoolType,
   LockType,
+  NextAssetIdType,
   NonceType,
   TotalIssuanceOfTokenIdType,
   TreasuryBurnType,
@@ -73,6 +76,21 @@ const getLock: LockType = async (api: ApiPromise, address: string, tokenId: BN) 
   return decodedlocks
 }
 
+const getBalanceOfAsset: BalanceAssetType = async (
+  api: ApiPromise,
+  assetId: BN,
+  accountAddress: string
+): Promise<BN> => {
+  const balance = await api.query.tokens.accounts(accountAddress, assetId)
+  const accountData = balance as AccountData
+  return new BN(accountData.free.toBigInt().toString())
+}
+
+const getNextAssetId: NextAssetIdType = async (api: ApiPromise): Promise<BN> => {
+  const nextAssetId = await api.query.tokens.nextCurrencyId()
+  return new BN(nextAssetId.toString())
+}
+
 export const Query: Iquery = {
   getNonce,
   getAmountOfTokenIdInPool,
@@ -82,4 +100,6 @@ export const Query: Iquery = {
   getTreasuryBurn,
   getTotalIssuanceOfTokenId,
   getLock,
+  getBalanceOfAsset,
+  getNextAssetId,
 }

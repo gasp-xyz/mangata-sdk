@@ -2,6 +2,7 @@ import { ApiPromise } from '@polkadot/api'
 import { GenericEvent } from '@polkadot/types'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { Signer } from '@polkadot/types/types'
+import type { AddressOrPair } from '@polkadot/api/types'
 import BN from 'bn.js'
 
 export type TxOptions = Partial<{
@@ -18,7 +19,7 @@ export enum ExtrinsicResult {
 export interface Itx {
   createPool(
     api: ApiPromise,
-    keyringPair: KeyringPair,
+    keyringPair: AddressOrPair | Signer,
     firstAssetId: string,
     firstAssetAmount: BN,
     secondAssetId: string,
@@ -107,6 +108,8 @@ export interface Iquery {
   getTreasuryBurn(api: ApiPromise, currencyId: BN): Promise<BN>
   getTotalIssuanceOfTokenId(api: ApiPromise, tokenId: BN): Promise<BN>
   getLock(api: ApiPromise, address: string, tokenId: BN): any
+  getBalanceOfAsset(api: ApiPromise, assetId: BN, accountAddress: string): Promise<BN>
+  getNextAssetId(api: ApiPromise): Promise<BN>
 }
 
 export interface Irpc {
@@ -168,6 +171,8 @@ export type TreasuryType = (api: ApiPromise, currencyId: BN) => Promise<BN>
 export type TreasuryBurnType = (api: ApiPromise, currencyId: BN) => Promise<BN>
 export type TotalIssuanceOfTokenIdType = (api: ApiPromise, tokenId: BN) => Promise<BN>
 export type LockType = (api: ApiPromise, address: string, tokenId: BN) => Promise<any>
+export type BalanceAssetType = (api: ApiPromise, assetId: BN, accountAddress: string) => Promise<BN>
+export type NextAssetIdType = (api: ApiPromise) => Promise<BN>
 
 // RPC methods types
 export type ChainType = (api: ApiPromise) => Promise<string>

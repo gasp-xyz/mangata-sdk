@@ -1,7 +1,9 @@
 /* eslint-disable no-console */
 import { ApiPromise, WsProvider } from '@polkadot/api'
 import { GenericEvent } from '@polkadot/types'
+import { Signer } from '@polkadot/types/types'
 import { KeyringPair } from '@polkadot/keyring/types'
+import type { AddressOrPair } from '@polkadot/api/types'
 import BN from 'bn.js'
 
 import { options } from './utils/options'
@@ -403,5 +405,15 @@ export class Mangata {
   public async getLock(address: string, tokenId: BN) {
     const api = await this.connect()
     return await Query.getLock(api, address, tokenId)
+  }
+
+  public async getBalanceOfAsset(assetId: BN, accountAddress: string): Promise<BN> {
+    const api = await this.connect()
+    return await Query.getBalanceOfAsset(api, assetId, accountAddress)
+  }
+
+  public async getNextAssetId(): Promise<BN> {
+    const api = await this.connect()
+    return await Query.getNextAssetId(api)
   }
 }
