@@ -1,9 +1,7 @@
 /* eslint-disable no-console */
 import { ApiPromise, WsProvider } from '@polkadot/api'
 import { GenericEvent } from '@polkadot/types'
-import { Signer } from '@polkadot/types/types'
 import { KeyringPair } from '@polkadot/keyring/types'
-import type { AddressOrPair } from '@polkadot/api/types'
 import BN from 'bn.js'
 
 import { options } from './utils/options'
@@ -11,6 +9,7 @@ import { RPC } from './services/Rpc'
 import { TX } from './services/Tx'
 import { Query } from './services/Query'
 import { TxOptions } from './types'
+import { log } from './utils/logger'
 
 /**
  * The Mangata class defines the `getInstance` method that lets clients access the unique singleton instance. Design pattern Singleton Promise is used.
@@ -117,6 +116,9 @@ export class Mangata {
     txOptions?: TxOptions
   ): Promise<GenericEvent[]> {
     const api = await this.connect()
+    log.info(
+      `Creating pool with [First Asset Id: ${firstAssetId} - ${firstAssetAmount} amount] and [Second Asset Id ${secondAssetId} - ${secondAssetAmount} amount] `
+    )
     return await TX.createPool(
       api,
       keyringPair,

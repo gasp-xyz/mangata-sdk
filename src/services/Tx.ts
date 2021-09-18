@@ -9,6 +9,7 @@ import xoshiro from 'xoshiro'
 import memoryDatabase from '../utils/MemoryDatabase'
 import { Query } from './Query'
 import { Itx, TxOptions } from '../types'
+import { log } from '../utils/logger'
 
 export const fisher_yates_shuffle = <K>(objects: K[], seed: Uint8Array) => {
   const prng = xoshiro.create('256+', seed)
@@ -78,13 +79,14 @@ export const signTx = async (
 
     const nextNonce: BN = nonce.addn(1)
     memoryDatabase.setNonce(keyringPair.address, nextNonce)
+    log.info(`Nonce: ${nonce}`)
     const unsub = await tx.signAndSend(
       keyringPair,
       { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
       async ({ status, isError }) => {
-        console.log('Transaction status:', status.type)
+        log.info(`Transaction status: ${status.type}`)
         if (status.isInBlock) {
-          console.log('Included at block hash', status.asInBlock.toHex())
+          log.info(`Included at block hash: ${status.asInBlock.toHex()}`)
           const unsub_new_heads = await api.rpc.chain.subscribeNewHeads(async (lastHeader) => {
             if (lastHeader.parentHash.toString() === status.asInBlock.toString()) {
               unsub_new_heads()
@@ -126,11 +128,11 @@ export const signTx = async (
             }
           })
         } else if (status.isFinalized) {
-          console.log('Finalized block hash', status.asFinalized.toHex())
+          log.info(`Finalized block hash: ${status.asFinalized.toHex()}`)
           unsub()
           resolve(result)
         } else if (isError) {
-          console.log('Transaction error')
+          log.error(`Transaction error`)
           const currentNonce: BN = await Query.getNonce(api, keyringPair.address)
           memoryDatabase.setNonce(keyringPair.address, currentNonce)
         }
