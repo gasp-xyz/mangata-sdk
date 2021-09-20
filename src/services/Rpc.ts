@@ -13,19 +13,23 @@ import {
   NodeVersionType,
   TokensRequiredForMintingType,
 } from '../types'
+import { log } from '../utils/logger'
 
 const getChain: ChainType = async (api: ApiPromise): Promise<string> => {
   const chain = await api.rpc.system.chain()
+  log.info(`Retrieved chain: ${chain}`)
   return chain.toHuman()
 }
 
 const getNodeName: NodeNameType = async (api: ApiPromise): Promise<string> => {
   const name = await api.rpc.system.name()
+  log.info(`Retrieved node name: ${name}`)
   return name.toHuman()
 }
 
 const getNodeVersion: NodeVersionType = async (api: ApiPromise): Promise<string> => {
   const version = await api.rpc.system.version()
+  log.info(`Retrieved version: ${version}`)
   return version.toHuman()
 }
 

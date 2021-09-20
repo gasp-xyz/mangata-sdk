@@ -19,7 +19,7 @@ export enum ExtrinsicResult {
 export interface Itx {
   createPool(
     api: ApiPromise,
-    keyringPair: AddressOrPair | Signer,
+    account: KeyringPair | string,
     firstAssetId: string,
     firstAssetAmount: BN,
     secondAssetId: string,
@@ -28,7 +28,7 @@ export interface Itx {
   ): Promise<GenericEvent[]>
   sellAsset(
     api: ApiPromise,
-    keyringPair: KeyringPair,
+    account: KeyringPair | string,
     soldAssetId: string,
     boughtAssetId: string,
     amount: BN,
@@ -37,7 +37,7 @@ export interface Itx {
   ): Promise<GenericEvent[]>
   buyAsset(
     api: ApiPromise,
-    keyringPair: KeyringPair,
+    account: KeyringPair | string,
     soldAssetId: string,
     boughtAssetId: string,
     amount: BN,
@@ -46,7 +46,7 @@ export interface Itx {
   ): Promise<GenericEvent[]>
   mintLiquidity(
     api: ApiPromise,
-    keyringPair: KeyringPair,
+    account: KeyringPair | string,
     firstAssetId: string,
     secondAssetId: string,
     firstAssetAmount: BN,
@@ -55,7 +55,7 @@ export interface Itx {
   ): Promise<GenericEvent[]>
   burnLiquidity(
     api: ApiPromise,
-    keyringPair: KeyringPair,
+    account: KeyringPair | string,
     firstAssetId: string,
     secondAssetId: string,
     liquidityAssetAmount: BN,
@@ -64,13 +64,13 @@ export interface Itx {
   createToken(
     api: ApiPromise,
     targetAddress: string,
-    sudoKeyringPair: KeyringPair,
+    sudoAccount: KeyringPair | string,
     currencyValue: BN,
     txOptions?: TxOptions
   ): Promise<GenericEvent[]>
   mintAsset(
     api: ApiPromise,
-    sudo: KeyringPair,
+    sudoAccount: KeyringPair | string,
     assetId: BN,
     targetAddress: string,
     amount: BN,
@@ -78,7 +78,7 @@ export interface Itx {
   ): Promise<GenericEvent[]>
   transferToken(
     api: ApiPromise,
-    account: KeyringPair,
+    account: KeyringPair | string,
     assetId: BN,
     targetAddress: string,
     amount: BN,
@@ -86,7 +86,7 @@ export interface Itx {
   ): Promise<GenericEvent[]>
   transferAllToken(
     api: ApiPromise,
-    account: KeyringPair,
+    account: KeyringPair | string,
     assetId: BN,
     targetAddress: string,
     txOptions?: TxOptions
@@ -218,3 +218,88 @@ export type LiquidityAssetType = (
   firstTokenId: BN,
   secondTokenId: BN
 ) => Promise<any>
+
+// TX types
+
+export type CreateTokenType = (
+  api: ApiPromise,
+  targetAddress: string,
+  sudoAccount: KeyringPair | string,
+  currencyValue: BN,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+export type CreatePoolType = (
+  api: ApiPromise,
+  account: KeyringPair | string,
+  firstAssetId: string,
+  firstAssetAmount: BN,
+  secondAssetId: string,
+  secondAssetAmount: BN,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+export type SellAssetType = (
+  api: ApiPromise,
+  account: KeyringPair | string,
+  soldAssetId: string,
+  boughtAssetId: string,
+  amount: BN,
+  minAmountOut: BN,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+export type BuyAssetType = (
+  api: ApiPromise,
+  account: KeyringPair | string,
+  soldAssetId: string,
+  boughtAssetId: string,
+  amount: BN,
+  maxAmountIn: BN,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+export type MintLiquidityType = (
+  api: ApiPromise,
+  account: KeyringPair | string,
+  firstAssetId: string,
+  secondAssetId: string,
+  firstAssetAmount: BN,
+  expectedSecondAssetAmount: BN,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+export type BurnLiquidityType = (
+  api: ApiPromise,
+  account: KeyringPair | string,
+  firstAssetId: string,
+  secondAssetId: string,
+  liquidityAssetAmount: BN,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+export type MintAssetType = (
+  api: ApiPromise,
+  sudoAccount: KeyringPair | string,
+  assetId: BN,
+  targetAddress: string,
+  amount: BN,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+export type TransferTokenType = (
+  api: ApiPromise,
+  account: KeyringPair | string,
+  tokenId: BN,
+  targetAddress: string,
+  amount: BN,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>
+
+export type TransferAllTokenType = (
+  api: ApiPromise,
+  account: KeyringPair | string,
+  tokenId: BN,
+  targetAddress: string,
+  txOptions?: TxOptions
+) => Promise<GenericEvent[]>

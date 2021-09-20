@@ -63,6 +63,7 @@ export class Mangata {
    */
 
   public async getChain(): Promise<string> {
+    log.info(`Retrieving chain ... `)
     const api = await this.connect()
     return RPC.getChain(api)
   }
@@ -72,6 +73,7 @@ export class Mangata {
    */
 
   public async getNodeName(): Promise<string> {
+    log.info(`Retrieving node name ...`)
     const api = await this.connect()
     return RPC.getNodeName(api)
   }
@@ -81,6 +83,7 @@ export class Mangata {
    */
 
   public async getNodeVersion(): Promise<string> {
+    log.info(`Retrieving node version ...`)
     const api = await this.connect()
     return RPC.getNodeVersion(api)
   }
@@ -90,6 +93,7 @@ export class Mangata {
    */
 
   public async getNonce(address: string): Promise<BN> {
+    log.info(`Retrieving nonce for the address: ${address}`)
     const api = await this.connect()
     return Query.getNonce(api, address)
   }
@@ -99,6 +103,7 @@ export class Mangata {
    */
 
   public async disconnect(): Promise<void> {
+    log.info(`Disconnecting ...`)
     const api = await this.connect()
     api.disconnect()
   }
@@ -108,7 +113,7 @@ export class Mangata {
    */
 
   public async createPool(
-    keyringPair: KeyringPair,
+    account: KeyringPair | string,
     firstAssetId: string,
     firstAssetAmount: BN,
     secondAssetId: string,
@@ -121,7 +126,7 @@ export class Mangata {
     )
     return await TX.createPool(
       api,
-      keyringPair,
+      account,
       firstAssetId,
       firstAssetAmount,
       secondAssetId,
@@ -134,17 +139,20 @@ export class Mangata {
    * Sell asset
    */
   public async sellAsset(
-    keyringPair: KeyringPair,
+    account: KeyringPair | string,
     soldAssetId: string,
     boughtAssetId: string,
     amount: BN,
     minAmountOut: BN,
     txOptions?: TxOptions
   ): Promise<GenericEvent[]> {
+    log.info(
+      `Selling asset with asset id: ${soldAssetId} in amount: ${amount} for asset id: ${boughtAssetId}, while specifying min amount out (minimal expected bought asset amount): ${minAmountOut}`
+    )
     const api = await this.connect()
     return await TX.sellAsset(
       api,
-      keyringPair,
+      account,
       soldAssetId,
       boughtAssetId,
       amount,
@@ -154,20 +162,23 @@ export class Mangata {
   }
 
   /**
-   * Mint liquidity
+   * Extrinsic to add liquidity to pool, while specifying first asset id and second asset
+   * id and first asset amount. Second asset amount is calculated in block, but cannot
+   * exceed expected second asset amount
    */
   public async mintLiquidity(
-    keyringPair: KeyringPair,
+    account: KeyringPair | string,
     firstAssetId: string,
     secondAssetId: string,
     firstAssetAmount: BN,
     expectedSecondAssetAmount: BN,
     txOptions?: TxOptions
   ): Promise<GenericEvent[]> {
+    log.info(`Adding liquidity to pool ...`)
     const api = await this.connect()
     return await TX.mintLiquidity(
       api,
-      keyringPair,
+      account,
       firstAssetId,
       secondAssetId,
       firstAssetAmount,
@@ -177,19 +188,21 @@ export class Mangata {
   }
 
   /**
-   * Burn liquidity
+   * Extrinsic to remove liquidity from liquidity pool, specifying first asset id and
+   * second asset id of a pool and liquidity asset amount you wish to burn
    */
   public async burnLiquidity(
-    keyringPair: KeyringPair,
+    account: KeyringPair | string,
     firstAssetId: string,
     secondAssetId: string,
     liquidityAssetAmount: BN,
     txOptions?: TxOptions
   ): Promise<GenericEvent[]> {
+    log.info(`Removing liquidity from liquidity pool ...`)
     const api = await this.connect()
     return await TX.burnLiquidity(
       api,
-      keyringPair,
+      account,
       firstAssetId,
       secondAssetId,
       liquidityAssetAmount,
@@ -198,44 +211,55 @@ export class Mangata {
   }
 
   /**
-   * Buy asset
+   * Extrinsic to buy/swap bought asset id in bought asset amount for sold asset id, while
+   * specifying max amount in: maximal amount you are willing to pay in sold asset id to
+   * purchase bouth asset id in bought asset amount
    */
   public async buyAsset(
-    keyringPair: KeyringPair,
+    account: KeyringPair | string,
     soldAssetId: string,
     boughtAssetId: string,
-    amount: BN,
+    boughtAssetAmount: BN,
     maxAmountIn: BN,
     txOptions?: TxOptions
   ): Promise<GenericEvent[]> {
+    log.info(
+      `Buying asset with asset id: ${boughtAssetId} in amount: ${boughtAssetAmount} for asset id: ${soldAssetId}, while specifying max amount in: maximal amount you are willing to pay in sold asset id: ${soldAssetId} to purchase bought asset id: ${boughtAssetId} in ${boughtAssetAmount}`
+    )
     const api = await this.connect()
     return await TX.buyAsset(
       api,
-      keyringPair,
+      account,
       soldAssetId,
       boughtAssetId,
-      amount,
+      boughtAssetAmount,
       maxAmountIn,
       txOptions
     )
   }
 
   /**
-   * Calculate buy price
+   * Returns sell amount you need to pay in sold token id for bought token id in buy
+   * amount, while specifying input reserve – reserve of sold token id, and output reserve
+   * – reserve of bought token id
    */
   public async calculateBuyPrice(inputReserve: BN, outputReserve: BN, buyAmount: BN): Promise<BN> {
+    log.info(`Calculating buy price ...`)
     const api = await this.connect()
     return await RPC.calculateBuyPrice(api, inputReserve, outputReserve, buyAmount)
   }
 
   /**
-   * Calculate sell price
+   * Returns bought asset amount returned by selling sold token id for bought token id in
+   * sell amount, while specifying input reserve – reserve of sold token id, and output
+   * reserve – reserve of bought token id
    */
   public async calculateSellPrice(
     inputReserve: BN,
     outputReserve: BN,
     sellAmount: BN
   ): Promise<BN> {
+    log.info(`Calculating sell price ...`)
     const api = await this.connect()
     return await RPC.calculateSellPrice(api, inputReserve, outputReserve, sellAmount)
   }
@@ -245,26 +269,26 @@ export class Mangata {
    */
   public async createToken(
     targetAddress: string,
-    sudoKeyringPair: KeyringPair,
+    sudoAccount: KeyringPair | string,
     currencyValue: BN,
     txOptions?: TxOptions
   ): Promise<GenericEvent[]> {
     const api = await this.connect()
-    return await TX.createToken(api, targetAddress, sudoKeyringPair, currencyValue, txOptions)
+    return await TX.createToken(api, targetAddress, sudoAccount, currencyValue, txOptions)
   }
 
   /**
    * Mint Asset
    */
   public async mintAsset(
-    sudo: KeyringPair,
+    sudoAccount: KeyringPair | string,
     assetId: BN,
     targetAddress: string,
     amount: BN,
     txOptions?: TxOptions
   ): Promise<GenericEvent[]> {
     const api = await this.connect()
-    return await TX.mintAsset(api, sudo, assetId, targetAddress, amount, txOptions)
+    return await TX.mintAsset(api, sudoAccount, assetId, targetAddress, amount, txOptions)
   }
 
   // TODO: not exposed in NODE: I cannot write test for this method
@@ -280,7 +304,8 @@ export class Mangata {
   }
 
   /**
-   * Get burn amount
+   * Returns amounts of first asset id and second asset id, while specifying first, second
+   * asset id liquidity asset amount of pool to burn
    */
   public async getBurnAmount(
     firstAssetId: BN,
@@ -293,7 +318,8 @@ export class Mangata {
 
   // TODO: return bought asset amount .. why it is called sell price ID
   /**
-   * Calculate sell price ID
+   * Returns bought asset amount returned by selling sold token id for bought token id in
+   * sell_amount
    */
 
   public async calculateSellPriceId(
@@ -306,7 +332,7 @@ export class Mangata {
   }
 
   /**
-   * Calculate buy price ID
+   * Returns sell amount you need to pay in sold token id for bought token id in buy amount
    */
 
   public async calculateBuyPriceId(soldTokenId: BN, boughtTokenId: BN, buyAmount: BN): Promise<BN> {
@@ -368,7 +394,7 @@ export class Mangata {
    */
 
   public async transferToken(
-    account: KeyringPair,
+    account: KeyringPair | string,
     tokenId: BN,
     targetAddress: string,
     amount: BN,
@@ -383,7 +409,7 @@ export class Mangata {
    */
 
   public async transferTokenAll(
-    account: KeyringPair,
+    account: KeyringPair | string,
     tokenId: BN,
     targetAddress: string,
     txOptions?: TxOptions

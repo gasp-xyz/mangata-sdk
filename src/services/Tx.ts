@@ -2,13 +2,25 @@
 import { ApiPromise } from '@polkadot/api'
 import { GenericExtrinsic, GenericEvent } from '@polkadot/types'
 import { KeyringPair } from '@polkadot/keyring/types'
-import { SubmittableExtrinsic, AddressOrPair } from '@polkadot/api/types'
-import { Signer } from '@polkadot/types/types'
+import { SubmittableExtrinsic } from '@polkadot/api/types'
 import BN from 'bn.js'
 import xoshiro from 'xoshiro'
+
 import memoryDatabase from '../utils/MemoryDatabase'
 import { Query } from './Query'
-import { Itx, TxOptions } from '../types'
+import {
+  BurnLiquidityType,
+  BuyAssetType,
+  CreatePoolType,
+  CreateTokenType,
+  Itx,
+  MintAssetType,
+  MintLiquidityType,
+  SellAssetType,
+  TransferAllTokenType,
+  TransferTokenType,
+  TxOptions,
+} from '../types'
 import { log } from '../utils/logger'
 
 export const fisher_yates_shuffle = <K>(objects: K[], seed: Uint8Array) => {
@@ -56,18 +68,19 @@ const recreateExtrinsicsOrder = (extrinsics: GenericExtrinsic[], seed_bytes: Uin
 export const signTx = async (
   api: ApiPromise,
   tx: SubmittableExtrinsic<'promise'>,
-  keyringPair: KeyringPair,
+  account: KeyringPair | string,
   txOptions?: TxOptions
 ): Promise<GenericEvent[]> => {
   return new Promise<GenericEvent[]>(async (resolve) => {
+    const extractedAccount = typeof account === 'string' ? account : account.address
     let result: GenericEvent[] = []
     let nonce: BN
     if (txOptions && txOptions.nonce) {
       nonce = txOptions.nonce
     } else {
-      const onChainNonce = await Query.getNonce(api, keyringPair.address)
-      if (memoryDatabase.hasAddressNonce(keyringPair.address)) {
-        nonce = memoryDatabase.getNonce(keyringPair.address)
+      const onChainNonce = await Query.getNonce(api, extractedAccount)
+      if (memoryDatabase.hasAddressNonce(extractedAccount)) {
+        nonce = memoryDatabase.getNonce(extractedAccount)
       } else {
         nonce = onChainNonce
       }
@@ -78,10 +91,10 @@ export const signTx = async (
     }
 
     const nextNonce: BN = nonce.addn(1)
-    memoryDatabase.setNonce(keyringPair.address, nextNonce)
+    memoryDatabase.setNonce(extractedAccount, nextNonce)
     log.info(`Nonce: ${nonce}`)
     const unsub = await tx.signAndSend(
-      keyringPair,
+      account,
       { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
       async ({ status, isError }) => {
         log.info(`Transaction status: ${status.type}`)
@@ -104,7 +117,7 @@ export const signTx = async (
               const index = shuffled_extrinsics.findIndex((e) => {
                 return (
                   e.isSigned &&
-                  e.signer.toString() === keyringPair.address &&
+                  e.signer.toString() === extractedAccount &&
                   e.nonce.toString() === nonce.toString()
                 )
               })
@@ -131,115 +144,32 @@ export const signTx = async (
           resolve(result)
         } else if (isError) {
           log.error(`Transaction error`)
-          const currentNonce: BN = await Query.getNonce(api, keyringPair.address)
-          memoryDatabase.setNonce(keyringPair.address, currentNonce)
+          const currentNonce: BN = await Query.getNonce(api, extractedAccount)
+          memoryDatabase.setNonce(extractedAccount, currentNonce)
         }
       }
     )
   })
 }
 
-export type CreateTokenType = (
-  api: ApiPromise,
-  targetAddress: string,
-  sudoKeyringPair: KeyringPair,
-  currencyValue: BN,
-  txOptions?: TxOptions
-) => Promise<GenericEvent[]>
-
-export type CreatePoolType = (
-  api: ApiPromise,
-  keyRingPair: KeyringPair,
-  firstAssetId: string,
-  firstAssetAmount: BN,
-  secondAssetId: string,
-  secondAssetAmount: BN,
-  txOptions?: TxOptions
-) => Promise<GenericEvent[]>
-
-export type SellAssetType = (
-  api: ApiPromise,
-  keyRingPair: KeyringPair,
-  soldAssetId: string,
-  boughtAssetId: string,
-  amount: BN,
-  minAmountOut: BN,
-  txOptions?: TxOptions
-) => Promise<GenericEvent[]>
-
-export type BuyAssetType = (
-  api: ApiPromise,
-  keyRingPair: KeyringPair,
-  soldAssetId: string,
-  boughtAssetId: string,
-  amount: BN,
-  maxAmountIn: BN,
-  txOptions?: TxOptions
-) => Promise<GenericEvent[]>
-
-export type MintLiquidityType = (
-  api: ApiPromise,
-  keyRingPair: KeyringPair,
-  firstAssetId: string,
-  secondAssetId: string,
-  firstAssetAmount: BN,
-  expectedSecondAssetAmount: BN,
-  txOptions?: TxOptions
-) => Promise<GenericEvent[]>
-
-export type BurnLiquidityType = (
-  api: ApiPromise,
-  keyRingPair: KeyringPair,
-  firstAssetId: string,
-  secondAssetId: string,
-  liquidityAssetAmount: BN,
-  txOptions?: TxOptions
-) => Promise<GenericEvent[]>
-
-export type MintAssetType = (
-  api: ApiPromise,
-  sudo: KeyringPair,
-  assetId: BN,
-  targetAddress: string,
-  amount: BN,
-  txOptions?: TxOptions
-) => Promise<GenericEvent[]>
-
-export type TransferTokenType = (
-  api: ApiPromise,
-  account: KeyringPair,
-  tokenId: BN,
-  targetAddress: string,
-  amount: BN,
-  txOptions?: TxOptions
-) => Promise<GenericEvent[]>
-
-export type TransferAllTokenType = (
-  api: ApiPromise,
-  account: KeyringPair,
-  tokenId: BN,
-  targetAddress: string,
-  txOptions?: TxOptions
-) => Promise<GenericEvent[]>
-
 const createToken: CreateTokenType = async (
   api: ApiPromise,
   targetAddress: string,
-  sudoKeyringPair: KeyringPair,
+  sudoAccount: KeyringPair | string,
   currencyValue: BN,
   txOptions?: TxOptions
 ): Promise<GenericEvent[]> => {
   return await signTx(
     api,
     api.tx.sudo.sudo(api.tx.tokens.create(targetAddress, currencyValue)),
-    sudoKeyringPair,
+    sudoAccount,
     txOptions
   )
 }
 
 const createPool: CreatePoolType = async (
   api: ApiPromise,
-  keyringPair: KeyringPair,
+  account: KeyringPair | string,
   firstAssetId: string,
   firstAssetAmount: BN,
   secondAssetId: string,
@@ -249,14 +179,14 @@ const createPool: CreatePoolType = async (
   return await signTx(
     api,
     api.tx.xyk.createPool(firstAssetId, firstAssetAmount, secondAssetId, secondAssetAmount),
-    keyringPair,
+    account,
     txOptions
   )
 }
 
 const sellAsset: SellAssetType = async (
   api: ApiPromise,
-  keyringPair: KeyringPair,
+  account: KeyringPair | string,
   soldAssetId: string,
   boughtAssetId: string,
   amount: BN,
@@ -266,14 +196,14 @@ const sellAsset: SellAssetType = async (
   return await signTx(
     api,
     api.tx.xyk.sellAsset(soldAssetId, boughtAssetId, amount, minAmountOut),
-    keyringPair,
+    account,
     txOptions
   )
 }
 
 const buyAsset: BuyAssetType = async (
   api: ApiPromise,
-  keyringPair: KeyringPair,
+  account: KeyringPair | string,
   soldAssetId: string,
   boughtAssetId: string,
   amount: BN,
@@ -283,14 +213,14 @@ const buyAsset: BuyAssetType = async (
   return await signTx(
     api,
     api.tx.xyk.buyAsset(soldAssetId, boughtAssetId, amount, maxAmountIn),
-    keyringPair,
+    account,
     txOptions
   )
 }
 
 const mintLiquidity: MintLiquidityType = async (
   api: ApiPromise,
-  keyringPair: KeyringPair,
+  account: KeyringPair | string,
   firstAssetId: string,
   secondAssetId: string,
   firstAssetAmount: BN,
@@ -305,14 +235,14 @@ const mintLiquidity: MintLiquidityType = async (
       firstAssetAmount,
       expectedSecondAssetAmount
     ),
-    keyringPair,
+    account,
     txOptions
   )
 }
 
 const burnLiquidity: BurnLiquidityType = async (
   api: ApiPromise,
-  keyringPair: KeyringPair,
+  account: KeyringPair | string,
   firstAssetId: string,
   secondAssetId: string,
   liquidityAssetAmount: BN,
@@ -321,14 +251,14 @@ const burnLiquidity: BurnLiquidityType = async (
   return await signTx(
     api,
     api.tx.xyk.burnLiquidity(firstAssetId, secondAssetId, liquidityAssetAmount),
-    keyringPair,
+    account,
     txOptions
   )
 }
 
 const mintAsset: MintAssetType = async (
   api: ApiPromise,
-  sudo: KeyringPair,
+  sudoAccount: KeyringPair | string,
   assetId: BN,
   targetAddress: string,
   amount: BN,
@@ -337,14 +267,14 @@ const mintAsset: MintAssetType = async (
   return await signTx(
     api,
     api.tx.sudo.sudo(api.tx.tokens.mint(assetId, targetAddress, amount)),
-    sudo,
+    sudoAccount,
     txOptions
   )
 }
 
 const transferToken: TransferTokenType = async (
   api: ApiPromise,
-  account: KeyringPair,
+  account: KeyringPair | string,
   tokenId: BN,
   targetAddress: string,
   amount: BN,
@@ -360,7 +290,7 @@ const transferToken: TransferTokenType = async (
 
 const transferAllToken: TransferAllTokenType = async (
   api: ApiPromise,
-  account: KeyringPair,
+  account: KeyringPair | string,
   tokenId: BN,
   targetAddress: string,
   txOptions?: TxOptions
