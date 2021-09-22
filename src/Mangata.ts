@@ -358,7 +358,8 @@ export class Mangata {
   }
 
   /**
-   * Get liquidity asset id
+   * Returns liquidity asset id while specifying first and second TokenId returns same liquidity asset id when specifying other way
+   * around – second and first TokenId
    */
   public async getLiquidityAssetId(firstTokenId: BN, secondTokenId: BN): Promise<BN> {
     const api = await this.connect()
@@ -366,7 +367,7 @@ export class Mangata {
   }
 
   /**
-   * Get liquidity pool
+   * Returns pool corresponding to specified liquidity asset ID in from of first and second TokenId pair
    */
   public async getLiquidityPool(liquidityAssetId: BN): Promise<BN[]> {
     const api = await this.connect()
@@ -374,7 +375,7 @@ export class Mangata {
   }
 
   /**
-   * Get treasury
+   * Returns amount of currency ID in Treasury
    */
   public async getTreasury(currencyId: BN): Promise<BN> {
     const api = await this.connect()
@@ -382,7 +383,7 @@ export class Mangata {
   }
 
   /**
-   * Get treasury burn
+   * Returns amount of currency ID in Treasury Burn
    */
   public async getTreasuryBurn(currencyId: BN): Promise<BN> {
     const api = await this.connect()
@@ -390,7 +391,7 @@ export class Mangata {
   }
 
   /**
-   * Extrinsic that transfers TokenId in value amount, from origin to dest
+   * Extrinsic that transfers TokenId in value amount from origin to destination
    */
 
   public async transferToken(
@@ -405,7 +406,7 @@ export class Mangata {
   }
 
   /**
-   * Extrinsic that transfers all token_id from origin to dest
+   * Extrinsic that transfers all token_id from origin to destination
    */
 
   public async transferTokenAll(
@@ -422,9 +423,9 @@ export class Mangata {
    * Returns total issuance of CurrencyId
    */
 
-  public async getTotalIssuanceOfTokenId(tokenId: BN): Promise<BN> {
+  public async getTotalIssuanceOfTokenId(currencyId: BN): Promise<BN> {
     const api = await this.connect()
-    return await Query.getTotalIssuanceOfTokenId(api, tokenId)
+    return await Query.getTotalIssuanceOfTokenId(api, currencyId)
   }
 
   /**
@@ -435,11 +436,17 @@ export class Mangata {
     return await Query.getLock(api, address, tokenId)
   }
 
-  public async getBalanceOfAsset(assetId: BN, accountAddress: string): Promise<BN> {
+  /**
+   * Returns Asset balance for address
+   */
+  public async getAssetBalanceForAddress(assetId: BN, address: string): Promise<BN> {
     const api = await this.connect()
-    return await Query.getBalanceOfAsset(api, assetId, accountAddress)
+    return await Query.getAssetBalanceForAddress(api, assetId, address)
   }
 
+  /**
+   * Returns next CurencyId, CurrencyId that will be used for next created token
+   */
   public async getNextAssetId(): Promise<BN> {
     const api = await this.connect()
     return await Query.getNextAssetId(api)

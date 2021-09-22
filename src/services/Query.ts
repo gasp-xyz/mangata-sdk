@@ -63,9 +63,9 @@ const getTreasuryBurn: TreasuryBurnType = async (api: ApiPromise, currencyId: BN
 
 const getTotalIssuanceOfTokenId: TotalIssuanceOfTokenIdType = async (
   api: ApiPromise,
-  tokenId: BN
+  currencyId: BN
 ): Promise<BN> => {
-  const tokenSupply = await api.query.tokens.totalIssuance(tokenId.toString())
+  const tokenSupply = await api.query.tokens.totalIssuance(currencyId.toString())
   return new BN(tokenSupply.toString())
 }
 
@@ -76,7 +76,7 @@ const getLock: LockType = async (api: ApiPromise, address: string, tokenId: BN) 
   return decodedlocks
 }
 
-const getBalanceOfAsset: BalanceAssetType = async (
+const getAssetBalanceForAddress: BalanceAssetType = async (
   api: ApiPromise,
   assetId: BN,
   accountAddress: string
@@ -100,6 +100,6 @@ export const Query: Iquery = {
   getTreasuryBurn,
   getTotalIssuanceOfTokenId,
   getLock,
-  getBalanceOfAsset,
+  getAssetBalanceForAddress,
   getNextAssetId,
 }

@@ -9,6 +9,7 @@ import { v4 as uuid } from 'uuid'
 import { options } from './utils/options'
 import rpcOptions from './utils/mangata-rpc'
 import typesOptions from './utils/mangata-types'
+import { log } from './utils/logger'
 
 export class MangataHelpers {
   public static getApiOptions(provider: WsProvider): ApiOptions {
@@ -27,7 +28,7 @@ export class MangataHelpers {
     let count = 0
     return new Promise(async (resolve) => {
       const unsubscribe = await api.rpc.chain.subscribeNewHeads((lastHeader) => {
-        console.log(`Last block #${lastHeader.number} has hash ${lastHeader.hash}`)
+        log.info(`Last block #${lastHeader.number} has hash ${lastHeader.hash}`)
         if (++count === 2) {
           unsubscribe()
           resolve(true)

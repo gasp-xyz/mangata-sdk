@@ -2,7 +2,6 @@ import { ApiPromise } from '@polkadot/api'
 import { GenericEvent } from '@polkadot/types'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { Signer } from '@polkadot/types/types'
-import type { AddressOrPair } from '@polkadot/api/types'
 import BN from 'bn.js'
 
 export type TxOptions = Partial<{
@@ -106,9 +105,9 @@ export interface Iquery {
   getLiquidityPool(api: ApiPromise, liquidityAssetId: BN): Promise<BN[]>
   getTreasury(api: ApiPromise, currencyId: BN): Promise<BN>
   getTreasuryBurn(api: ApiPromise, currencyId: BN): Promise<BN>
-  getTotalIssuanceOfTokenId(api: ApiPromise, tokenId: BN): Promise<BN>
+  getTotalIssuanceOfTokenId(api: ApiPromise, currencyId: BN): Promise<BN>
   getLock(api: ApiPromise, address: string, tokenId: BN): any
-  getBalanceOfAsset(api: ApiPromise, assetId: BN, accountAddress: string): Promise<BN>
+  getAssetBalanceForAddress(api: ApiPromise, assetId: BN, accountAddress: string): Promise<BN>
   getNextAssetId(api: ApiPromise): Promise<BN>
 }
 
