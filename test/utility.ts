@@ -39,7 +39,7 @@ export const getEventResultFromTxWait = (
   if (searchTerm.length > 0) {
     extrinsicResult = events.find((e) => {
       return (
-        e.event.toHuman().method !== null &&
+        e.method !== null &&
         searchTerm.every((filterTerm) =>
           (JSON.stringify(e.event.toHuman()) + JSON.stringify(e.event.toHuman().data)).includes(
             filterTerm
@@ -49,9 +49,7 @@ export const getEventResultFromTxWait = (
     })
   } else {
     extrinsicResult = events.find(
-      (e) =>
-        e.event.toHuman().method !== null &&
-        extrinsicResultMethods.includes(e.event.toHuman().method!.toString())
+      (e) => e.method !== null && extrinsicResultMethods.includes(e.method)
     )
   }
 
