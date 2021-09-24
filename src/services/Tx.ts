@@ -95,7 +95,7 @@ export const signTx = async (
 
     const nextNonce: BN = nonce.addn(1)
     memoryDatabase.setNonce(extractedAccount, nextNonce)
-    log.info('Nonce: ', nonce)
+    log.info('Nonce: ', nonce.toNumber())
     try {
       const unsub = await tx.signAndSend(
         account,

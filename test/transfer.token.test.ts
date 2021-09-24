@@ -32,7 +32,7 @@ beforeEach(async () => {
   await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
 })
 
-describe('test transfer token', () => {
+describe('Testing additional methods', () => {
   it('should trasnfer tokens from testUser1 to testUser2', async () => {
     const result = await mangataInstance.transferToken(
       testUser,
@@ -76,6 +76,37 @@ describe('test transfer token', () => {
 
     expect(lock).toEqual([])
   })
+})
+
+it('should get next token id', async () => {
+  await mangataInstance.createPool(
+    testUser,
+    firstCurrency,
+    new BN(50000),
+    secondCurrency,
+    new BN(25000)
+  )
+  await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
+  const liquidityAssetId = await mangataInstance.getLiquidityAssetId(
+    new BN(firstCurrency),
+    new BN(secondCurrency)
+  )
+  expect(liquidityAssetId.toNumber()).toBeGreaterThanOrEqual(0)
+})
+
+it('should get next token id', async () => {
+  const currencyId = await mangataInstance.getNextAssetId()
+  expect(currencyId.toNumber()).toBeGreaterThanOrEqual(0)
+})
+
+it('should get treasury', async () => {
+  const amountCurrencyId = await mangataInstance.getTreasury(new BN(firstCurrency))
+  expect(amountCurrencyId.toNumber()).toBeGreaterThanOrEqual(0)
+})
+
+it('should get treasury burn', async () => {
+  const amountCurrencyIdInTreasury = await mangataInstance.getTreasuryBurn(new BN(firstCurrency))
+  expect(amountCurrencyIdInTreasury.toNumber()).toBeGreaterThanOrEqual(0)
 })
 
 afterAll(async () => {
