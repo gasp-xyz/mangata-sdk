@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 import { ApiPromise, WsProvider } from '@polkadot/api'
-import { GenericEvent } from '@polkadot/types'
 import { KeyringPair } from '@polkadot/keyring/types'
 import BN from 'bn.js'
 
@@ -8,7 +7,7 @@ import { options } from './utils/options'
 import { RPC } from './services/Rpc'
 import { TX } from './services/Tx'
 import { Query } from './services/Query'
-import { TxOptions } from './types'
+import { MangataGenericEvent, TxOptions } from './types'
 import { log } from './utils/logger'
 
 /**
@@ -119,7 +118,7 @@ export class Mangata {
     secondAssetId: string,
     secondAssetAmount: BN,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]> {
+  ): Promise<MangataGenericEvent[]> {
     const api = await this.connect()
     log.info(
       `Creating pool with [First Asset Id: ${firstAssetId} - ${firstAssetAmount} amount] and [Second Asset Id ${secondAssetId} - ${secondAssetAmount} amount] `
@@ -145,10 +144,8 @@ export class Mangata {
     amount: BN,
     minAmountOut: BN,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]> {
-    log.info(
-      `Selling asset with asset id: ${soldAssetId} in amount: ${amount} for asset id: ${boughtAssetId}, while specifying min amount out (minimal expected bought asset amount): ${minAmountOut}`
-    )
+  ): Promise<MangataGenericEvent[]> {
+    log.info('Selling asset ...')
     const api = await this.connect()
     return await TX.sellAsset(
       api,
@@ -173,7 +170,7 @@ export class Mangata {
     firstAssetAmount: BN,
     expectedSecondAssetAmount: BN,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]> {
+  ): Promise<MangataGenericEvent[]> {
     log.info(`Adding liquidity to pool ...`)
     const api = await this.connect()
     return await TX.mintLiquidity(
@@ -197,7 +194,7 @@ export class Mangata {
     secondAssetId: string,
     liquidityAssetAmount: BN,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]> {
+  ): Promise<MangataGenericEvent[]> {
     log.info(`Removing liquidity from liquidity pool ...`)
     const api = await this.connect()
     return await TX.burnLiquidity(
@@ -222,10 +219,8 @@ export class Mangata {
     boughtAssetAmount: BN,
     maxAmountIn: BN,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]> {
-    log.info(
-      `Buying asset with asset id: ${boughtAssetId} in amount: ${boughtAssetAmount} for asset id: ${soldAssetId}, while specifying max amount in: maximal amount you are willing to pay in sold asset id: ${soldAssetId} to purchase bought asset id: ${boughtAssetId} in ${boughtAssetAmount}`
-    )
+  ): Promise<MangataGenericEvent[]> {
+    log.info('Buying asset ...')
     const api = await this.connect()
     return await TX.buyAsset(
       api,
@@ -272,7 +267,7 @@ export class Mangata {
     sudoAccount: KeyringPair | string,
     currencyValue: BN,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]> {
+  ): Promise<MangataGenericEvent[]> {
     const api = await this.connect()
     return await TX.createToken(api, targetAddress, sudoAccount, currencyValue, txOptions)
   }
@@ -286,21 +281,9 @@ export class Mangata {
     targetAddress: string,
     amount: BN,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]> {
+  ): Promise<MangataGenericEvent[]> {
     const api = await this.connect()
     return await TX.mintAsset(api, sudoAccount, assetId, targetAddress, amount, txOptions)
-  }
-
-  // TODO: not exposed in NODE: I cannot write test for this method
-  /**
-   * Get tokens required for minting
-   */
-  public async getTokensRequiredForMinting(
-    liquidityAssetId: BN,
-    liquidityAssetAmount: BN
-  ): Promise<any> {
-    const api = await this.connect()
-    return await RPC.getTokensRequiredForMinting(api, liquidityAssetId, liquidityAssetAmount)
   }
 
   /**
@@ -316,7 +299,6 @@ export class Mangata {
     return await RPC.getBurnAmount(api, firstAssetId, secondAssetId, liquidityAssetAmount)
   }
 
-  // TODO: return bought asset amount .. why it is called sell price ID
   /**
    * Returns bought asset amount returned by selling sold token id for bought token id in
    * sell_amount
@@ -338,15 +320,6 @@ export class Mangata {
   public async calculateBuyPriceId(soldTokenId: BN, boughtTokenId: BN, buyAmount: BN): Promise<BN> {
     const api = await this.connect()
     return await RPC.calculateBuyPriceId(api, soldTokenId, boughtTokenId, buyAmount)
-  }
-
-  /**
-   * Get liquidity asset (NOT EXPOSED: I cannot write test for this function)
-   */
-
-  public async getLiquidityAsset(firstTokenId: BN, secondTokenId: BN): Promise<any> {
-    const api = await this.connect()
-    return await RPC.getLiquidityAsset(api, firstTokenId, secondTokenId)
   }
 
   /**
@@ -400,7 +373,7 @@ export class Mangata {
     targetAddress: string,
     amount: BN,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]> {
+  ): Promise<MangataGenericEvent[]> {
     const api = await this.connect()
     return await TX.transferToken(api, account, tokenId, targetAddress, amount, txOptions)
   }
@@ -414,7 +387,7 @@ export class Mangata {
     tokenId: BN,
     targetAddress: string,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]> {
+  ): Promise<MangataGenericEvent[]> {
     const api = await this.connect()
     return await TX.transferAllToken(api, account, tokenId, targetAddress, txOptions)
   }

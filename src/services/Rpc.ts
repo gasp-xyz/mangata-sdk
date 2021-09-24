@@ -8,10 +8,8 @@ import {
   CalculateSellPriceIdType,
   ChainType,
   Irpc,
-  LiquidityAssetType,
   NodeNameType,
   NodeVersionType,
-  TokensRequiredForMintingType,
 } from '../types'
 import { log } from '../utils/logger'
 
@@ -31,19 +29,6 @@ const getNodeVersion: NodeVersionType = async (api: ApiPromise): Promise<string>
   const version = await api.rpc.system.version()
   log.info(`Retrieved version: ${version}`)
   return version.toHuman()
-}
-
-// TODO: need to figure out what is the return  value from this method
-const getTokensRequiredForMinting: TokensRequiredForMintingType = async (
-  api: ApiPromise,
-  liquidityAssetId: BN,
-  liquidityAssetAmount: BN
-): Promise<any> => {
-  const result = await (api.rpc as any).get_tokens_required_for_minting(
-    liquidityAssetId,
-    liquidityAssetAmount
-  )
-  return result.toHuman()
 }
 
 const calculateBuyPrice: CalculateBuyPriceType = async (
@@ -117,16 +102,6 @@ const calculateBuyPriceId: CalculateSellPriceIdType = async (
   return new BN(result.price)
 }
 
-// TODO: Need to figure out what is the return value from this method
-const getLiquidityAsset: LiquidityAssetType = async (
-  api: ApiPromise,
-  firstTokenId: BN,
-  secondTokenId: BN
-): Promise<any> => {
-  const result = await (api.rpc as any).xyk.get_liquidity_asset(firstTokenId, secondTokenId)
-  return result
-}
-
 export const RPC: Irpc = {
   getChain,
   getNodeName,
@@ -135,7 +110,5 @@ export const RPC: Irpc = {
   calculateSellPrice,
   calculateSellPriceId,
   calculateBuyPriceId,
-  getLiquidityAsset,
-  getTokensRequiredForMinting,
   getBurnAmount,
 }

@@ -1,13 +1,28 @@
 import { ApiPromise } from '@polkadot/api'
 import { GenericEvent } from '@polkadot/types'
 import { KeyringPair } from '@polkadot/keyring/types'
-import { Signer } from '@polkadot/types/types'
+import { Signer, Codec } from '@polkadot/types/types'
+import type { Event, Phase } from '@polkadot/types/interfaces'
 import BN from 'bn.js'
 
 export type TxOptions = Partial<{
   nonce: BN
   signer: Signer
 }>
+
+export interface MangataEventData {
+  type: string
+  data: Codec
+}
+
+export interface MangataGenericEvent extends GenericEvent {
+  event: Event
+  phase: Phase
+  section: string
+  method: string
+  metaDocumentation: string
+  eventData: MangataEventData[]
+}
 
 export enum ExtrinsicResult {
   ExtrinsicSuccess,
@@ -24,7 +39,7 @@ export interface Itx {
     secondAssetId: string,
     secondAssetAmount: BN,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]>
+  ): Promise<MangataGenericEvent[]>
   sellAsset(
     api: ApiPromise,
     account: KeyringPair | string,
@@ -33,7 +48,7 @@ export interface Itx {
     amount: BN,
     minAmountOut: BN,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]>
+  ): Promise<MangataGenericEvent[]>
   buyAsset(
     api: ApiPromise,
     account: KeyringPair | string,
@@ -42,7 +57,7 @@ export interface Itx {
     amount: BN,
     maxAmountIn: BN,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]>
+  ): Promise<MangataGenericEvent[]>
   mintLiquidity(
     api: ApiPromise,
     account: KeyringPair | string,
@@ -51,7 +66,7 @@ export interface Itx {
     firstAssetAmount: BN,
     expectedSecondAssetAmount: BN,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]>
+  ): Promise<MangataGenericEvent[]>
   burnLiquidity(
     api: ApiPromise,
     account: KeyringPair | string,
@@ -59,14 +74,14 @@ export interface Itx {
     secondAssetId: string,
     liquidityAssetAmount: BN,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]>
+  ): Promise<MangataGenericEvent[]>
   createToken(
     api: ApiPromise,
     targetAddress: string,
     sudoAccount: KeyringPair | string,
     currencyValue: BN,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]>
+  ): Promise<MangataGenericEvent[]>
   mintAsset(
     api: ApiPromise,
     sudoAccount: KeyringPair | string,
@@ -74,7 +89,7 @@ export interface Itx {
     targetAddress: string,
     amount: BN,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]>
+  ): Promise<MangataGenericEvent[]>
   transferToken(
     api: ApiPromise,
     account: KeyringPair | string,
@@ -82,14 +97,14 @@ export interface Itx {
     targetAddress: string,
     amount: BN,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]>
+  ): Promise<MangataGenericEvent[]>
   transferAllToken(
     api: ApiPromise,
     account: KeyringPair | string,
     assetId: BN,
     targetAddress: string,
     txOptions?: TxOptions
-  ): Promise<GenericEvent[]>
+  ): Promise<MangataGenericEvent[]>
 }
 
 export interface Database {
@@ -127,11 +142,6 @@ export interface Irpc {
     outputReserve: BN,
     sellAmount: BN
   ): Promise<BN>
-  getTokensRequiredForMinting(
-    api: ApiPromise,
-    liquidityAssetId: BN,
-    liquidityAssetAmount: BN
-  ): Promise<any>
   getBurnAmount(
     api: ApiPromise,
     firstAssetId: BN,
@@ -150,7 +160,6 @@ export interface Irpc {
     boughtTokenId: BN,
     buyAmount: BN
   ): Promise<BN>
-  getLiquidityAsset(api: ApiPromise, firstTokenId: BN, secondTokenId: BN): Promise<any>
 }
 
 // Query methods types
@@ -177,11 +186,6 @@ export type NextAssetIdType = (api: ApiPromise) => Promise<BN>
 export type ChainType = (api: ApiPromise) => Promise<string>
 export type NodeNameType = (api: ApiPromise) => Promise<string>
 export type NodeVersionType = (api: ApiPromise) => Promise<string>
-export type TokensRequiredForMintingType = (
-  api: ApiPromise,
-  liquidityAssetId: BN,
-  liquidityAssetAmount: BN
-) => Promise<any>
 export type CalculateBuyPriceType = (
   api: ApiPromise,
   inputReserve: BN,
@@ -212,11 +216,6 @@ export type CalculateBuyPriceIdType = (
   boughtTokenId: BN,
   buyAmount: BN
 ) => Promise<BN>
-export type LiquidityAssetType = (
-  api: ApiPromise,
-  firstTokenId: BN,
-  secondTokenId: BN
-) => Promise<any>
 
 // TX types
 
@@ -226,7 +225,7 @@ export type CreateTokenType = (
   sudoAccount: KeyringPair | string,
   currencyValue: BN,
   txOptions?: TxOptions
-) => Promise<GenericEvent[]>
+) => Promise<MangataGenericEvent[]>
 
 export type CreatePoolType = (
   api: ApiPromise,
@@ -236,7 +235,7 @@ export type CreatePoolType = (
   secondAssetId: string,
   secondAssetAmount: BN,
   txOptions?: TxOptions
-) => Promise<GenericEvent[]>
+) => Promise<MangataGenericEvent[]>
 
 export type SellAssetType = (
   api: ApiPromise,
@@ -246,7 +245,7 @@ export type SellAssetType = (
   amount: BN,
   minAmountOut: BN,
   txOptions?: TxOptions
-) => Promise<GenericEvent[]>
+) => Promise<MangataGenericEvent[]>
 
 export type BuyAssetType = (
   api: ApiPromise,
@@ -256,7 +255,7 @@ export type BuyAssetType = (
   amount: BN,
   maxAmountIn: BN,
   txOptions?: TxOptions
-) => Promise<GenericEvent[]>
+) => Promise<MangataGenericEvent[]>
 
 export type MintLiquidityType = (
   api: ApiPromise,
@@ -266,7 +265,7 @@ export type MintLiquidityType = (
   firstAssetAmount: BN,
   expectedSecondAssetAmount: BN,
   txOptions?: TxOptions
-) => Promise<GenericEvent[]>
+) => Promise<MangataGenericEvent[]>
 
 export type BurnLiquidityType = (
   api: ApiPromise,
@@ -275,7 +274,7 @@ export type BurnLiquidityType = (
   secondAssetId: string,
   liquidityAssetAmount: BN,
   txOptions?: TxOptions
-) => Promise<GenericEvent[]>
+) => Promise<MangataGenericEvent[]>
 
 export type MintAssetType = (
   api: ApiPromise,
@@ -284,7 +283,7 @@ export type MintAssetType = (
   targetAddress: string,
   amount: BN,
   txOptions?: TxOptions
-) => Promise<GenericEvent[]>
+) => Promise<MangataGenericEvent[]>
 
 export type TransferTokenType = (
   api: ApiPromise,
@@ -293,7 +292,7 @@ export type TransferTokenType = (
   targetAddress: string,
   amount: BN,
   txOptions?: TxOptions
-) => Promise<GenericEvent[]>
+) => Promise<MangataGenericEvent[]>
 
 export type TransferAllTokenType = (
   api: ApiPromise,
@@ -301,4 +300,4 @@ export type TransferAllTokenType = (
   tokenId: BN,
   targetAddress: string,
   txOptions?: TxOptions
-) => Promise<GenericEvent[]>
+) => Promise<MangataGenericEvent[]>

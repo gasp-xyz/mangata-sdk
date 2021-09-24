@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import { ApiPromise } from '@polkadot/api'
-import { GenericExtrinsic, GenericEvent } from '@polkadot/types'
+import { GenericExtrinsic } from '@polkadot/types'
+import { Codec } from '@polkadot/types/types'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { SubmittableExtrinsic } from '@polkadot/api/types'
 import BN from 'bn.js'
@@ -14,6 +15,8 @@ import {
   CreatePoolType,
   CreateTokenType,
   Itx,
+  MangataEventData,
+  MangataGenericEvent,
   MintAssetType,
   MintLiquidityType,
   SellAssetType,
@@ -33,7 +36,7 @@ export const fisher_yates_shuffle = <K>(objects: K[], seed: Uint8Array) => {
   }
 }
 
-const recreateExtrinsicsOrder = (extrinsics: GenericExtrinsic[], seed_bytes: Uint8Array) => {
+const recreateExtrinsicsOrder = (extrinsics: GenericExtrinsic[], seedBytes: Uint8Array) => {
   const slots = extrinsics.map((ev) => {
     if (ev.isSigned) {
       return ev.signer.toString()
@@ -42,7 +45,7 @@ const recreateExtrinsicsOrder = (extrinsics: GenericExtrinsic[], seed_bytes: Uin
     }
   })
 
-  fisher_yates_shuffle(slots, seed_bytes)
+  fisher_yates_shuffle(slots, seedBytes)
 
   const map = new Map()
 
@@ -70,10 +73,10 @@ export const signTx = async (
   tx: SubmittableExtrinsic<'promise'>,
   account: KeyringPair | string,
   txOptions?: TxOptions
-): Promise<GenericEvent[]> => {
-  return new Promise<GenericEvent[]>(async (resolve) => {
+): Promise<MangataGenericEvent[]> => {
+  return new Promise<MangataGenericEvent[]>(async (resolve, reject) => {
     const extractedAccount = typeof account === 'string' ? account : account.address
-    let result: GenericEvent[] = []
+    let result: MangataGenericEvent[] = []
     let nonce: BN
     if (txOptions && txOptions.nonce) {
       nonce = txOptions.nonce
@@ -92,63 +95,101 @@ export const signTx = async (
 
     const nextNonce: BN = nonce.addn(1)
     memoryDatabase.setNonce(extractedAccount, nextNonce)
-    log.info(`Nonce: ${nonce}`)
-    const unsub = await tx.signAndSend(
-      account,
-      { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
-      async ({ status, isError }) => {
-        log.info(`Transaction status: ${status.type}`)
-        if (status.isInBlock) {
-          log.info(`Included at block hash: ${status.asInBlock.toHex()}`)
-          const unsub_new_heads = await api.rpc.chain.subscribeNewHeads(async (lastHeader) => {
-            if (lastHeader.parentHash.toString() === status.asInBlock.toString()) {
-              unsub_new_heads()
-              const prev_block_extrinsics = (await api.rpc.chain.getBlock(lastHeader.parentHash))
-                .block.extrinsics
-              const curr_block_events = await api.query.system.events.at(lastHeader.hash)
+    log.info('Nonce: ', nonce)
+    try {
+      const unsub = await tx.signAndSend(
+        account,
+        { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
+        async ({ status, isError }) => {
+          log.info('Transaction status: ', status.type)
+          if (status.isInBlock) {
+            log.info('Included at block hash: ', status.asInBlock.toHex())
 
-              const json_response = JSON.parse(lastHeader.toString())
-              const seed_bytes = Uint8Array.from(
-                Buffer.from(json_response['seed']['seed'].substring(2), 'hex')
-              )
-              const shuffled_extrinsics = recreateExtrinsicsOrder(prev_block_extrinsics, seed_bytes)
+            const unsub_new_heads = await api.rpc.chain.subscribeNewHeads(async (lastHeader) => {
+              if (lastHeader.parentHash.toString() === status.asInBlock.toString()) {
+                unsub_new_heads()
+                const previousBlock = await api.rpc.chain.getBlock(lastHeader.parentHash)
+                const previousBlockExtrinsics = previousBlock.block.extrinsics
+                const currentBlockEvents = await api.query.system.events.at(lastHeader.hash)
+                const blockNumber = lastHeader.toJSON().number
+                log.info('Currently at block: ', blockNumber)
 
-              // filter extrinsic triggered by current request
-              const index = shuffled_extrinsics.findIndex((e) => {
-                return (
-                  e.isSigned &&
-                  e.signer.toString() === extractedAccount &&
-                  e.nonce.toString() === nonce.toString()
+                const headerJsonResponse = JSON.parse(lastHeader.toString())
+
+                const buffer: Buffer = Buffer.from(
+                  headerJsonResponse['seed']['seed'].substring(2),
+                  'hex'
                 )
-              })
-              if (index < 0) {
-                return
-              }
+                const seedBytes = Uint8Array.from(buffer)
+                const shuffledExtrinsics = recreateExtrinsicsOrder(
+                  previousBlockExtrinsics,
+                  seedBytes
+                )
 
-              const req_events = curr_block_events
-                .filter((event) => {
+                const index = shuffledExtrinsics.findIndex((shuffledExtrinsic) => {
                   return (
-                    event.phase.isApplyExtrinsic &&
-                    event.phase.asApplyExtrinsic.toNumber() === index
+                    shuffledExtrinsic.isSigned &&
+                    shuffledExtrinsic.signer.toString() === extractedAccount &&
+                    shuffledExtrinsic.nonce.toString() === nonce.toString()
                   )
                 })
-                .map(({ event }) => {
-                  return event
-                })
-              result = result.concat(req_events)
-            }
-          })
-        } else if (status.isFinalized) {
-          log.info(`Finalized block hash: ${status.asFinalized.toHex()}`)
-          unsub()
-          resolve(result)
-        } else if (isError) {
-          log.error(`Transaction error`)
-          const currentNonce: BN = await Query.getNonce(api, extractedAccount)
-          memoryDatabase.setNonce(extractedAccount, currentNonce)
+                if (index < 0) {
+                  return
+                }
+
+                const reqEvents: MangataGenericEvent[] = currentBlockEvents
+                  .filter((currentBlockEvent) => {
+                    return (
+                      currentBlockEvent.phase.isApplyExtrinsic &&
+                      currentBlockEvent.phase.asApplyExtrinsic.toNumber() === index
+                    )
+                  })
+                  .map((eventRecord) => {
+                    const { event, phase } = eventRecord
+                    const types = event.typeDef
+                    const eventData: MangataEventData[] = event.data.map((d, i) => {
+                      return {
+                        type: types[i].type,
+                        data: d,
+                      }
+                    })
+
+                    log.info('Event Section: ', event.section)
+                    log.info('Event Method: ', event.method)
+                    log.info('Event Phase: ', JSON.stringify(phase, null, 2))
+                    log.info('Event Metadata: ', event.meta.documentation.toString())
+                    log.info(`Event Data:`, JSON.stringify(eventData, null, 2))
+
+                    return {
+                      event,
+                      phase,
+                      section: event.section,
+                      method: event.method,
+                      metaDocumentation: event.meta.documentation.toString(),
+                      eventData,
+                    } as MangataGenericEvent
+                  })
+                result = result.concat(reqEvents)
+              }
+            })
+          } else if (status.isFinalized) {
+            log.info('Finalized block hash: ', status.asFinalized.toHex())
+            unsub()
+            resolve(result)
+          } else if (isError) {
+            unsub()
+            log.error(`Transaction error`)
+            const currentNonce: BN = await Query.getNonce(api, extractedAccount)
+            memoryDatabase.setNonce(extractedAccount, currentNonce)
+          }
         }
-      }
-    )
+      )
+    } catch (error) {
+      reject({
+        type: 'type',
+        data: (error as Error).message || (error as Error).message || (error as Error).toString(),
+      })
+    }
   })
 }
 
@@ -158,7 +199,7 @@ const createToken: CreateTokenType = async (
   sudoAccount: KeyringPair | string,
   currencyValue: BN,
   txOptions?: TxOptions
-): Promise<GenericEvent[]> => {
+): Promise<MangataGenericEvent[]> => {
   return await signTx(
     api,
     api.tx.sudo.sudo(api.tx.tokens.create(targetAddress, currencyValue)),
@@ -175,7 +216,7 @@ const createPool: CreatePoolType = async (
   secondAssetId: string,
   secondAssetAmount: BN,
   txOptions?: TxOptions
-): Promise<GenericEvent[]> => {
+): Promise<MangataGenericEvent[]> => {
   return await signTx(
     api,
     api.tx.xyk.createPool(firstAssetId, firstAssetAmount, secondAssetId, secondAssetAmount),
@@ -192,7 +233,7 @@ const sellAsset: SellAssetType = async (
   amount: BN,
   minAmountOut: BN,
   txOptions?: TxOptions
-): Promise<GenericEvent[]> => {
+): Promise<MangataGenericEvent[]> => {
   return await signTx(
     api,
     api.tx.xyk.sellAsset(soldAssetId, boughtAssetId, amount, minAmountOut),
@@ -209,7 +250,7 @@ const buyAsset: BuyAssetType = async (
   amount: BN,
   maxAmountIn: BN,
   txOptions?: TxOptions
-): Promise<GenericEvent[]> => {
+): Promise<MangataGenericEvent[]> => {
   return await signTx(
     api,
     api.tx.xyk.buyAsset(soldAssetId, boughtAssetId, amount, maxAmountIn),
@@ -226,7 +267,7 @@ const mintLiquidity: MintLiquidityType = async (
   firstAssetAmount: BN,
   expectedSecondAssetAmount: BN = new BN(Number.MAX_SAFE_INTEGER),
   txOptions?: TxOptions
-): Promise<GenericEvent[]> => {
+): Promise<MangataGenericEvent[]> => {
   return await signTx(
     api,
     api.tx.xyk.mintLiquidity(
@@ -247,7 +288,7 @@ const burnLiquidity: BurnLiquidityType = async (
   secondAssetId: string,
   liquidityAssetAmount: BN,
   txOptions?: TxOptions
-): Promise<GenericEvent[]> => {
+): Promise<MangataGenericEvent[]> => {
   return await signTx(
     api,
     api.tx.xyk.burnLiquidity(firstAssetId, secondAssetId, liquidityAssetAmount),
@@ -263,7 +304,7 @@ const mintAsset: MintAssetType = async (
   targetAddress: string,
   amount: BN,
   txOptions?: TxOptions
-): Promise<GenericEvent[]> => {
+): Promise<MangataGenericEvent[]> => {
   return await signTx(
     api,
     api.tx.sudo.sudo(api.tx.tokens.mint(assetId, targetAddress, amount)),
@@ -279,7 +320,7 @@ const transferToken: TransferTokenType = async (
   targetAddress: string,
   amount: BN,
   txOptions?: TxOptions
-): Promise<GenericEvent[]> => {
+): Promise<MangataGenericEvent[]> => {
   return await signTx(
     api,
     api.tx.tokens.transfer(targetAddress, tokenId, amount),
@@ -294,7 +335,7 @@ const transferAllToken: TransferAllTokenType = async (
   tokenId: BN,
   targetAddress: string,
   txOptions?: TxOptions
-): Promise<GenericEvent[]> => {
+): Promise<MangataGenericEvent[]> => {
   return await signTx(api, api.tx.tokens.transferAll(targetAddress, tokenId), account, txOptions)
 }
 

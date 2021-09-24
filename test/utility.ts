@@ -1,10 +1,9 @@
 /* eslint-disable no-console */
 import { GenericEvent } from '@polkadot/types'
 import { KeyringPair } from '@polkadot/keyring/types'
-import type { AnyJson } from '@polkadot/types/types'
 import BN from 'bn.js'
 
-import { ExtrinsicResult } from '../src/types'
+import { ExtrinsicResult, MangataGenericEvent } from '../src/types'
 import { Mangata } from '../src/Mangata'
 import { MangataHelpers } from '../src/MangataHelpers'
 
@@ -21,9 +20,10 @@ export const addAccountCurrencies = async (
     const result = await mangataInstance.createToken(user.address, sudo, currencyValues[currency], {
       nonce,
     })
+
     const eventResult = getEventResultFromTxWait(result, ['tokens', 'Issued', user.address])
 
-    const currencyId = new BN(eventResult.data[0])
+    const currencyId = new BN(eventResult.data[0]['data'])
     currencies.push(currencyId)
   }
   await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
@@ -31,41 +31,43 @@ export const addAccountCurrencies = async (
 }
 
 export const getEventResultFromTxWait = (
-  relatedEvents: GenericEvent[],
+  events: MangataGenericEvent[],
   searchTerm: string[] = []
 ): { state: ExtrinsicResult; data: string | number | any } => {
   const extrinsicResultMethods = ['ExtrinsicSuccess', 'ExtrinsicFailed', 'ExtrinsicUndefined']
   let extrinsicResult
   if (searchTerm.length > 0) {
-    extrinsicResult = relatedEvents.find(
-      (e) =>
-        e.toHuman().method !== null &&
+    extrinsicResult = events.find((e) => {
+      return (
+        e.event.toHuman().method !== null &&
         searchTerm.every((filterTerm) =>
-          (JSON.stringify(e.toHuman()) + JSON.stringify(e.toHuman().data)).includes(filterTerm)
+          (JSON.stringify(e.event.toHuman()) + JSON.stringify(e.event.toHuman().data)).includes(
+            filterTerm
+          )
         )
-    )
+      )
+    })
   } else {
-    extrinsicResult = relatedEvents.find(
+    extrinsicResult = events.find(
       (e) =>
-        e.toHuman().method !== null &&
-        extrinsicResultMethods.includes(e.toHuman().method!.toString())
+        e.event.toHuman().method !== null &&
+        extrinsicResultMethods.includes(e.event.toHuman().method!.toString())
     )
   }
 
   if (extrinsicResult) {
-    const eventResult = extrinsicResult.toHuman()
-    switch (eventResult.method) {
+    switch (extrinsicResult.method) {
       case extrinsicResultMethods[1]:
-        const data = eventResult.data as AnyJson[]
-        const error = JSON.stringify(data[0])
-        const errorNumber = JSON.parse(error).Module.error
-        return { state: ExtrinsicResult.ExtrinsicFailed, data: parseInt(errorNumber) }
+        return { state: ExtrinsicResult.ExtrinsicFailed, data: 'Extrinsic Failed' }
 
       case extrinsicResultMethods[2]:
-        return { state: ExtrinsicResult.ExtrinsicUndefined, data: eventResult.data }
+        return {
+          state: ExtrinsicResult.ExtrinsicUndefined,
+          data: extrinsicResult.eventData,
+        }
 
       default:
-        return { state: ExtrinsicResult.ExtrinsicSuccess, data: eventResult.data }
+        return { state: ExtrinsicResult.ExtrinsicSuccess, data: extrinsicResult.eventData }
     }
   }
   return { state: -1, data: 'ERROR: NO TX FOUND' }
