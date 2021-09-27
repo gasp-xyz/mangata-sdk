@@ -1,11 +1,10 @@
 /* eslint-disable no-console */
 import { ApiPromise } from '@polkadot/api'
 import { GenericExtrinsic } from '@polkadot/types'
-import { Codec } from '@polkadot/types/types'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { SubmittableExtrinsic } from '@polkadot/api/types'
 import BN from 'bn.js'
-import xoshiro from 'xoshiro'
+import xoshiro, { PrngState } from 'xoshiro'
 
 import memoryDatabase from '../utils/MemoryDatabase'
 import { Query } from './Query'
@@ -25,47 +24,43 @@ import {
   TxOptions,
 } from '../types'
 import { log } from '../utils/logger'
+import { getTxNonce } from '../utils/nonce.tracker'
 
-export const fisher_yates_shuffle = <K>(objects: K[], seed: Uint8Array) => {
-  const prng = xoshiro.create('256+', seed)
-  for (let i = objects.length - 1; i > 0; i--) {
-    const j = prng.roll() % i
-    const tmp = objects[i]
-    objects[i] = objects[j]
-    objects[j] = tmp
+const fisherYatesShuffle = <K>(arr: K[], seed: Uint8Array) => {
+  // create a pseudo random number generator with an algorithm (256+) and a seed
+  // '256+' xoshiro256+, requires the seed to be of at least 32 bytes
+  // using prng.roll() we can generate random number
+  const pseudoRandomNumberGenerator: PrngState = xoshiro.create('256+', seed)
+  // Start from the last element and swap
+  // one by one. We don't need to run for
+  // the first element that's why i > 0
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j: number = pseudoRandomNumberGenerator.roll() % i
+    const tmp = arr[i]
+    arr[i] = arr[j]
+    arr[j] = tmp
   }
 }
 
-const recreateExtrinsicsOrder = (extrinsics: GenericExtrinsic[], seedBytes: Uint8Array) => {
-  const slots = extrinsics.map((ev) => {
-    if (ev.isSigned) {
-      return ev.signer.toString()
-    } else {
-      return 'None'
-    }
-  })
+const getSignerMap = (extrinsics: GenericExtrinsic[]) => {
+  const signerMap = new Map<string, GenericExtrinsic[]>()
 
-  fisher_yates_shuffle(slots, seedBytes)
-
-  const map = new Map()
-
-  for (const e of extrinsics) {
-    let who = 'None'
-    if (e.isSigned) {
-      who = e.signer.toString()
-    }
-
-    if (map.has(who)) {
-      map.get(who).push(e)
-    } else {
-      map.set(who, [e])
-    }
+  for (const extrinsic of extrinsics) {
+    const who = extrinsic.isSigned ? extrinsic.signer.toString() : 'None'
+    signerMap.has(who) ? signerMap.get(who)?.push(extrinsic) : signerMap.set(who, [extrinsic])
   }
 
-  const shuffled_extrinsics = slots.map((who) => {
-    return map.get(who).shift()
-  })
-  return shuffled_extrinsics
+  return signerMap
+}
+
+const recreateExtrinsicsOrder = (extrinsics: GenericExtrinsic[], seedBytes: Uint8Array) => {
+  const slots: string[] = extrinsics.map((extrinsic) =>
+    extrinsic.isSigned ? extrinsic.signer.toString() : 'None'
+  )
+
+  fisherYatesShuffle(slots, seedBytes)
+
+  return slots.map((who) => getSignerMap(extrinsics).get(who)?.shift())
 }
 
 export const signTx = async (
@@ -75,27 +70,12 @@ export const signTx = async (
   txOptions?: TxOptions
 ): Promise<MangataGenericEvent[]> => {
   return new Promise<MangataGenericEvent[]>(async (resolve, reject) => {
-    const extractedAccount = typeof account === 'string' ? account : account.address
     let result: MangataGenericEvent[] = []
-    let nonce: BN
-    if (txOptions && txOptions.nonce) {
-      nonce = txOptions.nonce
-    } else {
-      const onChainNonce = await Query.getNonce(api, extractedAccount)
-      if (memoryDatabase.hasAddressNonce(extractedAccount)) {
-        nonce = memoryDatabase.getNonce(extractedAccount)
-      } else {
-        nonce = onChainNonce
-      }
+    const extractedAccount = typeof account === 'string' ? account : account.address
 
-      if (onChainNonce && onChainNonce.gt(nonce)) {
-        nonce = onChainNonce
-      }
-    }
-
-    const nextNonce: BN = nonce.addn(1)
-    memoryDatabase.setNonce(extractedAccount, nextNonce)
+    const nonce = await getTxNonce(api, extractedAccount, txOptions)
     log.info('Nonce: ', nonce.toNumber())
+
     try {
       const unsub = await tx.signAndSend(
         account,
@@ -105,73 +85,78 @@ export const signTx = async (
           if (status.isInBlock) {
             log.info('Included at block hash: ', status.asInBlock.toHex())
 
-            const unsub_new_heads = await api.rpc.chain.subscribeNewHeads(async (lastHeader) => {
-              if (lastHeader.parentHash.toString() === status.asInBlock.toString()) {
-                unsub_new_heads()
-                const previousBlock = await api.rpc.chain.getBlock(lastHeader.parentHash)
-                const previousBlockExtrinsics = previousBlock.block.extrinsics
-                const currentBlockEvents = await api.query.system.events.at(lastHeader.hash)
-                const blockNumber = lastHeader.toJSON().number
-                log.info('Currently at block: ', blockNumber)
+            const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
+              async (lastHeader) => {
+                if (lastHeader.parentHash.toString() === status.asInBlock.toString()) {
+                  unsubscribeNewHeads()
+                  const previousBlock = await api.rpc.chain.getBlock(lastHeader.parentHash)
+                  const previousBlockExtrinsics = previousBlock.block.extrinsics
+                  const currentBlockEvents = await api.query.system.events.at(lastHeader.hash)
+                  const blockNumber = lastHeader.toJSON().number
+                  log.info('Currently at block: ', blockNumber)
 
-                const headerJsonResponse = JSON.parse(lastHeader.toString())
+                  const headerJsonResponse = JSON.parse(lastHeader.toString())
 
-                const buffer: Buffer = Buffer.from(
-                  headerJsonResponse['seed']['seed'].substring(2),
-                  'hex'
-                )
-                const seedBytes = Uint8Array.from(buffer)
-                const shuffledExtrinsics = recreateExtrinsicsOrder(
-                  previousBlockExtrinsics,
-                  seedBytes
-                )
-
-                const index = shuffledExtrinsics.findIndex((shuffledExtrinsic) => {
-                  return (
-                    shuffledExtrinsic.isSigned &&
-                    shuffledExtrinsic.signer.toString() === extractedAccount &&
-                    shuffledExtrinsic.nonce.toString() === nonce.toString()
+                  const buffer: Buffer = Buffer.from(
+                    headerJsonResponse['seed']['seed'].substring(2),
+                    'hex'
                   )
-                })
-                if (index < 0) {
-                  return
-                }
+                  const shuffledExtrinsics = recreateExtrinsicsOrder(
+                    previousBlockExtrinsics,
+                    Uint8Array.from(buffer)
+                  )
 
-                const reqEvents: MangataGenericEvent[] = currentBlockEvents
-                  .filter((currentBlockEvent) => {
+                  console.log('shuffledExtrinsics: ' + shuffledExtrinsics)
+
+                  const index = shuffledExtrinsics.findIndex((shuffledExtrinsic) => {
                     return (
-                      currentBlockEvent.phase.isApplyExtrinsic &&
-                      currentBlockEvent.phase.asApplyExtrinsic.toNumber() === index
+                      shuffledExtrinsic?.isSigned &&
+                      shuffledExtrinsic?.signer.toString() === extractedAccount &&
+                      shuffledExtrinsic?.nonce.toString() === nonce.toString()
                     )
                   })
-                  .map((eventRecord) => {
-                    const { event, phase } = eventRecord
-                    const types = event.typeDef
-                    const eventData: MangataEventData[] = event.data.map((d, i) => {
-                      return {
-                        type: types[i].type,
-                        data: d,
-                      }
+
+                  console.log('INDEX: ' + index)
+                  if (index < 0) {
+                    return
+                  }
+
+                  const reqEvents: MangataGenericEvent[] = currentBlockEvents
+                    .filter((currentBlockEvent) => {
+                      return (
+                        currentBlockEvent.phase.isApplyExtrinsic &&
+                        currentBlockEvent.phase.asApplyExtrinsic.toNumber() === index
+                      )
                     })
+                    .map((eventRecord) => {
+                      const { event, phase } = eventRecord
+                      const types = event.typeDef
+                      const eventData: MangataEventData[] = event.data.map((d, i) => {
+                        return {
+                          type: types[i].type,
+                          data: d,
+                        }
+                      })
 
-                    log.info('Event Section: ', event.section)
-                    log.info('Event Method: ', event.method)
-                    log.info('Event Phase: ', JSON.stringify(phase, null, 2))
-                    log.info('Event Metadata: ', event.meta.documentation.toString())
-                    log.info(`Event Data:`, JSON.stringify(eventData, null, 2))
+                      log.info('Event Section: ', event.section)
+                      log.info('Event Method: ', event.method)
+                      log.info('Event Phase: ', JSON.stringify(phase, null, 2))
+                      log.info('Event Metadata: ', event.meta.documentation.toString())
+                      log.info(`Event Data:`, JSON.stringify(eventData, null, 2))
 
-                    return {
-                      event,
-                      phase,
-                      section: event.section,
-                      method: event.method,
-                      metaDocumentation: event.meta.documentation.toString(),
-                      eventData,
-                    } as MangataGenericEvent
-                  })
-                result = result.concat(reqEvents)
+                      return {
+                        event,
+                        phase,
+                        section: event.section,
+                        method: event.method,
+                        metaDocumentation: event.meta.documentation.toString(),
+                        eventData,
+                      } as MangataGenericEvent
+                    })
+                  result = result.concat(reqEvents)
+                }
               }
-            })
+            )
           } else if (status.isFinalized) {
             log.info('Finalized block hash: ', status.asFinalized.toHex())
             unsub()
@@ -179,14 +164,16 @@ export const signTx = async (
           } else if (isError) {
             unsub()
             log.error(`Transaction error`)
+            reject('Transaction error')
             const currentNonce: BN = await Query.getNonce(api, extractedAccount)
             memoryDatabase.setNonce(extractedAccount, currentNonce)
           }
         }
       )
     } catch (error) {
+      const currentNonce: BN = await Query.getNonce(api, extractedAccount)
+      memoryDatabase.setNonce(extractedAccount, currentNonce)
       reject({
-        type: 'type',
         data: (error as Error).message || (error as Error).message || (error as Error).toString(),
       })
     }

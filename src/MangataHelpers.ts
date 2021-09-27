@@ -11,6 +11,9 @@ import rpcOptions from './utils/mangata-rpc'
 import typesOptions from './utils/mangata-types'
 import { log } from './utils/logger'
 
+/**
+ * @class MangataHelpers
+ */
 export class MangataHelpers {
   public static getApiOptions(provider: WsProvider): ApiOptions {
     return options({ provider })

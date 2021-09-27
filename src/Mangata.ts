@@ -11,6 +11,7 @@ import { MangataGenericEvent, TxOptions } from './types'
 import { log } from './utils/logger'
 
 /**
+ * @class Mangata
  * The Mangata class defines the `getInstance` method that lets clients access the unique singleton instance. Design pattern Singleton Promise is used.
  */
 export class Mangata {
