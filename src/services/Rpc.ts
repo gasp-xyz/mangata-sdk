@@ -1,40 +1,38 @@
 import { ApiPromise } from '@polkadot/api'
 import BN from 'bn.js'
+import type { RpcInterface } from '@polkadot/rpc-core/types'
+import type { DecoratedRpc } from '@polkadot/api/types'
+import {
+  BurnAmountType,
+  CalculateBuyPriceType,
+  CalculateSellPriceType,
+  CalculateSellPriceIdType,
+  ChainType,
+  Irpc,
+  NodeNameType,
+  NodeVersionType,
+} from '../types'
+import { log } from '../utils/logger'
 
-type Irpc = {
-  getChain(api: ApiPromise): Promise<string>
-  getNodeName(api: ApiPromise): Promise<string>
-  getNodeVersion(api: ApiPromise): Promise<string>
-  calculateBuyPrice(
-    api: ApiPromise,
-    inputReserve: BN,
-    outputReserve: BN,
-    buyAmount: BN
-  ): Promise<BN>
-  calculateSellPrice(
-    api: ApiPromise,
-    inputReserve: BN,
-    outputReserve: BN,
-    sellAmount: BN
-  ): Promise<BN>
-}
-
-const getChain = async (api: ApiPromise): Promise<string> => {
+const getChain: ChainType = async (api: ApiPromise): Promise<string> => {
   const chain = await api.rpc.system.chain()
+  log.info(`Retrieved chain: ${chain}`)
   return chain.toHuman()
 }
 
-const getNodeName = async (api: ApiPromise): Promise<string> => {
+const getNodeName: NodeNameType = async (api: ApiPromise): Promise<string> => {
   const name = await api.rpc.system.name()
+  log.info(`Retrieved node name: ${name}`)
   return name.toHuman()
 }
 
-const getNodeVersion = async (api: ApiPromise): Promise<string> => {
+const getNodeVersion: NodeVersionType = async (api: ApiPromise): Promise<string> => {
   const version = await api.rpc.system.version()
+  log.info(`Retrieved version: ${version}`)
   return version.toHuman()
 }
 
-const calculateBuyPrice = async (
+const calculateBuyPrice: CalculateBuyPriceType = async (
   api: ApiPromise,
   inputReserve: BN,
   outputReserve: BN,
@@ -48,7 +46,7 @@ const calculateBuyPrice = async (
   return new BN(result.price)
 }
 
-const calculateSellPrice = async (
+const calculateSellPrice: CalculateSellPriceType = async (
   api: ApiPromise,
   inputReserve: BN,
   outputReserve: BN,
@@ -62,10 +60,56 @@ const calculateSellPrice = async (
   return new BN(result.price)
 }
 
+// TODO: Need to figure out the return value from this method
+const getBurnAmount: BurnAmountType = async (
+  api: ApiPromise,
+  firstAssetId: BN,
+  secondAssetId: BN,
+  liquidityAssetAmount: BN
+) => {
+  const result = await (api.rpc as any).xyk.get_burn_amount(
+    firstAssetId,
+    secondAssetId,
+    liquidityAssetAmount
+  )
+  return result.toHuman()
+}
+
+const calculateSellPriceId: CalculateSellPriceIdType = async (
+  api: ApiPromise,
+  soldTokenId: BN,
+  boughtTokenId: BN,
+  sellAmount: BN
+): Promise<BN> => {
+  const result = await (api.rpc as any).xyk.calculate_sell_price_id(
+    soldTokenId,
+    boughtTokenId,
+    sellAmount
+  )
+  return new BN(result.price)
+}
+
+const calculateBuyPriceId: CalculateSellPriceIdType = async (
+  api: ApiPromise,
+  soldTokenId: BN,
+  boughtTokenId: BN,
+  buyAmount: BN
+): Promise<BN> => {
+  const result = await (api.rpc as any).xyk.calculate_buy_price_id(
+    soldTokenId,
+    boughtTokenId,
+    buyAmount
+  )
+  return new BN(result.price)
+}
+
 export const RPC: Irpc = {
   getChain,
   getNodeName,
   getNodeVersion,
   calculateBuyPrice,
   calculateSellPrice,
+  calculateSellPriceId,
+  calculateBuyPriceId,
+  getBurnAmount,
 }

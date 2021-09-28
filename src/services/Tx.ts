@@ -1,218 +1,260 @@
 /* eslint-disable no-console */
 import { ApiPromise } from '@polkadot/api'
-import { GenericExtrinsic, GenericEvent } from '@polkadot/types'
+import { GenericExtrinsic } from '@polkadot/types'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { SubmittableExtrinsic } from '@polkadot/api/types'
 import BN from 'bn.js'
-import xoshiro from 'xoshiro'
+import xoshiro, { PrngState } from 'xoshiro'
+
 import memoryDatabase from '../utils/MemoryDatabase'
 import { Query } from './Query'
-import { Itx, txOptions } from '../types'
+import {
+  BurnLiquidityType,
+  BuyAssetType,
+  CreatePoolType,
+  CreateTokenType,
+  Itx,
+  MangataEventData,
+  MangataGenericEvent,
+  MintAssetType,
+  MintLiquidityType,
+  SellAssetType,
+  TransferAllTokenType,
+  TransferTokenType,
+  TxOptions,
+} from '../types'
+import { log } from '../utils/logger'
+import { getTxNonce } from '../utils/nonce.tracker'
 
-export const fisher_yates_shuffle = <K>(objects: K[], seed: Uint8Array) => {
-  const prng = xoshiro.create('256+', seed)
-  for (let i = objects.length - 1; i > 0; i--) {
-    const j = prng.roll() % i
-    const tmp = objects[i]
-    objects[i] = objects[j]
-    objects[j] = tmp
+const fisherYatesShuffle = <K>(arr: K[], seed: Uint8Array) => {
+  // create a pseudo random number generator with an algorithm (256+) and a seed
+  // '256+' xoshiro256+, requires the seed to be of at least 32 bytes
+  // using prng.roll() we can generate random number
+  const pseudoRandomNumberGenerator: PrngState = xoshiro.create('256+', seed)
+  // Start from the last element and swap
+  // one by one. We don't need to run for
+  // the first element that's why i > 0
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j: number = pseudoRandomNumberGenerator.roll() % i
+    const tmp = arr[i]
+    arr[i] = arr[j]
+    arr[j] = tmp
   }
 }
 
-const recreateExtrinsicsOrder = (extrinsics: GenericExtrinsic[], seed_bytes: Uint8Array) => {
-  const slots = extrinsics.map((ev) => {
-    if (ev.isSigned) {
-      return ev.signer.toString()
-    } else {
-      return 'None'
-    }
-  })
+const getSignerMap = (extrinsics: GenericExtrinsic[]) => {
+  const signerMap = new Map<string, GenericExtrinsic[]>()
 
-  fisher_yates_shuffle(slots, seed_bytes)
-
-  const map = new Map()
-
-  for (const e of extrinsics) {
-    let who = 'None'
-    if (e.isSigned) {
-      who = e.signer.toString()
-    }
-
-    if (map.has(who)) {
-      map.get(who).push(e)
-    } else {
-      map.set(who, [e])
-    }
+  for (const extrinsic of extrinsics) {
+    const who = extrinsic.isSigned ? extrinsic.signer.toString() : 'None'
+    signerMap.has(who) ? signerMap.get(who)?.push(extrinsic) : signerMap.set(who, [extrinsic])
   }
 
-  const shuffled_extrinsics = slots.map((who) => {
-    return map.get(who).shift()
-  })
-  return shuffled_extrinsics
+  return signerMap
+}
+
+const recreateExtrinsicsOrder = (extrinsics: GenericExtrinsic[], seedBytes: Uint8Array) => {
+  const slots: string[] = extrinsics.map((extrinsic) =>
+    extrinsic.isSigned ? extrinsic.signer.toString() : 'None'
+  )
+
+  fisherYatesShuffle(slots, seedBytes)
+
+  return slots.map((who) => getSignerMap(extrinsics).get(who)?.shift())
 }
 
 export const signTx = async (
   api: ApiPromise,
   tx: SubmittableExtrinsic<'promise'>,
-  keyringPair: KeyringPair,
-  txOptions?: txOptions
-): Promise<GenericEvent[]> => {
-  return new Promise<GenericEvent[]>(async (resolve) => {
-    let result: GenericEvent[] = []
-    let nonce: BN
-    if (txOptions && txOptions.nonce) {
-      nonce = txOptions.nonce
-    } else {
-      const onChainNonce = await Query.getNonce(api, keyringPair.address)
-      if (memoryDatabase.hasAddressNonce(keyringPair.address)) {
-        nonce = memoryDatabase.getNonce(keyringPair.address)
-      } else {
-        nonce = onChainNonce
-      }
+  account: KeyringPair | string,
+  txOptions?: TxOptions
+): Promise<MangataGenericEvent[]> => {
+  return new Promise<MangataGenericEvent[]>(async (resolve, reject) => {
+    let result: MangataGenericEvent[] = []
+    const extractedAccount = typeof account === 'string' ? account : account.address
 
-      if (onChainNonce && onChainNonce.gt(nonce)) {
-        nonce = onChainNonce
-      }
-    }
+    const nonce = await getTxNonce(api, extractedAccount, txOptions)
+    log.info('Nonce: ', nonce.toNumber())
 
-    const nextNonce: BN = nonce.addn(1)
-    memoryDatabase.setNonce(keyringPair.address, nextNonce)
-    const unsub = await tx.signAndSend(
-      keyringPair,
-      { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
-      async ({ status, isError }) => {
-        console.log('Transaction status:', status.type)
-        if (status.isInBlock) {
-          console.log('Included at block hash', status.asInBlock.toHex())
-          const unsub_new_heads = await api.rpc.chain.subscribeNewHeads(async (lastHeader) => {
-            if (lastHeader.parentHash.toString() === status.asInBlock.toString()) {
-              unsub_new_heads()
-              const prev_block_extrinsics = (await api.rpc.chain.getBlock(lastHeader.parentHash))
-                .block.extrinsics
-              const curr_block_extrinsics = (await api.rpc.chain.getBlock(lastHeader.hash)).block
-                .extrinsics
-              const curr_block_events = await api.query.system.events.at(lastHeader.hash)
+    try {
+      const unsub = await tx.signAndSend(
+        account,
+        { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
+        async ({ status, isError }) => {
+          log.info('Transaction status: ', status.type)
+          if (status.isInBlock) {
+            log.info('Included at block hash: ', status.asInBlock.toHex())
 
-              const json_response = JSON.parse(lastHeader.toString())
-              const seed_bytes = Uint8Array.from(
-                Buffer.from(json_response['seed']['seed'].substring(2), 'hex')
-              )
-              const shuffled_extrinsics = recreateExtrinsicsOrder(prev_block_extrinsics, seed_bytes)
+            const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
+              async (lastHeader) => {
+                if (lastHeader.parentHash.toString() === status.asInBlock.toString()) {
+                  unsubscribeNewHeads()
+                  const previousBlock = await api.rpc.chain.getBlock(lastHeader.parentHash)
+                  const previousBlockExtrinsics = previousBlock.block.extrinsics
+                  const currentBlockEvents = await api.query.system.events.at(lastHeader.hash)
+                  const blockNumber = lastHeader.toJSON().number
+                  log.info('Currently at block: ', blockNumber)
 
-              // filter extrinsic triggered by current request
-              const index = shuffled_extrinsics.findIndex((e) => {
-                return (
-                  e.isSigned &&
-                  e.signer.toString() === keyringPair.address &&
-                  e.nonce.toString() === nonce.toString()
-                )
-              })
-              if (index < 0) {
-                return
-              }
+                  const headerJsonResponse = JSON.parse(lastHeader.toString())
 
-              const req_events = curr_block_events
-                .filter((event) => {
-                  return (
-                    event.phase.isApplyExtrinsic &&
-                    event.phase.asApplyExtrinsic.toNumber() === index
+                  const buffer: Buffer = Buffer.from(
+                    headerJsonResponse['seed']['seed'].substring(2),
+                    'hex'
                   )
-                })
-                .map(({ event }) => {
-                  return event
-                })
-              result = result.concat(req_events)
-            }
-          })
-        } else if (status.isFinalized) {
-          console.log('Finalized block hash', status.asFinalized.toHex())
-          unsub()
-          resolve(result)
-        } else if (isError) {
-          console.log('Transaction error')
-          const currentNonce: BN = await Query.getNonce(api, keyringPair.address)
-          memoryDatabase.setNonce(keyringPair.address, currentNonce)
+                  const shuffledExtrinsics = recreateExtrinsicsOrder(
+                    previousBlockExtrinsics,
+                    Uint8Array.from(buffer)
+                  )
+
+                  console.log('shuffledExtrinsics: ' + shuffledExtrinsics)
+
+                  const index = shuffledExtrinsics.findIndex((shuffledExtrinsic) => {
+                    return (
+                      shuffledExtrinsic?.isSigned &&
+                      shuffledExtrinsic?.signer.toString() === extractedAccount &&
+                      shuffledExtrinsic?.nonce.toString() === nonce.toString()
+                    )
+                  })
+
+                  console.log('INDEX: ' + index)
+                  if (index < 0) {
+                    return
+                  }
+
+                  const reqEvents: MangataGenericEvent[] = currentBlockEvents
+                    .filter((currentBlockEvent) => {
+                      return (
+                        currentBlockEvent.phase.isApplyExtrinsic &&
+                        currentBlockEvent.phase.asApplyExtrinsic.toNumber() === index
+                      )
+                    })
+                    .map((eventRecord) => {
+                      const { event, phase } = eventRecord
+                      const types = event.typeDef
+                      const eventData: MangataEventData[] = event.data.map((d, i) => {
+                        return {
+                          type: types[i].type,
+                          data: d,
+                        }
+                      })
+
+                      log.info('Event Section: ', event.section)
+                      log.info('Event Method: ', event.method)
+                      log.info('Event Phase: ', JSON.stringify(phase, null, 2))
+                      log.info('Event Metadata: ', event.meta.documentation.toString())
+                      log.info(`Event Data:`, JSON.stringify(eventData, null, 2))
+
+                      return {
+                        event,
+                        phase,
+                        section: event.section,
+                        method: event.method,
+                        metaDocumentation: event.meta.documentation.toString(),
+                        eventData,
+                      } as MangataGenericEvent
+                    })
+                  result = result.concat(reqEvents)
+                }
+              }
+            )
+          } else if (status.isFinalized) {
+            log.info('Finalized block hash: ', status.asFinalized.toHex())
+            unsub()
+            resolve(result)
+          } else if (isError) {
+            unsub()
+            log.error(`Transaction error`)
+            reject('Transaction error')
+            const currentNonce: BN = await Query.getNonce(api, extractedAccount)
+            memoryDatabase.setNonce(extractedAccount, currentNonce)
+          }
         }
-      }
-    )
+      )
+    } catch (error) {
+      const currentNonce: BN = await Query.getNonce(api, extractedAccount)
+      memoryDatabase.setNonce(extractedAccount, currentNonce)
+      reject({
+        data: (error as Error).message || (error as Error).message || (error as Error).toString(),
+      })
+    }
   })
 }
 
-const createToken = async (
+const createToken: CreateTokenType = async (
   api: ApiPromise,
   targetAddress: string,
-  sudoKeyringPair: KeyringPair,
+  sudoAccount: KeyringPair | string,
   currencyValue: BN,
-  txOptions?: txOptions
-): Promise<GenericEvent[]> => {
+  txOptions?: TxOptions
+): Promise<MangataGenericEvent[]> => {
   return await signTx(
     api,
     api.tx.sudo.sudo(api.tx.tokens.create(targetAddress, currencyValue)),
-    sudoKeyringPair,
+    sudoAccount,
     txOptions
   )
 }
 
-const createPool = async (
+const createPool: CreatePoolType = async (
   api: ApiPromise,
-  keyringPair: KeyringPair,
+  account: KeyringPair | string,
   firstAssetId: string,
   firstAssetAmount: BN,
   secondAssetId: string,
   secondAssetAmount: BN,
-  txOptions?: txOptions
-): Promise<GenericEvent[]> => {
+  txOptions?: TxOptions
+): Promise<MangataGenericEvent[]> => {
   return await signTx(
     api,
     api.tx.xyk.createPool(firstAssetId, firstAssetAmount, secondAssetId, secondAssetAmount),
-    keyringPair,
+    account,
     txOptions
   )
 }
 
-const sellAsset = async (
+const sellAsset: SellAssetType = async (
   api: ApiPromise,
-  keyringPair: KeyringPair,
+  account: KeyringPair | string,
   soldAssetId: string,
   boughtAssetId: string,
   amount: BN,
   minAmountOut: BN,
-  txOptions?: txOptions
-): Promise<GenericEvent[]> => {
+  txOptions?: TxOptions
+): Promise<MangataGenericEvent[]> => {
   return await signTx(
     api,
     api.tx.xyk.sellAsset(soldAssetId, boughtAssetId, amount, minAmountOut),
-    keyringPair,
+    account,
     txOptions
   )
 }
 
-const buyAsset = async (
+const buyAsset: BuyAssetType = async (
   api: ApiPromise,
-  keyringPair: KeyringPair,
+  account: KeyringPair | string,
   soldAssetId: string,
   boughtAssetId: string,
   amount: BN,
   maxAmountIn: BN,
-  txOptions?: txOptions
-): Promise<GenericEvent[]> => {
+  txOptions?: TxOptions
+): Promise<MangataGenericEvent[]> => {
   return await signTx(
     api,
     api.tx.xyk.buyAsset(soldAssetId, boughtAssetId, amount, maxAmountIn),
-    keyringPair,
+    account,
     txOptions
   )
 }
 
-const mintLiquidity = async (
+const mintLiquidity: MintLiquidityType = async (
   api: ApiPromise,
-  keyringPair: KeyringPair,
+  account: KeyringPair | string,
   firstAssetId: string,
   secondAssetId: string,
   firstAssetAmount: BN,
   expectedSecondAssetAmount: BN = new BN(Number.MAX_SAFE_INTEGER),
-  txOptions?: txOptions
-): Promise<GenericEvent[]> => {
+  txOptions?: TxOptions
+): Promise<MangataGenericEvent[]> => {
   return await signTx(
     api,
     api.tx.xyk.mintLiquidity(
@@ -221,41 +263,67 @@ const mintLiquidity = async (
       firstAssetAmount,
       expectedSecondAssetAmount
     ),
-    keyringPair,
+    account,
     txOptions
   )
 }
 
-const burnLiquidity = async (
+const burnLiquidity: BurnLiquidityType = async (
   api: ApiPromise,
-  keyringPair: KeyringPair,
+  account: KeyringPair | string,
   firstAssetId: string,
   secondAssetId: string,
   liquidityAssetAmount: BN,
-  txOptions?: txOptions
-): Promise<GenericEvent[]> => {
+  txOptions?: TxOptions
+): Promise<MangataGenericEvent[]> => {
   return await signTx(
     api,
     api.tx.xyk.burnLiquidity(firstAssetId, secondAssetId, liquidityAssetAmount),
-    keyringPair,
+    account,
     txOptions
   )
 }
 
-const mintAsset = async (
+const mintAsset: MintAssetType = async (
   api: ApiPromise,
-  sudo: KeyringPair,
+  sudoAccount: KeyringPair | string,
   assetId: BN,
   targetAddress: string,
   amount: BN,
-  txOptions?: txOptions
-): Promise<GenericEvent[]> => {
+  txOptions?: TxOptions
+): Promise<MangataGenericEvent[]> => {
   return await signTx(
     api,
     api.tx.sudo.sudo(api.tx.tokens.mint(assetId, targetAddress, amount)),
-    sudo,
+    sudoAccount,
     txOptions
   )
+}
+
+const transferToken: TransferTokenType = async (
+  api: ApiPromise,
+  account: KeyringPair | string,
+  tokenId: BN,
+  targetAddress: string,
+  amount: BN,
+  txOptions?: TxOptions
+): Promise<MangataGenericEvent[]> => {
+  return await signTx(
+    api,
+    api.tx.tokens.transfer(targetAddress, tokenId, amount),
+    account,
+    txOptions
+  )
+}
+
+const transferAllToken: TransferAllTokenType = async (
+  api: ApiPromise,
+  account: KeyringPair | string,
+  tokenId: BN,
+  targetAddress: string,
+  txOptions?: TxOptions
+): Promise<MangataGenericEvent[]> => {
+  return await signTx(api, api.tx.tokens.transferAll(targetAddress, tokenId), account, txOptions)
 }
 
 export const TX: Itx = {
@@ -266,4 +334,6 @@ export const TX: Itx = {
   burnLiquidity,
   createToken,
   mintAsset,
+  transferToken,
+  transferAllToken,
 }

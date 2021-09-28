@@ -1,14 +1,19 @@
 /* eslint-disable no-console */
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api'
 import { KeypairType } from '@polkadot/util-crypto/types'
-import type { DefinitionRpc, DefinitionRpcSub, RegistryTypes, AnyJson } from '@polkadot/types/types'
+import { KeyringPair } from '@polkadot/keyring/types'
+import type { DefinitionRpc, DefinitionRpcSub, RegistryTypes } from '@polkadot/types/types'
 import { ApiOptions } from '@polkadot/api/types'
 import { v4 as uuid } from 'uuid'
 
 import { options } from './utils/options'
 import rpcOptions from './utils/mangata-rpc'
 import typesOptions from './utils/mangata-types'
+import { log } from './utils/logger'
 
+/**
+ * @class MangataHelpers
+ */
 export class MangataHelpers {
   public static getApiOptions(provider: WsProvider): ApiOptions {
     return options({ provider })
@@ -26,7 +31,7 @@ export class MangataHelpers {
     let count = 0
     return new Promise(async (resolve) => {
       const unsubscribe = await api.rpc.chain.subscribeNewHeads((lastHeader) => {
-        console.log(`Last block #${lastHeader.number} has hash ${lastHeader.hash}`)
+        log.info(`Last block #${lastHeader.number} has hash ${lastHeader.hash}`)
         if (++count === 2) {
           unsubscribe()
           resolve(true)
@@ -39,7 +44,10 @@ export class MangataHelpers {
     return new Keyring({ type })
   }
 
-  public static createKeyPairFromNameAndStoreAccountToKeyring(keyring: Keyring, name: string = '') {
+  public static createKeyPairFromNameAndStoreAccountToKeyring(
+    keyring: Keyring,
+    name: string = ''
+  ): KeyringPair {
     const userName: string = name ? name : '//testUser_' + uuid()
     const account = keyring.createFromUri(userName)
     keyring.addPair(account)
