@@ -106,8 +106,6 @@ export const signTx = async (
                     Uint8Array.from(buffer)
                   )
 
-                  console.log('shuffledExtrinsics: ' + shuffledExtrinsics)
-
                   const index = shuffledExtrinsics.findIndex((shuffledExtrinsic) => {
                     return (
                       shuffledExtrinsic?.isSigned &&
@@ -116,7 +114,6 @@ export const signTx = async (
                     )
                   })
 
-                  console.log('INDEX: ' + index)
                   if (index < 0) {
                     return
                   }
