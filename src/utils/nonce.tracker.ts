@@ -2,7 +2,7 @@ import { ApiPromise } from '@polkadot/api'
 import { KeyringPair } from '@polkadot/keyring/types'
 import BN from 'bn.js'
 
-import { Query } from '../services/Query'
+import Query from '../services/Query'
 import { TxOptions } from '../types'
 import memoryDatabase from '../utils/MemoryDatabase'
 

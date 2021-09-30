@@ -3,103 +3,76 @@ import { AccountInfo } from '@polkadot/types/interfaces'
 import { AccountData } from '@polkadot/types/interfaces/balances'
 import BN from 'bn.js'
 
-import {
-  AmountOfTokenIdInPoolType,
-  BalanceAssetType,
-  Iquery,
-  LiquidityAssetIdType,
-  LiquidityPoolType,
-  LockType,
-  NextAssetIdType,
-  NonceType,
-  TotalIssuanceOfTokenIdType,
-  TreasuryBurnType,
-  TreasuryType,
-} from '../types'
+import { getNonce as getNonceEntity } from '../entities/query/nonce'
+import { getAmountOfTokens as getAmountOfTokensEntity } from '../entities/query/pools'
+import { getLiquidityAssets as getLiquidityAssetsEntity } from '../entities/query/liquidityAssets'
+import { getLiquidityPool as getLiquidityPoolEntity } from '../entities/query/liquidityPools'
+import { getTreasury as getTreasuryEntity } from '../entities/query/treasury'
+import { getTreasuryBurn as getTreasuryBurnEntity } from '../entities/query/treasuryBurn'
+import { getTotalIssuance as getTotalIssuanceEntity } from '../entities/query/totalIssuance'
+import { getLock as getLockEntity } from '../entities/query/locks'
+import { getTokenBalance as getTokenBalanceEntity } from '../entities/query/accounts'
+import { getNextToken as getNextTokenEntity } from '../entities/query/nextCurrencyId'
+import TokensId from '../types/query/TokensId'
+import { Token } from '../types/Token'
 
-const getNonce: NonceType = async (api: ApiPromise, address: string): Promise<BN> => {
-  const accountInfo: AccountInfo = await api.query.system.account(address)
-  return accountInfo.nonce.toBn()
+class Query {
+  static async getNonce(api: ApiPromise, address: string): Promise<BN> {
+    const { nonce } = await getNonceEntity(api, address)
+    return nonce.toBn()
+  }
+
+  static async getAmountOfTokenIdInPool(api: ApiPromise, tokens: TokensId): Promise<BN> {
+    const balance = await getAmountOfTokensEntity(api, tokens)
+    return new BN(balance.toString())
+  }
+
+  static async getLiquidityAssetId(api: ApiPromise, tokens: TokensId): Promise<BN> {
+    const liquidityAssetId = await getLiquidityAssetsEntity(api, tokens)
+    return new BN(liquidityAssetId.toString())
+  }
+
+  static async getLiquidityPool(api: ApiPromise, liquidityAssetId: string): Promise<BN[]> {
+    const liquidityPool = await getLiquidityPoolEntity(api, liquidityAssetId)
+    const poolAssetIds = liquidityPool.toHuman() as Number[]
+    if (!poolAssetIds) {
+      return [new BN(-1), new BN(-1)]
+    }
+
+    return poolAssetIds.map((num) => new BN(num.toString()))
+  }
+
+  static async getTreasury(api: ApiPromise, tokenId: Token): Promise<BN> {
+    const treasuryBalance = await getTreasuryEntity(api, tokenId)
+    return new BN(treasuryBalance.toString())
+  }
+
+  static async getTreasuryBurn(api: ApiPromise, tokenId: Token): Promise<BN> {
+    const treasuryBalance = await getTreasuryBurnEntity(api, tokenId)
+    return new BN(treasuryBalance.toString())
+  }
+
+  static async getTotalIssuance(api: ApiPromise, tokenId: Token): Promise<BN> {
+    const tokenSupply = await getTotalIssuanceEntity(api, tokenId)
+    return new BN(tokenSupply.toString())
+  }
+
+  // TODO: find the return type
+  static async getLock(api: ApiPromise, address: string, tokenId: Token) {
+    const locksResponse = await getLockEntity(api, address, tokenId)
+    return JSON.parse(JSON.stringify(locksResponse.toHuman()))
+  }
+
+  static async getTokenBalance(api: ApiPromise, address: string, tokenId: Token): Promise<BN> {
+    const balance = await getTokenBalanceEntity(api, address, tokenId)
+    const accountData = balance as AccountData
+    return new BN(accountData.free.toBigInt().toString())
+  }
+
+  static async getNextTokenId(api: ApiPromise): Promise<BN> {
+    const nextTokenId = await getNextTokenEntity(api)
+    return new BN(nextTokenId.toString())
+  }
 }
 
-const getAmountOfTokenIdInPool: AmountOfTokenIdInPoolType = async (
-  api: ApiPromise,
-  firstTokenId: BN,
-  secondTokenId: BN
-): Promise<BN> => {
-  const balance = await api.query.xyk.pools([firstTokenId, secondTokenId])
-  return new BN(balance.toString())
-}
-
-const getLiquidityAssetId: LiquidityAssetIdType = async (
-  api: ApiPromise,
-  firstTokenId: BN,
-  secondTokenId: BN
-): Promise<BN> => {
-  const liquidityAssetId = await api.query.xyk.liquidityAssets([firstTokenId, secondTokenId])
-  return new BN(liquidityAssetId.toString())
-}
-
-const getLiquidityPool: LiquidityPoolType = async (
-  api: ApiPromise,
-  liquidityAssetId: BN
-): Promise<BN[]> => {
-  const liquidityPool = await api.query.xyk.liquidityPools(liquidityAssetId)
-  const poolAssetIds = liquidityPool.toHuman() as Number[]
-  if (!poolAssetIds) return [new BN(-1), new BN(-1)]
-
-  return poolAssetIds.map((num) => new BN(num.toString()))
-}
-
-const getTreasury: TreasuryType = async (api: ApiPromise, currencyId: BN): Promise<BN> => {
-  const treasuryBalance = await api.query.xyk.treasury(currencyId)
-  return new BN(treasuryBalance.toString())
-}
-
-const getTreasuryBurn: TreasuryBurnType = async (api: ApiPromise, currencyId: BN): Promise<BN> => {
-  const treasuryBalance = await api.query.xyk.treasuryBurn(currencyId)
-  return new BN(treasuryBalance.toString())
-}
-
-const getTotalIssuanceOfTokenId: TotalIssuanceOfTokenIdType = async (
-  api: ApiPromise,
-  currencyId: BN
-): Promise<BN> => {
-  const tokenSupply = await api.query.tokens.totalIssuance(currencyId.toString())
-  return new BN(tokenSupply.toString())
-}
-
-// TODO: Find out the return type for this method
-const getLock: LockType = async (api: ApiPromise, address: string, tokenId: BN) => {
-  const locksResponse = await api.query.tokens.locks(address, tokenId)!
-  const decodedlocks = JSON.parse(JSON.stringify(locksResponse.toHuman()))
-  return decodedlocks
-}
-
-const getAssetBalanceForAddress: BalanceAssetType = async (
-  api: ApiPromise,
-  assetId: BN,
-  accountAddress: string
-): Promise<BN> => {
-  const balance = await api.query.tokens.accounts(accountAddress, assetId)
-  const accountData = balance as AccountData
-  return new BN(accountData.free.toBigInt().toString())
-}
-
-const getNextAssetId: NextAssetIdType = async (api: ApiPromise): Promise<BN> => {
-  const nextAssetId = await api.query.tokens.nextCurrencyId()
-  return new BN(nextAssetId.toString())
-}
-
-export const Query: Iquery = {
-  getNonce,
-  getAmountOfTokenIdInPool,
-  getLiquidityAssetId,
-  getLiquidityPool,
-  getTreasury,
-  getTreasuryBurn,
-  getTotalIssuanceOfTokenId,
-  getLock,
-  getAssetBalanceForAddress,
-  getNextAssetId,
-}
+export default Query

@@ -24,12 +24,6 @@ export interface MangataGenericEvent extends GenericEvent {
   eventData: MangataEventData[]
 }
 
-export enum ExtrinsicResult {
-  ExtrinsicSuccess,
-  ExtrinsicFailed,
-  ExtrinsicUndefined,
-}
-
 export interface Itx {
   createPool(
     api: ApiPromise,
@@ -113,19 +107,6 @@ export interface Database {
   getNonce(address: string): BN
 }
 
-export interface Iquery {
-  getNonce(api: ApiPromise, address: string): Promise<BN>
-  getAmountOfTokenIdInPool(api: ApiPromise, firstTokenId: BN, secondTokenId: BN): Promise<BN>
-  getLiquidityAssetId(api: ApiPromise, firstTokenId: BN, secondTokenId: BN): Promise<BN>
-  getLiquidityPool(api: ApiPromise, liquidityAssetId: BN): Promise<BN[]>
-  getTreasury(api: ApiPromise, currencyId: BN): Promise<BN>
-  getTreasuryBurn(api: ApiPromise, currencyId: BN): Promise<BN>
-  getTotalIssuanceOfTokenId(api: ApiPromise, currencyId: BN): Promise<BN>
-  getLock(api: ApiPromise, address: string, tokenId: BN): any
-  getAssetBalanceForAddress(api: ApiPromise, assetId: BN, accountAddress: string): Promise<BN>
-  getNextAssetId(api: ApiPromise): Promise<BN>
-}
-
 export interface Irpc {
   getChain(api: ApiPromise): Promise<string>
   getNodeName(api: ApiPromise): Promise<string>
@@ -161,26 +142,6 @@ export interface Irpc {
     buyAmount: BN
   ): Promise<BN>
 }
-
-// Query methods types
-export type NonceType = (api: ApiPromise, address: string) => Promise<BN>
-export type AmountOfTokenIdInPoolType = (
-  api: ApiPromise,
-  firstTokenId: BN,
-  secondTokenId: BN
-) => Promise<BN>
-export type LiquidityAssetIdType = (
-  api: ApiPromise,
-  firstTokenId: BN,
-  secondTokenId: BN
-) => Promise<BN>
-export type LiquidityPoolType = (api: ApiPromise, liquidityAssetId: BN) => Promise<BN[]>
-export type TreasuryType = (api: ApiPromise, currencyId: BN) => Promise<BN>
-export type TreasuryBurnType = (api: ApiPromise, currencyId: BN) => Promise<BN>
-export type TotalIssuanceOfTokenIdType = (api: ApiPromise, tokenId: BN) => Promise<BN>
-export type LockType = (api: ApiPromise, address: string, tokenId: BN) => Promise<any>
-export type BalanceAssetType = (api: ApiPromise, assetId: BN, accountAddress: string) => Promise<BN>
-export type NextAssetIdType = (api: ApiPromise) => Promise<BN>
 
 // RPC methods types
 export type ChainType = (api: ApiPromise) => Promise<string>

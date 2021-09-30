@@ -3,9 +3,10 @@ import { GenericEvent } from '@polkadot/types'
 import { KeyringPair } from '@polkadot/keyring/types'
 import BN from 'bn.js'
 
-import { ExtrinsicResult, MangataGenericEvent } from '../src/types'
+import { MangataGenericEvent } from '../src/types'
 import { Mangata } from '../src/Mangata'
 import { MangataHelpers } from '../src/MangataHelpers'
+import ExtrinsicResult from '../src/enums/ExtrinsicResult'
 
 export const addAccountCurrencies = async (
   mangataInstance: Mangata,

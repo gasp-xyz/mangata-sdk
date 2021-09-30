@@ -1,7 +1,5 @@
 import { ApiPromise } from '@polkadot/api'
 import BN from 'bn.js'
-import type { RpcInterface } from '@polkadot/rpc-core/types'
-import type { DecoratedRpc } from '@polkadot/api/types'
 import {
   BurnAmountType,
   CalculateBuyPriceType,

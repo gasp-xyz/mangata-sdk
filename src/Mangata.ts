@@ -6,9 +6,10 @@ import BN from 'bn.js'
 import { options } from './utils/options'
 import { RPC } from './services/Rpc'
 import { TX } from './services/Tx'
-import { Query } from './services/Query'
+import Query from './services/Query'
 import { MangataGenericEvent, TxOptions } from './types'
 import { log } from './utils/logger'
+import TokensId from './types/query/TokensId'
 
 /**
  * @class Mangata
@@ -326,24 +327,32 @@ export class Mangata {
   /**
    * Get amount of token id in pool
    */
-  public async getAmountOfTokenIdInPool(firstTokenId: BN, secondTokenId: BN): Promise<BN> {
+  public async getAmountOfTokenIdInPool(firstTokenId: string, secondTokenId: string): Promise<BN> {
     const api = await this.connect()
-    return await Query.getAmountOfTokenIdInPool(api, firstTokenId, secondTokenId)
+    const tokens: TokensId = {
+      first: firstTokenId,
+      second: secondTokenId,
+    }
+    return await Query.getAmountOfTokenIdInPool(api, tokens)
   }
 
   /**
    * Returns liquidity asset id while specifying first and second TokenId returns same liquidity asset id when specifying other way
    * around – second and first TokenId
    */
-  public async getLiquidityAssetId(firstTokenId: BN, secondTokenId: BN): Promise<BN> {
+  public async getLiquidityAssetId(firstTokenId: string, secondTokenId: string): Promise<BN> {
     const api = await this.connect()
-    return await Query.getLiquidityAssetId(api, firstTokenId, secondTokenId)
+    const tokens: TokensId = {
+      first: firstTokenId,
+      second: secondTokenId,
+    }
+    return await Query.getLiquidityAssetId(api, tokens)
   }
 
   /**
    * Returns pool corresponding to specified liquidity asset ID in from of first and second TokenId pair
    */
-  public async getLiquidityPool(liquidityAssetId: BN): Promise<BN[]> {
+  public async getLiquidityPool(liquidityAssetId: string): Promise<BN[]> {
     const api = await this.connect()
     return await Query.getLiquidityPool(api, liquidityAssetId)
   }
@@ -351,17 +360,17 @@ export class Mangata {
   /**
    * Returns amount of currency ID in Treasury
    */
-  public async getTreasury(currencyId: BN): Promise<BN> {
+  public async getTreasury(tokenId: string): Promise<BN> {
     const api = await this.connect()
-    return await Query.getTreasury(api, currencyId)
+    return await Query.getTreasury(api, tokenId)
   }
 
   /**
    * Returns amount of currency ID in Treasury Burn
    */
-  public async getTreasuryBurn(currencyId: BN): Promise<BN> {
+  public async getTreasuryBurn(tokenId: string): Promise<BN> {
     const api = await this.connect()
-    return await Query.getTreasuryBurn(api, currencyId)
+    return await Query.getTreasuryBurn(api, tokenId)
   }
 
   /**
@@ -397,15 +406,15 @@ export class Mangata {
    * Returns total issuance of CurrencyId
    */
 
-  public async getTotalIssuanceOfTokenId(currencyId: BN): Promise<BN> {
+  public async getTotalIssuance(tokenId: string): Promise<BN> {
     const api = await this.connect()
-    return await Query.getTotalIssuanceOfTokenId(api, currencyId)
+    return await Query.getTotalIssuance(api, tokenId)
   }
 
   /**
    * Returns vec of locked tokenId of an specified account Id Address and tokenId
    */
-  public async getLock(address: string, tokenId: BN) {
+  public async getLock(address: string, tokenId: string) {
     const api = await this.connect()
     return await Query.getLock(api, address, tokenId)
   }
@@ -413,16 +422,16 @@ export class Mangata {
   /**
    * Returns Asset balance for address
    */
-  public async getAssetBalanceForAddress(assetId: BN, address: string): Promise<BN> {
+  public async getTokenBalance(tokenId: string, address: string): Promise<BN> {
     const api = await this.connect()
-    return await Query.getAssetBalanceForAddress(api, assetId, address)
+    return await Query.getTokenBalance(api, address, tokenId)
   }
 
   /**
    * Returns next CurencyId, CurrencyId that will be used for next created token
    */
-  public async getNextAssetId(): Promise<BN> {
+  public async getNextTokenId(): Promise<BN> {
     const api = await this.connect()
-    return await Query.getNextAssetId(api)
+    return await Query.getNextTokenId(api)
   }
 }

@@ -7,7 +7,7 @@ import BN from 'bn.js'
 import xoshiro, { PrngState } from 'xoshiro'
 
 import memoryDatabase from '../utils/MemoryDatabase'
-import { Query } from './Query'
+import Query from './Query'
 import {
   BurnLiquidityType,
   BuyAssetType,

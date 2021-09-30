@@ -4,8 +4,8 @@ import { KeyringPair } from '@polkadot/keyring/types'
 
 import { mangataInstance, SUDO_USER_NAME } from './mangataInstanceCreation'
 import { MangataHelpers } from '../src'
-import { ExtrinsicResult } from '../src/types'
 import { addAccountCurrencies, addMGAToken, getEventResultFromTxWait } from './utility'
+import ExtrinsicResult from '../src/enums/ExtrinsicResult'
 
 let testUser: KeyringPair
 let sudoUser: KeyringPair
