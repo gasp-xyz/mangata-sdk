@@ -1,15 +1,17 @@
 /* eslint-disable no-console */
 import { ApiPromise, WsProvider } from '@polkadot/api'
 import { KeyringPair } from '@polkadot/keyring/types'
+import { AccountData } from '@polkadot/types/interfaces/balances'
 import BN from 'bn.js'
 
 import { options } from './utils/options'
-import { RPC } from './services/Rpc'
+import Rpc from './services/Rpc'
 import { TX } from './services/Tx'
 import Query from './services/Query'
 import { MangataGenericEvent, TxOptions } from './types'
 import { log } from './utils/logger'
-import TokensId from './types/query/TokensId'
+import TokensId from './types/TokensId'
+import Reserve from './types/Reserve'
 
 /**
  * @class Mangata
@@ -66,7 +68,7 @@ export class Mangata {
   public async getChain(): Promise<string> {
     log.info(`Retrieving chain ... `)
     const api = await this.connect()
-    return RPC.getChain(api)
+    return Rpc.getChain(api)
   }
 
   /**
@@ -76,7 +78,7 @@ export class Mangata {
   public async getNodeName(): Promise<string> {
     log.info(`Retrieving node name ...`)
     const api = await this.connect()
-    return RPC.getNodeName(api)
+    return Rpc.getNodeName(api)
   }
 
   /**
@@ -86,7 +88,7 @@ export class Mangata {
   public async getNodeVersion(): Promise<string> {
     log.info(`Retrieving node version ...`)
     const api = await this.connect()
-    return RPC.getNodeVersion(api)
+    return Rpc.getNodeVersion(api)
   }
 
   /**
@@ -243,7 +245,11 @@ export class Mangata {
   public async calculateBuyPrice(inputReserve: BN, outputReserve: BN, buyAmount: BN): Promise<BN> {
     log.info(`Calculating buy price ...`)
     const api = await this.connect()
-    return await RPC.calculateBuyPrice(api, inputReserve, outputReserve, buyAmount)
+    const reserve: Reserve = {
+      input: inputReserve,
+      output: outputReserve,
+    }
+    return await Rpc.calculateBuyPrice(api, reserve, buyAmount)
   }
 
   /**
@@ -258,7 +264,11 @@ export class Mangata {
   ): Promise<BN> {
     log.info(`Calculating sell price ...`)
     const api = await this.connect()
-    return await RPC.calculateSellPrice(api, inputReserve, outputReserve, sellAmount)
+    const reserve: Reserve = {
+      input: inputReserve,
+      output: outputReserve,
+    }
+    return await Rpc.calculateSellPrice(api, reserve, sellAmount)
   }
 
   /**
@@ -293,12 +303,16 @@ export class Mangata {
    * asset id liquidity asset amount of pool to burn
    */
   public async getBurnAmount(
-    firstAssetId: BN,
-    secondAssetId: BN,
+    firstTokenId: string,
+    secondTokenId: string,
     liquidityAssetAmount: BN
   ): Promise<any> {
     const api = await this.connect()
-    return await RPC.getBurnAmount(api, firstAssetId, secondAssetId, liquidityAssetAmount)
+    const tokens: TokensId = {
+      first: firstTokenId,
+      second: secondTokenId,
+    }
+    return await Rpc.getBurnAmount(api, tokens, liquidityAssetAmount)
   }
 
   /**
@@ -307,21 +321,33 @@ export class Mangata {
    */
 
   public async calculateSellPriceId(
-    soldTokenId: BN,
-    boughtTokenId: BN,
+    soldTokenId: string,
+    boughtTokenId: string,
     sellAmount: BN
   ): Promise<BN> {
     const api = await this.connect()
-    return await RPC.calculateSellPriceId(api, soldTokenId, boughtTokenId, sellAmount)
+    const tokens: TokensId = {
+      first: soldTokenId,
+      second: boughtTokenId,
+    }
+    return await Rpc.calculateSellPriceId(api, tokens, sellAmount)
   }
 
   /**
    * Returns sell amount you need to pay in sold token id for bought token id in buy amount
    */
 
-  public async calculateBuyPriceId(soldTokenId: BN, boughtTokenId: BN, buyAmount: BN): Promise<BN> {
+  public async calculateBuyPriceId(
+    soldTokenId: string,
+    boughtTokenId: string,
+    buyAmount: BN
+  ): Promise<BN> {
     const api = await this.connect()
-    return await RPC.calculateBuyPriceId(api, soldTokenId, boughtTokenId, buyAmount)
+    const tokens: TokensId = {
+      first: soldTokenId,
+      second: boughtTokenId,
+    }
+    return await Rpc.calculateBuyPriceId(api, tokens, buyAmount)
   }
 
   /**
@@ -360,7 +386,7 @@ export class Mangata {
   /**
    * Returns amount of currency ID in Treasury
    */
-  public async getTreasury(tokenId: string): Promise<BN> {
+  public async getTreasury(tokenId: string): Promise<AccountData> {
     const api = await this.connect()
     return await Query.getTreasury(api, tokenId)
   }
@@ -368,7 +394,7 @@ export class Mangata {
   /**
    * Returns amount of currency ID in Treasury Burn
    */
-  public async getTreasuryBurn(tokenId: string): Promise<BN> {
+  public async getTreasuryBurn(tokenId: string): Promise<AccountData> {
     const api = await this.connect()
     return await Query.getTreasuryBurn(api, tokenId)
   }

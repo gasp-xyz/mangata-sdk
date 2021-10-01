@@ -1,5 +1,5 @@
+/* eslint-disable no-console */
 import { ApiPromise } from '@polkadot/api'
-import { AccountInfo } from '@polkadot/types/interfaces'
 import { AccountData } from '@polkadot/types/interfaces/balances'
 import BN from 'bn.js'
 
@@ -7,14 +7,17 @@ import { getNonce as getNonceEntity } from '../entities/query/nonce'
 import { getAmountOfTokens as getAmountOfTokensEntity } from '../entities/query/pools'
 import { getLiquidityAssets as getLiquidityAssetsEntity } from '../entities/query/liquidityAssets'
 import { getLiquidityPool as getLiquidityPoolEntity } from '../entities/query/liquidityPools'
-import { getTreasury as getTreasuryEntity } from '../entities/query/treasury'
-import { getTreasuryBurn as getTreasuryBurnEntity } from '../entities/query/treasuryBurn'
 import { getTotalIssuance as getTotalIssuanceEntity } from '../entities/query/totalIssuance'
 import { getLock as getLockEntity } from '../entities/query/locks'
 import { getTokenBalance as getTokenBalanceEntity } from '../entities/query/accounts'
 import { getNextToken as getNextTokenEntity } from '../entities/query/nextCurrencyId'
-import TokensId from '../types/query/TokensId'
+import TokensId from '../types/TokensId'
 import { Token } from '../types/Token'
+
+const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : ''
+const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
+  ? process.env.TREASURY_BURN_ADDRESS
+  : ''
 
 class Query {
   static async getNonce(api: ApiPromise, address: string): Promise<BN> {
@@ -42,14 +45,16 @@ class Query {
     return poolAssetIds.map((num) => new BN(num.toString()))
   }
 
-  static async getTreasury(api: ApiPromise, tokenId: Token): Promise<BN> {
-    const treasuryBalance = await getTreasuryEntity(api, tokenId)
-    return new BN(treasuryBalance.toString())
+  static async getTreasury(api: ApiPromise, tokenId: Token): Promise<AccountData> {
+    const treasuryBalance = await getTokenBalanceEntity(api, TREASURY_ADDRESS, tokenId)
+    const accountData = treasuryBalance as AccountData
+    return accountData
   }
 
-  static async getTreasuryBurn(api: ApiPromise, tokenId: Token): Promise<BN> {
-    const treasuryBalance = await getTreasuryBurnEntity(api, tokenId)
-    return new BN(treasuryBalance.toString())
+  static async getTreasuryBurn(api: ApiPromise, tokenId: Token): Promise<AccountData> {
+    const treasuryBalance = await getTokenBalanceEntity(api, TREASURY_BURN_ADDRESS, tokenId)
+    const accountData = treasuryBalance as AccountData
+    return accountData
   }
 
   static async getTotalIssuance(api: ApiPromise, tokenId: Token): Promise<BN> {

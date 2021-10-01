@@ -94,13 +94,13 @@ it('should get next token id', async () => {
 })
 
 it('should get treasury', async () => {
-  const amountCurrencyId = await mangataInstance.getTreasury(firstCurrency)
-  expect(amountCurrencyId.toNumber()).toBeGreaterThanOrEqual(0)
+  const accountData = await mangataInstance.getTreasury(firstCurrency)
+  expect(accountData.free.toBn().toNumber()).toBeGreaterThanOrEqual(0)
 })
 
 it('should get treasury burn', async () => {
-  const amountCurrencyIdInTreasury = await mangataInstance.getTreasuryBurn(firstCurrency)
-  expect(amountCurrencyIdInTreasury.toNumber()).toBeGreaterThanOrEqual(0)
+  const accountData = await mangataInstance.getTreasuryBurn(firstCurrency)
+  expect(accountData.free.toBn().toNumber()).toBeGreaterThanOrEqual(0)
 })
 
 afterAll(async () => {
