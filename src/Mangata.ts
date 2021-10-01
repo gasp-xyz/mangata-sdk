@@ -4,14 +4,21 @@ import { KeyringPair } from '@polkadot/keyring/types'
 import { AccountData } from '@polkadot/types/interfaces/balances'
 import BN from 'bn.js'
 
-import { options } from './utils/options'
 import Rpc from './services/Rpc'
-import { TX } from './services/Tx'
+import TX from './services/Tx'
 import Query from './services/Query'
-import { MangataGenericEvent, TxOptions } from './types'
+
+import { options } from './utils/options'
 import { log } from './utils/logger'
-import TokensId from './types/TokensId'
-import Reserve from './types/Reserve'
+import { TokensId } from './types/TokensId'
+import { Reserve } from './types/Reserve'
+import { Amount } from './types/Amount'
+import { MangataAccount } from './types/MangataAccount'
+import { Pool } from './types/Pool'
+import { TokenId } from './types/TokenId'
+import { MangataGenericEvent } from './types/MangataGenericEvent'
+import { TxOptions } from './types/TxOptions'
+import { Address } from './types/Address'
 
 /**
  * @class Mangata
@@ -34,9 +41,12 @@ export class Mangata {
   /**
    * Initialised via isReady & new with specific provider
    */
-  private async connect() {
+  private async connect(): Promise<ApiPromise> {
     if (!this.api) {
       const provider = new WsProvider(this.uri)
+      provider.on('disconnected', () => log.info('provider', 'disconnected'))
+      provider.on('connected', () => log.info('provider', 'connected'))
+      provider.on('error', (error) => log.error('provider', 'error', error))
       this.api = await ApiPromise.create(options({ provider }))
     }
 
@@ -95,7 +105,7 @@ export class Mangata {
    * Retrieve the current nonce
    */
 
-  public async getNonce(address: string): Promise<BN> {
+  public async getNonce(address: Address): Promise<BN> {
     log.info(`Retrieving nonce for the address: ${address}`)
     const api = await this.connect()
     return Query.getNonce(api, address)
@@ -116,37 +126,33 @@ export class Mangata {
    */
 
   public async createPool(
-    account: KeyringPair | string,
-    firstAssetId: string,
-    firstAssetAmount: BN,
-    secondAssetId: string,
-    secondAssetAmount: BN,
+    account: MangataAccount,
+    firstTokenId: TokenId,
+    firstTokenAmount: Amount,
+    secondTokenId: TokenId,
+    secondTokenAmount: Amount,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
+    log.info(`Creating pool ...`)
     const api = await this.connect()
-    log.info(
-      `Creating pool with [First Asset Id: ${firstAssetId} - ${firstAssetAmount} amount] and [Second Asset Id ${secondAssetId} - ${secondAssetAmount} amount] `
-    )
-    return await TX.createPool(
-      api,
-      account,
-      firstAssetId,
-      firstAssetAmount,
-      secondAssetId,
-      secondAssetAmount,
-      txOptions
-    )
+    const pool: Pool = {
+      firstTokenId: firstTokenId,
+      firstTokenAmount: firstTokenAmount,
+      secondTokenId: secondTokenId,
+      secondTokenAmount: secondTokenAmount,
+    }
+    return await TX.createPool(api, account, pool, txOptions)
   }
 
   /**
    * Sell asset
    */
   public async sellAsset(
-    account: KeyringPair | string,
-    soldAssetId: string,
-    boughtAssetId: string,
-    amount: BN,
-    minAmountOut: BN,
+    account: MangataAccount,
+    soldAssetId: TokenId,
+    boughtAssetId: TokenId,
+    amount: Amount,
+    minAmountOut: Amount,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     log.info('Selling asset ...')
@@ -168,22 +174,25 @@ export class Mangata {
    * exceed expected second asset amount
    */
   public async mintLiquidity(
-    account: KeyringPair | string,
-    firstAssetId: string,
-    secondAssetId: string,
-    firstAssetAmount: BN,
-    expectedSecondAssetAmount: BN,
+    account: MangataAccount,
+    firstTokenId: TokenId,
+    secondTokenId: TokenId,
+    firstTokenAmount: Amount,
+    expectedSecondTokenAmount: Amount,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     log.info(`Adding liquidity to pool ...`)
     const api = await this.connect()
+    const tokens: TokensId = {
+      first: firstTokenId,
+      second: secondTokenId,
+    }
     return await TX.mintLiquidity(
       api,
       account,
-      firstAssetId,
-      secondAssetId,
-      firstAssetAmount,
-      expectedSecondAssetAmount,
+      tokens,
+      firstTokenAmount,
+      expectedSecondTokenAmount,
       txOptions
     )
   }
@@ -193,22 +202,19 @@ export class Mangata {
    * second asset id of a pool and liquidity asset amount you wish to burn
    */
   public async burnLiquidity(
-    account: KeyringPair | string,
-    firstAssetId: string,
-    secondAssetId: string,
-    liquidityAssetAmount: BN,
+    account: MangataAccount,
+    firstTokenId: TokenId,
+    secondTokenId: TokenId,
+    liquidityTokenAmount: Amount,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     log.info(`Removing liquidity from liquidity pool ...`)
     const api = await this.connect()
-    return await TX.burnLiquidity(
-      api,
-      account,
-      firstAssetId,
-      secondAssetId,
-      liquidityAssetAmount,
-      txOptions
-    )
+    const tokens: TokensId = {
+      first: firstTokenId,
+      second: secondTokenId,
+    }
+    return await TX.burnLiquidity(api, account, tokens, liquidityTokenAmount, txOptions)
   }
 
   /**
@@ -217,11 +223,11 @@ export class Mangata {
    * purchase bouth asset id in bought asset amount
    */
   public async buyAsset(
-    account: KeyringPair | string,
-    soldAssetId: string,
-    boughtAssetId: string,
-    boughtAssetAmount: BN,
-    maxAmountIn: BN,
+    account: MangataAccount,
+    soldAssetId: TokenId,
+    boughtAssetId: TokenId,
+    boughtAssetAmount: Amount,
+    maxAmountIn: Amount,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     log.info('Buying asset ...')
@@ -242,7 +248,11 @@ export class Mangata {
    * amount, while specifying input reserve – reserve of sold token id, and output reserve
    * – reserve of bought token id
    */
-  public async calculateBuyPrice(inputReserve: BN, outputReserve: BN, buyAmount: BN): Promise<BN> {
+  public async calculateBuyPrice(
+    inputReserve: Amount,
+    outputReserve: Amount,
+    buyAmount: Amount
+  ): Promise<BN> {
     log.info(`Calculating buy price ...`)
     const api = await this.connect()
     const reserve: Reserve = {
@@ -258,9 +268,9 @@ export class Mangata {
    * reserve – reserve of bought token id
    */
   public async calculateSellPrice(
-    inputReserve: BN,
-    outputReserve: BN,
-    sellAmount: BN
+    inputReserve: Amount,
+    outputReserve: Amount,
+    sellAmount: Amount
   ): Promise<BN> {
     log.info(`Calculating sell price ...`)
     const api = await this.connect()
@@ -275,9 +285,9 @@ export class Mangata {
    * Create Token
    */
   public async createToken(
-    targetAddress: string,
-    sudoAccount: KeyringPair | string,
-    currencyValue: BN,
+    targetAddress: Address,
+    sudoAccount: MangataAccount,
+    currencyValue: Amount,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     const api = await this.connect()
@@ -288,14 +298,14 @@ export class Mangata {
    * Mint Asset
    */
   public async mintAsset(
-    sudoAccount: KeyringPair | string,
-    assetId: BN,
-    targetAddress: string,
-    amount: BN,
+    sudoAccount: MangataAccount,
+    tokenId: TokenId,
+    address: Address,
+    amount: Amount,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     const api = await this.connect()
-    return await TX.mintAsset(api, sudoAccount, assetId, targetAddress, amount, txOptions)
+    return await TX.mintAsset(api, sudoAccount, tokenId, address, amount, txOptions)
   }
 
   /**
@@ -303,8 +313,8 @@ export class Mangata {
    * asset id liquidity asset amount of pool to burn
    */
   public async getBurnAmount(
-    firstTokenId: string,
-    secondTokenId: string,
+    firstTokenId: TokenId,
+    secondTokenId: TokenId,
     liquidityAssetAmount: BN
   ): Promise<any> {
     const api = await this.connect()
@@ -321,9 +331,9 @@ export class Mangata {
    */
 
   public async calculateSellPriceId(
-    soldTokenId: string,
-    boughtTokenId: string,
-    sellAmount: BN
+    soldTokenId: TokenId,
+    boughtTokenId: TokenId,
+    sellAmount: Amount
   ): Promise<BN> {
     const api = await this.connect()
     const tokens: TokensId = {
@@ -338,9 +348,9 @@ export class Mangata {
    */
 
   public async calculateBuyPriceId(
-    soldTokenId: string,
-    boughtTokenId: string,
-    buyAmount: BN
+    soldTokenId: TokenId,
+    boughtTokenId: TokenId,
+    buyAmount: Amount
   ): Promise<BN> {
     const api = await this.connect()
     const tokens: TokensId = {
@@ -353,7 +363,10 @@ export class Mangata {
   /**
    * Get amount of token id in pool
    */
-  public async getAmountOfTokenIdInPool(firstTokenId: string, secondTokenId: string): Promise<BN> {
+  public async getAmountOfTokenIdInPool(
+    firstTokenId: TokenId,
+    secondTokenId: TokenId
+  ): Promise<BN> {
     const api = await this.connect()
     const tokens: TokensId = {
       first: firstTokenId,
@@ -366,7 +379,7 @@ export class Mangata {
    * Returns liquidity asset id while specifying first and second TokenId returns same liquidity asset id when specifying other way
    * around – second and first TokenId
    */
-  public async getLiquidityAssetId(firstTokenId: string, secondTokenId: string): Promise<BN> {
+  public async getLiquidityAssetId(firstTokenId: TokenId, secondTokenId: TokenId): Promise<BN> {
     const api = await this.connect()
     const tokens: TokensId = {
       first: firstTokenId,
@@ -378,7 +391,7 @@ export class Mangata {
   /**
    * Returns pool corresponding to specified liquidity asset ID in from of first and second TokenId pair
    */
-  public async getLiquidityPool(liquidityAssetId: string): Promise<BN[]> {
+  public async getLiquidityPool(liquidityAssetId: TokenId): Promise<BN[]> {
     const api = await this.connect()
     return await Query.getLiquidityPool(api, liquidityAssetId)
   }
@@ -386,7 +399,7 @@ export class Mangata {
   /**
    * Returns amount of currency ID in Treasury
    */
-  public async getTreasury(tokenId: string): Promise<AccountData> {
+  public async getTreasury(tokenId: TokenId): Promise<AccountData> {
     const api = await this.connect()
     return await Query.getTreasury(api, tokenId)
   }
@@ -394,7 +407,7 @@ export class Mangata {
   /**
    * Returns amount of currency ID in Treasury Burn
    */
-  public async getTreasuryBurn(tokenId: string): Promise<AccountData> {
+  public async getTreasuryBurn(tokenId: TokenId): Promise<AccountData> {
     const api = await this.connect()
     return await Query.getTreasuryBurn(api, tokenId)
   }
@@ -404,14 +417,14 @@ export class Mangata {
    */
 
   public async transferToken(
-    account: KeyringPair | string,
-    tokenId: BN,
-    targetAddress: string,
-    amount: BN,
+    account: MangataAccount,
+    tokenId: TokenId,
+    address: Address,
+    amount: Amount,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     const api = await this.connect()
-    return await TX.transferToken(api, account, tokenId, targetAddress, amount, txOptions)
+    return await TX.transferToken(api, account, tokenId, address, amount, txOptions)
   }
 
   /**
@@ -419,20 +432,20 @@ export class Mangata {
    */
 
   public async transferTokenAll(
-    account: KeyringPair | string,
-    tokenId: BN,
-    targetAddress: string,
+    account: MangataAccount,
+    tokenId: TokenId,
+    address: Address,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     const api = await this.connect()
-    return await TX.transferAllToken(api, account, tokenId, targetAddress, txOptions)
+    return await TX.transferAllToken(api, account, tokenId, address, txOptions)
   }
 
   /**
    * Returns total issuance of CurrencyId
    */
 
-  public async getTotalIssuance(tokenId: string): Promise<BN> {
+  public async getTotalIssuance(tokenId: TokenId): Promise<BN> {
     const api = await this.connect()
     return await Query.getTotalIssuance(api, tokenId)
   }
@@ -440,7 +453,7 @@ export class Mangata {
   /**
    * Returns vec of locked tokenId of an specified account Id Address and tokenId
    */
-  public async getLock(address: string, tokenId: string) {
+  public async getLock(address: Address, tokenId: TokenId) {
     const api = await this.connect()
     return await Query.getLock(api, address, tokenId)
   }
@@ -448,7 +461,7 @@ export class Mangata {
   /**
    * Returns Asset balance for address
    */
-  public async getTokenBalance(tokenId: string, address: string): Promise<BN> {
+  public async getTokenBalance(tokenId: TokenId, address: Address): Promise<BN> {
     const api = await this.connect()
     return await Query.getTokenBalance(api, address, tokenId)
   }

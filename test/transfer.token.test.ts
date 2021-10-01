@@ -36,7 +36,7 @@ describe('Testing additional methods', () => {
   it('should trasnfer tokens from testUser1 to testUser2', async () => {
     const result = await mangataInstance.transferToken(
       testUser,
-      new BN(secondCurrency),
+      secondCurrency,
       testUser1.address,
       new BN(100)
     )
@@ -50,7 +50,7 @@ describe('Testing additional methods', () => {
 
     const resultTransferAll = await mangataInstance.transferTokenAll(
       testUser,
-      new BN(firstCurrency),
+      firstCurrency,
       testUser1.address
     )
 

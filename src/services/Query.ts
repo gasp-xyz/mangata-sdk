@@ -11,8 +11,9 @@ import { getTotalIssuance as getTotalIssuanceEntity } from '../entities/query/to
 import { getLock as getLockEntity } from '../entities/query/locks'
 import { getTokenBalance as getTokenBalanceEntity } from '../entities/query/accounts'
 import { getNextToken as getNextTokenEntity } from '../entities/query/nextCurrencyId'
-import TokensId from '../types/TokensId'
-import { Token } from '../types/Token'
+import { TokensId } from '../types/TokensId'
+import { TokenId } from '../types/TokenId'
+import { Address } from '../types/Address'
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : ''
 const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
@@ -20,7 +21,7 @@ const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
   : ''
 
 class Query {
-  static async getNonce(api: ApiPromise, address: string): Promise<BN> {
+  static async getNonce(api: ApiPromise, address: Address): Promise<BN> {
     const { nonce } = await getNonceEntity(api, address)
     return nonce.toBn()
   }
@@ -35,7 +36,7 @@ class Query {
     return new BN(liquidityAssetId.toString())
   }
 
-  static async getLiquidityPool(api: ApiPromise, liquidityAssetId: string): Promise<BN[]> {
+  static async getLiquidityPool(api: ApiPromise, liquidityAssetId: TokenId): Promise<BN[]> {
     const liquidityPool = await getLiquidityPoolEntity(api, liquidityAssetId)
     const poolAssetIds = liquidityPool.toHuman() as Number[]
     if (!poolAssetIds) {
@@ -45,30 +46,30 @@ class Query {
     return poolAssetIds.map((num) => new BN(num.toString()))
   }
 
-  static async getTreasury(api: ApiPromise, tokenId: Token): Promise<AccountData> {
+  static async getTreasury(api: ApiPromise, tokenId: TokenId): Promise<AccountData> {
     const treasuryBalance = await getTokenBalanceEntity(api, TREASURY_ADDRESS, tokenId)
     const accountData = treasuryBalance as AccountData
     return accountData
   }
 
-  static async getTreasuryBurn(api: ApiPromise, tokenId: Token): Promise<AccountData> {
+  static async getTreasuryBurn(api: ApiPromise, tokenId: TokenId): Promise<AccountData> {
     const treasuryBalance = await getTokenBalanceEntity(api, TREASURY_BURN_ADDRESS, tokenId)
     const accountData = treasuryBalance as AccountData
     return accountData
   }
 
-  static async getTotalIssuance(api: ApiPromise, tokenId: Token): Promise<BN> {
+  static async getTotalIssuance(api: ApiPromise, tokenId: TokenId): Promise<BN> {
     const tokenSupply = await getTotalIssuanceEntity(api, tokenId)
     return new BN(tokenSupply.toString())
   }
 
   // TODO: find the return type
-  static async getLock(api: ApiPromise, address: string, tokenId: Token) {
+  static async getLock(api: ApiPromise, address: Address, tokenId: TokenId) {
     const locksResponse = await getLockEntity(api, address, tokenId)
     return JSON.parse(JSON.stringify(locksResponse.toHuman()))
   }
 
-  static async getTokenBalance(api: ApiPromise, address: string, tokenId: Token): Promise<BN> {
+  static async getTokenBalance(api: ApiPromise, address: Address, tokenId: TokenId): Promise<BN> {
     const balance = await getTokenBalanceEntity(api, address, tokenId)
     const accountData = balance as AccountData
     return new BN(accountData.free.toBigInt().toString())

@@ -1,6 +1,6 @@
-type TokensId = {
-  first: string
-  second: string
-}
+import { TokenId } from './TokenId'
 
-export default TokensId
+export type TokensId = {
+  first: TokenId
+  second: TokenId
+}

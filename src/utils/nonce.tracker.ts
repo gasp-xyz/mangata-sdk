@@ -1,10 +1,9 @@
 import { ApiPromise } from '@polkadot/api'
-import { KeyringPair } from '@polkadot/keyring/types'
 import BN from 'bn.js'
 
 import Query from '../services/Query'
-import { TxOptions } from '../types'
 import memoryDatabase from '../utils/MemoryDatabase'
+import { TxOptions } from '../types/TxOptions'
 
 export const getTxNonce = async (
   api: ApiPromise,

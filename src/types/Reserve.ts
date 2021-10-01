@@ -1,8 +1,6 @@
-import BN from 'bn.js'
+import { Amount } from './Amount'
 
-type Reserve = {
-  input: BN
-  output: BN
+export type Reserve = {
+  input: Amount
+  output: Amount
 }
-
-export default Reserve

@@ -11,9 +11,9 @@ import { calculateSellPriceId as calculateSellPriceIdEntity } from '../entities/
 import { calculateBuyPriceId as calculateBuyPriceIdEntity } from '../entities/rpc/calculate_buy_price_id'
 
 import { Amount } from '../types/Amount'
-import Reserve from '../types/Reserve'
+import { Reserve } from '../types/Reserve'
 import { log } from '../utils/logger'
-import TokensId from '../types/TokensId'
+import { TokensId } from '../types/TokensId'
 
 class Rpc {
   static async getChain(api: ApiPromise): Promise<string> {

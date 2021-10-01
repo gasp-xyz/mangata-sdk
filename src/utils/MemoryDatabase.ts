@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import BN from 'bn.js'
-import { Database } from '../types'
+import { Database } from '../types/Database'
 
 class InMemoryDatabase implements Database {
   static instance: InMemoryDatabase
