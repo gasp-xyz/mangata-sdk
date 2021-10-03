@@ -44,9 +44,6 @@ export class Mangata {
   private async connect(): Promise<ApiPromise> {
     if (!this.api) {
       const provider = new WsProvider(this.uri)
-      provider.on('disconnected', () => log.info('provider', 'disconnected'))
-      provider.on('connected', () => log.info('provider', 'connected'))
-      provider.on('error', (error) => log.error('provider', 'error', error))
       this.api = await ApiPromise.create(options({ provider }))
     }
 

@@ -1,4 +1,12 @@
-import { Mangata } from './Mangata'
-import { MangataHelpers } from './MangataHelpers'
+export { Mangata } from './Mangata'
+export { MangataHelpers } from './MangataHelpers'
 
-export { Mangata, MangataHelpers }
+export { Address } from './types/Address'
+export { Amount } from './types/Amount'
+export { MangataAccount } from './types/MangataAccount'
+export { MangataEventData } from './types/MangataEventData'
+export { MangataGenericEvent } from './types/MangataGenericEvent'
+export { Reserve } from './types/Reserve'
+export { TokenId } from './types/TokenId'
+export { TokensId } from './types/TokensId'
+export { TxOptions } from './types/TxOptions'
