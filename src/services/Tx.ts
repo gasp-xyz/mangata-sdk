@@ -42,6 +42,7 @@ export const signTx = async (
         account,
         { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
         async ({ status, isError }) => {
+          txOptions && txOptions.statusCallback && txOptions.statusCallback(status)
           log.info('Transaction status: ', status.type)
           if (status.isInBlock) {
             log.info('Included at block hash: ', status.asInBlock.toHex())
