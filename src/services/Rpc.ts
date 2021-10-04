@@ -10,10 +10,7 @@ import { getBurnAmount as getBurnAmountEntity } from '../entities/rpc/get_burn_a
 import { calculateSellPriceId as calculateSellPriceIdEntity } from '../entities/rpc/calculate_sell_price_id'
 import { calculateBuyPriceId as calculateBuyPriceIdEntity } from '../entities/rpc/calculate_buy_price_id'
 
-import { Amount } from '../types/Amount'
-import { Reserve } from '../types/Reserve'
 import { log } from '../utils/logger'
-import { TokensId } from '../types/TokensId'
 
 class Rpc {
   static async getChain(api: ApiPromise): Promise<string> {
@@ -34,34 +31,55 @@ class Rpc {
   }
 
   // TODO: need to find out the return type
-  static async calculateBuyPrice(api: ApiPromise, reserve: Reserve, amount: Amount): Promise<BN> {
-    const result = await calculateBuyPriceEntity(api, reserve, amount)
+  static async calculateBuyPrice(
+    api: ApiPromise,
+    inputReserve: BN,
+    outputReserve: BN,
+    amount: BN
+  ): Promise<BN> {
+    const result = await calculateBuyPriceEntity(api, inputReserve, outputReserve, amount)
     return new BN(result.price)
   }
 
   // TODO: need to find out the return type
-  static async calculateSellPrice(api: ApiPromise, reserve: Reserve, amount: Amount): Promise<BN> {
-    const result = await calculateSellPriceEntity(api, reserve, amount)
+  static async calculateSellPrice(
+    api: ApiPromise,
+    inputReserve: BN,
+    outputReserve: BN,
+    amount: BN
+  ): Promise<BN> {
+    const result = await calculateSellPriceEntity(api, inputReserve, outputReserve, amount)
     return new BN(result.price)
   }
 
   // TODO: Need to figure out the return value from this method
-  static async getBurnAmount(api: ApiPromise, tokens: TokensId, amount: Amount) {
-    const result = await getBurnAmountEntity(api, tokens, amount)
+  static async getBurnAmount(
+    api: ApiPromise,
+    firstTokenId: string,
+    secondTokenId: string,
+    amount: BN
+  ) {
+    const result = await getBurnAmountEntity(api, firstTokenId, secondTokenId, amount)
     return result.toHuman()
   }
 
   static async calculateSellPriceId(
     api: ApiPromise,
-    tokens: TokensId,
-    amount: Amount
+    firstTokenId: string,
+    secondTokenId: string,
+    amount: BN
   ): Promise<BN> {
-    const result = await calculateSellPriceIdEntity(api, tokens, amount)
+    const result = await calculateSellPriceIdEntity(api, firstTokenId, secondTokenId, amount)
     return new BN(result.price)
   }
 
-  static async calculateBuyPriceId(api: ApiPromise, tokens: TokensId, amount: Amount): Promise<BN> {
-    const result = await calculateBuyPriceIdEntity(api, tokens, amount)
+  static async calculateBuyPriceId(
+    api: ApiPromise,
+    firstTokenId: string,
+    secondTokenId: string,
+    amount: BN
+  ): Promise<BN> {
+    const result = await calculateBuyPriceIdEntity(api, firstTokenId, secondTokenId, amount)
     return new BN(result.price)
   }
 }

@@ -19,20 +19,15 @@ import { transferToken as transferTokenEntity } from '../entities/tx/transfer'
 import { transferAllToken as transferAllTokenEntity } from '../entities/tx/transferAll'
 import { createToken as createTokenEntity } from '../entities/tx/createToken'
 import { mintToken as mintTokenEntity } from '../entities/tx/mintToken'
-import { Pool } from '../types/Pool'
-import { TokenId } from '../types/TokenId'
-import { Amount } from '../types/Amount'
-import { MangataAccount } from '../types/MangataAccount'
-import { TokensId } from '../types/TokensId'
+
 import { TxOptions } from '../types/TxOptions'
 import { MangataGenericEvent } from '../types/MangataGenericEvent'
 import { MangataEventData } from '../types/MangataEventData'
-import { Address } from '../types/Address'
 
 export const signTx = async (
   api: ApiPromise,
   tx: SubmittableExtrinsic<'promise'>,
-  account: MangataAccount,
+  account: string | KeyringPair,
   txOptions?: TxOptions
 ): Promise<MangataGenericEvent[]> => {
   return new Promise<MangataGenericEvent[]>(async (resolve, reject) => {
@@ -146,20 +141,28 @@ export const signTx = async (
 class Tx {
   static async createPool(
     api: ApiPromise,
-    account: MangataAccount,
-    pool: Pool,
+    account: string | KeyringPair,
+    firstTokenId: string,
+    firstTokenAmount: BN,
+    secondTokenId: string,
+    secondTokenAmount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    return await signTx(api, createPoolEntity(api, pool), account, txOptions)
+    return await signTx(
+      api,
+      createPoolEntity(api, firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount),
+      account,
+      txOptions
+    )
   }
 
   static async sellAsset(
     api: ApiPromise,
-    account: MangataAccount,
-    soldTokenId: TokenId,
-    boughtTokenId: TokenId,
-    amount: Amount,
-    minAmountOut: Amount,
+    account: string | KeyringPair,
+    soldTokenId: string,
+    boughtTokenId: string,
+    amount: BN,
+    minAmountOut: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
@@ -172,11 +175,11 @@ class Tx {
 
   static async buyAsset(
     api: ApiPromise,
-    account: MangataAccount,
-    soldTokenId: TokenId,
-    boughtTokenId: TokenId,
-    amount: Amount,
-    maxAmountIn: Amount,
+    account: string | KeyringPair,
+    soldTokenId: string,
+    boughtTokenId: string,
+    amount: BN,
+    maxAmountIn: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
@@ -189,15 +192,22 @@ class Tx {
 
   static async mintLiquidity(
     api: ApiPromise,
-    account: MangataAccount,
-    tokens: TokensId,
-    firstTokenAmount: Amount,
-    expectedSecondTokenAmount: Amount = new BN(Number.MAX_SAFE_INTEGER),
+    account: string | KeyringPair,
+    firstTokenId: string,
+    secondTokenId: string,
+    firstTokenAmount: BN,
+    expectedSecondTokenAmount: BN = new BN(Number.MAX_SAFE_INTEGER),
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      mintLiquidityEntity(api, tokens, firstTokenAmount, expectedSecondTokenAmount),
+      mintLiquidityEntity(
+        api,
+        firstTokenId,
+        secondTokenId,
+        firstTokenAmount,
+        expectedSecondTokenAmount
+      ),
       account,
       txOptions
     )
@@ -205,14 +215,15 @@ class Tx {
 
   static async burnLiquidity(
     api: ApiPromise,
-    account: MangataAccount,
-    tokens: TokensId,
-    liquidityTokenAmount: Amount,
+    account: string | KeyringPair,
+    firstTokenId: string,
+    secondTokenId: string,
+    liquidityTokenAmount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      burnLiquidityEntity(api, tokens, liquidityTokenAmount),
+      burnLiquidityEntity(api, firstTokenId, secondTokenId, liquidityTokenAmount),
       account,
       txOptions
     )
@@ -220,10 +231,10 @@ class Tx {
 
   static async transferToken(
     api: ApiPromise,
-    account: MangataAccount,
-    tokenId: TokenId,
-    address: Address,
-    amount: Amount,
+    account: string | KeyringPair,
+    tokenId: string,
+    address: string,
+    amount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     return await signTx(api, transferTokenEntity(api, address, tokenId, amount), account, txOptions)
@@ -231,9 +242,9 @@ class Tx {
 
   static async transferAllToken(
     api: ApiPromise,
-    account: MangataAccount,
-    tokenId: TokenId,
-    address: Address,
+    account: string | KeyringPair,
+    tokenId: string,
+    address: string,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     return await signTx(api, transferAllTokenEntity(api, address, tokenId), account, txOptions)
@@ -241,9 +252,9 @@ class Tx {
 
   static async createToken(
     api: ApiPromise,
-    address: Address,
-    sudoAccount: MangataAccount,
-    tokenValu: Amount,
+    address: string,
+    sudoAccount: string | KeyringPair,
+    tokenValu: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     return await signTx(api, createTokenEntity(api, address, tokenValu), sudoAccount, txOptions)
@@ -251,10 +262,10 @@ class Tx {
 
   static async mintAsset(
     api: ApiPromise,
-    sudoAccount: MangataAccount,
-    tokenId: TokenId,
-    address: Address,
-    amount: Amount,
+    sudoAccount: string | KeyringPair,
+    tokenId: string,
+    address: string,
+    amount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     return await signTx(api, mintTokenEntity(api, address, tokenId, amount), sudoAccount, txOptions)

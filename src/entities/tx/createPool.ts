@@ -1,12 +1,13 @@
 import { ApiPromise } from '@polkadot/api'
 import { SubmittableExtrinsic } from '@polkadot/api/types'
-import { Pool } from '../../types/Pool'
+import BN from 'bn.js'
 
-export function createPool(api: ApiPromise, pool: Pool): SubmittableExtrinsic<'promise'> {
-  return api.tx.xyk.createPool(
-    pool.firstTokenId,
-    pool.firstTokenAmount,
-    pool.secondTokenId,
-    pool.secondTokenAmount
-  )
+export function createPool(
+  api: ApiPromise,
+  firstTokenId: string,
+  firstTokenAmount: BN,
+  secondTokenId: string,
+  secondTokenAmount: BN
+): SubmittableExtrinsic<'promise'> {
+  return api.tx.xyk.createPool(firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount)
 }

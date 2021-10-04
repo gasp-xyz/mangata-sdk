@@ -1,12 +1,12 @@
 import { ApiPromise } from '@polkadot/api'
 import { SubmittableExtrinsic } from '@polkadot/api/types'
-import { Amount } from '../../types/Amount'
-import { TokensId } from '../../types/TokensId'
+import BN from 'bn.js'
 
 export function burnLiquidity(
   api: ApiPromise,
-  tokens: TokensId,
-  liquidityTokenAmount: Amount
+  firstTokenId: string,
+  secondTokenId: string,
+  liquidityTokenAmount: BN
 ): SubmittableExtrinsic<'promise'> {
-  return api.tx.xyk.burnLiquidity(tokens.first, tokens.second, liquidityTokenAmount)
+  return api.tx.xyk.burnLiquidity(firstTokenId, secondTokenId, liquidityTokenAmount)
 }

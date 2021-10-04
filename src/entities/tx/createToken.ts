@@ -1,11 +1,11 @@
 import { ApiPromise } from '@polkadot/api'
 import { SubmittableExtrinsic } from '@polkadot/api/types'
-import { Amount } from '../../types/Amount'
+import BN from 'bn.js'
 
 export function createToken(
   api: ApiPromise,
   address: string,
-  tokenValue: Amount
+  tokenValue: BN
 ): SubmittableExtrinsic<'promise'> {
   return api.tx.sudo.sudo(api.tx.tokens.create(address, tokenValue))
 }

@@ -1,7 +1,11 @@
 import { ApiPromise } from '@polkadot/api'
-import { Amount } from '../../types/Amount'
-import { TokensId } from '../../types/TokensId'
+import BN from 'bn.js'
 
-export function calculateSellPriceId(api: ApiPromise, tokens: TokensId, amount: Amount) {
-  return (api.rpc as any).xyk.calculate_sell_price_id(tokens.first, tokens.second, amount)
+export function calculateSellPriceId(
+  api: ApiPromise,
+  firstTokenId: string,
+  secondTokenId: string,
+  amount: BN
+) {
+  return (api.rpc as any).xyk.calculate_sell_price_id(firstTokenId, secondTokenId, amount)
 }
