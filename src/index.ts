@@ -1,4 +1,6 @@
-import { Mangata } from './Mangata'
-import { MangataHelpers } from './MangataHelpers'
+export { Mangata } from './Mangata'
+export { MangataHelpers } from './MangataHelpers'
 
-export { Mangata, MangataHelpers }
+export { MangataEventData } from './types/MangataEventData'
+export { MangataGenericEvent } from './types/MangataGenericEvent'
+export { TxOptions } from './types/TxOptions'

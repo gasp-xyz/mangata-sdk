@@ -1,115 +1,87 @@
 import { ApiPromise } from '@polkadot/api'
 import BN from 'bn.js'
-import type { RpcInterface } from '@polkadot/rpc-core/types'
-import type { DecoratedRpc } from '@polkadot/api/types'
-import {
-  BurnAmountType,
-  CalculateBuyPriceType,
-  CalculateSellPriceType,
-  CalculateSellPriceIdType,
-  ChainType,
-  Irpc,
-  NodeNameType,
-  NodeVersionType,
-} from '../types'
+
+import { getChain as getChainEntity } from '../entities/rpc/chain'
+import { getNodeName as getNodeNameEntity } from '../entities/rpc/name'
+import { getNodeVersion as getNodeVersionEntity } from '../entities/rpc/version'
+import { calculateBuyPrice as calculateBuyPriceEntity } from '../entities/rpc/calculate_buy_price'
+import { calculateSellPrice as calculateSellPriceEntity } from '../entities/rpc/calculate_sell_price'
+import { getBurnAmount as getBurnAmountEntity } from '../entities/rpc/get_burn_amount'
+import { calculateSellPriceId as calculateSellPriceIdEntity } from '../entities/rpc/calculate_sell_price_id'
+import { calculateBuyPriceId as calculateBuyPriceIdEntity } from '../entities/rpc/calculate_buy_price_id'
+
 import { log } from '../utils/logger'
 
-const getChain: ChainType = async (api: ApiPromise): Promise<string> => {
-  const chain = await api.rpc.system.chain()
-  log.info(`Retrieved chain: ${chain}`)
-  return chain.toHuman()
+class Rpc {
+  static async getChain(api: ApiPromise): Promise<string> {
+    const chain = await getChainEntity(api)
+    log.info(`Retrieved chain: ${chain}`)
+    return chain.toHuman()
+  }
+
+  static async getNodeName(api: ApiPromise): Promise<string> {
+    const name = await getNodeNameEntity(api)
+    log.info(`Retrieved node name: ${name}`)
+    return name.toHuman()
+  }
+  static async getNodeVersion(api: ApiPromise): Promise<string> {
+    const version = await getNodeVersionEntity(api)
+    log.info(`Retrieved version: ${version}`)
+    return version.toHuman()
+  }
+
+  // TODO: need to find out the return type
+  static async calculateBuyPrice(
+    api: ApiPromise,
+    inputReserve: BN,
+    outputReserve: BN,
+    amount: BN
+  ): Promise<BN> {
+    const result = await calculateBuyPriceEntity(api, inputReserve, outputReserve, amount)
+    return new BN(result.price)
+  }
+
+  // TODO: need to find out the return type
+  static async calculateSellPrice(
+    api: ApiPromise,
+    inputReserve: BN,
+    outputReserve: BN,
+    amount: BN
+  ): Promise<BN> {
+    const result = await calculateSellPriceEntity(api, inputReserve, outputReserve, amount)
+    return new BN(result.price)
+  }
+
+  // TODO: Need to figure out the return value from this method
+  static async getBurnAmount(
+    api: ApiPromise,
+    firstTokenId: string,
+    secondTokenId: string,
+    amount: BN
+  ) {
+    const result = await getBurnAmountEntity(api, firstTokenId, secondTokenId, amount)
+    return result.toHuman()
+  }
+
+  static async calculateSellPriceId(
+    api: ApiPromise,
+    firstTokenId: string,
+    secondTokenId: string,
+    amount: BN
+  ): Promise<BN> {
+    const result = await calculateSellPriceIdEntity(api, firstTokenId, secondTokenId, amount)
+    return new BN(result.price)
+  }
+
+  static async calculateBuyPriceId(
+    api: ApiPromise,
+    firstTokenId: string,
+    secondTokenId: string,
+    amount: BN
+  ): Promise<BN> {
+    const result = await calculateBuyPriceIdEntity(api, firstTokenId, secondTokenId, amount)
+    return new BN(result.price)
+  }
 }
 
-const getNodeName: NodeNameType = async (api: ApiPromise): Promise<string> => {
-  const name = await api.rpc.system.name()
-  log.info(`Retrieved node name: ${name}`)
-  return name.toHuman()
-}
-
-const getNodeVersion: NodeVersionType = async (api: ApiPromise): Promise<string> => {
-  const version = await api.rpc.system.version()
-  log.info(`Retrieved version: ${version}`)
-  return version.toHuman()
-}
-
-const calculateBuyPrice: CalculateBuyPriceType = async (
-  api: ApiPromise,
-  inputReserve: BN,
-  outputReserve: BN,
-  buyAmount: BN
-): Promise<BN> => {
-  const result = await (api.rpc as any).xyk.calculate_buy_price(
-    inputReserve,
-    outputReserve,
-    buyAmount
-  )
-  return new BN(result.price)
-}
-
-const calculateSellPrice: CalculateSellPriceType = async (
-  api: ApiPromise,
-  inputReserve: BN,
-  outputReserve: BN,
-  sellAmount: BN
-): Promise<BN> => {
-  const result = await (api.rpc as any).xyk.calculate_sell_price(
-    inputReserve,
-    outputReserve,
-    sellAmount
-  )
-  return new BN(result.price)
-}
-
-// TODO: Need to figure out the return value from this method
-const getBurnAmount: BurnAmountType = async (
-  api: ApiPromise,
-  firstAssetId: BN,
-  secondAssetId: BN,
-  liquidityAssetAmount: BN
-) => {
-  const result = await (api.rpc as any).xyk.get_burn_amount(
-    firstAssetId,
-    secondAssetId,
-    liquidityAssetAmount
-  )
-  return result.toHuman()
-}
-
-const calculateSellPriceId: CalculateSellPriceIdType = async (
-  api: ApiPromise,
-  soldTokenId: BN,
-  boughtTokenId: BN,
-  sellAmount: BN
-): Promise<BN> => {
-  const result = await (api.rpc as any).xyk.calculate_sell_price_id(
-    soldTokenId,
-    boughtTokenId,
-    sellAmount
-  )
-  return new BN(result.price)
-}
-
-const calculateBuyPriceId: CalculateSellPriceIdType = async (
-  api: ApiPromise,
-  soldTokenId: BN,
-  boughtTokenId: BN,
-  buyAmount: BN
-): Promise<BN> => {
-  const result = await (api.rpc as any).xyk.calculate_buy_price_id(
-    soldTokenId,
-    boughtTokenId,
-    buyAmount
-  )
-  return new BN(result.price)
-}
-
-export const RPC: Irpc = {
-  getChain,
-  getNodeName,
-  getNodeVersion,
-  calculateBuyPrice,
-  calculateSellPrice,
-  calculateSellPriceId,
-  calculateBuyPriceId,
-  getBurnAmount,
-}
+export default Rpc

@@ -1,72 +1,33 @@
 /* eslint-disable no-console */
 import { ApiPromise } from '@polkadot/api'
-import { GenericExtrinsic } from '@polkadot/types'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { SubmittableExtrinsic } from '@polkadot/api/types'
 import BN from 'bn.js'
-import xoshiro, { PrngState } from 'xoshiro'
 
+import recreateExtrinsicsOrder from '../utils/recreateExtrinsicsOrder'
 import memoryDatabase from '../utils/MemoryDatabase'
-import { Query } from './Query'
-import {
-  BurnLiquidityType,
-  BuyAssetType,
-  CreatePoolType,
-  CreateTokenType,
-  Itx,
-  MangataEventData,
-  MangataGenericEvent,
-  MintAssetType,
-  MintLiquidityType,
-  SellAssetType,
-  TransferAllTokenType,
-  TransferTokenType,
-  TxOptions,
-} from '../types'
+import Query from './Query'
+
 import { log } from '../utils/logger'
 import { getTxNonce } from '../utils/nonce.tracker'
+import { createPool as createPoolEntity } from '../entities/tx/createPool'
+import { sellAsset as sellAssetEntity } from '../entities/tx/sellAsset'
+import { buyAsset as buyAssetEntity } from '../entities/tx/buyAsset'
+import { mintLiquidity as mintLiquidityEntity } from '../entities/tx/mintLiquidity'
+import { burnLiquidity as burnLiquidityEntity } from '../entities/tx/burnLiquidity'
+import { transferToken as transferTokenEntity } from '../entities/tx/transfer'
+import { transferAllToken as transferAllTokenEntity } from '../entities/tx/transferAll'
+import { createToken as createTokenEntity } from '../entities/tx/createToken'
+import { mintToken as mintTokenEntity } from '../entities/tx/mintToken'
 
-const fisherYatesShuffle = <K>(arr: K[], seed: Uint8Array) => {
-  // create a pseudo random number generator with an algorithm (256+) and a seed
-  // '256+' xoshiro256+, requires the seed to be of at least 32 bytes
-  // using prng.roll() we can generate random number
-  const pseudoRandomNumberGenerator: PrngState = xoshiro.create('256+', seed)
-  // Start from the last element and swap
-  // one by one. We don't need to run for
-  // the first element that's why i > 0
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j: number = pseudoRandomNumberGenerator.roll() % i
-    const tmp = arr[i]
-    arr[i] = arr[j]
-    arr[j] = tmp
-  }
-}
-
-const getSignerMap = (extrinsics: GenericExtrinsic[]) => {
-  const signerMap = new Map<string, GenericExtrinsic[]>()
-
-  for (const extrinsic of extrinsics) {
-    const who = extrinsic.isSigned ? extrinsic.signer.toString() : 'None'
-    signerMap.has(who) ? signerMap.get(who)?.push(extrinsic) : signerMap.set(who, [extrinsic])
-  }
-
-  return signerMap
-}
-
-const recreateExtrinsicsOrder = (extrinsics: GenericExtrinsic[], seedBytes: Uint8Array) => {
-  const slots: string[] = extrinsics.map((extrinsic) =>
-    extrinsic.isSigned ? extrinsic.signer.toString() : 'None'
-  )
-
-  fisherYatesShuffle(slots, seedBytes)
-
-  return slots.map((who) => getSignerMap(extrinsics).get(who)?.shift())
-}
+import { TxOptions } from '../types/TxOptions'
+import { MangataGenericEvent } from '../types/MangataGenericEvent'
+import { MangataEventData } from '../types/MangataEventData'
 
 export const signTx = async (
   api: ApiPromise,
   tx: SubmittableExtrinsic<'promise'>,
-  account: KeyringPair | string,
+  account: string | KeyringPair,
   txOptions?: TxOptions
 ): Promise<MangataGenericEvent[]> => {
   return new Promise<MangataGenericEvent[]>(async (resolve, reject) => {
@@ -177,160 +138,138 @@ export const signTx = async (
   })
 }
 
-const createToken: CreateTokenType = async (
-  api: ApiPromise,
-  targetAddress: string,
-  sudoAccount: KeyringPair | string,
-  currencyValue: BN,
-  txOptions?: TxOptions
-): Promise<MangataGenericEvent[]> => {
-  return await signTx(
-    api,
-    api.tx.sudo.sudo(api.tx.tokens.create(targetAddress, currencyValue)),
-    sudoAccount,
-    txOptions
-  )
+class Tx {
+  static async createPool(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    firstTokenId: string,
+    firstTokenAmount: BN,
+    secondTokenId: string,
+    secondTokenAmount: BN,
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    return await signTx(
+      api,
+      createPoolEntity(api, firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount),
+      account,
+      txOptions
+    )
+  }
+
+  static async sellAsset(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    soldTokenId: string,
+    boughtTokenId: string,
+    amount: BN,
+    minAmountOut: BN,
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    return await signTx(
+      api,
+      sellAssetEntity(api, soldTokenId, boughtTokenId, amount, minAmountOut),
+      account,
+      txOptions
+    )
+  }
+
+  static async buyAsset(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    soldTokenId: string,
+    boughtTokenId: string,
+    amount: BN,
+    maxAmountIn: BN,
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    return await signTx(
+      api,
+      buyAssetEntity(api, soldTokenId, boughtTokenId, amount, maxAmountIn),
+      account,
+      txOptions
+    )
+  }
+
+  static async mintLiquidity(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    firstTokenId: string,
+    secondTokenId: string,
+    firstTokenAmount: BN,
+    expectedSecondTokenAmount: BN = new BN(Number.MAX_SAFE_INTEGER),
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    return await signTx(
+      api,
+      mintLiquidityEntity(
+        api,
+        firstTokenId,
+        secondTokenId,
+        firstTokenAmount,
+        expectedSecondTokenAmount
+      ),
+      account,
+      txOptions
+    )
+  }
+
+  static async burnLiquidity(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    firstTokenId: string,
+    secondTokenId: string,
+    liquidityTokenAmount: BN,
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    return await signTx(
+      api,
+      burnLiquidityEntity(api, firstTokenId, secondTokenId, liquidityTokenAmount),
+      account,
+      txOptions
+    )
+  }
+
+  static async transferToken(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    tokenId: string,
+    address: string,
+    amount: BN,
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    return await signTx(api, transferTokenEntity(api, address, tokenId, amount), account, txOptions)
+  }
+
+  static async transferAllToken(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    tokenId: string,
+    address: string,
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    return await signTx(api, transferAllTokenEntity(api, address, tokenId), account, txOptions)
+  }
+
+  static async createToken(
+    api: ApiPromise,
+    address: string,
+    sudoAccount: string | KeyringPair,
+    tokenValu: BN,
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    return await signTx(api, createTokenEntity(api, address, tokenValu), sudoAccount, txOptions)
+  }
+
+  static async mintAsset(
+    api: ApiPromise,
+    sudoAccount: string | KeyringPair,
+    tokenId: string,
+    address: string,
+    amount: BN,
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    return await signTx(api, mintTokenEntity(api, address, tokenId, amount), sudoAccount, txOptions)
+  }
 }
 
-const createPool: CreatePoolType = async (
-  api: ApiPromise,
-  account: KeyringPair | string,
-  firstAssetId: string,
-  firstAssetAmount: BN,
-  secondAssetId: string,
-  secondAssetAmount: BN,
-  txOptions?: TxOptions
-): Promise<MangataGenericEvent[]> => {
-  return await signTx(
-    api,
-    api.tx.xyk.createPool(firstAssetId, firstAssetAmount, secondAssetId, secondAssetAmount),
-    account,
-    txOptions
-  )
-}
-
-const sellAsset: SellAssetType = async (
-  api: ApiPromise,
-  account: KeyringPair | string,
-  soldAssetId: string,
-  boughtAssetId: string,
-  amount: BN,
-  minAmountOut: BN,
-  txOptions?: TxOptions
-): Promise<MangataGenericEvent[]> => {
-  return await signTx(
-    api,
-    api.tx.xyk.sellAsset(soldAssetId, boughtAssetId, amount, minAmountOut),
-    account,
-    txOptions
-  )
-}
-
-const buyAsset: BuyAssetType = async (
-  api: ApiPromise,
-  account: KeyringPair | string,
-  soldAssetId: string,
-  boughtAssetId: string,
-  amount: BN,
-  maxAmountIn: BN,
-  txOptions?: TxOptions
-): Promise<MangataGenericEvent[]> => {
-  return await signTx(
-    api,
-    api.tx.xyk.buyAsset(soldAssetId, boughtAssetId, amount, maxAmountIn),
-    account,
-    txOptions
-  )
-}
-
-const mintLiquidity: MintLiquidityType = async (
-  api: ApiPromise,
-  account: KeyringPair | string,
-  firstAssetId: string,
-  secondAssetId: string,
-  firstAssetAmount: BN,
-  expectedSecondAssetAmount: BN = new BN(Number.MAX_SAFE_INTEGER),
-  txOptions?: TxOptions
-): Promise<MangataGenericEvent[]> => {
-  return await signTx(
-    api,
-    api.tx.xyk.mintLiquidity(
-      firstAssetId,
-      secondAssetId,
-      firstAssetAmount,
-      expectedSecondAssetAmount
-    ),
-    account,
-    txOptions
-  )
-}
-
-const burnLiquidity: BurnLiquidityType = async (
-  api: ApiPromise,
-  account: KeyringPair | string,
-  firstAssetId: string,
-  secondAssetId: string,
-  liquidityAssetAmount: BN,
-  txOptions?: TxOptions
-): Promise<MangataGenericEvent[]> => {
-  return await signTx(
-    api,
-    api.tx.xyk.burnLiquidity(firstAssetId, secondAssetId, liquidityAssetAmount),
-    account,
-    txOptions
-  )
-}
-
-const mintAsset: MintAssetType = async (
-  api: ApiPromise,
-  sudoAccount: KeyringPair | string,
-  assetId: BN,
-  targetAddress: string,
-  amount: BN,
-  txOptions?: TxOptions
-): Promise<MangataGenericEvent[]> => {
-  return await signTx(
-    api,
-    api.tx.sudo.sudo(api.tx.tokens.mint(assetId, targetAddress, amount)),
-    sudoAccount,
-    txOptions
-  )
-}
-
-const transferToken: TransferTokenType = async (
-  api: ApiPromise,
-  account: KeyringPair | string,
-  tokenId: BN,
-  targetAddress: string,
-  amount: BN,
-  txOptions?: TxOptions
-): Promise<MangataGenericEvent[]> => {
-  return await signTx(
-    api,
-    api.tx.tokens.transfer(targetAddress, tokenId, amount),
-    account,
-    txOptions
-  )
-}
-
-const transferAllToken: TransferAllTokenType = async (
-  api: ApiPromise,
-  account: KeyringPair | string,
-  tokenId: BN,
-  targetAddress: string,
-  txOptions?: TxOptions
-): Promise<MangataGenericEvent[]> => {
-  return await signTx(api, api.tx.tokens.transferAll(targetAddress, tokenId), account, txOptions)
-}
-
-export const TX: Itx = {
-  createPool,
-  sellAsset,
-  buyAsset,
-  mintLiquidity,
-  burnLiquidity,
-  createToken,
-  mintAsset,
-  transferToken,
-  transferAllToken,
-}
+export default Tx

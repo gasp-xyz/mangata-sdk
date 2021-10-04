@@ -91,6 +91,15 @@ const typesOptions: RegistryTypes = {
     digest: 'Digest',
     seed: 'ShufflingSeed',
   },
+  TxnRegistryDetails: {
+    doubly_encrypted_call: 'Vec<u8>',
+    user: 'AccountId',
+    nonce: 'Index',
+    weight: 'Weight',
+    builder: 'AccountId',
+    executor: 'AccountId',
+    singly_encrypted_call: 'Option<Vec<u8>>',
+  },
 }
 
 export default typesOptions

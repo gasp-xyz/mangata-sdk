@@ -19,6 +19,7 @@
     "outDir": "build",
     // It tells typescript to generate the typings ( important if we want some "automatic" docs for our code
     "declaration": true,
+    "declarationMap": true,
     "rootDir": "src"
   }
 }

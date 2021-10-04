@@ -4,8 +4,8 @@ import { KeyringPair } from '@polkadot/keyring/types'
 
 import { mangataInstance, SUDO_USER_NAME } from './mangataInstanceCreation'
 import { MangataHelpers } from '../src'
-import { ExtrinsicResult } from '../src/types'
 import { addAccountCurrencies, addMGAToken, getEventResultFromTxWait } from './utility'
+import ExtrinsicResult from '../src/enums/ExtrinsicResult'
 
 let testUser: KeyringPair
 let testUser1: KeyringPair
@@ -36,7 +36,7 @@ describe('Testing additional methods', () => {
   it('should trasnfer tokens from testUser1 to testUser2', async () => {
     const result = await mangataInstance.transferToken(
       testUser,
-      new BN(secondCurrency),
+      secondCurrency,
       testUser1.address,
       new BN(100)
     )
@@ -50,7 +50,7 @@ describe('Testing additional methods', () => {
 
     const resultTransferAll = await mangataInstance.transferTokenAll(
       testUser,
-      new BN(firstCurrency),
+      firstCurrency,
       testUser1.address
     )
 
@@ -61,18 +61,15 @@ describe('Testing additional methods', () => {
     ])
     expect(eventTransferAll.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
 
-    const issuance = await mangataInstance.getTotalIssuanceOfTokenId(new BN(firstCurrency))
+    const issuance = await mangataInstance.getTotalIssuance(firstCurrency)
 
     expect(issuance.toNumber()).toEqual(500000)
 
-    const tokenBalance = await mangataInstance.getAssetBalanceForAddress(
-      new BN(firstCurrency),
-      testUser1.address
-    )
+    const tokenBalance = await mangataInstance.getTokenBalance(firstCurrency, testUser1.address)
 
     expect(tokenBalance.toNumber()).toEqual(500000)
 
-    const lock = await mangataInstance.getLock(testUser.address, new BN(firstCurrency))
+    const lock = await mangataInstance.getLock(testUser.address, firstCurrency)
 
     expect(lock).toEqual([])
   })
@@ -87,26 +84,23 @@ it('should get next token id', async () => {
     new BN(25000)
   )
   await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
-  const liquidityAssetId = await mangataInstance.getLiquidityAssetId(
-    new BN(firstCurrency),
-    new BN(secondCurrency)
-  )
+  const liquidityAssetId = await mangataInstance.getLiquidityAssetId(firstCurrency, secondCurrency)
   expect(liquidityAssetId.toNumber()).toBeGreaterThanOrEqual(0)
 })
 
 it('should get next token id', async () => {
-  const currencyId = await mangataInstance.getNextAssetId()
-  expect(currencyId.toNumber()).toBeGreaterThanOrEqual(0)
+  const tokenId = await mangataInstance.getNextTokenId()
+  expect(tokenId.toNumber()).toBeGreaterThanOrEqual(0)
 })
 
 it('should get treasury', async () => {
-  const amountCurrencyId = await mangataInstance.getTreasury(new BN(firstCurrency))
-  expect(amountCurrencyId.toNumber()).toBeGreaterThanOrEqual(0)
+  const accountData = await mangataInstance.getTreasury(firstCurrency)
+  expect(accountData.free.toBn().toNumber()).toBeGreaterThanOrEqual(0)
 })
 
 it('should get treasury burn', async () => {
-  const amountCurrencyIdInTreasury = await mangataInstance.getTreasuryBurn(new BN(firstCurrency))
-  expect(amountCurrencyIdInTreasury.toNumber()).toBeGreaterThanOrEqual(0)
+  const accountData = await mangataInstance.getTreasuryBurn(firstCurrency)
+  expect(accountData.free.toBn().toNumber()).toBeGreaterThanOrEqual(0)
 })
 
 afterAll(async () => {

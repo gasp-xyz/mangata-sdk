@@ -3,9 +3,10 @@ import { GenericEvent } from '@polkadot/types'
 import { KeyringPair } from '@polkadot/keyring/types'
 import BN from 'bn.js'
 
-import { ExtrinsicResult, MangataGenericEvent } from '../src/types'
 import { Mangata } from '../src/Mangata'
 import { MangataHelpers } from '../src/MangataHelpers'
+import ExtrinsicResult from '../src/enums/ExtrinsicResult'
+import { MangataGenericEvent } from '../src/types/MangataGenericEvent'
 
 export const addAccountCurrencies = async (
   mangataInstance: Mangata,
@@ -76,10 +77,10 @@ export const addMGAToken = async (
   sudoUser: KeyringPair,
   user: KeyringPair,
   freeAmount: BN = new BN(10).pow(new BN(11))
-): Promise<GenericEvent[]> => {
+): Promise<MangataGenericEvent[]> => {
   const sudoNonce = await mangataInstance.getNonce(sudoUser.address)
   await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
-  return await mangataInstance.mintAsset(sudoUser, new BN(0), user.address, new BN(freeAmount), {
+  return await mangataInstance.mintAsset(sudoUser, '0', user.address, new BN(freeAmount), {
     nonce: sudoNonce,
   })
 }
