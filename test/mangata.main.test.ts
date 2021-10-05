@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import BN from 'bn.js'
 import { KeyringPair } from '@polkadot/keyring/types'
+import { hexToBn } from '@polkadot/util'
 
 import { mangataInstance, SUDO_USER_NAME } from './mangataInstanceCreation'
 import { MangataHelpers } from '../src'
@@ -39,6 +40,26 @@ describe('test create pool', () => {
     )
     const eventResult = getEventResultFromTxWait(result, ['xyk', 'PoolCreated', testUser.address])
     expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
+  })
+})
+
+describe('test amount of token in pool', () => {
+  it('should test the balance', async () => {
+    await mangataInstance.createPool(
+      testUser,
+      firstCurrency,
+      new BN(50000),
+      secondCurrency,
+      new BN(60000)
+    )
+
+    const balance1 = await mangataInstance.getAmountOfTokenIdInPool(firstCurrency, secondCurrency)
+    const balance2 = await mangataInstance.getAmountOfTokenIdInPool(secondCurrency, firstCurrency)
+
+    expect(balance1[0].toNumber()).toEqual(50000)
+    expect(balance1[1].toNumber()).toEqual(60000)
+    expect(balance2[0].toNumber()).toEqual(0)
+    expect(balance2[1].toNumber()).toEqual(0)
   })
 })
 

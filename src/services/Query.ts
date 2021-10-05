@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import { ApiPromise } from '@polkadot/api'
 import { AccountData } from '@polkadot/types/interfaces/balances'
+import { hexToBn } from '@polkadot/util'
 import BN from 'bn.js'
 
 import { getNonce as getNonceEntity } from '../entities/query/nonce'
@@ -27,9 +28,13 @@ class Query {
     api: ApiPromise,
     firstTokenId: string,
     secondTokenId: string
-  ): Promise<BN> {
+  ): Promise<BN[]> {
     const balance = await getAmountOfTokensEntity(api, firstTokenId, secondTokenId)
-    return new BN(balance.toString())
+    const tokenValue1 = JSON.parse(balance.toString())[0]
+    const tokenValue2 = JSON.parse(balance.toString())[1]
+    const token1: BN = hexToBn(tokenValue1)
+    const token2: BN = hexToBn(tokenValue2)
+    return [token1, token2]
   }
 
   static async getLiquidityAssetId(
