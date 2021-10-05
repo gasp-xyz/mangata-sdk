@@ -331,7 +331,10 @@ export class Mangata {
   /**
    * Get amount of token id in pool
    */
-  public async getAmountOfTokenIdInPool(firstTokenId: string, secondTokenId: string): Promise<BN> {
+  public async getAmountOfTokenIdInPool(
+    firstTokenId: string,
+    secondTokenId: string
+  ): Promise<BN[]> {
     const api = await this.getApi()
     return await Query.getAmountOfTokenIdInPool(api, firstTokenId, secondTokenId)
   }
