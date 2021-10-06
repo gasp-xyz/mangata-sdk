@@ -1,4 +1,5 @@
-import { XoShiRo256Plus } from 'prng-xoshiro/src/xoshiro256'
+/* eslint-disable no-console */
+import { XoShiRo256Plus } from 'mangata-prng-xoshiro'
 
 function bufToBn(buf: Uint8Array): bigint {
   const hex: any[] = []
@@ -41,6 +42,8 @@ const fisherYatesShuffle = <K>(arr: K[], seed: Uint8Array) => {
   // Peek method returns the next random number without altering
   // the state of the generator.
   const pseudoRandomNumberGenerator = new XoShiRo256Plus(bufToBn(seed))
+  console.log('XOSHIRO: ', pseudoRandomNumberGenerator.peek())
+  console.log('XOSHIRO_NUMBER: ', Number(pseudoRandomNumberGenerator.peek()))
   // Start from the last element and swap
   // one by one. We don't need to run for
   // the first element that's why i > 0

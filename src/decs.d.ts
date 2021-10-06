@@ -1,1 +1,1 @@
-declare module 'prng-xoshiro/src/xoshiro256'
+declare module 'mangata-prng-xoshiro'

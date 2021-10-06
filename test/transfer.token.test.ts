@@ -9,7 +9,6 @@ import ExtrinsicResult from '../src/enums/ExtrinsicResult'
 
 let testUser: KeyringPair
 let testUser1: KeyringPair
-let testUser2: KeyringPair
 let sudoUser: KeyringPair
 let firstCurrency: string
 let secondCurrency: string
@@ -19,7 +18,6 @@ beforeEach(async () => {
   const keyring = MangataHelpers.createKeyring('sr25519')
   testUser = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring)
   testUser1 = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring)
-  testUser2 = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring)
   sudoUser = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring, SUDO_USER_NAME)
   await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
   const currencies = await addAccountCurrencies(mangataInstance, testUser, sudoUser, [

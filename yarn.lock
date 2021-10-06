@@ -4510,6 +4510,11 @@ makeerror@1.0.x:
   dependencies:
     tmpl "1.0.x"
 
+mangata-prng-xoshiro@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.npmjs.org/mangata-prng-xoshiro/-/mangata-prng-xoshiro-1.1.1.tgz#d5454734b3f1bd71c3fd542833e8886c3917cef6"
+  integrity sha512-Jw/b2N36U0Tt0cAocCnfyBgJSxSLLCKLMVdHcYoze72t+ulK/VVeUNL9ttGz2PzDAlsk6teXthzGarHQUqz8HA==
+
 map-cache@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/map-cache/-/map-cache-0.2.2.tgz#c32abd0bd6525d9b051645bb4f26ac5dc98a0dbf"
@@ -5139,11 +5144,6 @@ pretty-format@^27.0.6:
     ansi-regex "^5.0.0"
     ansi-styles "^5.0.0"
     react-is "^17.0.1"
-
-prng-xoshiro@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.npmjs.org/prng-xoshiro/-/prng-xoshiro-1.0.1.tgz#5d9021c84cb38defd9c2827f817bd1183af29c98"
-  integrity sha512-PZWg48zx2mxZaWKO0SfgAfUsKXOUBgkANRCoJ2eU8Otnkwjtsy5H+ogJkX8j74FoWxyCmepBsFVegDXQycJ/Gg==
 
 process-nextick-args@~2.0.0:
   version "2.0.1"
