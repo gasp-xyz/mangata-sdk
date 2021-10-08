@@ -4510,10 +4510,10 @@ makeerror@1.0.x:
   dependencies:
     tmpl "1.0.x"
 
-mangata-prng-xoshiro@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.npmjs.org/mangata-prng-xoshiro/-/mangata-prng-xoshiro-1.1.1.tgz#d5454734b3f1bd71c3fd542833e8886c3917cef6"
-  integrity sha512-Jw/b2N36U0Tt0cAocCnfyBgJSxSLLCKLMVdHcYoze72t+ulK/VVeUNL9ttGz2PzDAlsk6teXthzGarHQUqz8HA==
+mangata-prng-xoshiro@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.npmjs.org/mangata-prng-xoshiro/-/mangata-prng-xoshiro-1.2.0.tgz#b0931c4bb91b4e574812b019cf5debaedc4e6a54"
+  integrity sha512-kuG0evoSLdYr6k1W5+ctDcqfHAkm7TlhVqCNPrANg2EKp82L/OdShkhbDGDt6kb2P6r4MYHelo1DzhfnCG3JWw==
 
 map-cache@^0.2.2:
   version "0.2.2"
