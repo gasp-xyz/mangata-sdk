@@ -31,7 +31,7 @@ export const signTx = async (
   txOptions?: TxOptions
 ): Promise<MangataGenericEvent[]> => {
   return new Promise<MangataGenericEvent[]>(async (resolve, reject) => {
-    let result: MangataGenericEvent[] = []
+    let output: MangataGenericEvent[] = []
     const extractedAccount = typeof account === 'string' ? account : account.address
 
     const nonce = await getTxNonce(api, extractedAccount, txOptions)
@@ -41,15 +41,15 @@ export const signTx = async (
       const unsub = await tx.signAndSend(
         account,
         { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
-        async ({ status, isError }) => {
-          txOptions && txOptions.statusCallback && txOptions.statusCallback(status)
-          log.info('Transaction status: ', status.type)
-          if (status.isInBlock) {
-            log.info('Included at block hash: ', status.asInBlock.toHex())
+        async (result) => {
+          txOptions && txOptions.statusCallback && txOptions.statusCallback(result)
+          log.info('Transaction status: ', result.status.type)
+          if (result.status.isInBlock) {
+            log.info('Included at block hash: ', result.status.asInBlock.toHex())
 
             const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
               async (lastHeader) => {
-                if (lastHeader.parentHash.toString() === status.asInBlock.toString()) {
+                if (lastHeader.parentHash.toString() === result.status.asInBlock.toString()) {
                   unsubscribeNewHeads()
                   const previousBlock = await api.rpc.chain.getBlock(lastHeader.parentHash)
                   const previousBlockExtrinsics = previousBlock.block.extrinsics
@@ -112,15 +112,15 @@ export const signTx = async (
                         eventData,
                       } as MangataGenericEvent
                     })
-                  result = result.concat(reqEvents)
+                  output = output.concat(reqEvents)
                 }
               }
             )
-          } else if (status.isFinalized) {
-            log.info('Finalized block hash: ', status.asFinalized.toHex())
+          } else if (result.status.isFinalized) {
+            log.info('Finalized block hash: ', result.status.asFinalized.toHex())
             unsub()
-            resolve(result)
-          } else if (isError) {
+            resolve(output)
+          } else if (result.isError) {
             unsub()
             log.error(`Transaction error`)
             reject('Transaction error')
