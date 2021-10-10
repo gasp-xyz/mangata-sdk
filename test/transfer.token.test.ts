@@ -64,8 +64,9 @@ describe('Testing additional methods', () => {
     expect(issuance.toNumber()).toEqual(500000)
 
     const tokenBalance = await mangataInstance.getTokenBalance(firstCurrency, testUser1.address)
+    tokenBalance.free
 
-    expect(tokenBalance.toNumber()).toEqual(500000)
+    expect(tokenBalance.free.toNumber()).toEqual(500000)
 
     const lock = await mangataInstance.getLock(testUser.address, firstCurrency)
 
