@@ -9,7 +9,7 @@ import { v4 as uuid } from 'uuid'
 import { options } from './utils/options'
 import rpcOptions from './utils/mangata-rpc'
 import typesOptions from './utils/mangata-types'
-import { log } from './utils/logger'
+import { Roarr as log } from 'roarr'
 
 /**
  * @class MangataHelpers

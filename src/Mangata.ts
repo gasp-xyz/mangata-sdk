@@ -2,7 +2,7 @@
 import { ApiPromise, WsProvider } from '@polkadot/api'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { AccountData } from '@polkadot/types/interfaces/balances'
-import { Codec } from '@polkadot/types/types'
+import { Roarr as log } from 'roarr'
 import BN from 'bn.js'
 
 import Rpc from './services/Rpc'
@@ -10,7 +10,6 @@ import TX from './services/Tx'
 import Query from './services/Query'
 
 import { options } from './utils/options'
-import { log } from './utils/logger'
 import { MangataGenericEvent } from './types/MangataGenericEvent'
 import { TxOptions } from './types/TxOptions'
 

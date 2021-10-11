@@ -3,12 +3,12 @@ import { ApiPromise } from '@polkadot/api'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { SubmittableExtrinsic } from '@polkadot/api/types'
 import BN from 'bn.js'
+import { Roarr as log } from 'roarr'
 
 import recreateExtrinsicsOrder from '../utils/recreateExtrinsicsOrder'
 import memoryDatabase from '../utils/MemoryDatabase'
 import Query from './Query'
 
-import { log } from '../utils/logger'
 import { getTxNonce } from '../utils/nonce.tracker'
 import { createPool as createPoolEntity } from '../entities/tx/createPool'
 import { sellAsset as sellAssetEntity } from '../entities/tx/sellAsset'
@@ -55,7 +55,7 @@ export const signTx = async (
                   const previousBlockExtrinsics = previousBlock.block.extrinsics
                   const currentBlockEvents = await api.query.system.events.at(lastHeader.hash)
                   const blockNumber = lastHeader.toJSON().number
-                  log.info('Currently at block: ', blockNumber)
+                  log.info('Currently at block: ', blockNumber?.toString())
 
                   const headerJsonResponse = JSON.parse(lastHeader.toString())
 
