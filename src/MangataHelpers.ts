@@ -31,7 +31,7 @@ export class MangataHelpers {
     let count = 0
     return new Promise(async (resolve) => {
       const unsubscribe = await api.rpc.chain.subscribeNewHeads((lastHeader) => {
-        log(`Last block #${lastHeader.number} has hash ${lastHeader.hash}`)
+        log.info(`Last block #${lastHeader.number} has hash ${lastHeader.hash}`)
         if (++count === 2) {
           unsubscribe()
           resolve(true)
