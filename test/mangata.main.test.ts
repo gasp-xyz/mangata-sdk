@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 import BN from 'bn.js'
 import { KeyringPair } from '@polkadot/keyring/types'
-import { hexToBn } from '@polkadot/util'
 
 import { mangataInstance, SUDO_USER_NAME } from './mangataInstanceCreation'
 import { MangataHelpers } from '../src'

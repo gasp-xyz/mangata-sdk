@@ -2,6 +2,7 @@
 import { ApiPromise, WsProvider } from '@polkadot/api'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { AccountData } from '@polkadot/types/interfaces/balances'
+import { Codec } from '@polkadot/types/types'
 import BN from 'bn.js'
 
 import Rpc from './services/Rpc'
@@ -421,7 +422,7 @@ export class Mangata {
   /**
    * Returns Asset balance for address
    */
-  public async getTokenBalance(tokenId: string, address: string): Promise<BN> {
+  public async getTokenBalance(tokenId: string, address: string): Promise<AccountData> {
     const api = await this.getApi()
     return await Query.getTokenBalance(api, address, tokenId)
   }
@@ -432,5 +433,26 @@ export class Mangata {
   public async getNextTokenId(): Promise<BN> {
     const api = await this.getApi()
     return await Query.getNextTokenId(api)
+  }
+
+  public async getBridgeTokens(): Promise<
+    Promise<{
+      assetId: string
+      info: {
+        name: string
+        symbol: string
+        decimal: string
+        description: string
+      }
+      ethereumAddress: string
+    }>[]
+  > {
+    const api = await this.getApi()
+    return await Query.getBridgedTokens(api)
+  }
+
+  public async getTokenInfo(tokenId: string) {
+    const api = await this.getApi()
+    return await Query.getTokenInfo(api, tokenId)
   }
 }

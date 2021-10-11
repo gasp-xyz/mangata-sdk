@@ -2,6 +2,7 @@
 import { ApiPromise } from '@polkadot/api'
 import { AccountData } from '@polkadot/types/interfaces/balances'
 import { hexToBn } from '@polkadot/util'
+import { Codec } from '@polkadot/types/types'
 import BN from 'bn.js'
 
 import { getNonce as getNonceEntity } from '../entities/query/nonce'
@@ -12,6 +13,8 @@ import { getTotalIssuance as getTotalIssuanceEntity } from '../entities/query/to
 import { getLock as getLockEntity } from '../entities/query/locks'
 import { getTokenBalance as getTokenBalanceEntity } from '../entities/query/accounts'
 import { getNextToken as getNextTokenEntity } from '../entities/query/nextCurrencyId'
+import { getBridgedTokens as getBridgedTokensEntity } from '../entities/query/bridgedAsset'
+import { getTokenInfo as getTokenInfoEntity } from '../entities/query/assetInfo'
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : ''
 const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
@@ -79,15 +82,54 @@ class Query {
     return JSON.parse(JSON.stringify(locksResponse.toHuman()))
   }
 
-  static async getTokenBalance(api: ApiPromise, address: string, tokenId: string): Promise<BN> {
+  static async getTokenBalance(
+    api: ApiPromise,
+    address: string,
+    tokenId: string
+  ): Promise<AccountData> {
     const balance = await getTokenBalanceEntity(api, address, tokenId)
     const accountData = balance as AccountData
-    return new BN(accountData.free.toBigInt().toString())
+    return accountData
   }
 
   static async getNextTokenId(api: ApiPromise): Promise<BN> {
     const nextTokenId = await getNextTokenEntity(api)
     return new BN(nextTokenId.toString())
+  }
+
+  static async getBridgedTokens(api: ApiPromise): Promise<
+    Promise<{
+      assetId: string
+      info: {
+        name: string
+        symbol: string
+        decimal: string
+        description: string
+      }
+      ethereumAddress: string
+    }>[]
+  > {
+    const bridgedAssets = await getBridgedTokensEntity(api)
+    return bridgedAssets.map(async (bridgedAsset) => {
+      const tokenId = bridgedAsset[0].args[0].toString()
+      const info = await api.query.assetsInfo.assetsInfo(tokenId)
+      const ethAddress = bridgedAsset[1].toString()
+      return {
+        assetId: tokenId,
+        info: info.toHuman() as {
+          name: string
+          symbol: string
+          decimal: string
+          description: string
+        },
+        ethereumAddress: ethAddress,
+      }
+    })
+  }
+
+  static async getTokenInfo(api: ApiPromise, tokenId: string): Promise<Codec> {
+    const tokenInfo = getTokenInfoEntity(api, tokenId)
+    return tokenInfo
   }
 }
 

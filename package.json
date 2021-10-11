@@ -1,6 +1,6 @@
 {
   "name": "mangata-sdk",
-  "version": "0.4.1",
+  "version": "0.4.3",
   "description": "SDK for communication with Mangata node",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -57,7 +57,7 @@
   "dependencies": {
     "@polkadot/api": "^2.10.1",
     "bn.js": "^5.2.0",
-    "mangata-prng-xoshiro": "^1.1.1",
+    "mangata-prng-xoshiro": "^1.2.0",
     "tslog": "^3.2.2",
     "uuid": "^8.3.2"
   }
