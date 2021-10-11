@@ -10,23 +10,18 @@ import { getBurnAmount as getBurnAmountEntity } from '../entities/rpc/get_burn_a
 import { calculateSellPriceId as calculateSellPriceIdEntity } from '../entities/rpc/calculate_sell_price_id'
 import { calculateBuyPriceId as calculateBuyPriceIdEntity } from '../entities/rpc/calculate_buy_price_id'
 
-import { log } from '../utils/logger'
-
 class Rpc {
   static async getChain(api: ApiPromise): Promise<string> {
     const chain = await getChainEntity(api)
-    log.info(`Retrieved chain: ${chain}`)
     return chain.toHuman()
   }
 
   static async getNodeName(api: ApiPromise): Promise<string> {
     const name = await getNodeNameEntity(api)
-    log.info(`Retrieved node name: ${name}`)
     return name.toHuman()
   }
   static async getNodeVersion(api: ApiPromise): Promise<string> {
     const version = await getNodeVersionEntity(api)
-    log.info(`Retrieved version: ${version}`)
     return version.toHuman()
   }
 

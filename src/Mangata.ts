@@ -2,7 +2,7 @@
 import { ApiPromise, WsProvider } from '@polkadot/api'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { AccountData } from '@polkadot/types/interfaces/balances'
-import { Codec } from '@polkadot/types/types'
+import { Roarr as log } from 'roarr'
 import BN from 'bn.js'
 
 import Rpc from './services/Rpc'
@@ -10,7 +10,6 @@ import TX from './services/Tx'
 import Query from './services/Query'
 
 import { options } from './utils/options'
-import { log } from './utils/logger'
 import { MangataGenericEvent } from './types/MangataGenericEvent'
 import { TxOptions } from './types/TxOptions'
 
@@ -67,7 +66,7 @@ export class Mangata {
    */
 
   public async getChain(): Promise<string> {
-    log.info(`Retrieving chain ... `)
+    log(`Retrieving chain ... `)
     const api = await this.getApi()
     return Rpc.getChain(api)
   }
@@ -77,7 +76,7 @@ export class Mangata {
    */
 
   public async getNodeName(): Promise<string> {
-    log.info(`Retrieving node name ...`)
+    log(`Retrieving node name ...`)
     const api = await this.getApi()
     return Rpc.getNodeName(api)
   }
@@ -87,7 +86,7 @@ export class Mangata {
    */
 
   public async getNodeVersion(): Promise<string> {
-    log.info(`Retrieving node version ...`)
+    log(`Retrieving node version ...`)
     const api = await this.getApi()
     return Rpc.getNodeVersion(api)
   }
@@ -97,7 +96,7 @@ export class Mangata {
    */
 
   public async getNonce(address: string): Promise<BN> {
-    log.info(`Retrieving nonce for the address: ${address}`)
+    log(`Retrieving nonce for the address: ${address}`)
     const api = await this.getApi()
     return Query.getNonce(api, address)
   }
@@ -107,7 +106,7 @@ export class Mangata {
    */
 
   public async disconnect(): Promise<void> {
-    log.info(`Disconnecting ...`)
+    log(`Disconnecting ...`)
     const api = await this.getApi()
     api.disconnect()
   }
@@ -124,7 +123,7 @@ export class Mangata {
     secondTokenAmount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    log.info(`Creating pool ...`)
+    log(`Creating pool ...`)
     const api = await this.getApi()
     return await TX.createPool(
       api,
@@ -148,7 +147,7 @@ export class Mangata {
     minAmountOut: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    log.info('Selling asset ...')
+    log('Selling asset ...')
     const api = await this.getApi()
     return await TX.sellAsset(
       api,
@@ -174,7 +173,7 @@ export class Mangata {
     expectedSecondTokenAmount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    log.info(`Adding liquidity to pool ...`)
+    log(`Adding liquidity to pool ...`)
     const api = await this.getApi()
     return await TX.mintLiquidity(
       api,
@@ -198,7 +197,7 @@ export class Mangata {
     liquidityTokenAmount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    log.info(`Removing liquidity from liquidity pool ...`)
+    log(`Removing liquidity from liquidity pool ...`)
     const api = await this.getApi()
     return await TX.burnLiquidity(
       api,
@@ -223,7 +222,7 @@ export class Mangata {
     maxAmountIn: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    log.info('Buying asset ...')
+    log('Buying asset ...')
     const api = await this.getApi()
     return await TX.buyAsset(
       api,
@@ -242,7 +241,7 @@ export class Mangata {
    * – reserve of bought token id
    */
   public async calculateBuyPrice(inputReserve: BN, outputReserve: BN, buyAmount: BN): Promise<BN> {
-    log.info(`Calculating buy price ...`)
+    log(`Calculating buy price ...`)
     const api = await this.getApi()
     return await Rpc.calculateBuyPrice(api, inputReserve, outputReserve, buyAmount)
   }
@@ -257,7 +256,7 @@ export class Mangata {
     outputReserve: BN,
     sellAmount: BN
   ): Promise<BN> {
-    log.info(`Calculating sell price ...`)
+    log(`Calculating sell price ...`)
     const api = await this.getApi()
     return await Rpc.calculateSellPrice(api, inputReserve, outputReserve, sellAmount)
   }
