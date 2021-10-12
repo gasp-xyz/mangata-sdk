@@ -2,7 +2,6 @@
 import { ApiPromise, WsProvider } from '@polkadot/api'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { AccountData } from '@polkadot/types/interfaces/balances'
-import { Roarr as log } from 'roarr'
 import BN from 'bn.js'
 
 import Rpc from './services/Rpc'
@@ -66,7 +65,6 @@ export class Mangata {
    */
 
   public async getChain(): Promise<string> {
-    log.info(`Retrieving chain ... `)
     const api = await this.getApi()
     return Rpc.getChain(api)
   }
@@ -76,7 +74,6 @@ export class Mangata {
    */
 
   public async getNodeName(): Promise<string> {
-    log.info(`Retrieving node name ...`)
     const api = await this.getApi()
     return Rpc.getNodeName(api)
   }
@@ -86,7 +83,6 @@ export class Mangata {
    */
 
   public async getNodeVersion(): Promise<string> {
-    log.info(`Retrieving node version ...`)
     const api = await this.getApi()
     return Rpc.getNodeVersion(api)
   }
@@ -96,7 +92,6 @@ export class Mangata {
    */
 
   public async getNonce(address: string): Promise<BN> {
-    log.info(`Retrieving nonce for the address: ${address}`)
     const api = await this.getApi()
     return Query.getNonce(api, address)
   }
@@ -106,7 +101,6 @@ export class Mangata {
    */
 
   public async disconnect(): Promise<void> {
-    log.info(`Disconnecting ...`)
     const api = await this.getApi()
     api.disconnect()
   }
@@ -123,7 +117,6 @@ export class Mangata {
     secondTokenAmount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    log.info(`Creating pool ...`)
     const api = await this.getApi()
     return await TX.createPool(
       api,
@@ -147,7 +140,6 @@ export class Mangata {
     minAmountOut: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    log.info('Selling asset ...')
     const api = await this.getApi()
     return await TX.sellAsset(
       api,
@@ -173,7 +165,6 @@ export class Mangata {
     expectedSecondTokenAmount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    log.info(`Adding liquidity to pool ...`)
     const api = await this.getApi()
     return await TX.mintLiquidity(
       api,
@@ -197,7 +188,6 @@ export class Mangata {
     liquidityTokenAmount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    log.info(`Removing liquidity from liquidity pool ...`)
     const api = await this.getApi()
     return await TX.burnLiquidity(
       api,
@@ -222,7 +212,6 @@ export class Mangata {
     maxAmountIn: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    log.info('Buying asset ...')
     const api = await this.getApi()
     return await TX.buyAsset(
       api,
@@ -241,7 +230,6 @@ export class Mangata {
    * – reserve of bought token id
    */
   public async calculateBuyPrice(inputReserve: BN, outputReserve: BN, buyAmount: BN): Promise<BN> {
-    log.info(`Calculating buy price ...`)
     const api = await this.getApi()
     return await Rpc.calculateBuyPrice(api, inputReserve, outputReserve, buyAmount)
   }
@@ -256,7 +244,6 @@ export class Mangata {
     outputReserve: BN,
     sellAmount: BN
   ): Promise<BN> {
-    log.info(`Calculating sell price ...`)
     const api = await this.getApi()
     return await Rpc.calculateSellPrice(api, inputReserve, outputReserve, sellAmount)
   }

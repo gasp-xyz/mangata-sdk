@@ -3,7 +3,6 @@ import { ApiPromise } from '@polkadot/api'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { SubmittableExtrinsic } from '@polkadot/api/types'
 import BN from 'bn.js'
-import { Roarr as log } from 'roarr'
 
 import recreateExtrinsicsOrder from '../utils/recreateExtrinsicsOrder'
 import memoryDatabase from '../utils/MemoryDatabase'
@@ -35,7 +34,7 @@ export const signTx = async (
     const extractedAccount = typeof account === 'string' ? account : account.address
 
     const nonce = await getTxNonce(api, extractedAccount, txOptions)
-    log.info('Nonce: ', nonce.toNumber())
+    // log.info('Nonce: ', nonce.toNumber())
 
     try {
       const unsub = await tx.signAndSend(
@@ -43,9 +42,9 @@ export const signTx = async (
         { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
         async (result) => {
           txOptions && txOptions.statusCallback && txOptions.statusCallback(result)
-          log.info('Transaction status: ', result.status.type)
+          // log.info('Transaction status: ', result.status.type)
           if (result.status.isInBlock) {
-            log.info('Included at block hash: ', result.status.asInBlock.toHex())
+            // log.info('Included at block hash: ', result.status.asInBlock.toHex())
 
             const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
               async (lastHeader) => {
@@ -55,7 +54,7 @@ export const signTx = async (
                   const previousBlockExtrinsics = previousBlock.block.extrinsics
                   const currentBlockEvents = await api.query.system.events.at(lastHeader.hash)
                   const blockNumber = lastHeader.toJSON().number
-                  log.info('Currently at block: ', blockNumber?.toString())
+                  // log.info('Currently at block: ', blockNumber?.toString())
 
                   const headerJsonResponse = JSON.parse(lastHeader.toString())
 
@@ -97,11 +96,11 @@ export const signTx = async (
                         }
                       })
 
-                      log.info('Event Section: ', event.section)
-                      log.info('Event Method: ', event.method)
-                      log.info('Event Phase: ', JSON.stringify(phase, null, 2))
-                      log.info('Event Metadata: ', event.meta.documentation.toString())
-                      log.info(`Event Data:`, JSON.stringify(eventData, null, 2))
+                      // log.info('Event Section: ', event.section)
+                      // log.info('Event Method: ', event.method)
+                      // log.info('Event Phase: ', JSON.stringify(phase, null, 2))
+                      // log.info('Event Metadata: ', event.meta.documentation.toString())
+                      // log.info(`Event Data:`, JSON.stringify(eventData, null, 2))
 
                       return {
                         event,
@@ -117,12 +116,12 @@ export const signTx = async (
               }
             )
           } else if (result.status.isFinalized) {
-            log.info('Finalized block hash: ', result.status.asFinalized.toHex())
+            // log.info('Finalized block hash: ', result.status.asFinalized.toHex())
             unsub()
             resolve(output)
           } else if (result.isError) {
             unsub()
-            log.error(`Transaction error`)
+            // log.error(`Transaction error`)
             reject('Transaction error')
             const currentNonce: BN = await Query.getNonce(api, extractedAccount)
             memoryDatabase.setNonce(extractedAccount, currentNonce)
