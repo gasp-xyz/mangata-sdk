@@ -117,22 +117,22 @@ export const signTx = async (
             )
           } else if (result.status.isFinalized) {
             // log.info('Finalized block hash: ', result.status.asFinalized.toHex())
-            unsub()
             resolve(output)
           } else if (result.isError) {
-            unsub()
             // log.error(`Transaction error`)
             reject('Transaction error')
             const currentNonce: BN = await Query.getNonce(api, extractedAccount)
             memoryDatabase.setNonce(extractedAccount, currentNonce)
+          } else if (result.isCompleted) {
+            unsub()
           }
         }
       )
-    } catch (error) {
+    } catch (error: any) {
       const currentNonce: BN = await Query.getNonce(api, extractedAccount)
       memoryDatabase.setNonce(extractedAccount, currentNonce)
       reject({
-        data: (error as Error).message || (error as Error).message || (error as Error).toString(),
+        data: error.message || error.description || error.data?.toString() || error.toString(),
       })
     }
   })
