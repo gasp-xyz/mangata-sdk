@@ -427,7 +427,7 @@ export class Mangata {
       info: {
         name: string
         symbol: string
-        decimals: string
+        decimals: number
         description: string
       }
       ethereumAddress: string

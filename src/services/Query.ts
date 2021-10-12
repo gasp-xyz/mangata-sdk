@@ -103,7 +103,7 @@ class Query {
       info: {
         name: string
         symbol: string
-        decimals: string
+        decimals: number
         description: string
       }
       ethereumAddress: string
@@ -119,7 +119,7 @@ class Query {
         info: info.toHuman() as {
           name: string
           symbol: string
-          decimals: string
+          decimals: number
           description: string
         },
         ethereumAddress: ethAddress,
