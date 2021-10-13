@@ -53,8 +53,6 @@ export const signTx = async (
                   const previousBlock = await api.rpc.chain.getBlock(lastHeader.parentHash)
                   const previousBlockExtrinsics = previousBlock.block.extrinsics
                   const currentBlockEvents = await api.query.system.events.at(lastHeader.hash)
-                  const blockNumber = lastHeader.toJSON().number
-                  // log.info('Currently at block: ', blockNumber?.toString())
 
                   const headerJsonResponse = JSON.parse(lastHeader.toString())
 
@@ -96,12 +94,6 @@ export const signTx = async (
                         }
                       })
 
-                      // log.info('Event Section: ', event.section)
-                      // log.info('Event Method: ', event.method)
-                      // log.info('Event Phase: ', JSON.stringify(phase, null, 2))
-                      // log.info('Event Metadata: ', event.meta.documentation.toString())
-                      // log.info(`Event Data:`, JSON.stringify(eventData, null, 2))
-
                       return {
                         event,
                         phase,
@@ -111,20 +103,21 @@ export const signTx = async (
                         eventData,
                       } as MangataGenericEvent
                     })
+
                   output = output.concat(reqEvents)
                 }
               }
             )
           } else if (result.status.isFinalized) {
+            txOptions && txOptions.extrinsicStatus && txOptions.extrinsicStatus(output)
             // log.info('Finalized block hash: ', result.status.asFinalized.toHex())
             resolve(output)
+            unsub()
           } else if (result.isError) {
             // log.error(`Transaction error`)
             reject('Transaction error')
             const currentNonce: BN = await Query.getNonce(api, extractedAccount)
             memoryDatabase.setNonce(extractedAccount, currentNonce)
-          } else if (result.isCompleted) {
-            unsub()
           }
         }
       )
