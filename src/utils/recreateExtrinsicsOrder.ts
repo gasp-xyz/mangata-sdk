@@ -1,6 +1,6 @@
+/* eslint-disable no-console */
 import { GenericExtrinsic } from '@polkadot/types'
 import fisherYatesShuffle from './fisherYatesShuffle'
-import signerMap from './signerMap'
 
 const recreateExtrinsicsOrder = (extrinsics: GenericExtrinsic[], seedBytes: Uint8Array) => {
   const slots: string[] = extrinsics.map((extrinsic) =>
@@ -9,7 +9,25 @@ const recreateExtrinsicsOrder = (extrinsics: GenericExtrinsic[], seedBytes: Uint
 
   fisherYatesShuffle(slots, seedBytes)
 
-  return slots.map((who) => signerMap(extrinsics).get(who)?.shift())
-}
+  const map = new Map()
 
+  for (const e of extrinsics) {
+    let who = 'None'
+    if (e.isSigned) {
+      who = e.signer.toString()
+    }
+
+    if (map.has(who)) {
+      map.get(who).push(e)
+    } else {
+      map.set(who, [e])
+    }
+  }
+
+  const shuffledExtrinsics = slots.map((who) => {
+    return map.get(who).shift()
+  })
+
+  return shuffledExtrinsics
+}
 export default recreateExtrinsicsOrder

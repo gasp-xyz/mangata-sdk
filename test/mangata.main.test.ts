@@ -85,6 +85,41 @@ describe('test buy asset', () => {
   })
 })
 
+describe('test sellasset four times at the same time', () => {
+  it('should sell asset 4 times', async () => {
+    await mangataInstance.createPool(
+      testUser,
+      firstCurrency,
+      new BN(100000),
+      secondCurrency,
+      new BN(100000)
+    )
+    const userNonce = []
+    userNonce.push(await mangataInstance.getNonce(testUser.address))
+    const promises = []
+    const maxFutureNonce = userNonce[0].toNumber() + 3
+    for (let index = maxFutureNonce; index >= userNonce[0].toNumber(); index--) {
+      promises.push(
+        mangataInstance.sellAsset(
+          testUser,
+          firstCurrency,
+          secondCurrency,
+          new BN(1000 + index),
+          new BN(0),
+          {
+            nonce: new BN(index),
+          }
+        )
+      )
+    }
+    const promisesEvents = await Promise.all(promises)
+    promisesEvents.forEach((events) => {
+      const result = getEventResultFromTxWait(events)
+      expect(result.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
+    })
+  })
+})
+
 describe('test sell asset', () => {
   it('should sell asset', async () => {
     await mangataInstance.createPool(
