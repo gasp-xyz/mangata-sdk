@@ -24,10 +24,10 @@ export const getTxNonce = async (
     if (onChainNonce && onChainNonce.gt(nonce)) {
       nonce = onChainNonce
     }
-  }
 
-  const nextNonce: BN = nonce.addn(1)
-  memoryDatabase.setNonce(address, nextNonce)
+    const nextNonce: BN = nonce.addn(1)
+    memoryDatabase.setNonce(address, nextNonce)
+  }
 
   return nonce
 }
