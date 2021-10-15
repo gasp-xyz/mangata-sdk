@@ -456,7 +456,7 @@ export class Mangata {
     tokenAddress: string,
     ethereumAddress: string,
     amount: BN,
-    txOptions: TxOptions
+    txOptions?: TxOptions
   ) {
     const api = await this.getApi()
     return await Tx.bridgeERC20ToEthereum(

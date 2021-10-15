@@ -270,7 +270,7 @@ class Tx {
     tokenAddress: string,
     ethereumAddress: string,
     amount: BN,
-    txOptions: TxOptions
+    txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
