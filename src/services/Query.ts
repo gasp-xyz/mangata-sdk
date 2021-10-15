@@ -128,8 +128,13 @@ class Query {
   }
 
   static async getTokenInfo(api: ApiPromise, tokenId: string): Promise<Codec> {
-    const tokenInfo = getTokenInfoEntity(api, tokenId)
+    const tokenInfo = await getTokenInfoEntity(api, tokenId)
     return tokenInfo
+  }
+
+  static async getLiquidityTokenIds(api: ApiPromise): Promise<string[]> {
+    const liquidityTokens = await api.query.xyk.liquidityAssets.entries()
+    return liquidityTokens.map((liquidityToken) => liquidityToken[1].toString())
   }
 }
 

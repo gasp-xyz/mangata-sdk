@@ -263,6 +263,22 @@ class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(api, mintTokenEntity(api, address, tokenId, amount), sudoAccount, txOptions)
   }
+
+  static async bridgeERC20ToEthereum(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    tokenAddress: string,
+    ethereumAddress: string,
+    amount: BN,
+    txOptions: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    return await signTx(
+      api,
+      api.tx.erc20.burn(tokenAddress, ethereumAddress, amount),
+      account,
+      txOptions
+    )
+  }
 }
 
 export default Tx
