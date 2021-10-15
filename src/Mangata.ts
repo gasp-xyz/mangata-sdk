@@ -11,6 +11,7 @@ import Query from './services/Query'
 import { options } from './utils/options'
 import { MangataGenericEvent } from './types/MangataGenericEvent'
 import { TxOptions } from './types/TxOptions'
+import Tx from './services/Tx'
 
 /**
  * @class Mangata
@@ -440,5 +441,31 @@ export class Mangata {
   public async getTokenInfo(tokenId: string) {
     const api = await this.getApi()
     return await Query.getTokenInfo(api, tokenId)
+  }
+
+  public async getLiquidityTokenIds(): Promise<string[]> {
+    const api = await this.getApi()
+    return await Query.getLiquidityTokenIds(api)
+  }
+
+  /**
+   * @deprecated This method will be deprecated
+   */
+  public async bridgeERC20ToEthereum(
+    account: string | KeyringPair,
+    tokenAddress: string,
+    ethereumAddress: string,
+    amount: BN,
+    txOptions: TxOptions
+  ) {
+    const api = await this.getApi()
+    return await Tx.bridgeERC20ToEthereum(
+      api,
+      account,
+      tokenAddress,
+      ethereumAddress,
+      amount,
+      txOptions
+    )
   }
 }
