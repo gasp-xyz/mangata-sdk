@@ -448,6 +448,9 @@ export class Mangata {
     return await Query.getLiquidityTokenIds(api)
   }
 
+  /**
+   * @deprecated This method will be deprecated
+   */
   public async bridgeERC20ToEthereum(
     account: string | KeyringPair,
     tokenAddress: string,
