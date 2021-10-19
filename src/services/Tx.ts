@@ -279,6 +279,16 @@ class Tx {
       txOptions
     )
   }
+
+  static async bridgeEthToEthereum(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    ethereumAddress: string,
+    amount: BN,
+    txOptions?: TxOptions
+  ) {
+    return await signTx(api, api.tx.eth.burn(ethereumAddress, amount), account, txOptions)
+  }
 }
 
 export default Tx
