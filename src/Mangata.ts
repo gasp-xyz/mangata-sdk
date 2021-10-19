@@ -468,4 +468,14 @@ export class Mangata {
       txOptions
     )
   }
+
+  public async bridgeEthToEthereum(
+    account: string | KeyringPair,
+    ethereumAddress: string,
+    amount: BN,
+    txOptions?: TxOptions
+  ) {
+    const api = await this.getApi()
+    return await Tx.bridgeEthToEthereum(api, account, ethereumAddress, amount, txOptions)
+  }
 }
