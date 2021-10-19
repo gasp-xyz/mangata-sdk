@@ -469,6 +469,9 @@ export class Mangata {
     )
   }
 
+  /**
+   * @deprecated This method will be deprecated
+   */
   public async bridgeEthToEthereum(
     account: string | KeyringPair,
     ethereumAddress: string,
