@@ -1,4 +1,6 @@
-export function getXoshiroStates(seed: Uint8Array) {
+import { XoShiRo256Plus } from 'mangata-prng-xoshiro'
+
+function getXoshiroStates(seed: Uint8Array) {
   const s0 =
     (BigInt(seed[0]) << BigInt(0)) |
     (BigInt(seed[1]) << BigInt(8)) |
@@ -37,4 +39,9 @@ export function getXoshiroStates(seed: Uint8Array) {
     (BigInt(seed[31]) << BigInt(56))
 
   return { s0, s1, s2, s3 }
+}
+
+export function getXoshiro(seed: Uint8Array) {
+  const { s0, s1, s2, s3 } = getXoshiroStates(seed)
+  return new XoShiRo256Plus(s0, s1, s2, s3)
 }

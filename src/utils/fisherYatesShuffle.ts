@@ -1,10 +1,8 @@
 /* eslint-disable no-console */
-import { XoShiRo256Plus } from 'mangata-prng-xoshiro'
-import { getXoshiroStates } from './getXorshiroStates'
+import { getXoshiro } from './getXorshiroStates'
 
 const fisherYatesShuffle = <K>(arr: K[], seed: Uint8Array) => {
-  const { s0, s1, s2, s3 } = getXoshiroStates(seed)
-  const xoshiro = new XoShiRo256Plus(s0, s1, s2, s3)
+  const xoshiro = getXoshiro(seed)
   // Start from the last element and swap
   // one by one. We don't need to run for
   // the first element that's why i > 0

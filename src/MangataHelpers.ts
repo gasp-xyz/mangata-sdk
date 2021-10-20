@@ -9,6 +9,7 @@ import { v4 as uuid } from 'uuid'
 import { options } from './utils/options'
 import rpcOptions from './utils/mangata-rpc'
 import typesOptions from './utils/mangata-types'
+import { getXoshiro } from './utils/getXorshiroStates'
 
 /**
  * @class MangataHelpers
@@ -50,5 +51,9 @@ export class MangataHelpers {
     const account = keyring.createFromUri(userName)
     keyring.addPair(account)
     return account
+  }
+
+  public static getXoshiro(seed: Uint8Array) {
+    return getXoshiro(seed)
   }
 }
