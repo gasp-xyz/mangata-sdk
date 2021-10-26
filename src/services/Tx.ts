@@ -9,15 +9,6 @@ import memoryDatabase from '../utils/MemoryDatabase'
 import Query from './Query'
 
 import { getTxNonce } from '../utils/nonce.tracker'
-import { createPool as createPoolEntity } from '../entities/tx/createPool'
-import { sellAsset as sellAssetEntity } from '../entities/tx/sellAsset'
-import { buyAsset as buyAssetEntity } from '../entities/tx/buyAsset'
-import { mintLiquidity as mintLiquidityEntity } from '../entities/tx/mintLiquidity'
-import { burnLiquidity as burnLiquidityEntity } from '../entities/tx/burnLiquidity'
-import { transferToken as transferTokenEntity } from '../entities/tx/transfer'
-import { transferAllToken as transferAllTokenEntity } from '../entities/tx/transferAll'
-import { createToken as createTokenEntity } from '../entities/tx/createToken'
-import { mintToken as mintTokenEntity } from '../entities/tx/mintToken'
 
 import { TxOptions } from '../types/TxOptions'
 import { MangataGenericEvent } from '../types/MangataGenericEvent'
@@ -143,7 +134,7 @@ class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      createPoolEntity(api, firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount),
+      api.tx.xyk.createPool(firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount),
       account,
       txOptions
     )
@@ -160,7 +151,7 @@ class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      sellAssetEntity(api, soldTokenId, boughtTokenId, amount, minAmountOut),
+      api.tx.xyk.sellAsset(soldTokenId, boughtTokenId, amount, minAmountOut),
       account,
       txOptions
     )
@@ -177,7 +168,7 @@ class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      buyAssetEntity(api, soldTokenId, boughtTokenId, amount, maxAmountIn),
+      api.tx.xyk.buyAsset(soldTokenId, boughtTokenId, amount, maxAmountIn),
       account,
       txOptions
     )
@@ -194,8 +185,7 @@ class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      mintLiquidityEntity(
-        api,
+      api.tx.xyk.mintLiquidity(
         firstTokenId,
         secondTokenId,
         firstTokenAmount,
@@ -216,7 +206,7 @@ class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      burnLiquidityEntity(api, firstTokenId, secondTokenId, liquidityTokenAmount),
+      api.tx.xyk.burnLiquidity(firstTokenId, secondTokenId, liquidityTokenAmount),
       account,
       txOptions
     )
@@ -230,7 +220,7 @@ class Tx {
     amount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    return await signTx(api, transferTokenEntity(api, address, tokenId, amount), account, txOptions)
+    return await signTx(api, api.tx.tokens.transfer(address, tokenId, amount), account, txOptions)
   }
 
   static async transferAllToken(
@@ -240,17 +230,22 @@ class Tx {
     address: string,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    return await signTx(api, transferAllTokenEntity(api, address, tokenId), account, txOptions)
+    return await signTx(api, api.tx.tokens.transferAll(address, tokenId), account, txOptions)
   }
 
   static async createToken(
     api: ApiPromise,
     address: string,
     sudoAccount: string | KeyringPair,
-    tokenValu: BN,
+    tokenValue: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    return await signTx(api, createTokenEntity(api, address, tokenValu), sudoAccount, txOptions)
+    return await signTx(
+      api,
+      api.tx.sudo.sudo(api.tx.tokens.create(address, tokenValue)),
+      sudoAccount,
+      txOptions
+    )
   }
 
   static async mintAsset(
@@ -261,7 +256,12 @@ class Tx {
     amount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    return await signTx(api, mintTokenEntity(api, address, tokenId, amount), sudoAccount, txOptions)
+    return await signTx(
+      api,
+      api.tx.sudo.sudo(api.tx.tokens.mint(tokenId, address, amount)),
+      sudoAccount,
+      txOptions
+    )
   }
 
   static async bridgeERC20ToEthereum(

@@ -5,11 +5,16 @@ import { KeyringPair } from '@polkadot/keyring/types'
 import type { DefinitionRpc, DefinitionRpcSub, RegistryTypes } from '@polkadot/types/types'
 import { ApiOptions } from '@polkadot/api/types'
 import { v4 as uuid } from 'uuid'
+import BN from 'bn.js'
 
 import { options } from './utils/options'
 import rpcOptions from './utils/mangata-rpc'
 import typesOptions from './utils/mangata-types'
 import { getXoshiro } from './utils/getXorshiroStates'
+import { isInputValid } from './utils/isInputValid'
+import { toBN } from './utils/toBn'
+import { toFixed } from './utils/toFixed'
+import { BN_TEN_THOUSAND } from '.'
 
 /**
  * @class MangataHelpers
@@ -55,5 +60,38 @@ export class MangataHelpers {
 
   public static getXoshiro(seed: Uint8Array) {
     return getXoshiro(seed)
+  }
+
+  public static getPriceImpact(
+    poolBalance: { firstTokenBalance: BN; secondTokenBalance: BN },
+    poolDecimals: { firstTokenDecimals: number; secondTokenDecimals: number },
+    firstTokenAmount: string,
+    secondTokenAmount: string
+  ) {
+    if (
+      !poolBalance ||
+      !poolDecimals ||
+      !isInputValid(firstTokenAmount) ||
+      !isInputValid(secondTokenAmount)
+    ) {
+      return
+    }
+
+    const firstReserveBefore = poolBalance.firstTokenBalance
+    const secondReserveBefore = poolBalance.secondTokenBalance
+
+    const soldAmount = toBN(firstTokenAmount, poolDecimals.firstTokenDecimals)
+    const boughtAmount = toBN(secondTokenAmount, poolDecimals.secondTokenDecimals)
+
+    const numerator = firstReserveBefore
+      .add(soldAmount)
+      .mul(BN_TEN_THOUSAND)
+      .mul(secondReserveBefore)
+    const denominator = secondReserveBefore.sub(boughtAmount).mul(firstReserveBefore)
+
+    const res = numerator.div(denominator).sub(BN_TEN_THOUSAND)
+    const resFormatted = toFixed((res.toNumber() / 100).toString(), 2)
+
+    return resFormatted
   }
 }
