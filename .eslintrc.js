@@ -8,7 +8,7 @@ module.exports = {
   rules: {
     'no-var': 'warn',
     'prefer-const': 'warn',
-    'no-console': 'warn',
+    'no-console': 'off',
     'prettier/prettier': 'warn',
     'arrow-body-style': 'off',
     'prefer-arrow-callback': 'off',
