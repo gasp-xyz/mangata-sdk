@@ -102,14 +102,20 @@ class Query {
     return bridgedAssets.map(async (bridgedAsset) => {
       const tokenId = bridgedAsset[0].args[0].toString()
       const info = await api.query.assetsInfo.assetsInfo(tokenId)
+      const infoHuman = info.toHuman() as {
+        name: string
+        symbol: string
+        decimals: string
+        description: string
+      }
       const ethAddress = bridgedAsset[1].toString()
       return {
         assetId: tokenId,
-        info: info.toHuman() as {
-          name: string
-          symbol: string
-          decimals: number
-          description: string
+        info: {
+          name: infoHuman.name,
+          symbol: infoHuman.symbol,
+          decimals: Number(infoHuman.decimals),
+          description: infoHuman.description,
         },
         ethereumAddress: ethAddress,
       }

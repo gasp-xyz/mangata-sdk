@@ -12,7 +12,7 @@ describe('test create pool', () => {
     const tokenObject = tokenInfo.toHuman() as {
       name: string
       symbol: string
-      decimal: string
+      decimals: number
       description: string
     }
     expect(tokenObject.description).toEqual('Mangata Asset')
