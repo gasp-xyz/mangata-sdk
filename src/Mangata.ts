@@ -423,7 +423,7 @@ export class Mangata {
   }
 
   public async getBridgeTokens(): Promise<
-    Promise<{
+    {
       assetId: string
       info: {
         name: string
@@ -432,10 +432,29 @@ export class Mangata {
         description: string
       }
       ethereumAddress: string
-    }>[]
+    }[]
   > {
     const api = await this.getApi()
-    return await Query.getBridgedTokens(api)
+    const bridgedTokens = await Query.getBridgedTokens(api)
+    const bridgedTokensFormatted: {
+      assetId: string
+      info: {
+        name: string
+        symbol: string
+        decimals: number
+        description: string
+      }
+      ethereumAddress: string
+    }[] = []
+
+    for (const item of bridgedTokens) {
+      // `item` is a Promise, therefore we await it
+      const bridgedAsset = await item
+
+      bridgedTokensFormatted.push(bridgedAsset)
+    }
+
+    return bridgedTokensFormatted
   }
 
   public async getTokenInfo(tokenId: string) {
