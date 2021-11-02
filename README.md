@@ -66,7 +66,7 @@ main().catch(console.error).finally(() => process.exit());
 
 ## `getApi`
 
-If you need retrieve underlying API
+If you need to retrieve underlying API
 
 ```js
 const mangata = Mangata.getInstance('ws://127.0.0.1:9944')
@@ -74,5 +74,17 @@ const api = await mangata.getApi()
 console.log("Connected: ", api.isConnected)
 
 ```
+
+## `getNonce`
+
+Retrieve the current nonce
+
+| Input           | Type                                                     |
+| ---------------- | --------------------------------------------------------------- |
+| `address`        | string |
+
+
+
+
 
 
