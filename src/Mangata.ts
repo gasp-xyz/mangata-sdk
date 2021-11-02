@@ -209,7 +209,7 @@ export class Mangata {
     account: string | KeyringPair,
     soldAssetId: string,
     boughtAssetId: string,
-    boughtAssetAmount: BN,
+    amount: BN,
     maxAmountIn: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
@@ -219,7 +219,7 @@ export class Mangata {
       account,
       soldAssetId,
       boughtAssetId,
-      boughtAssetAmount,
+      amount,
       maxAmountIn,
       txOptions
     )

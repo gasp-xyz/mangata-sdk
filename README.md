@@ -94,6 +94,16 @@ Retrieve the current nonce
 | ---------------- | --------------------------------------------------------------- |
 | `address`        | string |
 
+### TxOptions Type (Optional)
+
+| Input             | Type     |
+| ----------------- | -------- |
+| `nonce`           | BN       |
+| `signer`          | string   |
+| `statusCallback`  | function |
+| `extrinsicStatus` | function |
+
+
 ## `createPool`
 
 Extrinsic to create pool
@@ -107,13 +117,35 @@ Extrinsic to create pool
 | `secondTokenAmount` | BN                    |
 | `txOptions`         | TxOptions             |
 
-### TxOptions (Optional)
-| Input             | Type     |
-| ----------------- | -------- |
-| `nonce`           | BN       |
-| `signer`          | string   |
-| `statusCallback`  | function |
-| `extrinsicStatus` | function |
+## `sellAsset`
+
+Extrinsic to sell/swap
+
+| Input           | Type                  |
+| --------------- | --------------------- |
+| `account`       | string or KeyringPair |
+| `soldAssetId`   | string                |
+| `boughtAssetId` | string                |
+| `amount`        | BN                    |
+| `minAmountOut`  | BN                    |
+| `txOptions`     | TxOptions             |
+
+## `buyAsset`
+
+Extrinsic to sell/swap
+
+| Input           | Type                  |
+| --------------- | --------------------- |
+| `account`       | string or KeyringPair |
+| `soldAssetId`   | string                |
+| `boughtAssetId` | string                |
+| `amount`        | BN                    |
+| `maxAmountIn`   | BN                    |
+| `txOptions`     | TxOptions             |
+
+
+
+
 
 
 
