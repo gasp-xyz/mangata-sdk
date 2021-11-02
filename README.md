@@ -133,7 +133,7 @@ Extrinsic to sell/swap
 
 ## `buyAsset`
 
-Extrinsic to sell/swap
+Extrinsic to buy/swap
 
 | Input           | Type                  |
 | --------------- | --------------------- |
