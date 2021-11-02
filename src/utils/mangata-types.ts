@@ -1,37 +1,16 @@
 import type { RegistryTypes } from '@polkadot/types/types'
 
 const typesOptions: RegistryTypes = {
-  SeedType: {
-    seed: '[u8;32]',
-    proof: '[u8;64]',
-  },
-  CurrencyIdOf: 'u32',
   CurrencyId: 'u32',
-  Balance: 'u128',
-  App: {
-    _enum: ['ETH', 'ERC20'],
-  },
-
-  RpcResult: {
-    price: 'Balance',
-  },
-  RPCAmountsResult: {
-    firstAssetAmount: 'Balance',
-    secondAssetAmount: 'Balance',
-  },
-
-  // mapping the actual specified address format
+  CurrencyIdOf: 'u32',
   Address: 'AccountId',
-  // mapping the lookup
   LookupSource: 'AccountId',
-
   AssetInfo: {
     name: 'Option<Vec<u8>>',
     symbol: 'Option<Vec<u8>>',
     description: 'Option<Vec<u8>>',
     decimals: 'Option<u32>',
   },
-
   AppId: '[u8; 20]',
   Message: {
     payload: 'Vec<u8>',
@@ -49,8 +28,21 @@ const typesOptions: RegistryTypes = {
   },
   TokenId: 'u32',
   BridgedAssetId: 'H160',
-  AssetAccountData: {
-    free: 'U256',
+  AccountInfo: {
+    nonce: 'u32',
+    refcount: 'u32',
+    data: 'BalancesAccountData',
+  },
+  BalancesAccountData: {
+    free: 'u128',
+    reserved: 'u128',
+    misc_frozen: 'u128',
+    fee_frozen: 'u128',
+  },
+  AccountData: {
+    free: 'u128',
+    reserved: 'u128',
+    frozen: 'u128',
   },
   EthereumHeader: {
     parentHash: 'H256',
@@ -68,12 +60,15 @@ const typesOptions: RegistryTypes = {
     difficulty: 'U256',
     seal: 'Vec<Vec<u8>>',
   },
+  App: {
+    _enum: ['ETH', 'ERC20'],
+  },
+  SeedType: {
+    seed: '[u8; 32]',
+    proof: '[u8; 64]',
+  },
   Bloom: {
     _: '[u8; 256]',
-  },
-  BalanceLock: {
-    id: '[u8; 8]',
-    amount: 'Balance',
   },
   Valuation: {
     liquidity_token_amount: 'Balance',
@@ -99,7 +94,13 @@ const typesOptions: RegistryTypes = {
     builder: 'AccountId',
     executor: 'AccountId',
     singly_encrypted_call: 'Option<Vec<u8>>',
+    decrypted_call: 'Option<Vec<u8>>',
+    doubly_encrypted_nonce: 'Option<Vec<u8>>',
+    singly_encrypted_nonce: 'Option<Vec<u8>>',
   },
+  AuthorityId: '[u8; 33]',
+  VectorOfCalls: 'Vec<Call>',
+  VectorOfVecu8: 'Vec<Vec<u8>>',
 }
 
 export default typesOptions
