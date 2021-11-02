@@ -3,7 +3,7 @@
     <img width="132" height="101" src="https://mangata.finance/images/logo-without-text.svg" class="attachment-full size-full" alt="Mangata brand" loading="lazy" /></a>
 </p>
 
-<h2 align="center">~Mangata SDK</h2>
+<h2 align="center">Mangata SDK</h2>
 
 <p align="center">
     Mangata Software Development Kit (SDK) is a toolset for convenient communication with Mangata Substrate node.
@@ -12,14 +12,9 @@
 
 # DO NOT USE. UNDER DEVELOPMENT 
 
-# mangata-SDK
+# Getting Started
 
-Mangata Software Development Kit (SDK) is a toolset for convenient communication with Mangata Substrate node.
-
-# mangata-ts
-
-Mangata-ts is a first library, built in typescript that provides easy methods for buying and selling assets on Mangata DEX. The main purpose is
-to save time for builders of client applications, primarily for algorithmic traders and frontend interface builders.
+Mangata SDK is a first library, built in typescript that provides easy methods for buying and selling assets on Mangata DEX. The main purpose is to save time for builders of client applications, primarily for algorithmic traders and frontend interface builders.
 
 # Basic use case (Unstable and under construction)
 
