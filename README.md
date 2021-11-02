@@ -6,6 +6,10 @@
 <h2 align="center">Mangata SDK</h2>
 
 ![npm](https://img.shields.io/npm/v/mangata-sdk)
+![GitHub last commit](https://img.shields.io/github/last-commit/mangata-finance/mangata-sdk)
+![npm type definitions](https://img.shields.io/npm/types/mangata-sdk)
+
+
 
 
 <p align="center">
