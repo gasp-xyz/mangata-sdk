@@ -6,10 +6,10 @@
 <h2 align="center">Mangata SDK</h2>
 
 ![npm](https://img.shields.io/npm/v/mangata-sdk)
+![Issues](https://img.shields.io/github/issues/mangata-finance/mangata-sdk)
+![Pull Request](https://img.shields.io/github/issues-pr/mangata-finance/mangata-sdk)
 ![GitHub last commit](https://img.shields.io/github/last-commit/mangata-finance/mangata-sdk)
 ![npm type definitions](https://img.shields.io/npm/types/mangata-sdk)
-
-
 
 
 <p align="center">
@@ -23,8 +23,6 @@
 
 Mangata SDK is a first library, built in typescript that provides easy methods for buying and selling assets on Mangata DEX. The main purpose is to save time for builders of client applications, primarily for algorithmic traders and frontend interface builders.
 
-# Basic use case
-
 ## Installation
 
 ```sh
@@ -34,6 +32,8 @@ npm i mangata-sdk
 // with yarn
 yarn add mangata-sdk
 ```
+
+# Basic use case
 
 Here is a quick example to get you started, **all you need is Mangata instance**:
 
