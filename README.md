@@ -64,6 +64,16 @@ main().catch(console.error).finally(() => process.exit());
 
 # Available Methods 
 
+### TxOptions Type (Optional)
+
+| Input             | Type     |
+| ----------------- | -------- |
+| `nonce`           | BN       |
+| `signer`          | string   |
+| `statusCallback`  | function |
+| `extrinsicStatus` | function |
+
+
 ## `getApi`
 
 If you need to retrieve underlying API
@@ -93,15 +103,6 @@ Retrieve the current nonce
 | Input           | Type                                                     |
 | ---------------- | --------------------------------------------------------------- |
 | `address`        | string |
-
-### TxOptions Type (Optional)
-
-| Input             | Type     |
-| ----------------- | -------- |
-| `nonce`           | BN       |
-| `signer`          | string   |
-| `statusCallback`  | function |
-| `extrinsicStatus` | function |
 
 
 ## `createPool`
