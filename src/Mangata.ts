@@ -107,7 +107,7 @@ export class Mangata {
   }
 
   /**
-   * Create a pool
+   * Extrinsic to create pool
    */
 
   public async createPool(

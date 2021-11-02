@@ -75,6 +75,17 @@ console.log("Connected: ", api.isConnected)
 
 ```
 
+## `getChain`
+
+If you need to retrieve the chain name
+
+```js
+const mangata = Mangata.getInstance('ws://127.0.0.1:9944')
+const chain = await mangata.getChain()
+console.log('Chain: ', chain)
+```
+
+
 ## `getNonce`
 
 Retrieve the current nonce
@@ -82,6 +93,32 @@ Retrieve the current nonce
 | Input           | Type                                                     |
 | ---------------- | --------------------------------------------------------------- |
 | `address`        | string |
+
+## `createPool`
+
+Extrinsic to create pool
+
+| Input               | Type                  |
+| ------------------- | --------------------- |
+| `account`           | string or KeyringPair |
+| `firstTokenId`      | string                |
+| `firstTokenAmount`  | BN                    |
+| `secondTokenId`     | string                |
+| `secondTokenAmount` | BN                    |
+| `txOptions`         | TxOptions             |
+
+### TxOptions (Optional)
+| Input             | Type     |
+| ----------------- | -------- |
+| `nonce`           | BN       |
+| `signer`          | string   |
+| `statusCallback`  | function |
+| `extrinsicStatus` | function |
+
+
+
+
+
 
 
 
