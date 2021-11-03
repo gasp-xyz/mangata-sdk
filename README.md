@@ -145,6 +145,20 @@ Extrinsic to buy/swap
 | `txOptions`     | TxOptions             |
 
 
+## `mintLiquidity`
+
+Extrinsic to add liquidity to pool
+
+| Input                       | Type                  |
+| --------------------------- | --------------------- |
+| `account`                   | string or KeyringPair |
+| `firstTokenId`              | string                |
+| `secondTokenId`             | string                |
+| `firstTokenAmount`          | BN                    |
+| `expectedSecondTokenAmount` | BN                    |
+| `txOptions`                 | TxOptions             |
+
+
 
 
 
