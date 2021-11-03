@@ -4,6 +4,7 @@ const typesOptions: RegistryTypes = {
   CurrencyId: 'u32',
   CurrencyIdOf: 'u32',
   Address: 'AccountId',
+  Balance: 'u128',
   LookupSource: 'AccountId',
   AssetInfo: {
     name: 'Option<Vec<u8>>',
@@ -33,11 +34,21 @@ const typesOptions: RegistryTypes = {
     refcount: 'u32',
     data: 'BalancesAccountData',
   },
+  RpcResult: {
+    price: 'Balance',
+  },
+  RPCAmountsResult: {
+    firstAssetAmount: 'Balance',
+    secondAssetAmount: 'Balance',
+  },
   BalancesAccountData: {
     free: 'u128',
     reserved: 'u128',
     misc_frozen: 'u128',
     fee_frozen: 'u128',
+  },
+  AssetAccountData: {
+    free: 'U256',
   },
   AccountData: {
     free: 'u128',
@@ -77,6 +88,10 @@ const typesOptions: RegistryTypes = {
   ShufflingSeed: {
     seed: 'H256',
     proof: 'H512',
+  },
+  BalanceLock: {
+    id: '[u8; 8]',
+    amount: 'Balance',
   },
   Header: {
     parentHash: 'Hash',
