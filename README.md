@@ -306,6 +306,18 @@ Returns token balance for address
 | `tokenId` | string |
 | `address` | string |
 
+## `getTokenInfo`
+
+Returns token info
+
+| Input     | Type   |
+| --------- | ------ |
+| `tokenId` | string |
+
+
+
+## `getBridgeTokens`
+
 
 
 
