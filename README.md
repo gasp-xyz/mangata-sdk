@@ -159,6 +159,70 @@ Extrinsic to add liquidity to pool
 | `txOptions`                 | TxOptions             |
 
 
+## `burnLiquidity`
+
+Extrinsic to remove liquidity from liquidity pool
+
+| Input                  | Type                  |
+| ---------------------- | --------------------- |
+| `account`              | string or KeyringPair |
+| `firstTokenId`         | string                |
+| `secondTokenId`        | string                |
+| `liquidityTokenAmount` | BN                    |
+| `txOptions`            | TxOptions             |
+
+
+## `calculateBuyPrice`
+
+Returns sell amount you need to pay in sold token id for bought token id in buy amount
+
+| Input           | Type |
+| --------------- | ---- |
+| `inputReserve`  | BN   |
+| `outputReserve` | BN   |
+| `buyAmount`     | BN   |
+
+
+## `calculateSellPrice`
+
+Returns bought asset amount returned by selling sold token id for bought token id in sell amount
+
+| Input           | Type |
+| --------------- | ---- |
+| `inputReserve`  | BN   |
+| `outputReserve` | BN   |
+| `buyAmount`     | BN   |
+
+## `calculateSellPriceId`
+
+Returns bought token amount returned by selling sold token id for bought token id in sell amount
+
+| Input           | Type |
+| --------------- | ---- |
+| `soldTokenId`   | BN   |
+| `boughtTokenId` | BN   |
+| `sellAmount`    | BN   |
+
+
+## `calculateBuyPriceId`
+
+Returns sell amount you need to pay in sold token id for bought token id in buy amount
+
+| Input           | Type |
+| --------------- | ---- |
+| `soldTokenId`   | BN   |
+| `boughtTokenId` | BN   |
+| `buyAmount`     | BN   |
+
+
+
+
+
+
+
+
+
+
 
 
 

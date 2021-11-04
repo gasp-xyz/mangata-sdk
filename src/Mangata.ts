@@ -263,7 +263,7 @@ export class Mangata {
   }
 
   /**
-   * Mint Asset (SUDO
+   * Mint Asset (SUDO)
    */
   public async mintAsset(
     sudoAccount: string | KeyringPair,
@@ -277,8 +277,8 @@ export class Mangata {
   }
 
   /**
-   * Returns amounts of first asset id and second asset id, while specifying first, second
-   * asset id liquidity asset amount of pool to burn
+   * Returns amounts of first token id and second token id, while specifying first, second
+   * token id liquidity asset amount of pool to burn
    */
   public async getBurnAmount(
     firstTokenId: string,
@@ -291,7 +291,7 @@ export class Mangata {
 
   /**
    * Returns bought asset amount returned by selling sold token id for bought token id in
-   * sell_amount
+   * sell amount
    */
 
   public async calculateSellPriceId(
