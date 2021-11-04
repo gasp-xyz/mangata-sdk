@@ -215,6 +215,114 @@ Returns sell amount you need to pay in sold token id for bought token id in buy 
 | `buyAmount`     | BN   |
 
 
+## `getAmountOfTokenIdInPool`
+
+Get amount of token id in pool
+
+| Input           | Type |
+| --------------- | ---- |
+| `firstTokenId`  | BN   |
+| `secondTokenId` | BN   |
+
+
+## `getLiquidityAssetId`
+
+Returns liquidity asset id
+
+| Input           | Type |
+| --------------- | ---- |
+| `firstTokenId`  | BN   |
+| `secondTokenId` | BN   |
+
+
+## `getLiquidityPool`
+
+Returns pool corresponding to specified liquidity asset ID in from of first and second token Id pair
+
+| Input              | Type   |
+| ------------------ | ------ |
+| `liquidityAssetId` | string |
+
+
+## `getTreasury`
+
+Returns amount of token ID in Treasury
+
+| Input     | Type   |
+| --------- | ------ |
+| `tokenId` | string |
+
+
+## `getTreasuryBurn`
+
+Returns amount of currtokenency ID in Treasury Burn
+
+| Input     | Type   |
+| --------- | ------ |
+| `tokenId` | string |
+
+
+## `transferToken`
+
+Extrinsic that transfers Token Id in value amount from origin to destination
+
+| Input       | Type                  |
+| ----------- | --------------------- |
+| `account`   | string or KeyringPair |
+| `tokenId`   | string                |
+| `address`   | string                |
+| `amount`    | BN                    |
+| `txOptions` | TxOptions             |
+
+
+## `transferTokenAll`
+
+Extrinsic that transfers all token Id from origin to destination
+
+
+| Input       | Type                  |
+| ----------- | --------------------- |
+| `account`   | string or KeyringPair |
+| `tokenId`   | string                |
+| `address`   | string                |
+| `txOptions` | TxOptions             |
+
+
+## `getTotalIssuance`
+
+Returns total issuance of Token Id
+
+| Input     | Type   |
+| --------- | ------ |
+| `tokenId` | string |
+
+
+## `getTokenBalance`
+
+Returns token balance for address
+
+| Input     | Type   |
+| --------- | ------ |
+| `tokenId` | string |
+| `address` | string |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

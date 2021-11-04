@@ -337,7 +337,7 @@ export class Mangata {
   }
 
   /**
-   * Returns pool corresponding to specified liquidity asset ID in from of first and second TokenId pair
+   * Returns pool corresponding to specified liquidity asset ID in from of first and second * token id pair
    */
   public async getLiquidityPool(liquidityAssetId: string): Promise<BN[]> {
     const api = await this.getApi()
@@ -390,7 +390,7 @@ export class Mangata {
   }
 
   /**
-   * Returns total issuance of CurrencyId
+   * Returns total issuance of Token Id
    */
 
   public async getTotalIssuance(tokenId: string): Promise<BN> {
@@ -407,7 +407,7 @@ export class Mangata {
   }
 
   /**
-   * Returns Asset balance for address
+   * Returns token balance for address
    */
   public async getTokenBalance(tokenId: string, address: string): Promise<AccountData> {
     const api = await this.getApi()
