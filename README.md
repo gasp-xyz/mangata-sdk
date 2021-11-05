@@ -69,7 +69,7 @@ main().catch(console.error).finally(() => process.exit());
 | Input             | Type     |
 | ----------------- | -------- |
 | `nonce`           | BN       |
-| `signer`          | string   |
+| `signer`          | Signer   |
 | `statusCallback`  | function |
 | `extrinsicStatus` | function |
 
