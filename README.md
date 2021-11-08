@@ -10,6 +10,7 @@
 </p>
 
 ![Artwork](https://mangata.finance/images/home/assets-artwork.webp)
+
 ![npm](https://img.shields.io/npm/v/mangata-sdk)
 ![Issues](https://img.shields.io/github/issues/mangata-finance/mangata-sdk)
 ![Pull Request](https://img.shields.io/github/issues-pr/mangata-finance/mangata-sdk)
