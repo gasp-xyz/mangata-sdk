@@ -317,7 +317,7 @@ export class Mangata {
   }
 
   /**
-   * Get amount of token id in pool
+   * Returns amount of token ids in pool.
    */
   public async getAmountOfTokenIdInPool(
     firstTokenId: string,
@@ -355,6 +355,11 @@ export class Mangata {
   /**
    * Returns amount of currency ID in Treasury Burn
    */
+  /**
+   *
+   * @param tokenId
+   * @returns
+   */
   public async getTreasuryBurn(tokenId: string): Promise<AccountData> {
     const api = await this.getApi()
     return await Query.getTreasuryBurn(api, tokenId)
@@ -376,7 +381,7 @@ export class Mangata {
   }
 
   /**
-   * Extrinsic that transfers all token_id from origin to destination
+   * Extrinsic that transfers all token id from origin to destination
    */
 
   public async transferTokenAll(

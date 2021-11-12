@@ -25,7 +25,6 @@ export const signTx = async (
     const extractedAccount = typeof account === 'string' ? account : account.address
 
     const nonce = await getTxNonce(api, extractedAccount, txOptions)
-    // log.info('Nonce: ', nonce.toNumber())
 
     try {
       const unsub = await tx.signAndSend(
@@ -92,6 +91,7 @@ export const signTx = async (
                         method: event.method,
                         metaDocumentation: event.meta.documentation.toString(),
                         eventData,
+                        error: getError(api, event.method, eventData),
                       } as MangataGenericEvent
                     })
 
@@ -101,11 +101,9 @@ export const signTx = async (
             )
           } else if (result.status.isFinalized) {
             txOptions && txOptions.extrinsicStatus && txOptions.extrinsicStatus(output)
-            // log.info('Finalized block hash: ', result.status.asFinalized.toHex())
             resolve(output)
             unsub()
           } else if (result.isError) {
-            // log.error(`Transaction error`)
             reject('Transaction error')
             const currentNonce: BN = await Query.getNonce(api, extractedAccount)
             memoryDatabase.setNonce(extractedAccount, currentNonce)
@@ -120,6 +118,56 @@ export const signTx = async (
       })
     }
   })
+}
+
+type TErrorData = {
+  Module?: {
+    index?: string
+    error?: string
+  }
+}
+
+const getError = (
+  api: ApiPromise,
+  method: string,
+  eventData: MangataEventData[]
+): {
+  documentation: string[]
+  name: string
+} | null => {
+  const failedEvent = method === 'ExtrinsicFailed'
+
+  if (failedEvent) {
+    const error = eventData.find((item) => item.type === 'DispatchError')
+    const errorData = error?.data?.toHuman?.() as TErrorData | undefined
+    const errorIdx = errorData?.Module?.error
+    const moduleIdx = errorData?.Module?.index
+
+    if (errorIdx && moduleIdx) {
+      try {
+        const decode = api.registry.findMetaError({
+          error: new BN(errorIdx),
+          index: new BN(moduleIdx),
+        })
+        return {
+          documentation: decode.documentation,
+          name: decode.name,
+        }
+      } catch (error) {
+        return {
+          documentation: ['Unknown error'],
+          name: 'UnknownError',
+        }
+      }
+    } else {
+      return {
+        documentation: ['Unknown error'],
+        name: 'UnknownError',
+      }
+    }
+  }
+
+  return null
 }
 
 class Tx {

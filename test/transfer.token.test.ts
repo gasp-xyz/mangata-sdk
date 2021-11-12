@@ -32,39 +32,33 @@ beforeEach(async () => {
 
 describe('Testing additional methods', () => {
   it('should trasnfer tokens from testUser1 to testUser2', async () => {
-    const result = await mangataInstance.transferToken(
-      testUser,
-      secondCurrency,
-      testUser1.address,
-      new BN(100)
-    )
+    await mangataInstance.transferToken(testUser, secondCurrency, testUser1.address, new BN(100), {
+      extrinsicStatus: (result) => {
+        const eventTransfer = getEventResultFromTxWait(result, [
+          'tokens',
+          'Transferred',
+          testUser.address,
+        ])
+        expect(eventTransfer.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
+      },
+    })
 
-    const eventTransfer = getEventResultFromTxWait(result, [
-      'tokens',
-      'Transferred',
-      testUser.address,
-    ])
-    expect(eventTransfer.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
-
-    const resultTransferAll = await mangataInstance.transferTokenAll(
-      testUser,
-      firstCurrency,
-      testUser1.address
-    )
-
-    const eventTransferAll = getEventResultFromTxWait(resultTransferAll, [
-      'tokens',
-      'Transferred',
-      testUser.address,
-    ])
-    expect(eventTransferAll.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
+    await mangataInstance.transferTokenAll(testUser, firstCurrency, testUser1.address, {
+      extrinsicStatus: (resultTransferAll) => {
+        const eventTransferAll = getEventResultFromTxWait(resultTransferAll, [
+          'tokens',
+          'Transferred',
+          testUser.address,
+        ])
+        expect(eventTransferAll.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
+      },
+    })
 
     const issuance = await mangataInstance.getTotalIssuance(firstCurrency)
 
     expect(issuance.toNumber()).toEqual(500000)
 
     const tokenBalance = await mangataInstance.getTokenBalance(firstCurrency, testUser1.address)
-    tokenBalance.free
 
     expect(tokenBalance.free.toNumber()).toEqual(500000)
 

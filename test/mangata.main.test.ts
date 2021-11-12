@@ -30,15 +30,23 @@ beforeEach(async () => {
 
 describe('test create pool', () => {
   it('should create pool', async () => {
-    const result = await mangataInstance.createPool(
+    await mangataInstance.createPool(
       testUser,
       firstCurrency,
       new BN(50000),
       secondCurrency,
-      new BN(50000)
+      new BN(50000),
+      {
+        extrinsicStatus: (result) => {
+          const eventResult = getEventResultFromTxWait(result, [
+            'xyk',
+            'PoolCreated',
+            testUser.address,
+          ])
+          expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
+        },
+      }
     )
-    const eventResult = getEventResultFromTxWait(result, ['xyk', 'PoolCreated', testUser.address])
-    expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
   })
 })
 
@@ -72,16 +80,23 @@ describe('test buy asset', () => {
       new BN(25000)
     )
     await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
-    const result = await mangataInstance.buyAsset(
+    await mangataInstance.buyAsset(
       testUser,
       firstCurrency,
       secondCurrency,
       new BN(1000),
-      new BN(60000)
+      new BN(60000),
+      {
+        extrinsicStatus: (result) => {
+          const eventResult = getEventResultFromTxWait(result, [
+            'xyk',
+            'AssetsSwapped',
+            testUser.address,
+          ])
+          expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
+        },
+      }
     )
-
-    const eventResult = getEventResultFromTxWait(result, ['xyk', 'AssetsSwapped', testUser.address])
-    expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
   })
 })
 
@@ -130,15 +145,23 @@ describe('test sell asset', () => {
       new BN(25000)
     )
     await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
-    const result = await mangataInstance.sellAsset(
+    await mangataInstance.sellAsset(
       testUser,
       firstCurrency,
       secondCurrency,
       new BN(10000),
-      new BN(100)
+      new BN(100),
+      {
+        extrinsicStatus: (result) => {
+          const eventResult = getEventResultFromTxWait(result, [
+            'xyk',
+            'AssetsSwapped',
+            testUser.address,
+          ])
+          expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
+        },
+      }
     )
-    const eventResult = getEventResultFromTxWait(result, ['xyk', 'AssetsSwapped', testUser.address])
-    expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
   })
 })
 
@@ -152,16 +175,19 @@ describe('test mint liquidity', () => {
       new BN(25000)
     )
     await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
-    const result = await mangataInstance.mintLiquidity(
+    await mangataInstance.mintLiquidity(
       testUser,
       firstCurrency,
       secondCurrency,
       new BN(10000),
-      new BN(5001)
+      new BN(5001),
+      {
+        extrinsicStatus: (result) => {
+          const eventResult = getEventResultFromTxWait(result)
+          expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
+        },
+      }
     )
-
-    const eventResult = getEventResultFromTxWait(result)
-    expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
   })
 })
 
@@ -175,27 +201,23 @@ describe('test burn liquidity', () => {
       new BN(25000)
     )
     await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
-    const result = await mangataInstance.burnLiquidity(
-      testUser,
-      firstCurrency,
-      secondCurrency,
-      new BN(10000)
-    )
-
-    const eventResult = getEventResultFromTxWait(result)
-    expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
+    await mangataInstance.burnLiquidity(testUser, firstCurrency, secondCurrency, new BN(10000), {
+      extrinsicStatus: (result) => {
+        const eventResult = getEventResultFromTxWait(result)
+        expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
+      },
+    })
   })
 })
 
 describe('test create token', () => {
   it('should create token', async () => {
-    const result = await mangataInstance.createToken(
-      testUser.address,
-      sudoUser,
-      new BN(firstCurrency)
-    )
-    const eventResult = getEventResultFromTxWait(result, ['tokens', 'Issued', testUser.address])
-    expect(eventResult.data).not.toBeNull()
+    await mangataInstance.createToken(testUser.address, sudoUser, new BN(firstCurrency), {
+      extrinsicStatus: (result) => {
+        const eventResult = getEventResultFromTxWait(result, ['tokens', 'Issued', testUser.address])
+        expect(eventResult.data).not.toBeNull()
+      },
+    })
   })
 })
 

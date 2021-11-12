@@ -100,9 +100,10 @@ console.log('Chain: ', chain)
 
 Retrieve the current nonce
 
-| Input           | Type                                                     |
-| ---------------- | --------------------------------------------------------------- |
-| `address`        | string |
+| Input     | Type   |
+| --------- | ------ |
+| `address` | string |
+
 
 
 ## `createPool`
