@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-import { GenericEvent } from '@polkadot/types'
 import { KeyringPair } from '@polkadot/keyring/types'
 import BN from 'bn.js'
 
