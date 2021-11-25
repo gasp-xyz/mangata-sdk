@@ -6,6 +6,7 @@ import type { DefinitionRpc, DefinitionRpcSub, RegistryTypes } from '@polkadot/t
 import { ApiOptions } from '@polkadot/api/types'
 import { v4 as uuid } from 'uuid'
 import BN from 'bn.js'
+import Big from 'big.js'
 
 import { options } from './utils/options'
 import rpcOptions from './utils/mangata-rpc'
@@ -15,6 +16,7 @@ import { isInputValid } from './utils/isInputValid'
 import { toBN } from './utils/toBn'
 import { toFixed } from './utils/toFixed'
 import { BN_TEN_THOUSAND } from '.'
+import { BIG_HUNDRED } from './utils/bigConstants'
 
 /**
  * @class MangataHelpers
@@ -90,7 +92,10 @@ export class MangataHelpers {
     const denominator = secondReserveBefore.sub(boughtAmount).mul(firstReserveBefore)
 
     const res = numerator.div(denominator).sub(BN_TEN_THOUSAND)
-    const resFormatted = toFixed((res.toNumber() / 100).toString(), 2)
+
+    const resStr = res.toString()
+    const resBig = Big(resStr)
+    const resFormatted = toFixed(resBig.div(BIG_HUNDRED).toString(), 2)
 
     return resFormatted
   }
