@@ -1,6 +1,10 @@
 import BN from 'bn.js'
 import Big from 'big.js'
 
+Big.PE = 256
+Big.DP = 40
+Big.NE = -40
+
 const BIG_10 = Big('10')
 const DEFAULT_ASSET_DECIMALS = 18
 const DEFAULT_DECIMAL_MULTIPLIER = BIG_10.pow(DEFAULT_ASSET_DECIMALS)
