@@ -15,7 +15,7 @@ import Tx from './services/Tx'
 
 /**
  * @class Mangata
- * The Mangata class defines the `getInstance` method that lets clients access the unique singleton instance. Design pattern Singleton Promise is used.
+ * The Mangata class defines the `getInstance` method that lets clients access the unique singleton instance.
  */
 export class Mangata {
   private static instance: Mangata
@@ -36,8 +36,13 @@ export class Mangata {
    */
   private async connect(): Promise<ApiPromise> {
     if (!this.api) {
-      const provider = new WsProvider(this.uri)
-      this.api = await ApiPromise.create(options({ provider }))
+      const api = new ApiPromise(
+        options({
+          provider: new WsProvider(this.uri, 100),
+        })
+      )
+      await api.isReady
+      this.api = api
     }
 
     return this.api
@@ -108,8 +113,15 @@ export class Mangata {
 
   /**
    * Extrinsic to create pool
+   * @param {string | Keyringpair} account
+   * @param {string} firstTokenId
+   * @param {BN} firstTokenAmount
+   * @param {string} secondTokenId
+   * @param {BN} secondTokenAmount
+   * @param {TxOptions} [txOptions]
+   *
+   * @returns {(MangataGenericEvent|Array)}
    */
-
   public async createPool(
     account: string | KeyringPair,
     firstTokenId: string,
@@ -131,7 +143,17 @@ export class Mangata {
   }
 
   /**
-   * Sell asset
+   * Extrinsic to sell/swap sold token id in sold token amount for bought token id,
+   * while specifying min amount out: minimal expected bought token amount
+   *
+   * @param {string | Keyringpair} account
+   * @param {string} soldAssetId
+   * @param {string} boughtAssetId
+   * @param {BN} amount
+   * @param {BN} minAmountOut
+   * @param {TxOptions} [txOptions]
+   *
+   * @returns {(MangataGenericEvent|Array)}
    */
   public async sellAsset(
     account: string | KeyringPair,
@@ -154,9 +176,18 @@ export class Mangata {
   }
 
   /**
-   * Extrinsic to add liquidity to pool, while specifying first asset id and second asset
-   * id and first asset amount. Second asset amount is calculated in block, but cannot
-   * exceed expected second asset amount
+   * Extrinsic to add liquidity to pool, while specifying first token id
+   * and second token id and first token amount. Second token amount is calculated in block, but cannot
+   * exceed expected second token amount
+   *
+   * @param {string | Keyringpair} account
+   * @param {string} firstTokenId
+   * @param {string} secondTokenId
+   * @param {BN} firstTokenAmount
+   * @param {BN} expectedSecondTokenAmount
+   * @param {TxOptions} [txOptions]
+   *
+   * @returns {(MangataGenericEvent|Array)}
    */
   public async mintLiquidity(
     account: string | KeyringPair,
@@ -179,8 +210,16 @@ export class Mangata {
   }
 
   /**
-   * Extrinsic to remove liquidity from liquidity pool, specifying first asset id and
-   * second asset id of a pool and liquidity asset amount you wish to burn
+   * Extrinsic to remove liquidity from liquidity pool, specifying first token id and
+   * second token id of a pool and liquidity token amount you wish to burn
+   *
+   * @param {string | Keyringpair} account
+   * @param {string} firstTokenId
+   * @param {string} secondTokenId
+   * @param {BN} liquidityTokenAmount
+   * @param {TxOptions} [txOptions]
+   *
+   * @returns {(MangataGenericEvent|Array)}
    */
   public async burnLiquidity(
     account: string | KeyringPair,
@@ -201,9 +240,18 @@ export class Mangata {
   }
 
   /**
-   * Extrinsic to buy/swap bought asset id in bought asset amount for sold asset id, while
-   * specifying max amount in: maximal amount you are willing to pay in sold asset id to
-   * purchase bouth asset id in bought asset amount
+   * Extrinsic to buy/swap bought token id in bought token amount for sold token id, while
+   * specifying max amount in: maximal amount you are willing to pay in sold token id to
+   * purchase bought token id in bought token amount.
+   *
+   * @param {string | Keyringpair} account
+   * @param {string} soldAssetId
+   * @param {string} boughtAssetId
+   * @param {BN} amount
+   * @param {BN} maxAmountIn
+   * @param {TxOptions} [txOptions]
+   *
+   * @returns {(MangataGenericEvent|Array)}
    */
   public async buyAsset(
     account: string | KeyringPair,
@@ -229,6 +277,12 @@ export class Mangata {
    * Returns sell amount you need to pay in sold token id for bought token id in buy
    * amount, while specifying input reserve – reserve of sold token id, and output reserve
    * – reserve of bought token id
+   *
+   * @param {BN} inputReserve
+   * @param {BN} outputReserve
+   * @param {BN} buyAmount
+   *
+   * @returns {BN}
    */
   public async calculateBuyPrice(inputReserve: BN, outputReserve: BN, buyAmount: BN): Promise<BN> {
     const api = await this.getApi()
@@ -236,9 +290,15 @@ export class Mangata {
   }
 
   /**
-   * Returns bought asset amount returned by selling sold token id for bought token id in
+   * Returns bought token amount returned by selling sold token id for bought token id in
    * sell amount, while specifying input reserve – reserve of sold token id, and output
    * reserve – reserve of bought token id
+   *
+   * @param {BN} inputReserve
+   * @param {BN} outputReserve
+   * @param {BN} sellAmount
+   *
+   * @returns {BN}
    */
   public async calculateSellPrice(
     inputReserve: BN,
@@ -277,8 +337,15 @@ export class Mangata {
   }
 
   /**
-   * Returns amounts of first token id and second token id, while specifying first, second
-   * token id liquidity asset amount of pool to burn
+   * Returns bought token amount returned by selling sold token id for bought token id in
+   * sell amount, while specifying input reserve – reserve of sold token id, and output
+   * reserve – reserve of bought token id
+   *
+   * @param {BN} inputReserve
+   * @param {BN} outputReserve
+   * @param {BN} sellAmount
+   *
+   * @returns {BN}
    */
   public async getBurnAmount(
     firstTokenId: string,
@@ -318,6 +385,11 @@ export class Mangata {
 
   /**
    * Returns amount of token ids in pool.
+   *
+   * @param {string} firstTokenId
+   * @param {string} secondTokenId
+   *
+   * @returns {BN | Array}
    */
   public async getAmountOfTokenIdInPool(
     firstTokenId: string,
@@ -328,8 +400,14 @@ export class Mangata {
   }
 
   /**
-   * Returns liquidity asset id while specifying first and second TokenId returns same liquidity asset id when specifying other way
-   * around – second and first TokenId
+   * Returns liquidity asset id while specifying first and second Token Id.
+   * Returns same liquidity asset id when specifying other way
+   * around – second and first Token Id
+   *
+   * @param {string} firstTokenId
+   * @param {string} secondTokenId
+   *
+   * @returns {BN}
    */
   public async getLiquidityAssetId(firstTokenId: string, secondTokenId: string): Promise<BN> {
     const api = await this.getApi()
@@ -337,7 +415,10 @@ export class Mangata {
   }
 
   /**
-   * Returns pool corresponding to specified liquidity asset ID in from of first and second * token id pair
+   * Returns pool corresponding to specified liquidity asset ID
+   * @param {string} liquidityAssetId
+   *
+   * @returns {BN | Array}
    */
   public async getLiquidityPool(liquidityAssetId: string): Promise<BN[]> {
     const api = await this.getApi()
@@ -345,7 +426,10 @@ export class Mangata {
   }
 
   /**
-   * Returns amount of currency ID in Treasury
+   * Returns amount of token Id in Treasury
+   * @param {string} token Id
+   *
+   * @returns {AccountData}
    */
   public async getTreasury(tokenId: string): Promise<AccountData> {
     const api = await this.getApi()
@@ -353,12 +437,10 @@ export class Mangata {
   }
 
   /**
-   * Returns amount of currency ID in Treasury Burn
-   */
-  /**
+   * Returns amount of token Id in Treasury Burn
+   * @param {string} token Id
    *
-   * @param tokenId
-   * @returns
+   * @returns {AccountData}
    */
   public async getTreasuryBurn(tokenId: string): Promise<AccountData> {
     const api = await this.getApi()
@@ -366,9 +448,15 @@ export class Mangata {
   }
 
   /**
-   * Extrinsic that transfers TokenId in value amount from origin to destination
+   * Extrinsic that transfers Token Id in value amount from origin to destination
+   * @param {string | Keyringpair} account
+   * @param {string} tokenId
+   * @param {string} address
+   * @param {BN} amount
+   * @param {TxOptions} [txOptions]
+   *
+   * @returns {(MangataGenericEvent|Array)}
    */
-
   public async transferToken(
     account: string | KeyringPair,
     tokenId: string,
@@ -381,9 +469,14 @@ export class Mangata {
   }
 
   /**
-   * Extrinsic that transfers all token id from origin to destination
+   * Extrinsic that transfers all token Id from origin to destination
+   * @param {string | Keyringpair} account
+   * @param {string} tokenId
+   * @param {string} address
+   * @param {TxOptions} [txOptions]
+   *
+   * @returns {(MangataGenericEvent|Array)}
    */
-
   public async transferTokenAll(
     account: string | KeyringPair,
     tokenId: string,
@@ -396,15 +489,20 @@ export class Mangata {
 
   /**
    * Returns total issuance of Token Id
+   * @param {string} tokenId
+   *
+   * @returns {BN}
    */
-
   public async getTotalIssuance(tokenId: string): Promise<BN> {
     const api = await this.getApi()
     return await Query.getTotalIssuance(api, tokenId)
   }
 
   /**
-   * Returns vec of locked tokenId of an specified account Id Address and tokenId
+   * Returns vec of locked token Id of an specified address and tokenId
+   * @param {string} address
+   * @param {string} tokenId
+   *
    */
   public async getLock(address: string, tokenId: string) {
     const api = await this.getApi()
@@ -413,6 +511,10 @@ export class Mangata {
 
   /**
    * Returns token balance for address
+   * @param {string} tokenId
+   * @param {string} address
+   *
+   * @returns {AccountData}
    */
   public async getTokenBalance(tokenId: string, address: string): Promise<AccountData> {
     const api = await this.getApi()
@@ -462,11 +564,19 @@ export class Mangata {
     return bridgedTokensFormatted
   }
 
+  /**
+   * Returns token info
+   * @param {string} tokenId
+   */
   public async getTokenInfo(tokenId: string) {
     const api = await this.getApi()
     return await Query.getTokenInfo(api, tokenId)
   }
 
+  /**
+   * Returns liquditity token Ids
+   * @returns {string | Array}
+   */
   public async getLiquidityTokenIds(): Promise<string[]> {
     const api = await this.getApi()
     return await Query.getLiquidityTokenIds(api)
