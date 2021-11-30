@@ -12,6 +12,7 @@ import { options } from './utils/options'
 import { MangataGenericEvent } from './types/MangataGenericEvent'
 import { TxOptions } from './types/TxOptions'
 import Tx from './services/Tx'
+import { AssetInfo } from './types/AssetInfo'
 
 /**
  * @class Mangata
@@ -38,7 +39,7 @@ export class Mangata {
     if (!this.api) {
       const api = new ApiPromise(
         options({
-          provider: new WsProvider(this.uri, 100),
+          provider: new WsProvider(this.uri),
         })
       )
       await api.isReady
@@ -580,6 +581,11 @@ export class Mangata {
   public async getLiquidityTokenIds(): Promise<string[]> {
     const api = await this.getApi()
     return await Query.getLiquidityTokenIds(api)
+  }
+
+  public async getAllAssetsInfo(): Promise<AssetInfo[]> {
+    const api = await this.getApi()
+    return await Query.getAllAssetsInfo(api)
   }
 
   /**

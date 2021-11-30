@@ -3,7 +3,9 @@ export { MangataHelpers } from './MangataHelpers'
 
 export { MangataEventData } from './types/MangataEventData'
 export { MangataGenericEvent } from './types/MangataGenericEvent'
+export { AssetInfo } from './types/AssetInfo'
 export { TxOptions } from './types/TxOptions'
+export { signTx } from './services/Tx'
 export {
   BN_DIV_NUMERATOR_MULTIPLIER,
   BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS,

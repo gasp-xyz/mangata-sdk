@@ -4,6 +4,7 @@ import { AccountData } from '@polkadot/types/interfaces/balances'
 import { hexToBn } from '@polkadot/util'
 import { Codec } from '@polkadot/types/types'
 import BN from 'bn.js'
+import { AssetInfo } from '../types/AssetInfo'
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : ''
 const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
@@ -129,6 +130,19 @@ class Query {
   static async getLiquidityTokenIds(api: ApiPromise): Promise<string[]> {
     const liquidityTokens = await api.query.xyk.liquidityAssets.entries()
     return liquidityTokens.map((liquidityToken) => liquidityToken[1].toString())
+  }
+
+  static async getAllAssetsInfo(api: ApiPromise): Promise<AssetInfo[]> {
+    const availableAssetsInfo = await api.query.assetsInfo.assetsInfo.entries()
+    const assetsInfo = availableAssetsInfo.map((asset) => {
+      const id = JSON.parse(JSON.stringify(asset[0].toHuman()))[0]
+      const infoToken = JSON.parse(JSON.stringify(asset[1].toHuman()))
+      return {
+        id,
+        infoToken,
+      } as AssetInfo
+    })
+    return assetsInfo
   }
 }
 

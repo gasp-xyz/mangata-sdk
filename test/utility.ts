@@ -17,7 +17,7 @@ export const addAccountCurrencies = async (
   for (let currency = 0; currency < currencyValues.length; currency++) {
     await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
     const nonce = await mangataInstance.getNonce(sudo.address)
-    const result = await mangataInstance.createToken(user.address, sudo, currencyValues[currency], {
+    await mangataInstance.createToken(user.address, sudo, currencyValues[currency], {
       nonce,
       extrinsicStatus: (result) => {
         const eventResult = getEventResultFromTxWait(result, ['tokens', 'Issued', user.address])
