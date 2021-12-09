@@ -19,9 +19,9 @@ import { AssetInfo } from './types/AssetInfo'
  * The Mangata class defines the `getInstance` method that lets clients access the unique singleton instance.
  */
 export class Mangata {
-  private static instance: Mangata
-  private api: ApiPromise | null
+  private api: Promise<ApiPromise> | null
   private uri: string
+  private static instanceMap: Map<string, Mangata> = new Map<string, Mangata>()
 
   /**
    * The Mangata's constructor is private to prevent direct
@@ -35,42 +35,50 @@ export class Mangata {
   /**
    * Initialised via isReady & new with specific provider
    */
-  private async connect(): Promise<ApiPromise> {
-    if (!this.api) {
-      const api = new ApiPromise(
-        options({
-          provider: new WsProvider(this.uri),
-        })
-      )
-      await api.isReady
-      this.api = api
-    }
-
-    return this.api
+  private async connectToNode(uri: string) {
+    const api = await ApiPromise.create(
+      options({
+        provider: new WsProvider(uri),
+      })
+    )
+    return api
   }
 
   /**
    * The static method that controls the access to the Mangata instance.
    */
   public static getInstance(uri: string): Mangata {
-    if (!Mangata.instance) {
-      Mangata.instance = new Mangata(uri)
+    if (!Mangata.instanceMap.has(uri)) {
+      this.instanceMap.set(uri, new Mangata(uri))
+      return this.instanceMap.get(uri)!
+    } else {
+      return this.instanceMap.get(uri)!
     }
-
-    return Mangata.instance
   }
 
   /**
-   * Retrieve the underlying API
+   * Retrieve the underlying api
    */
   public async getApi(): Promise<ApiPromise> {
-    return await this.connect()
+    // Because we assign this.api synchronously, repeated calls to
+    // method() are guaranteed to always reuse the same promise.
+    if (!this.api) {
+      this.api = this.connectToNode(this.uri)
+    }
+
+    return this.api
+  }
+
+  /**
+   * Retrieve the underlying uri
+   */
+  public getUri(): string {
+    return this.uri
   }
 
   /**
    * Retrieve the chain name
    */
-
   public async getChain(): Promise<string> {
     const api = await this.getApi()
     return Rpc.getChain(api)
@@ -79,7 +87,6 @@ export class Mangata {
   /**
    * Retrieve the node name
    */
-
   public async getNodeName(): Promise<string> {
     const api = await this.getApi()
     return Rpc.getNodeName(api)
@@ -88,7 +95,6 @@ export class Mangata {
   /**
    * Retrieve the node version
    */
-
   public async getNodeVersion(): Promise<string> {
     const api = await this.getApi()
     return Rpc.getNodeVersion(api)
@@ -97,7 +103,6 @@ export class Mangata {
   /**
    * Retrieve the current nonce
    */
-
   public async getNonce(address: string): Promise<BN> {
     const api = await this.getApi()
     return Query.getNonce(api, address)
@@ -106,7 +111,6 @@ export class Mangata {
   /**
    * Disconnect
    */
-
   public async disconnect(): Promise<void> {
     const api = await this.getApi()
     api.disconnect()
@@ -380,7 +384,7 @@ export class Mangata {
     boughtTokenId: string,
     buyAmount: BN
   ): Promise<BN> {
-    const api = await this.connect()
+    const api = await this.getApi()
     return await Rpc.calculateBuyPriceId(api, soldTokenId, boughtTokenId, buyAmount)
   }
 
