@@ -32,16 +32,20 @@ export const signTx = async (
         { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
         async (result) => {
           txOptions && txOptions.statusCallback && txOptions.statusCallback(result)
-          // log.info('Transaction status: ', result.status.type)
-          if (result.status.isInBlock) {
-            // log.info('Included at block hash: ', result.status.asInBlock.toHex())
-
+          console.info('Transaction status: ' + result.status.type)
+          if (result.status.isFinalized) {
+            console.info(' Is finalized ')
+            console.info('Included at block hash: ' + result.status.asFinalized.toHex())
+            console.info(' .... ')
             const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
               async (lastHeader) => {
-                if (lastHeader.parentHash.toString() === result.status.asInBlock.toString()) {
+                if (lastHeader.parentHash.toString() === result.status.asFinalized.toString()) {
+                  console.info('im in IF')
                   unsubscribeNewHeads()
-                  const previousBlock = await api.rpc.chain.getBlock(lastHeader.parentHash)
-                  const previousBlockExtrinsics = previousBlock.block.extrinsics
+                  //const previousBlock = await api.rpc.chain.getBlock(lastHeader.parentHash)
+                  //const previousBlockExtrinsics = previousBlock.block.extrinsics
+                  const currentBlock = await api.rpc.chain.getBlock(lastHeader.hash)
+                  const currentBlockExtrinsics = currentBlock.block.extrinsics
                   const currentBlockEvents = await api.query.system.events.at(lastHeader.hash)
 
                   const headerJsonResponse = JSON.parse(lastHeader.toString())
@@ -50,11 +54,33 @@ export const signTx = async (
                     headerJsonResponse['seed']['seed'].substring(2),
                     'hex'
                   )
+                  const countOfExtrinsicsFromThisBlock = headerJsonResponse['count']
+                  const currentBlockInherents = currentBlockExtrinsics
+                    .slice(0, countOfExtrinsicsFromThisBlock)
+                    .filter((tx) => {
+                      return !tx.isSigned
+                    })
+                  const previousBlockExtrinsics = currentBlockExtrinsics.slice(
+                    countOfExtrinsicsFromThisBlock,
+                    currentBlockExtrinsics.length
+                  )
+                  const bothBlocksExtrinsics = currentBlockInherents.concat(previousBlockExtrinsics)
+                  console.info(
+                    'Sufled extrinsics - toHum \n' +
+                      JSON.stringify(bothBlocksExtrinsics.map((x) => x.toHuman()))
+                  )
+                  console.info('Buffer? \n' + buffer.toString())
                   const shuffledExtrinsics = recreateExtrinsicsOrder(
-                    previousBlockExtrinsics,
+                    bothBlocksExtrinsics,
                     Uint8Array.from(buffer)
                   )
-
+                  console.info(
+                    'result Sufled extrinsics - toHum \n' +
+                      JSON.stringify(shuffledExtrinsics.map((x) => x.toHuman()))
+                  )
+                  console.info(
+                    'events - toHum \n' + JSON.stringify(currentBlockEvents.map((x) => x.toHuman()))
+                  )
                   const index = shuffledExtrinsics.findIndex((shuffledExtrinsic) => {
                     return (
                       shuffledExtrinsic?.isSigned &&
@@ -62,11 +88,11 @@ export const signTx = async (
                       shuffledExtrinsic?.nonce.toString() === nonce.toString()
                     )
                   })
-
+                  console.info('index ' + index)
                   if (index < 0) {
                     return
                   }
-
+                  console.info('Sufled CurrBlockEvents \n' + JSON.stringify(currentBlockEvents))
                   const reqEvents: MangataGenericEvent[] = currentBlockEvents
                     .filter((currentBlockEvent) => {
                       return (
@@ -89,20 +115,25 @@ export const signTx = async (
                         phase,
                         section: event.section,
                         method: event.method,
-                        metaDocumentation: event.meta.documentation.toString(),
+                        metaDocumentation: event.meta.docs.toString(),
                         eventData,
                         error: getError(api, event.method, eventData),
                       } as MangataGenericEvent
                     })
 
                   output = output.concat(reqEvents)
+                  console.info('output' + JSON.stringify(output))
+                  resolve(output)
+                  unsub()
+                } else if (lastHeader.hash.toString() === result.status.asFinalized.toString()) {
+                } else {
+                  console.info('Unsubscribed! ')
+                  unsubscribeNewHeads()
+                  reject()
+                  unsub()
                 }
               }
             )
-          } else if (result.status.isFinalized) {
-            txOptions && txOptions.extrinsicStatus && txOptions.extrinsicStatus(output)
-            resolve(output)
-            unsub()
           } else if (result.isError) {
             reject('Transaction error')
             const currentNonce: BN = await Query.getNonce(api, extractedAccount)
@@ -150,7 +181,7 @@ const getError = (
           index: new BN(moduleIdx),
         })
         return {
-          documentation: decode.documentation,
+          documentation: decode.docs,
           name: decode.name,
         }
       } catch (error) {

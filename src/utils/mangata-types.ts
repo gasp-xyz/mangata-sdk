@@ -1,27 +1,27 @@
 import type { RegistryTypes } from '@polkadot/types/types'
 
-const typesOptions : RegistryTypes = {
-    CurrencyId: "u32",
-    CurrencyIdOf: "u32",
-    Address: "MultiAddress",
-    LookupSource: "MultiAddress",
-    TokenId: "u32",
-    ShufflingSeed: {
-      seed: 'H256',
-      proof: 'H512'
-    },
-    Header: {
-      parentHash: "Hash",
-      number: "Compact<BlockNumber>",
-      stateRoot: "Hash",
-      extrinsicsRoot: "Hash",
-      digest: "Digest",
-      seed: "ShufflingSeed",
-      count: "BlockNumber"
-    },
+const typesOptions: RegistryTypes = {
+  CurrencyId: 'u32',
+  CurrencyIdOf: 'u32',
+  Address: 'MultiAddress',
+  LookupSource: 'MultiAddress',
+  TokenId: 'u32',
+  ShufflingSeed: {
+    seed: 'H256',
+    proof: 'H512',
+  },
+  Header: {
+    parentHash: 'Hash',
+    number: 'Compact<BlockNumber>',
+    stateRoot: 'Hash',
+    extrinsicsRoot: 'Hash',
+    digest: 'Digest',
+    seed: 'ShufflingSeed',
+    count: 'BlockNumber',
+  },
 }
 
-const oldTypesOptions: RegistryTypes = {
+const OldtypesOptions: RegistryTypes = {
   CurrencyId: 'u32',
   CurrencyIdOf: 'u32',
   Address: 'AccountId',
