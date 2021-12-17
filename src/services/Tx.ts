@@ -32,7 +32,10 @@ export const signTx = async (
         { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
         async (result) => {
           txOptions && txOptions.statusCallback && txOptions.statusCallback(result)
-          console.info('Transaction status: ' + result.status.type)
+          const blockNumber = await api.query.system.number()
+          console.info(
+            'Transaction status: ' + result.status.type + 'Block_No: ' + blockNumber.toString()
+          )
           if (result.status.isFinalized) {
             console.info(' Is finalized ')
             console.info('Included at block hash: ' + result.status.asFinalized.toHex())
@@ -69,7 +72,6 @@ export const signTx = async (
                     'Sufled extrinsics - toHum \n' +
                       JSON.stringify(bothBlocksExtrinsics.map((x) => x.toHuman()))
                   )
-                  console.info('Buffer? \n' + buffer.toString())
                   const shuffledExtrinsics = recreateExtrinsicsOrder(
                     bothBlocksExtrinsics,
                     Uint8Array.from(buffer)
@@ -309,7 +311,7 @@ class Tx {
     address: string,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    return await signTx(api, api.tx.tokens.transferAll(address, tokenId), account, txOptions)
+    return await signTx(api, api.tx.tokens.transferAll(address, tokenId, true), account, txOptions)
   }
 
   static async createToken(
