@@ -27,7 +27,8 @@ export const signTx = async (
     const nonce = await getTxNonce(api, extractedAccount, txOptions)
 
     try {
-      console.info(`W[${env.JEST_WORKER_ID}]  - ${tx.hash} - submitting Tx`)
+      let tx_id = tx.hash;
+      console.info(`W[${env.JEST_WORKER_ID}]  - ${tx_id} - submitting Tx`)
       const unsub = await tx.signAndSend(
         account,
         { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
@@ -35,24 +36,24 @@ export const signTx = async (
           txOptions && txOptions.statusCallback && txOptions.statusCallback(result)
           const blockNumber = await api.query.system.number()
           console.info(
-            `W[${env.JEST_WORKER_ID}]  - ${tx.hash}` +
+            `W[${env.JEST_WORKER_ID}]  - ${tx_id}` +
               ' Transaction status: ' +
               result.status.type +
               ' Block_No: ' +
               blockNumber.toString()
           )
           if (result.status.isFinalized) {
-            console.info(`W[${env.JEST_WORKER_ID}]  - ${tx.hash}` + ' Is finalized ')
+            console.info(`W[${env.JEST_WORKER_ID}]  - ${tx_id}` + ' Is finalized ')
             console.info(
-              `W[${env.JEST_WORKER_ID}]  - ${tx.hash}` +
+              `W[${env.JEST_WORKER_ID}]  - ${tx_id}` +
                 'Included at block hash: ' +
                 result.status.asFinalized.toHex()
             )
-            console.info(`W[${env.JEST_WORKER_ID}]  - ${tx.hash} ` + ' .... ')
+            console.info(`W[${env.JEST_WORKER_ID}]  - ${tx_id} ` + ' .... ')
             const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
               async (lastHeader) => {
                 if (lastHeader.parentHash.toString() === result.status.asFinalized.toString()) {
-                  console.info(`W[${env.JEST_WORKER_ID}] - ${tx.hash}` + 'im in IF')
+                  console.info(`W[${env.JEST_WORKER_ID}] - ${tx_id}` + 'im in IF')
                   unsubscribeNewHeads()
                   //const previousBlock = await api.rpc.chain.getBlock(lastHeader.parentHash)
                   //const previousBlockExtrinsics = previousBlock.block.extrinsics
@@ -78,7 +79,7 @@ export const signTx = async (
                   )
                   const bothBlocksExtrinsics = currentBlockInherents.concat(previousBlockExtrinsics)
                   console.info(
-                    `W[${env.JEST_WORKER_ID}]  - ${tx.hash} ` +
+                    `W[${env.JEST_WORKER_ID}]  - ${tx_id} ` +
                       'Sufled extrinsics - toHum \n' +
                       JSON.stringify(bothBlocksExtrinsics.map((x) => x.toHuman()))
                   )
@@ -88,12 +89,12 @@ export const signTx = async (
                     Uint8Array.from(buffer)
                   )
                   console.info(
-                    `W[${env.JEST_WORKER_ID}]  - ${tx.hash} ` +
+                    `W[${env.JEST_WORKER_ID}]  - ${tx_id} ` +
                       'result Sufled extrinsics - toHum \n' +
                       JSON.stringify(shuffledExtrinsics.map((x) => x.toHuman()))
                   )
                   console.info(
-                    `W[${env.JEST_WORKER_ID}]  - ${tx.hash} ` +
+                    `W[${env.JEST_WORKER_ID}]  - ${tx_id} ` +
                       'events - toHum \n' +
                       JSON.stringify(currentBlockEvents.map((x) => x.toHuman()))
                   )
@@ -104,12 +105,12 @@ export const signTx = async (
                       shuffledExtrinsic?.nonce.toString() === nonce.toString()
                     )
                   })
-                  console.info(`W[${env.JEST_WORKER_ID}]  - ${tx.hash} ` + 'index ' + index)
+                  console.info(`W[${env.JEST_WORKER_ID}]  - ${tx_id} ` + 'index ' + index)
                   if (index < 0) {
                     return
                   }
                   console.info(
-                    `W[${env.JEST_WORKER_ID}]  - ${tx.hash} ` +
+                    `W[${env.JEST_WORKER_ID}]  - ${tx_id} ` +
                       'Sufled CurrBlockEvents \n' +
                       JSON.stringify(currentBlockEvents)
                   )
@@ -143,13 +144,13 @@ export const signTx = async (
 
                   output = output.concat(reqEvents)
                   console.info(
-                    `W[${env.JEST_WORKER_ID}]  - ${tx.hash} ` + 'output' + JSON.stringify(output)
+                    `W[${env.JEST_WORKER_ID}]  - ${tx_id} ` + 'output' + JSON.stringify(output)
                   )
                   resolve(output)
                   unsub()
                 } else if (lastHeader.hash.toString() === result.status.asFinalized.toString()) {
                 } else {
-                  console.info(`W[${env.JEST_WORKER_ID}]  - ${tx.hash} ` + 'Unsubscribed! ')
+                  console.info(`W[${env.JEST_WORKER_ID}]  - ${tx_id} ` + 'Unsubscribed! ')
                   unsubscribeNewHeads()
                   reject()
                   unsub()
@@ -157,7 +158,7 @@ export const signTx = async (
               }
             )
           } else if (result.isError) {
-            reject(`W[${env.JEST_WORKER_ID}]  - ${tx.hash} ` + 'Transaction error')
+            reject(`W[${env.JEST_WORKER_ID}]  - ${tx_id} ` + 'Transaction error')
             const currentNonce: BN = await Query.getNonce(api, extractedAccount)
             memoryDatabase.setNonce(extractedAccount, currentNonce)
           }
