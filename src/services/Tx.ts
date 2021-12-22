@@ -82,6 +82,7 @@ export const signTx = async (
                       'Sufled extrinsics - toHum \n' +
                       JSON.stringify(bothBlocksExtrinsics.map((x) => x.toHuman()))
                   )
+                  
                   const shuffledExtrinsics = recreateExtrinsicsOrder(
                     bothBlocksExtrinsics,
                     Uint8Array.from(buffer)
