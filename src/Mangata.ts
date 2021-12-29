@@ -33,7 +33,8 @@ export class Mangata {
   }
 
   /**
-   * Initialised via isReady & new with specific provider
+   * Initialised via create method with proper types and rpc
+   * for Mangata
    */
   private async connectToNode(uri: string) {
     const api = await ApiPromise.create(
@@ -57,7 +58,7 @@ export class Mangata {
   }
 
   /**
-   * Retrieve the underlying api
+   * Api instance of the connected node
    */
   public async getApi(): Promise<ApiPromise> {
     // Because we assign this.api synchronously, repeated calls to
@@ -70,14 +71,30 @@ export class Mangata {
   }
 
   /**
-   * Retrieve the underlying uri
+   * Uri of the connected node
    */
   public getUri(): string {
     return this.uri
   }
 
   /**
-   * Retrieve the chain name
+   * Wait for the new block
+   */
+  public async waitNewBlock(): Promise<boolean> {
+    let count = 0
+    const api = await this.getApi()
+    return new Promise(async (resolve) => {
+      const unsubscribe = await api.rpc.chain.subscribeNewHeads(() => {
+        if (++count === 2) {
+          unsubscribe()
+          resolve(true)
+        }
+      })
+    })
+  }
+
+  /**
+   * Chain name of the connected node
    */
   public async getChain(): Promise<string> {
     const api = await this.getApi()
@@ -85,7 +102,7 @@ export class Mangata {
   }
 
   /**
-   * Retrieve the node name
+   * Node name of the connected node
    */
   public async getNodeName(): Promise<string> {
     const api = await this.getApi()
@@ -93,7 +110,7 @@ export class Mangata {
   }
 
   /**
-   * Retrieve the node version
+   * Node version of the connected node
    */
   public async getNodeVersion(): Promise<string> {
     const api = await this.getApi()
@@ -101,7 +118,7 @@ export class Mangata {
   }
 
   /**
-   * Retrieve the current nonce
+   * Get the current nonce of the account
    */
   public async getNonce(address: string): Promise<BN> {
     const api = await this.getApi()
@@ -109,7 +126,7 @@ export class Mangata {
   }
 
   /**
-   * Disconnect
+   * Disconnect from the node
    */
   public async disconnect(): Promise<void> {
     const api = await this.getApi()
@@ -182,8 +199,7 @@ export class Mangata {
 
   /**
    * Extrinsic to add liquidity to pool, while specifying first token id
-   * and second token id and first token amount. Second token amount is calculated in block, but cannot
-   * exceed expected second token amount
+   * and second token id and first token amount. Second token amount is calculated in block, * but cannot exceed expected second token amount
    *
    * @param {string | Keyringpair} account
    * @param {string} firstTokenId
@@ -364,6 +380,12 @@ export class Mangata {
   /**
    * Returns bought asset amount returned by selling sold token id for bought token id in
    * sell amount
+   *
+   * @param {string} soldTokenId
+   * @param {string} boughtTokenId
+   * @param {BN} sellAmount
+   *
+   * @returns {BN}
    */
 
   public async calculateSellPriceId(
@@ -377,6 +399,13 @@ export class Mangata {
 
   /**
    * Returns sell amount you need to pay in sold token id for bought token id in buy amount
+   *
+   * @param {string} soldTokenId
+   * @param {string} boughtTokenId
+   * @param {BN} buyAmount
+   *
+   * @returns {BN}
+   *
    */
 
   public async calculateBuyPriceId(
@@ -443,7 +472,7 @@ export class Mangata {
 
   /**
    * Returns amount of token Id in Treasury Burn
-   * @param {string} token Id
+   * @param {string} tokenId
    *
    * @returns {AccountData}
    */
@@ -534,6 +563,10 @@ export class Mangata {
     return await Query.getNextTokenId(api)
   }
 
+  /*
+   * Returns bridge tokens
+   */
+
   public async getBridgeTokens(): Promise<
     {
       assetId: string
@@ -586,6 +619,10 @@ export class Mangata {
     const api = await this.getApi()
     return await Query.getLiquidityTokenIds(api)
   }
+
+  /**
+   * Returns info about all assets
+   */
 
   public async getAllAssetsInfo(): Promise<AssetInfo[]> {
     const api = await this.getApi()
