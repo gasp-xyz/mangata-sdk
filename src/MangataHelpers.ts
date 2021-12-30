@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { ApiPromise, WsProvider, Keyring } from '@polkadot/api'
+import { WsProvider, Keyring } from '@polkadot/api'
 import { KeypairType } from '@polkadot/util-crypto/types'
 import { KeyringPair } from '@polkadot/keyring/types'
 import type { DefinitionRpc, DefinitionRpcSub, RegistryTypes } from '@polkadot/types/types'
@@ -32,18 +32,6 @@ export class MangataHelpers {
 
   public static getMangataTypes(): RegistryTypes {
     return typesOptions
-  }
-
-  public static async waitNewBlock(api: ApiPromise): Promise<boolean> {
-    let count = 0
-    return new Promise(async (resolve) => {
-      const unsubscribe = await api.rpc.chain.subscribeNewHeads((lastHeader) => {
-        if (++count === 2) {
-          unsubscribe()
-          resolve(true)
-        }
-      })
-    })
   }
 
   public static createKeyring(type: KeypairType): Keyring {

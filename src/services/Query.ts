@@ -13,7 +13,7 @@ const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
 
 class Query {
   static async getNonce(api: ApiPromise, address: string): Promise<BN> {
-    const { nonce } = await api.query.system.account(address)
+    const nonce = await api.rpc.system.accountNextIndex(address)
     return nonce.toBn()
   }
 
