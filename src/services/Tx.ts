@@ -27,7 +27,7 @@ export const signTx = async (
     const nonce = await getTxNonce(api, extractedAccount, txOptions)
 
     try {
-      let tx_id = tx.hash;
+      const tx_id = tx.hash
       console.info(`W[${env.JEST_WORKER_ID}]  - ${tx_id} - submitting Tx`)
       const unsub = await tx.signAndSend(
         account,
@@ -83,7 +83,6 @@ export const signTx = async (
                       'Sufled extrinsics - toHum \n' +
                       JSON.stringify(bothBlocksExtrinsics.map((x) => x.toHuman()))
                   )
-                  
                   const shuffledExtrinsics = recreateExtrinsicsOrder(
                     bothBlocksExtrinsics,
                     Uint8Array.from(buffer)
