@@ -7,7 +7,6 @@ import BN from 'bn.js'
 import recreateExtrinsicsOrder from '../utils/recreateExtrinsicsOrder'
 import memoryDatabase from '../utils/MemoryDatabase'
 import Query from './Query'
-import { env } from 'process'
 import { getTxNonce } from '../utils/nonce.tracker'
 
 import { TxOptions } from '../types/TxOptions'
@@ -28,7 +27,7 @@ export const signTx = async (
 
     try {
       const tx_id = tx.hash
-      console.info(`W[${env.JEST_WORKER_ID}]  - ${tx_id} - submitting Tx`)
+      console.info(`W[${process.env.JEST_WORKER_ID}]  - ${tx_id} - submitting Tx`)
       const unsub = await tx.signAndSend(
         account,
         { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
@@ -36,31 +35,30 @@ export const signTx = async (
           txOptions && txOptions.statusCallback && txOptions.statusCallback(result)
           const blockNumber = await api.query.system.number()
           console.info(
-            `W[${env.JEST_WORKER_ID}]  - ${tx_id}` +
+            `W[${process.env.JEST_WORKER_ID}]  - ${tx_id}` +
               ' Transaction status: ' +
               result.status.type +
               ' Block_No: ' +
               blockNumber.toString()
           )
           if (result.status.isFinalized) {
-            console.info(`W[${env.JEST_WORKER_ID}]  - ${tx_id}` + ' Is finalized ')
+            console.info(`W[${process.env.JEST_WORKER_ID}]  - ${tx_id}` + ' Is finalized ')
             console.info(
-              `W[${env.JEST_WORKER_ID}]  - ${tx_id}` +
+              `W[${process.env.JEST_WORKER_ID}]  - ${tx_id}` +
                 'Included at block hash: ' +
                 result.status.asFinalized.toHex()
             )
-            console.info(`W[${env.JEST_WORKER_ID}]  - ${tx_id} ` + ' .... ')
+            console.info(`W[${process.env.JEST_WORKER_ID}]  - ${tx_id} ` + ' .... ')
             const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
               async (lastHeader) => {
                 if (lastHeader.parentHash.toString() === result.status.asFinalized.toString()) {
-                  console.info(`W[${env.JEST_WORKER_ID}] - ${tx_id}` + 'im in IF')
+                  console.info(`W[${process.env.JEST_WORKER_ID}] - ${tx_id}` + 'im in IF')
                   unsubscribeNewHeads()
                   //const previousBlock = await api.rpc.chain.getBlock(lastHeader.parentHash)
                   //const previousBlockExtrinsics = previousBlock.block.extrinsics
                   const currentBlock = await api.rpc.chain.getBlock(lastHeader.hash)
                   const currentBlockExtrinsics = currentBlock.block.extrinsics
                   const currentBlockEvents = await api.query.system.events.at(lastHeader.hash)
-
                   const headerJsonResponse = JSON.parse(lastHeader.toString())
 
                   const buffer: Buffer = Buffer.from(
@@ -79,7 +77,7 @@ export const signTx = async (
                   )
                   const bothBlocksExtrinsics = currentBlockInherents.concat(previousBlockExtrinsics)
                   console.info(
-                    `W[${env.JEST_WORKER_ID}]  - ${tx_id} ` +
+                    `W[${process.env.JEST_WORKER_ID}]  - ${tx_id} ` +
                       'Sufled extrinsics - toHum \n' +
                       JSON.stringify(bothBlocksExtrinsics.map((x) => x.toHuman()))
                   )
@@ -88,12 +86,12 @@ export const signTx = async (
                     Uint8Array.from(buffer)
                   )
                   console.info(
-                    `W[${env.JEST_WORKER_ID}]  - ${tx_id} ` +
+                    `W[${process.env.JEST_WORKER_ID}]  - ${tx_id} ` +
                       'result Sufled extrinsics - toHum \n' +
                       JSON.stringify(shuffledExtrinsics.map((x) => x.toHuman()))
                   )
                   console.info(
-                    `W[${env.JEST_WORKER_ID}]  - ${tx_id} ` +
+                    `W[${process.env.JEST_WORKER_ID}]  - ${tx_id} ` +
                       'events - toHum \n' +
                       JSON.stringify(currentBlockEvents.map((x) => x.toHuman()))
                   )
@@ -104,12 +102,12 @@ export const signTx = async (
                       shuffledExtrinsic?.nonce.toString() === nonce.toString()
                     )
                   })
-                  console.info(`W[${env.JEST_WORKER_ID}]  - ${tx_id} ` + 'index ' + index)
+                  console.info(`W[${process.env.JEST_WORKER_ID}]  - ${tx_id} ` + 'index ' + index)
                   if (index < 0) {
                     return
                   }
                   console.info(
-                    `W[${env.JEST_WORKER_ID}]  - ${tx_id} ` +
+                    `W[${process.env.JEST_WORKER_ID}]  - ${tx_id} ` +
                       'Sufled CurrBlockEvents \n' +
                       JSON.stringify(currentBlockEvents)
                   )
@@ -143,13 +141,15 @@ export const signTx = async (
 
                   output = output.concat(reqEvents)
                   console.info(
-                    `W[${env.JEST_WORKER_ID}]  - ${tx_id} ` + 'output' + JSON.stringify(output)
+                    `W[${process.env.JEST_WORKER_ID}]  - ${tx_id} ` +
+                      'output' +
+                      JSON.stringify(output)
                   )
                   resolve(output)
                   unsub()
                 } else if (lastHeader.hash.toString() === result.status.asFinalized.toString()) {
                 } else {
-                  console.info(`W[${env.JEST_WORKER_ID}]  - ${tx_id} ` + 'Unsubscribed! ')
+                  console.info(`W[${process.env.JEST_WORKER_ID}]  - ${tx_id} ` + 'Unsubscribed! ')
                   unsubscribeNewHeads()
                   reject()
                   unsub()
@@ -157,7 +157,7 @@ export const signTx = async (
               }
             )
           } else if (result.isError) {
-            reject(`W[${env.JEST_WORKER_ID}]  - ${tx_id} ` + 'Transaction error')
+            reject(`W[${process.env.JEST_WORKER_ID}]  - ${tx_id} ` + 'Transaction error')
             const currentNonce: BN = await Query.getNonce(api, extractedAccount)
             memoryDatabase.setNonce(extractedAccount, currentNonce)
           }
