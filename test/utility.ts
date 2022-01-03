@@ -15,7 +15,7 @@ export const addAccountCurrencies = async (
 ): Promise<BN[]> => {
   const currencies: BN[] = []
   for (let currency = 0; currency < currencyValues.length; currency++) {
-    await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
+    await mangataInstance.waitNewBlock()
     const nonce = await mangataInstance.getNonce(sudo.address)
     await mangataInstance.createToken(user.address, sudo, currencyValues[currency], {
       nonce,
@@ -27,7 +27,7 @@ export const addAccountCurrencies = async (
       },
     })
   }
-  await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
+  await mangataInstance.waitNewBlock()
   return currencies
 }
 
@@ -79,7 +79,7 @@ export const addMGAToken = async (
   freeAmount: BN = new BN(10).pow(new BN(11))
 ): Promise<void> => {
   const sudoNonce = await mangataInstance.getNonce(sudoUser.address)
-  await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
+  await mangataInstance.waitNewBlock()
   await mangataInstance.mintAsset(sudoUser, '0', user.address, new BN(freeAmount), {
     nonce: sudoNonce,
   })
