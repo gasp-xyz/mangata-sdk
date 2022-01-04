@@ -1,6 +1,6 @@
 import { Mangata } from '../src'
 
-describe('Test for for instances', () => {
+describe('Instance', () => {
   it('should get different instances for different uri', async () => {
     const developMangata = Mangata.getInstance('develop')
     const productionMangata = Mangata.getInstance('production')
