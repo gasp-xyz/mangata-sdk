@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { mangataInstance } from './mangataInstanceCreation'
 
-describe('test chain name, node version and node name', () => {
+describe('Chain, Node and Version', () => {
   it('should retrive chain name when calling getChain method', async () => {
     const chain = await mangataInstance.getChain()
     expect(chain).toEqual('Development')

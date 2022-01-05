@@ -37,9 +37,10 @@ export class Mangata {
    * for Mangata
    */
   private async connectToNode(uri: string) {
+    const provider = new WsProvider(uri)
     const api = await ApiPromise.create(
       options({
-        provider: new WsProvider(uri),
+        provider,
       })
     )
     return api

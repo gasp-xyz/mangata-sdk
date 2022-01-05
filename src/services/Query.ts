@@ -41,12 +41,12 @@ class Query {
 
   static async getLiquidityPool(api: ApiPromise, liquidityAssetId: string): Promise<BN[]> {
     const liquidityPool = await api.query.xyk.liquidityPools(liquidityAssetId)
-    const poolAssetIds = liquidityPool.toHuman() as Number[]
+    const poolAssetIds = JSON.parse(JSON.stringify(liquidityPool))
     if (!poolAssetIds) {
       return [new BN(-1), new BN(-1)]
     }
 
-    return poolAssetIds.map((num) => new BN(num.toString()))
+    return poolAssetIds.map((num: any) => new BN(num.toString()))
   }
 
   static async getTreasury(api: ApiPromise, tokenId: string): Promise<AccountData> {
