@@ -17,15 +17,21 @@ export const addAccountCurrencies = async (
   for (let currency = 0; currency < currencyValues.length; currency++) {
     await mangataInstance.waitNewBlock()
     const nonce = await mangataInstance.getNonce(sudo.address)
-    await mangataInstance.createToken(user.address, sudo, currencyValues[currency], {
-      nonce,
-      extrinsicStatus: (result) => {
-        const eventResult = getEventResultFromTxWait(result, ['tokens', 'Issued', user.address])
+    await mangataInstance
+      .createToken(user.address, sudo, currencyValues[currency], {
+        nonce,
+        extrinsicStatus: (result) => {
+          const eventResult = getEventResultFromTxWait(result, ['tokens', 'Issued', user.address])
 
+          const currencyId = new BN(eventResult.data[0]['data'])
+          currencies.push(currencyId)
+        },
+      })
+      .then((result) => {
+        const eventResult = getEventResultFromTxWait(result, ['tokens', 'Issued', user.address])
         const currencyId = new BN(eventResult.data[0]['data'])
         currencies.push(currencyId)
-      },
-    })
+      })
   }
   await mangataInstance.waitNewBlock()
   return currencies
@@ -76,7 +82,7 @@ export const addMGAToken = async (
   mangataInstance: Mangata,
   sudoUser: KeyringPair,
   user: KeyringPair,
-  freeAmount: BN = new BN(10).pow(new BN(11))
+  freeAmount: BN = new BN(10).pow(new BN(18))
 ): Promise<void> => {
   const sudoNonce = await mangataInstance.getNonce(sudoUser.address)
   await mangataInstance.waitNewBlock()

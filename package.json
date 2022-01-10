@@ -7,7 +7,7 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "test": "jest",
+    "test": "jest --runInBand --detectOpenHandles --verbose",
     "build": "tsc -p tsconfig.json",
     "start": "yarn build && node ./build/index.js",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
