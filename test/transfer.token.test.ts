@@ -14,12 +14,12 @@ let firstCurrency: string
 let secondCurrency: string
 
 beforeEach(async () => {
-  await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
+  await mangataInstance.waitNewBlock()
   const keyring = MangataHelpers.createKeyring('sr25519')
   testUser = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring)
   testUser1 = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring)
   sudoUser = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring, SUDO_USER_NAME)
-  await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
+  await mangataInstance.waitNewBlock()
   const currencies = await addAccountCurrencies(mangataInstance, testUser, sudoUser, [
     new BN(500000),
     new BN(500000).add(new BN(1)),
@@ -27,7 +27,7 @@ beforeEach(async () => {
   firstCurrency = currencies[0].toString()
   secondCurrency = currencies[1].toString()
   await addMGAToken(mangataInstance, sudoUser, testUser)
-  await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
+  await mangataInstance.waitNewBlock()
 })
 
 describe('Testing additional methods', () => {
@@ -76,7 +76,7 @@ it('should get next token id', async () => {
     secondCurrency,
     new BN(25000)
   )
-  await MangataHelpers.waitNewBlock(await mangataInstance.getApi())
+  await mangataInstance.waitNewBlock()
   const liquidityAssetId = await mangataInstance.getLiquidityAssetId(firstCurrency, secondCurrency)
   expect(liquidityAssetId.toNumber()).toBeGreaterThanOrEqual(0)
 })

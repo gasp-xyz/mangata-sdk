@@ -2,7 +2,7 @@
 import BN from 'bn.js'
 import { mangataInstance } from './mangataInstanceCreation'
 
-describe('Test for calculating buy and sell price', () => {
+describe('Calculate Price', () => {
   it('should calculate buy price', async () => {
     const buyPrice = await mangataInstance.calculateBuyPrice(
       new BN(50000),
