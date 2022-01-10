@@ -1,11 +1,13 @@
 {
   "name": "mangata-sdk",
-  "version": "0.10.1",
+
+  "version": "0.12.0",
+
   "description": "SDK for communication with Mangata node",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "test": "jest",
+    "test": "jest --runInBand --detectOpenHandles --verbose",
     "build": "tsc -p tsconfig.json",
     "start": "yarn build && node ./build/index.js",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
@@ -56,7 +58,7 @@
     "typescript": "^4.5.2"
   },
   "dependencies": {
-    "@polkadot/api": "^2.10.1",
+    "@polkadot/api": "^6.5.3",
     "big.js": "^6.1.1",
     "bn.js": "^5.2.0",
     "mangata-prng-xoshiro": "^1.2.0",

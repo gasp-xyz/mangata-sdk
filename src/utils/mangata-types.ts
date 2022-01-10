@@ -3,9 +3,9 @@ import type { RegistryTypes } from '@polkadot/types/types'
 const typesOptions: RegistryTypes = {
   CurrencyId: 'u32',
   CurrencyIdOf: 'u32',
-  Address: 'AccountId',
+  Address: 'MultiAddress',
   Balance: 'u128',
-  LookupSource: 'AccountId',
+  LookupSource: 'MultiAddress',
   AssetInfo: {
     name: 'Option<Vec<u8>>',
     symbol: 'Option<Vec<u8>>',
@@ -100,6 +100,7 @@ const typesOptions: RegistryTypes = {
     extrinsicsRoot: 'Hash',
     digest: 'Digest',
     seed: 'ShufflingSeed',
+    count: 'BlockNumber',
   },
   TxnRegistryDetails: {
     doubly_encrypted_call: 'Vec<u8>',

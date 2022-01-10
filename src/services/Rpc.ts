@@ -52,7 +52,8 @@ class Rpc {
     amount: BN
   ) {
     const result = await (api.rpc as any).xyk.get_burn_amount(firstTokenId, secondTokenId, amount)
-    return result.toHuman()
+    const resultAsJson = JSON.parse(result.toString())
+    return resultAsJson
   }
 
   static async calculateSellPriceId(

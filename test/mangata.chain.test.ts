@@ -4,17 +4,17 @@ import { mangataInstance } from './mangataInstanceCreation'
 describe('Chain, Node and Version', () => {
   it('should retrive chain name when calling getChain method', async () => {
     const chain = await mangataInstance.getChain()
-    expect(chain).toEqual('Development')
+    expect(chain).toEqual('Local Testnet')
   })
 
   it('should match version 0.4.0 node version when calling getNodeVersion method', async () => {
-    const version = '0.4.0'
+    const version = '0.1.0-unknown-x86_64-linux-gnu'
     const nodeVersion = await mangataInstance.getNodeVersion()
     expect(nodeVersion).toMatch(new RegExp(`^${version}?`))
   })
 
   it('should match name when calling getNodeName method', async () => {
-    const name = 'Substrate'
+    const name = 'Mangata'
     const nodeName = await mangataInstance.getNodeName()
     expect(nodeName).toMatch(new RegExp(`^${name}?`))
   })
