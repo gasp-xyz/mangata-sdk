@@ -12,7 +12,7 @@ import { options } from './utils/options'
 import { MangataGenericEvent } from './types/MangataGenericEvent'
 import { TxOptions } from './types/TxOptions'
 import Tx from './services/Tx'
-import { AssetInfo } from './types/AssetInfo'
+import { TAsset, TAssetInfo, TBalance } from './types/AssetInfo'
 
 /**
  * @class Mangata
@@ -612,6 +612,31 @@ export class Mangata {
     return await Query.getTokenInfo(api, tokenId)
   }
 
+  public async getBlockNumber(): Promise<string> {
+    const api = await this.getApi()
+    return await Query.getBlockNumber(api)
+  }
+
+  public async getOwnedTokens(address: string): Promise<TAsset[] | null> {
+    const api = await this.getApi()
+    const ownedTokens = await Query.getOwnedTokens(api, address)
+
+    if (!ownedTokens) {
+      return null
+    }
+
+    const ownedTokensFormatted: TAsset[] = []
+
+    for (const item of ownedTokens) {
+      // `item` is a Promise, therefore we await it
+      const ownedToken = await item
+
+      ownedTokensFormatted.push(ownedToken)
+    }
+
+    return ownedTokensFormatted
+  }
+
   /**
    * Returns liquditity token Ids
    * @returns {string | Array}
@@ -625,9 +650,25 @@ export class Mangata {
    * Returns info about all assets
    */
 
-  public async getAllAssetsInfo(): Promise<AssetInfo[]> {
+  public async getAssetsInfo(): Promise<TAssetInfo[]> {
     const api = await this.getApi()
-    return await Query.getAllAssetsInfo(api)
+    const allAssets = await Query.getAssetsInfo(api)
+
+    const allAssetsFormatted: TAssetInfo[] = []
+
+    for (const item of allAssets) {
+      // `item` is a Promise, therefore we await it
+      const asset = await item
+
+      allAssetsFormatted.push(asset)
+    }
+
+    return allAssetsFormatted
+  }
+
+  public async getBalances(): Promise<TBalance> {
+    const api = await this.getApi()
+    return await Query.getBalances(api)
   }
 
   /**

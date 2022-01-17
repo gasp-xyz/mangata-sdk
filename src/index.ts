@@ -3,7 +3,7 @@ export { MangataHelpers } from './MangataHelpers'
 
 export { MangataEventData } from './types/MangataEventData'
 export { MangataGenericEvent } from './types/MangataGenericEvent'
-export { AssetInfo } from './types/AssetInfo'
+export { TAssetInfo, TAsset, TBalance } from './types/AssetInfo'
 export { TxOptions } from './types/TxOptions'
 export { signTx } from './services/Tx'
 export {

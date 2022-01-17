@@ -4,7 +4,7 @@ import { AccountData } from '@polkadot/types/interfaces/balances'
 import { hexToBn } from '@polkadot/util'
 import { Codec } from '@polkadot/types/types'
 import BN from 'bn.js'
-import { AssetInfo } from '../types/AssetInfo'
+import { TAsset, TAssetInfo, TAssetMainInfo, TBalance } from '../types/AssetInfo'
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : ''
 const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
@@ -13,7 +13,7 @@ const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
 
 class Query {
   static async getNonce(api: ApiPromise, address: string): Promise<BN> {
-    const nonce = await api.rpc.system.accountNextIndex(address)
+    const { nonce } = await api.query.system.account(address)
     return nonce.toBn()
   }
 
@@ -132,17 +132,83 @@ class Query {
     return liquidityTokens.map((liquidityToken) => liquidityToken[1].toString())
   }
 
-  static async getAllAssetsInfo(api: ApiPromise): Promise<AssetInfo[]> {
-    const availableAssetsInfo = await api.query.assetsInfo.assetsInfo.entries()
-    const assetsInfo = availableAssetsInfo.map((asset) => {
-      const id = JSON.parse(JSON.stringify(asset[0].toHuman()))[0]
-      const infoToken = JSON.parse(JSON.stringify(asset[1].toHuman()))
+  static async getAssetsInfo(api: ApiPromise): Promise<Promise<TAssetInfo>[]> {
+    const result = await api.query.assetsInfo.assetsInfo.entries()
+
+    return result.map(async ([key, exposure]) => {
+      const exposureFormatted = exposure.toHuman() as TAssetMainInfo
+
       return {
-        id,
-        infoToken,
-      } as AssetInfo
+        id: (key.toHuman() as string[])[0].replace(/[, ]/g, ''),
+        name: exposureFormatted.symbol.includes('TKN')
+          ? 'Liquidity Pool Token'
+          : exposureFormatted.name,
+        symbol: exposureFormatted.symbol.includes('TKN')
+          ? exposureFormatted.symbol
+              .split('-')
+              .map((item) => item.replace('TKN', ''))
+              .map((tokenId) => (tokenId.startsWith('0x') ? hexToBn(tokenId).toString() : tokenId))
+              .join('-')
+          : exposureFormatted.symbol,
+        decimals: Number(exposureFormatted.decimals),
+        description: exposureFormatted.description,
+      }
     })
-    return assetsInfo
+  }
+
+  static async getBlockNumber(api: ApiPromise): Promise<string> {
+    const block = await api.rpc.chain.getBlock()
+    return block.block.header.number.toString()
+  }
+
+  static async getOwnedTokens(api: ApiPromise, address: string): Promise<Promise<TAsset>[] | null> {
+    if (!address) {
+      return null
+    }
+
+    const ownedAssets = await api.query.tokens.accounts.entries(address)
+
+    return ownedAssets.map(async ([key, exposure]) => {
+      const tokenId = (key.toHuman() as string[])[1].replace(/[, ]/g, '')
+      const tokenInfo = await api.query.assetsInfo.assetsInfo(tokenId)
+      const balance = JSON.parse(JSON.stringify(exposure)).free
+
+      const tokenInfoFormatted = tokenInfo.toHuman() as TAssetMainInfo
+
+      return {
+        id: tokenId,
+        name: tokenInfoFormatted.symbol.includes('TKN')
+          ? 'Liquidity Pool Token'
+          : tokenInfoFormatted.name,
+        symbol: tokenInfoFormatted.symbol.includes('TKN')
+          ? tokenInfoFormatted.symbol
+              .split('-')
+              .map((item) => item.replace('TKN', ''))
+              .map((tokenId) => (tokenId.startsWith('0x') ? hexToBn(tokenId).toString() : tokenId))
+              .join('-')
+          : tokenInfoFormatted.symbol,
+        decimals: Number(tokenInfoFormatted.decimals),
+        description: tokenInfoFormatted.description,
+        balance: new BN(BigInt(balance).toString()),
+      }
+    })
+  }
+
+  static async getBalances(api: ApiPromise): Promise<TBalance> {
+    const balances = await api.query.tokens.totalIssuance.entries()
+    let map = new Map<string, BN>()
+    balances.forEach(([key, exposure]) => {
+      const id = (key.toHuman() as string[])[0].replace(/[, ]/g, '')
+      const balance = new BN(exposure.toString())
+      map.set(id, balance)
+    })
+
+    const result = Array.from(map).reduce((obj, [key, value]) => {
+      obj[key] = value
+      return obj
+    }, {} as { [id: string]: BN })
+
+    return result
   }
 }
 

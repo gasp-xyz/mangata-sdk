@@ -31,38 +31,26 @@ export const signTx = async (
         { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
         async (result) => {
           txOptions && txOptions.statusCallback && txOptions.statusCallback(result)
-          const blockNumber = await api.query.system.number()
-          if (result.status.isFinalized) {
+          if (result.status.isInBlock) {
             const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
               async (lastHeader) => {
-                if (lastHeader.parentHash.toString() === result.status.asFinalized.toString()) {
+                if (lastHeader.parentHash.toString() === result.status.asInBlock.toString()) {
                   unsubscribeNewHeads()
-                  //const previousBlock = await api.rpc.chain.getBlock(lastHeader.parentHash)
-                  //const previousBlockExtrinsics = previousBlock.block.extrinsics
-                  const currentBlock = await api.rpc.chain.getBlock(lastHeader.hash)
-                  const currentBlockExtrinsics = currentBlock.block.extrinsics
+                  const previousBlock = await api.rpc.chain.getBlock(lastHeader.parentHash)
+                  const previousBlockExtrinsics = previousBlock.block.extrinsics
                   const currentBlockEvents = await api.query.system.events.at(lastHeader.hash)
+
                   const headerJsonResponse = JSON.parse(lastHeader.toString())
 
                   const buffer: Buffer = Buffer.from(
                     headerJsonResponse['seed']['seed'].substring(2),
                     'hex'
                   )
-                  const countOfExtrinsicsFromThisBlock = headerJsonResponse['count']
-                  const currentBlockInherents = currentBlockExtrinsics
-                    .slice(0, countOfExtrinsicsFromThisBlock)
-                    .filter((tx) => {
-                      return !tx.isSigned
-                    })
-                  const previousBlockExtrinsics = currentBlockExtrinsics.slice(
-                    countOfExtrinsicsFromThisBlock,
-                    currentBlockExtrinsics.length
-                  )
-                  const bothBlocksExtrinsics = currentBlockInherents.concat(previousBlockExtrinsics)
                   const shuffledExtrinsics = recreateExtrinsicsOrder(
-                    bothBlocksExtrinsics,
+                    previousBlockExtrinsics,
                     Uint8Array.from(buffer)
                   )
+
                   const index = shuffledExtrinsics.findIndex((shuffledExtrinsic) => {
                     return (
                       shuffledExtrinsic?.isSigned &&
@@ -70,9 +58,11 @@ export const signTx = async (
                       shuffledExtrinsic?.nonce.toString() === nonce.toString()
                     )
                   })
+
                   if (index < 0) {
                     return
                   }
+
                   const reqEvents: MangataGenericEvent[] = currentBlockEvents
                     .filter((currentBlockEvent) => {
                       return (
@@ -95,25 +85,22 @@ export const signTx = async (
                         phase,
                         section: event.section,
                         method: event.method,
-                        metaDocumentation: event.meta.docs.toString(),
+                        metaDocumentation: event.meta.documentation.toString(),
                         eventData,
                         error: getError(api, event.method, eventData),
                       } as MangataGenericEvent
                     })
 
                   output = output.concat(reqEvents)
-                  resolve(output)
-                  unsub()
-                } else if (lastHeader.hash.toString() === result.status.asFinalized.toString()) {
-                } else {
-                  unsubscribeNewHeads()
-                  reject()
-                  unsub()
                 }
               }
             )
+          } else if (result.status.isFinalized) {
+            txOptions && txOptions.extrinsicStatus && txOptions.extrinsicStatus(output)
+            resolve(output)
+            unsub()
           } else if (result.isError) {
-            reject(`W[${process.env.JEST_WORKER_ID}]  - ${tx.hash} ` + 'Transaction error')
+            reject('Transaction error')
             const currentNonce: BN = await Query.getNonce(api, extractedAccount)
             memoryDatabase.setNonce(extractedAccount, currentNonce)
           }
@@ -159,7 +146,7 @@ const getError = (
           index: new BN(moduleIdx),
         })
         return {
-          documentation: decode.docs,
+          documentation: decode.documentation,
           name: decode.name,
         }
       } catch (error) {
@@ -287,7 +274,7 @@ class Tx {
     address: string,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    return await signTx(api, api.tx.tokens.transferAll(address, tokenId, true), account, txOptions)
+    return await signTx(api, api.tx.tokens.transferAll(address, tokenId), account, txOptions)
   }
 
   static async createToken(
