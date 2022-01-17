@@ -4,7 +4,7 @@ import { AccountData } from '@polkadot/types/interfaces/balances'
 import { hexToBn } from '@polkadot/util'
 import { Codec } from '@polkadot/types/types'
 import BN from 'bn.js'
-import { TAsset, TAssetInfo, TAssetMainInfo, TBalance } from '../types/AssetInfo'
+import { TAsset, TAssetInfo, TAssetMainInfo, TBalances } from '../types/AssetInfo'
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : ''
 const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
@@ -87,40 +87,62 @@ class Query {
     return new BN(nextTokenId.toString())
   }
 
-  static async getBridgedTokens(api: ApiPromise): Promise<
-    Promise<{
-      assetId: string
-      info: {
-        name: string
-        symbol: string
-        decimals: number
-        description: string
-      }
-      ethereumAddress: string
-    }>[]
-  > {
-    const bridgedAssets = await api.query.bridgedAsset.bridgedAsset.entries<'Vec<u8>'>()
-    return bridgedAssets.map(async (bridgedAsset) => {
-      const tokenId = bridgedAsset[0].args[0].toString()
-      const info = await api.query.assetsInfo.assetsInfo(tokenId)
-      const infoHuman = info.toHuman() as {
-        name: string
-        symbol: string
-        decimals: string
-        description: string
-      }
-      const ethAddress = bridgedAsset[1].toString()
-      return {
-        assetId: tokenId,
-        info: {
-          name: infoHuman.name,
-          symbol: infoHuman.symbol,
-          decimals: Number(infoHuman.decimals),
-          description: infoHuman.description,
-        },
-        ethereumAddress: ethAddress,
-      }
+  static async getBridgeAddresses(api: ApiPromise) {
+    const bridgedAssets = await api.query.bridgedAsset.bridgedAsset.entries()
+    let map = new Map<string, string>()
+    bridgedAssets.map(([key, exposure]) => {
+      const id = (key.toHuman() as string[])[0].replace(/[, ]/g, '')
+      const address = exposure.toString()
+      map.set(address, id)
     })
+
+    const result = Array.from(map).reduce((obj, [key, value]) => {
+      obj[key] = value
+      return obj
+    }, {} as { [address: string]: string })
+
+    return result
+  }
+
+  static async getBridgeIds(api: ApiPromise) {
+    const bridgedAssets = await api.query.bridgedAsset.bridgedAsset.entries()
+    let map = new Map<string, string>()
+    bridgedAssets.map(([key, exposure]) => {
+      const id = (key.toHuman() as string[])[0].replace(/[, ]/g, '')
+      const address = exposure.toString()
+      map.set(id, address)
+    })
+
+    const result = Array.from(map).reduce((obj, [key, value]) => {
+      obj[key] = value
+      return obj
+    }, {} as { [id: string]: string })
+
+    return result
+  }
+
+  static async getBridgedTokens(api: ApiPromise) {
+    const assetsInfo = await this.getAssetsInfo(api)
+
+    const bridgedAssets = await this.getBridgeIds(api)
+
+    const bridgedAssetsFormatted = Object.values(assetsInfo)
+      .filter((item: TAssetInfo) => bridgedAssets[item.id])
+      .map((item: TAssetInfo) => {
+        return {
+          ...item,
+          description: bridgedAssets[item.id],
+        }
+      })
+
+    let map = new Map<string, TAssetInfo>()
+    bridgedAssetsFormatted.forEach((asset: TAssetInfo) => map.set(asset.id, asset))
+    const result = Array.from(map).reduce((obj, [key, value]) => {
+      obj[key] = value
+      return obj
+    }, {} as { [id: string]: TAssetInfo })
+
+    return result
   }
 
   static async getTokenInfo(api: ApiPromise, tokenId: string): Promise<Codec> {
@@ -132,10 +154,10 @@ class Query {
     return liquidityTokens.map((liquidityToken) => liquidityToken[1].toString())
   }
 
-  static async getAssetsInfo(api: ApiPromise): Promise<Promise<TAssetInfo>[]> {
-    const result = await api.query.assetsInfo.assetsInfo.entries()
+  static async getAssetsInfo(api: ApiPromise) {
+    const assetsInfoResponse = await api.query.assetsInfo.assetsInfo.entries()
 
-    return result.map(async ([key, exposure]) => {
+    const assets = assetsInfoResponse.map(([key, exposure]) => {
       const exposureFormatted = exposure.toHuman() as TAssetMainInfo
 
       return {
@@ -154,6 +176,16 @@ class Query {
         description: exposureFormatted.description,
       }
     })
+
+    let map = new Map<string, TAssetInfo>()
+    assets.forEach((asset: TAssetInfo) => map.set(asset.id, asset))
+
+    const result = Array.from(map).reduce((obj, [key, value]) => {
+      obj[key] = value
+      return obj
+    }, {} as { [id: string]: TAssetInfo })
+
+    return result
   }
 
   static async getBlockNumber(api: ApiPromise): Promise<string> {
@@ -161,40 +193,48 @@ class Query {
     return block.block.header.number.toString()
   }
 
-  static async getOwnedTokens(api: ApiPromise, address: string): Promise<Promise<TAsset>[] | null> {
+  static async getOwnedTokens(api: ApiPromise, address: string) {
     if (!address) {
       return null
     }
 
-    const ownedAssets = await api.query.tokens.accounts.entries(address)
+    const bridgeIds = await this.getBridgeIds(api)
 
-    return ownedAssets.map(async ([key, exposure]) => {
-      const tokenId = (key.toHuman() as string[])[1].replace(/[, ]/g, '')
-      const tokenInfo = await api.query.assetsInfo.assetsInfo(tokenId)
-      const balance = JSON.parse(JSON.stringify(exposure)).free
+    const assetsInfo = await this.getAssetsInfo(api)
 
-      const tokenInfoFormatted = tokenInfo.toHuman() as TAssetMainInfo
-
-      return {
-        id: tokenId,
-        name: tokenInfoFormatted.symbol.includes('TKN')
-          ? 'Liquidity Pool Token'
-          : tokenInfoFormatted.name,
-        symbol: tokenInfoFormatted.symbol.includes('TKN')
-          ? tokenInfoFormatted.symbol
-              .split('-')
-              .map((item) => item.replace('TKN', ''))
-              .map((tokenId) => (tokenId.startsWith('0x') ? hexToBn(tokenId).toString() : tokenId))
-              .join('-')
-          : tokenInfoFormatted.symbol,
-        decimals: Number(tokenInfoFormatted.decimals),
-        description: tokenInfoFormatted.description,
-        balance: new BN(BigInt(balance).toString()),
-      }
+    const ownedAssetsResponse = await api.query.tokens.accounts.entries(address)
+    let map = new Map<string, BN>()
+    ownedAssetsResponse.forEach(([key, exposure]) => {
+      const id = (key.toHuman() as string[])[1].replace(/[, ]/g, '')
+      const balance: BN = new BN(BigInt(JSON.parse(JSON.stringify(exposure)).free).toString())
+      map.set(id, balance)
     })
+
+    const ownedTokens: TAsset[] = Object.values(assetsInfo)
+      .filter((item) => map.has(item.id))
+      .map((item) => {
+        return {
+          ...item,
+          description: Object(bridgeIds).hasOwnProperty(item.id)
+            ? bridgeIds[item.id]
+            : item.description,
+
+          balance: map.get(item.id)!,
+        }
+      })
+
+    let mapOwnedTokens = new Map<string, TAsset>()
+    ownedTokens.forEach((item: TAsset) => mapOwnedTokens.set(item.id, item))
+
+    const result = Array.from(mapOwnedTokens).reduce((obj, [key, value]) => {
+      obj[key] = value
+      return obj
+    }, {} as { [id: string]: TAsset })
+
+    return result
   }
 
-  static async getBalances(api: ApiPromise): Promise<TBalance> {
+  static async getBalances(api: ApiPromise): Promise<TBalances> {
     const balances = await api.query.tokens.totalIssuance.entries()
     let map = new Map<string, BN>()
     balances.forEach(([key, exposure]) => {

@@ -12,7 +12,7 @@ import { options } from './utils/options'
 import { MangataGenericEvent } from './types/MangataGenericEvent'
 import { TxOptions } from './types/TxOptions'
 import Tx from './services/Tx'
-import { TAsset, TAssetInfo, TBalance } from './types/AssetInfo'
+import { TAsset, TAssetInfo, TBalances } from './types/AssetInfo'
 
 /**
  * @class Mangata
@@ -568,39 +568,9 @@ export class Mangata {
    * Returns bridge tokens
    */
 
-  public async getBridgeTokens(): Promise<
-    {
-      assetId: string
-      info: {
-        name: string
-        symbol: string
-        decimals: number
-        description: string
-      }
-      ethereumAddress: string
-    }[]
-  > {
+  public async getBridgeTokens() {
     const api = await this.getApi()
-    const bridgedTokens = await Query.getBridgedTokens(api)
-    const bridgedTokensFormatted: {
-      assetId: string
-      info: {
-        name: string
-        symbol: string
-        decimals: number
-        description: string
-      }
-      ethereumAddress: string
-    }[] = []
-
-    for (const item of bridgedTokens) {
-      // `item` is a Promise, therefore we await it
-      const bridgedAsset = await item
-
-      bridgedTokensFormatted.push(bridgedAsset)
-    }
-
-    return bridgedTokensFormatted
+    return await Query.getBridgedTokens(api)
   }
 
   /**
@@ -617,24 +587,9 @@ export class Mangata {
     return await Query.getBlockNumber(api)
   }
 
-  public async getOwnedTokens(address: string): Promise<TAsset[] | null> {
+  public async getOwnedTokens(address: string) {
     const api = await this.getApi()
-    const ownedTokens = await Query.getOwnedTokens(api, address)
-
-    if (!ownedTokens) {
-      return null
-    }
-
-    const ownedTokensFormatted: TAsset[] = []
-
-    for (const item of ownedTokens) {
-      // `item` is a Promise, therefore we await it
-      const ownedToken = await item
-
-      ownedTokensFormatted.push(ownedToken)
-    }
-
-    return ownedTokensFormatted
+    return await Query.getOwnedTokens(api, address)
   }
 
   /**
@@ -650,25 +605,24 @@ export class Mangata {
    * Returns info about all assets
    */
 
-  public async getAssetsInfo(): Promise<TAssetInfo[]> {
+  public async getAssetsInfo() {
     const api = await this.getApi()
-    const allAssets = await Query.getAssetsInfo(api)
-
-    const allAssetsFormatted: TAssetInfo[] = []
-
-    for (const item of allAssets) {
-      // `item` is a Promise, therefore we await it
-      const asset = await item
-
-      allAssetsFormatted.push(asset)
-    }
-
-    return allAssetsFormatted
+    return await Query.getAssetsInfo(api)
   }
 
-  public async getBalances(): Promise<TBalance> {
+  public async getBalances(): Promise<TBalances> {
     const api = await this.getApi()
     return await Query.getBalances(api)
+  }
+
+  public async getBridgeAddresses() {
+    const api = await this.getApi()
+    return await Query.getBridgeAddresses(api)
+  }
+
+  public async getBridgeIds() {
+    const api = await this.getApi()
+    return await Query.getBridgeIds(api)
   }
 
   /**

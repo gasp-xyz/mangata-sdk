@@ -12,6 +12,14 @@ export type TAsset = {
 export type TAssetMainInfo = Omit<TAsset, 'id' | 'balance'>
 export type TAssetInfo = Omit<TAsset, 'balance'>
 
-export type TBalance = {
+export type TBalances = {
   [id: string]: BN
+}
+
+export type TBridgeIds = {
+  [id: string]: string
+}
+
+export type TBridgeTokens = {
+  [id: string]: TAssetInfo
 }
