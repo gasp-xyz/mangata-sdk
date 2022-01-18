@@ -1,10 +1,12 @@
 /* eslint-disable no-console */
 import { ApiPromise } from '@polkadot/api'
 import { AccountData } from '@polkadot/types/interfaces/balances'
-import { hexToBn } from '@polkadot/util'
+import { hexToBn, isHex } from '@polkadot/util'
 import { Codec } from '@polkadot/types/types'
 import BN from 'bn.js'
-import { TAsset, TAssetInfo, TAssetMainInfo, TBalances } from '../types/AssetInfo'
+import { TAsset, TAssetInfo, TAssetMainInfo, TBalances, TMainAssets } from '../types/AssetInfo'
+import { getSymbol } from '../utils/getSymbol'
+import { getAssetsInfoMap } from '../utils/getAssetsInfoMap'
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : ''
 const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
@@ -123,7 +125,6 @@ class Query {
 
   static async getBridgedTokens(api: ApiPromise) {
     const assetsInfo = await this.getAssetsInfo(api)
-
     const bridgedAssets = await this.getBridgeIds(api)
 
     const bridgedAssetsFormatted = Object.values(assetsInfo)
@@ -154,31 +155,31 @@ class Query {
     return liquidityTokens.map((liquidityToken) => liquidityToken[1].toString())
   }
 
-  static async getAssetsInfo(api: ApiPromise) {
-    const assetsInfoResponse = await api.query.assetsInfo.assetsInfo.entries()
+  static async getAssetsInfo(api: ApiPromise): Promise<TMainAssets> {
+    const assetsInfo = await getAssetsInfoMap(api)
 
-    const assets = assetsInfoResponse.map(([key, exposure]) => {
-      const exposureFormatted = exposure.toHuman() as TAssetMainInfo
-
-      return {
-        id: (key.toHuman() as string[])[0].replace(/[, ]/g, ''),
-        name: exposureFormatted.symbol.includes('TKN')
-          ? 'Liquidity Pool Token'
-          : exposureFormatted.name,
-        symbol: exposureFormatted.symbol.includes('TKN')
-          ? exposureFormatted.symbol
-              .split('-')
-              .map((item) => item.replace('TKN', ''))
-              .map((tokenId) => (tokenId.startsWith('0x') ? hexToBn(tokenId).toString() : tokenId))
-              .join('-')
-          : exposureFormatted.symbol,
-        decimals: Number(exposureFormatted.decimals),
-        description: exposureFormatted.description,
-      }
-    })
-
+    // from assets info we receive liquidity tokens in the format
+    // TKN0x000003CD-TKN0x00000000
+    // therefore we need to parse this to tokens ids
+    // TKN0x000003CD-TKN0x00000000 -> 13-4 -> 'm12-MGA / mDOT'
     let map = new Map<string, TAssetInfo>()
-    assets.forEach((asset: TAssetInfo) => map.set(asset.id, asset))
+
+    const getCorrectSymbol = (symbol: string, assets: TMainAssets) => {
+      const retrivedSymbol = getSymbol(symbol, assets)
+      return retrivedSymbol.includes('TKN') ? getSymbol(retrivedSymbol, assets) : retrivedSymbol
+    }
+
+    for (const [key, value] of Object.entries(assetsInfo)) {
+      map.set(key, {
+        id: key,
+        name: value.symbol.includes('TKN') ? 'Liquidity Pool Token' : value.name,
+        symbol: value.symbol.includes('TKN')
+          ? getCorrectSymbol(value.symbol, assetsInfo)!
+          : value.symbol,
+        decimals: Number(value.decimals),
+        description: value.description,
+      })
+    }
 
     const result = Array.from(map).reduce((obj, [key, value]) => {
       obj[key] = value
@@ -199,10 +200,9 @@ class Query {
     }
 
     const bridgeIds = await this.getBridgeIds(api)
-
     const assetsInfo = await this.getAssetsInfo(api)
-
     const ownedAssetsResponse = await api.query.tokens.accounts.entries(address)
+
     let map = new Map<string, BN>()
     ownedAssetsResponse.forEach(([key, exposure]) => {
       const id = (key.toHuman() as string[])[1].replace(/[, ]/g, '')

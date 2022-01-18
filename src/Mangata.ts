@@ -12,7 +12,7 @@ import { options } from './utils/options'
 import { MangataGenericEvent } from './types/MangataGenericEvent'
 import { TxOptions } from './types/TxOptions'
 import Tx from './services/Tx'
-import { TAsset, TAssetInfo, TBalances } from './types/AssetInfo'
+import { TAsset, TAssetInfo, TBalances, TMainAssets } from './types/AssetInfo'
 
 /**
  * @class Mangata
@@ -605,7 +605,7 @@ export class Mangata {
    * Returns info about all assets
    */
 
-  public async getAssetsInfo() {
+  public async getAssetsInfo(): Promise<TMainAssets> {
     const api = await this.getApi()
     return await Query.getAssetsInfo(api)
   }

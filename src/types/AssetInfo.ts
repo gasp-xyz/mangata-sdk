@@ -23,3 +23,7 @@ export type TBridgeIds = {
 export type TBridgeTokens = {
   [id: string]: TAssetInfo
 }
+
+export type TMainAssets = {
+  [id: string]: TAssetInfo
+}
