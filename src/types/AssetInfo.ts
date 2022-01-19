@@ -27,3 +27,15 @@ export type TBridgeTokens = {
 export type TMainAssets = {
   [id: string]: TAssetInfo
 }
+
+export type TPool = {
+  firstToken: string
+  secondToken: string
+  firstTokenAmount: BN
+  secondTokenAmount: BN
+  liquidityTokenId: string
+}
+
+export type TLiquidityAssets = {
+  [identificator: string]: string
+}

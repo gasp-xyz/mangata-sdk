@@ -4,9 +4,22 @@ import { AccountData } from '@polkadot/types/interfaces/balances'
 import { hexToBn, isHex } from '@polkadot/util'
 import { Codec } from '@polkadot/types/types'
 import BN from 'bn.js'
-import { TAsset, TAssetInfo, TAssetMainInfo, TBalances, TMainAssets } from '../types/AssetInfo'
+import {
+  TAsset,
+  TAssetInfo,
+  TAssetMainInfo,
+  TBalances,
+  TMainAssets,
+  TPool,
+} from '../types/AssetInfo'
 import { getSymbol } from '../utils/getSymbol'
 import { getAssetsInfoMap } from '../utils/getAssetsInfoMap'
+import { liquidityAssetsMap } from '../utils/liquidityAssetsMap'
+import { poolsBalanceMap } from '../utils/poolsBalanceMap'
+import { poolsMap } from '../utils/poolsmap'
+import { balancesMap } from '../utils/balancesMap'
+import { accountEntriesMap } from '../utils/accountEntriesMap'
+import { ownedTokensMap } from '../utils/ownedTokensMap'
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : ''
 const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
@@ -201,17 +214,10 @@ class Query {
 
     const bridgeIds = await this.getBridgeIds(api)
     const assetsInfo = await this.getAssetsInfo(api)
-    const ownedAssetsResponse = await api.query.tokens.accounts.entries(address)
-
-    let map = new Map<string, BN>()
-    ownedAssetsResponse.forEach(([key, exposure]) => {
-      const id = (key.toHuman() as string[])[1].replace(/[, ]/g, '')
-      const balance: BN = new BN(BigInt(JSON.parse(JSON.stringify(exposure)).free).toString())
-      map.set(id, balance)
-    })
+    const accountEntries = await accountEntriesMap(api, address)
 
     const ownedTokens: TAsset[] = Object.values(assetsInfo)
-      .filter((item) => map.has(item.id))
+      .filter((item) => accountEntries[item.id])
       .map((item) => {
         return {
           ...item,
@@ -219,36 +225,40 @@ class Query {
             ? bridgeIds[item.id]
             : item.description,
 
-          balance: map.get(item.id)!,
+          balance: accountEntries[item.id],
         }
       })
 
-    let mapOwnedTokens = new Map<string, TAsset>()
-    ownedTokens.forEach((item: TAsset) => mapOwnedTokens.set(item.id, item))
-
-    const result = Array.from(mapOwnedTokens).reduce((obj, [key, value]) => {
-      obj[key] = value
-      return obj
-    }, {} as { [id: string]: TAsset })
-
-    return result
+    return ownedTokensMap(ownedTokens)
   }
 
   static async getBalances(api: ApiPromise): Promise<TBalances> {
-    const balances = await api.query.tokens.totalIssuance.entries()
-    let map = new Map<string, BN>()
-    balances.forEach(([key, exposure]) => {
-      const id = (key.toHuman() as string[])[0].replace(/[, ]/g, '')
-      const balance = new BN(exposure.toString())
-      map.set(id, balance)
-    })
+    return await balancesMap(api)
+  }
 
-    const result = Array.from(map).reduce((obj, [key, value]) => {
-      obj[key] = value
-      return obj
-    }, {} as { [id: string]: BN })
+  static async getPools(api: ApiPromise) {
+    const assetsInfo = await this.getAssetsInfo(api)
+    const liquidityAssets = await liquidityAssetsMap(api)
+    const poolBalances = await poolsBalanceMap(api, liquidityAssets)
 
-    return result
+    const result = Object.values(assetsInfo)
+      .filter((assetInfo) => Object.values(liquidityAssets).includes(assetInfo.id))
+      .map(
+        (asset) =>
+          ({
+            firstToken: asset.symbol.includes('/')
+              ? asset.symbol.split('/')[0]
+              : asset.symbol.split('-')[0],
+            secondToken: asset.symbol.includes('/')
+              ? asset.symbol.split('/')[1]
+              : asset.symbol.split('-')[1],
+            firstTokenAmount: poolBalances[asset.id][0],
+            secondTokenAmount: poolBalances[asset.id][1],
+            liquidityTokenId: asset.id,
+          } as TPool)
+      )
+
+    return poolsMap(result)
   }
 }
 

@@ -658,4 +658,9 @@ export class Mangata {
     const api = await this.getApi()
     return await Tx.bridgeEthToEthereum(api, account, ethereumAddress, amount, txOptions)
   }
+
+  public async getPools() {
+    const api = await this.getApi()
+    return await Query.getPools(api)
+  }
 }
