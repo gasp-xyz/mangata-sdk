@@ -1,17 +1,10 @@
 /* eslint-disable no-console */
 import { ApiPromise } from '@polkadot/api'
 import { AccountData } from '@polkadot/types/interfaces/balances'
-import { hexToBn, isHex } from '@polkadot/util'
+import { hexToBn } from '@polkadot/util'
 import { Codec } from '@polkadot/types/types'
 import BN from 'bn.js'
-import {
-  TAsset,
-  TAssetInfo,
-  TAssetMainInfo,
-  TBalances,
-  TMainAssets,
-  TPool,
-} from '../types/AssetInfo'
+import { TAsset, TAssetInfo, TBalances, TMainAssets, TPool } from '../types/AssetInfo'
 import { getSymbol } from '../utils/getSymbol'
 import { getAssetsInfoMap } from '../utils/getAssetsInfoMap'
 import { liquidityAssetsMap } from '../utils/liquidityAssetsMap'
@@ -104,7 +97,7 @@ class Query {
 
   static async getBridgeAddresses(api: ApiPromise) {
     const bridgedAssets = await api.query.bridgedAsset.bridgedAsset.entries()
-    let map = new Map<string, string>()
+    const map = new Map<string, string>()
     bridgedAssets.map(([key, exposure]) => {
       const id = (key.toHuman() as string[])[0].replace(/[, ]/g, '')
       const address = exposure.toString()
@@ -121,7 +114,7 @@ class Query {
 
   static async getBridgeIds(api: ApiPromise) {
     const bridgedAssets = await api.query.bridgedAsset.bridgedAsset.entries()
-    let map = new Map<string, string>()
+    const map = new Map<string, string>()
     bridgedAssets.map(([key, exposure]) => {
       const id = (key.toHuman() as string[])[0].replace(/[, ]/g, '')
       const address = exposure.toString()
@@ -149,7 +142,7 @@ class Query {
         }
       })
 
-    let map = new Map<string, TAssetInfo>()
+    const map = new Map<string, TAssetInfo>()
     bridgedAssetsFormatted.forEach((asset: TAssetInfo) => map.set(asset.id, asset))
     const result = Array.from(map).reduce((obj, [key, value]) => {
       obj[key] = value
@@ -175,7 +168,7 @@ class Query {
     // TKN0x000003CD-TKN0x00000000
     // therefore we need to parse this to tokens ids
     // TKN0x000003CD-TKN0x00000000 -> 13-4 -> 'm12-MGA / mDOT'
-    let map = new Map<string, TAssetInfo>()
+    const map = new Map<string, TAssetInfo>()
 
     const getCorrectSymbol = (symbol: string, assets: TMainAssets) => {
       const retrivedSymbol = getSymbol(symbol, assets)

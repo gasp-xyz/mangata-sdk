@@ -3,7 +3,7 @@ import { ApiPromise } from '@polkadot/api'
 export const liquidityAssetsMap = async (api: ApiPromise) => {
   const liquidityAssetsResponse = await api.query.xyk.liquidityAssets.entries()
 
-  let liquidityAssetsMap = new Map<string, string>()
+  const liquidityAssetsMap = new Map<string, string>()
   liquidityAssetsResponse.forEach(([key, value]) => {
     const identificator = key.args.map((k) => k.toHuman())[0] as string
     const liquidityAssetId = value.toString().replace(/[, ]/g, '')
