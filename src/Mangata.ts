@@ -625,6 +625,11 @@ export class Mangata {
     return await Query.getBridgeIds(api)
   }
 
+  public async getLiquidityTokens() {
+    const api = await this.getApi()
+    return await Query.getLiquidityTokens(api)
+  }
+
   /**
    * @deprecated This method will be deprecated
    */

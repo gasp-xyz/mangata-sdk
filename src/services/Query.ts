@@ -13,6 +13,7 @@ import { poolsMap } from '../utils/poolsMap'
 import { balancesMap } from '../utils/balancesMap'
 import { accountEntriesMap } from '../utils/accountEntriesMap'
 import { ownedTokensMap } from '../utils/ownedTokensMap'
+import { getCorrectSymbol } from '../utils/getCorrectSymbol'
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : ''
 const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
@@ -152,13 +153,48 @@ class Query {
     return result
   }
 
-  static async getTokenInfo(api: ApiPromise, tokenId: string): Promise<Codec> {
-    return await api.query.assetsInfo.assetsInfo(tokenId)
+  static async getTokenInfo(api: ApiPromise, tokenId: string) {
+    const assetsInfo = await getAssetsInfoMap(api)
+
+    const asset = assetsInfo[tokenId]
+    return asset.name.includes('LiquidityPoolToken')
+      ? {
+          ...asset,
+          name: 'Liquidity Pool Token',
+          symbol: getCorrectSymbol(asset.symbol, assetsInfo),
+        }
+      : assetsInfo[tokenId]
   }
 
   static async getLiquidityTokenIds(api: ApiPromise): Promise<string[]> {
     const liquidityTokens = await api.query.xyk.liquidityAssets.entries()
     return liquidityTokens.map((liquidityToken) => liquidityToken[1].toString())
+  }
+
+  static async getLiquidityTokens(api: ApiPromise) {
+    const assetsInfo = await getAssetsInfoMap(api)
+    const liquidityTokens = Object.values(assetsInfo)
+      .filter((asset) => asset.name.includes('LiquidityPoolToken'))
+      .map((asset) => {
+        return {
+          id: asset.id,
+          chainId: asset.chainId,
+          address: asset.address,
+          name: 'Liquidity Pool Token',
+          symbol: getCorrectSymbol(asset.symbol, assetsInfo),
+          decimals: Number(asset.decimals),
+        } as TAssetInfo
+      })
+
+    const map = new Map<string, TAssetInfo>()
+    liquidityTokens.forEach((asset: TAssetInfo) => map.set(asset.id, asset))
+
+    const result = Array.from(map).reduce((obj, [key, value]) => {
+      obj[key] = value
+      return obj
+    }, {} as { [id: string]: TAssetInfo })
+
+    return result
   }
 
   static async getAssetsInfo(api: ApiPromise): Promise<TMainAssets> {
@@ -170,20 +206,16 @@ class Query {
     // TKN0x000003CD-TKN0x00000000 -> 13-4 -> 'm12-MGA / mDOT'
     const map = new Map<string, TAssetInfo>()
 
-    const getCorrectSymbol = (symbol: string, assets: TMainAssets) => {
-      const retrivedSymbol = getSymbol(symbol, assets)
-      return retrivedSymbol.includes('TKN') ? getSymbol(retrivedSymbol, assets) : retrivedSymbol
-    }
-
     for (const [key, value] of Object.entries(assetsInfo)) {
       map.set(key, {
         id: key,
+        chainId: value.chainId,
+        address: value.address,
         name: value.symbol.includes('TKN') ? 'Liquidity Pool Token' : value.name,
         symbol: value.symbol.includes('TKN')
-          ? getCorrectSymbol(value.symbol, assetsInfo)!
+          ? getCorrectSymbol(value.symbol, assetsInfo)
           : value.symbol,
         decimals: Number(value.decimals),
-        description: value.description,
       })
     }
 
@@ -214,10 +246,7 @@ class Query {
       .map((item) => {
         return {
           ...item,
-          description: Object(bridgeIds).hasOwnProperty(item.id)
-            ? bridgeIds[item.id]
-            : item.description,
-
+          address: Object(bridgeIds).hasOwnProperty(item.id) ? bridgeIds[item.id] : item.address,
           balance: accountEntries[item.id],
         }
       })

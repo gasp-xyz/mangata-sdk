@@ -1,17 +1,23 @@
 import { ApiPromise } from '@polkadot/api'
-import { TAssetMainInfo, TAssetInfo } from '../types/AssetInfo'
+import { TAssetInfo } from '../types/AssetInfo'
 
 export const getAssetsInfoMap = async (api: ApiPromise) => {
   const assetsInfoResponse = await api.query.assetsInfo.assetsInfo.entries()
 
   const assetsInfoMap = new Map<string, TAssetInfo>()
   assetsInfoResponse.forEach(([key, value]) => {
-    const info = value.toHuman() as TAssetMainInfo
+    const info = value.toHuman() as {
+      symbol: string
+      name: string
+      description: string
+      decimals: number
+    }
     const id = (key.toHuman() as string[])[0].replace(/[, ]/g, '')
     assetsInfoMap.set(id, {
       id: (key.toHuman() as string[])[0].replace(/[, ]/g, ''),
+      chainId: 0,
       symbol: info.symbol,
-      description: info.description,
+      address: info.description,
       name: info.name,
       decimals: Number(info.decimals),
     })

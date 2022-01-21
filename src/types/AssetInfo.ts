@@ -2,14 +2,15 @@ import BN from 'bn.js'
 
 export type TAsset = {
   id: string
+  chainId: number
   name: string
   symbol: string
-  description: string
+  address: string
   decimals: number
   balance: BN
 }
 
-export type TAssetMainInfo = Omit<TAsset, 'id' | 'balance'>
+export type TAssetMainInfo = Omit<TAsset, 'id' | 'balance' | 'chainId'>
 export type TAssetInfo = Omit<TAsset, 'balance'>
 
 export type TBalances = {

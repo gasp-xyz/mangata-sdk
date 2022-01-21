@@ -3,7 +3,16 @@ export { MangataHelpers } from './MangataHelpers'
 
 export { MangataEventData } from './types/MangataEventData'
 export { MangataGenericEvent } from './types/MangataGenericEvent'
-export { TAssetInfo, TAsset, TBalances } from './types/AssetInfo'
+export {
+  TAssetInfo,
+  TAsset,
+  TBalances,
+  TMainAssets,
+  TLiquidityAssets,
+  TPool,
+  TBridgeTokens,
+  TBridgeIds,
+} from './types/AssetInfo'
 export { TxOptions } from './types/TxOptions'
 export { signTx } from './services/Tx'
 export {
