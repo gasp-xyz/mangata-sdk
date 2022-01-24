@@ -1,18 +1,14 @@
 /* eslint-disable no-console */
 import { ApiPromise } from '@polkadot/api'
 import { AccountData } from '@polkadot/types/interfaces/balances'
-import { hexToBn } from '@polkadot/util'
-import { Codec } from '@polkadot/types/types'
+import { hexToBn, isHex } from '@polkadot/util'
 import BN from 'bn.js'
-import { TAsset, TAssetInfo, TBalances, TMainAssets, TPool } from '../types/AssetInfo'
-import { getSymbol } from '../utils/getSymbol'
+import { TAsset, TAssetInfo, TBalances, TMainAssets, TokenBalance, TPool } from '../types/AssetInfo'
 import { getAssetsInfoMap } from '../utils/getAssetsInfoMap'
 import { liquidityAssetsMap } from '../utils/liquidityAssetsMap'
 import { poolsBalanceMap } from '../utils/poolsBalanceMap'
-import { poolsMap } from '../utils/poolsMap'
 import { balancesMap } from '../utils/balancesMap'
 import { accountEntriesMap } from '../utils/accountEntriesMap'
-import { ownedTokensMap } from '../utils/ownedTokensMap'
 import { getCorrectSymbol } from '../utils/getCorrectSymbol'
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : ''
@@ -85,10 +81,19 @@ class Query {
     api: ApiPromise,
     address: string,
     tokenId: string
-  ): Promise<AccountData> {
-    const balance = await api.query.tokens.accounts(address, tokenId)
-    const accountData = balance as AccountData
-    return accountData
+  ): Promise<TokenBalance> {
+    const balanceResponse = await api.query.tokens.accounts(address, tokenId)
+    const balance = JSON.parse(JSON.stringify(balanceResponse)) as {
+      free: string
+      reserved: string
+      frozen: string
+    }
+
+    return {
+      free: isHex(balance.free) ? hexToBn(balance.free) : new BN(balance.free),
+      reserved: isHex(balance.reserved) ? hexToBn(balance.reserved) : new BN(balance.reserved),
+      frozen: isHex(balance.frozen) ? hexToBn(balance.frozen) : new BN(balance.frozen),
+    }
   }
 
   static async getNextTokenId(api: ApiPromise): Promise<BN> {
@@ -98,36 +103,23 @@ class Query {
 
   static async getBridgeAddresses(api: ApiPromise) {
     const bridgedAssets = await api.query.bridgedAsset.bridgedAsset.entries()
-    const map = new Map<string, string>()
-    bridgedAssets.map(([key, exposure]) => {
+    return bridgedAssets.reduce((obj, [key, exposure]) => {
       const id = (key.toHuman() as string[])[0].replace(/[, ]/g, '')
       const address = exposure.toString()
-      map.set(address, id)
-    })
-
-    const result = Array.from(map).reduce((obj, [key, value]) => {
-      obj[key] = value
+      obj[address] = id
       return obj
     }, {} as { [address: string]: string })
-
-    return result
   }
 
   static async getBridgeIds(api: ApiPromise) {
     const bridgedAssets = await api.query.bridgedAsset.bridgedAsset.entries()
-    const map = new Map<string, string>()
-    bridgedAssets.map(([key, exposure]) => {
+
+    return bridgedAssets.reduce((obj, [key, exposure]) => {
       const id = (key.toHuman() as string[])[0].replace(/[, ]/g, '')
       const address = exposure.toString()
-      map.set(id, address)
-    })
-
-    const result = Array.from(map).reduce((obj, [key, value]) => {
-      obj[key] = value
+      obj[id] = address
       return obj
     }, {} as { [id: string]: string })
-
-    return result
   }
 
   static async getBridgedTokens(api: ApiPromise) {
@@ -171,60 +163,22 @@ class Query {
     return liquidityTokens.map((liquidityToken) => liquidityToken[1].toString())
   }
 
-  static async getLiquidityTokens(api: ApiPromise) {
+  static async getLiquidityTokens(api: ApiPromise): Promise<TMainAssets> {
     const assetsInfo = await getAssetsInfoMap(api)
-    const liquidityTokens = Object.values(assetsInfo)
-      .filter((asset) => asset.name.includes('LiquidityPoolToken'))
-      .map((asset) => {
-        return {
-          id: asset.id,
-          chainId: asset.chainId,
-          address: asset.address,
-          name: 'Liquidity Pool Token',
-          symbol: getCorrectSymbol(asset.symbol, assetsInfo),
-          decimals: Number(asset.decimals),
-        } as TAssetInfo
-      })
 
-    const map = new Map<string, TAssetInfo>()
-    liquidityTokens.forEach((asset: TAssetInfo) => map.set(asset.id, asset))
-
-    const result = Array.from(map).reduce((obj, [key, value]) => {
-      obj[key] = value
-      return obj
-    }, {} as { [id: string]: TAssetInfo })
-
-    return result
+    return Object.values(assetsInfo)
+      .reduce(
+        (acc, asset) => (asset.name.includes('Liquidity Pool Token') ? acc.concat(asset) : acc),
+        [] as TAssetInfo[]
+      )
+      .reduce((acc, assetInfo) => {
+        acc[assetInfo.id] = assetInfo
+        return acc
+      }, {} as { [id: string]: TAssetInfo })
   }
 
   static async getAssetsInfo(api: ApiPromise): Promise<TMainAssets> {
-    const assetsInfo = await getAssetsInfoMap(api)
-
-    // from assets info we receive liquidity tokens in the format
-    // TKN0x000003CD-TKN0x00000000
-    // therefore we need to parse this to tokens ids
-    // TKN0x000003CD-TKN0x00000000 -> 13-4 -> 'm12-MGA / mDOT'
-    const map = new Map<string, TAssetInfo>()
-
-    for (const [key, value] of Object.entries(assetsInfo)) {
-      map.set(key, {
-        id: key,
-        chainId: value.chainId,
-        address: value.address,
-        name: value.symbol.includes('TKN') ? 'Liquidity Pool Token' : value.name,
-        symbol: value.symbol.includes('TKN')
-          ? getCorrectSymbol(value.symbol, assetsInfo)
-          : value.symbol,
-        decimals: Number(value.decimals),
-      })
-    }
-
-    const result = Array.from(map).reduce((obj, [key, value]) => {
-      obj[key] = value
-      return obj
-    }, {} as { [id: string]: TAssetInfo })
-
-    return result
+    return await getAssetsInfoMap(api)
   }
 
   static async getBlockNumber(api: ApiPromise): Promise<string> {
@@ -237,21 +191,25 @@ class Query {
       return null
     }
 
-    const bridgeIds = await this.getBridgeIds(api)
-    const assetsInfo = await this.getAssetsInfo(api)
-    const accountEntries = await accountEntriesMap(api, address)
+    const [assetsInfo, accountEntries] = await Promise.all([
+      getAssetsInfoMap(api),
+      accountEntriesMap(api, address),
+    ])
 
-    const ownedTokens: TAsset[] = Object.values(assetsInfo)
-      .filter((item) => accountEntries[item.id])
-      .map((item) => {
-        return {
-          ...item,
-          address: Object(bridgeIds).hasOwnProperty(item.id) ? bridgeIds[item.id] : item.address,
-          balance: accountEntries[item.id],
+    return Object.values(assetsInfo)
+      .reduce(
+        (acc, asset) => (accountEntries[asset.id] ? acc.concat(asset) : acc),
+        [] as TAssetInfo[]
+      )
+      .reduce((acc, assetInfo) => {
+        const asset = {
+          ...assetInfo,
+          balance: accountEntries[assetInfo.id],
         }
-      })
 
-    return ownedTokensMap(ownedTokens)
+        acc[asset.id] = asset
+        return acc
+      }, {} as { [id: string]: TAsset })
   }
 
   static async getBalances(api: ApiPromise): Promise<TBalances> {
@@ -259,15 +217,21 @@ class Query {
   }
 
   static async getPools(api: ApiPromise) {
-    const assetsInfo = await this.getAssetsInfo(api)
-    const liquidityAssets = await liquidityAssetsMap(api)
+    const [assetsInfo, liquidityAssets] = await Promise.all([
+      getAssetsInfoMap(api),
+      liquidityAssetsMap(api),
+    ])
     const poolBalances = await poolsBalanceMap(api, liquidityAssets)
 
-    const result = Object.values(assetsInfo)
-      .filter((assetInfo) => Object.values(liquidityAssets).includes(assetInfo.id))
-      .map(
-        (asset) =>
-          ({
+    return Object.values(assetsInfo)
+      .reduce(
+        (acc, asset) =>
+          Object.values(liquidityAssets).includes(asset.id) ? acc.concat(asset) : acc,
+        [] as TAssetInfo[]
+      )
+      .reduce(
+        (acc, asset) => {
+          const poolInfo = {
             firstToken: asset.symbol.includes('/')
               ? asset.symbol.split('/')[0]
               : asset.symbol.split('-')[0],
@@ -277,10 +241,14 @@ class Query {
             firstTokenAmount: poolBalances[asset.id][0],
             secondTokenAmount: poolBalances[asset.id][1],
             liquidityTokenId: asset.id,
-          } as TPool)
+          } as TPool
+          acc[poolInfo.liquidityTokenId] = poolInfo
+          return acc
+        },
+        {} as {
+          [id: string]: TPool
+        }
       )
-
-    return poolsMap(result)
   }
 }
 

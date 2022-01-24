@@ -4,15 +4,10 @@ import BN from 'bn.js'
 export const accountEntriesMap = async (api: ApiPromise, address: string) => {
   const ownedAssetsResponse = await api.query.tokens.accounts.entries(address)
 
-  const ownedAssetsMap = new Map<string, BN>()
-  ownedAssetsResponse.forEach(([key, exposure]) => {
+  return ownedAssetsResponse.reduce((acc, [key, value]) => {
     const id = (key.toHuman() as string[])[1].replace(/[, ]/g, '')
-    const balance: BN = new BN(BigInt(JSON.parse(JSON.stringify(exposure)).free).toString())
-    ownedAssetsMap.set(id, balance)
-  })
-
-  return Array.from(ownedAssetsMap).reduce((obj, [key, value]) => {
-    obj[key] = value
-    return obj
+    const balance: BN = new BN(BigInt(JSON.parse(JSON.stringify(value)).free).toString())
+    acc[id] = balance
+    return acc
   }, {} as { [id: string]: BN })
 }

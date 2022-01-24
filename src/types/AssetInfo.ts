@@ -40,3 +40,9 @@ export type TPool = {
 export type TLiquidityAssets = {
   [identificator: string]: string
 }
+
+export type TokenBalance = {
+  free: BN
+  reserved: BN
+  frozen: BN
+}

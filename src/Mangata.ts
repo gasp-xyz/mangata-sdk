@@ -12,7 +12,7 @@ import { options } from './utils/options'
 import { MangataGenericEvent } from './types/MangataGenericEvent'
 import { TxOptions } from './types/TxOptions'
 import Tx from './services/Tx'
-import { TAsset, TAssetInfo, TBalances, TMainAssets } from './types/AssetInfo'
+import { TAsset, TAssetInfo, TBalances, TMainAssets, TokenBalance } from './types/AssetInfo'
 
 /**
  * @class Mangata
@@ -551,7 +551,7 @@ export class Mangata {
    *
    * @returns {AccountData}
    */
-  public async getTokenBalance(tokenId: string, address: string): Promise<AccountData> {
+  public async getTokenBalance(tokenId: string, address: string): Promise<TokenBalance> {
     const api = await this.getApi()
     return await Query.getTokenBalance(api, address, tokenId)
   }
@@ -625,7 +625,7 @@ export class Mangata {
     return await Query.getBridgeIds(api)
   }
 
-  public async getLiquidityTokens() {
+  public async getLiquidityTokens(): Promise<TMainAssets> {
     const api = await this.getApi()
     return await Query.getLiquidityTokens(api)
   }
