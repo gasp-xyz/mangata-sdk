@@ -60,7 +60,10 @@ export const signTx = async (
                   )
                   const bothBlocksExtrinsics = currentBlockInherents.concat(previousBlockExtrinsics)
                   const shuffledExtrinsics = recreateExtrinsicsOrder(
-                    bothBlocksExtrinsics,
+                    bothBlocksExtrinsics.map((tx) => {
+                      const who = tx.isSigned ? tx.signer.toString() : '0000'
+                      return [who, tx]
+                    }),
                     Uint8Array.from(buffer)
                   )
                   const index = shuffledExtrinsics.findIndex((shuffledExtrinsic) => {

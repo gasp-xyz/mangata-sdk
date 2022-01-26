@@ -1,33 +1,48 @@
 /* eslint-disable no-console */
 import { GenericExtrinsic } from '@polkadot/types'
-import fisherYatesShuffle from './fisherYatesShuffle'
+import { FisherYates } from './fisherYatesShuffle'
 
-const recreateExtrinsicsOrder = (extrinsics: GenericExtrinsic[], seedBytes: Uint8Array) => {
-  const slots: string[] = extrinsics.map((extrinsic) =>
-    extrinsic.isSigned ? extrinsic.signer.toString() : 'None'
-  )
-
-  fisherYatesShuffle(slots, seedBytes)
+const recreateExtrinsicsOrder = <K>(extrinsics: [string, K][], seedBytes: Uint8Array) => {
+  let result: K[] = []
+  const fy = new FisherYates(seedBytes)
 
   const map = new Map()
-
-  for (const e of extrinsics) {
-    let who = 'None'
-    if (e.isSigned) {
-      who = e.signer.toString()
-    }
-
+  extrinsics.forEach((info) => {
+    const who = info[0]
+    const tx = info[1]
     if (map.has(who)) {
-      map.get(who).push(e)
+      map.get(who).push(tx)
     } else {
-      map.set(who, [e])
+      map.set(who, [tx])
     }
-  }
-
-  const shuffledExtrinsics = slots.map((who) => {
-    return map.get(who).shift()
   })
 
-  return shuffledExtrinsics
+  while (map.size != 0) {
+    const slots: K[] = []
+
+    const keys = []
+    for (const entry of map.entries()) {
+      keys.push(entry[0])
+    }
+    keys.sort()
+
+    for (const key of keys) {
+      const values = map.get(key)
+      slots.push(values.shift())
+      if (values.length == 0) {
+        map.delete(key)
+      }
+    }
+    let txs = slots.map((tx) => {
+      return (tx as any).hash.toHex()
+    })
+    fy.shuffle(slots)
+    txs = slots.map((tx) => {
+      return (tx as any).hash.toHex()
+    })
+    result = result.concat(slots)
+  }
+  return result
 }
+
 export default recreateExtrinsicsOrder
