@@ -30,8 +30,8 @@ export type TMainAssets = {
 }
 
 export type TPool = {
-  firstToken: string
-  secondToken: string
+  firstTokenId: string
+  secondTokenId: string
   firstTokenAmount: BN
   secondTokenAmount: BN
   liquidityTokenId: string

@@ -10,6 +10,7 @@ import { poolsBalanceMap } from '../utils/poolsBalanceMap'
 import { balancesMap } from '../utils/balancesMap'
 import { accountEntriesMap } from '../utils/accountEntriesMap'
 import { getCorrectSymbol } from '../utils/getCorrectSymbol'
+import { getAssetsInfoMapWithIds } from '../utils/getAssetsInfoMapWithIds'
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : ''
 const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
@@ -218,7 +219,7 @@ class Query {
 
   static async getPools(api: ApiPromise) {
     const [assetsInfo, liquidityAssets] = await Promise.all([
-      getAssetsInfoMap(api),
+      getAssetsInfoMapWithIds(api),
       liquidityAssetsMap(api),
     ])
     const poolBalances = await poolsBalanceMap(api, liquidityAssets)
@@ -229,26 +230,15 @@ class Query {
           Object.values(liquidityAssets).includes(asset.id) ? acc.concat(asset) : acc,
         [] as TAssetInfo[]
       )
-      .reduce(
-        (acc, asset) => {
-          const poolInfo = {
-            firstToken: asset.symbol.includes('/')
-              ? asset.symbol.split('/')[0]
-              : asset.symbol.split('-')[0],
-            secondToken: asset.symbol.includes('/')
-              ? asset.symbol.split('/')[1]
-              : asset.symbol.split('-')[1],
-            firstTokenAmount: poolBalances[asset.id][0],
-            secondTokenAmount: poolBalances[asset.id][1],
-            liquidityTokenId: asset.id,
-          } as TPool
-          acc[poolInfo.liquidityTokenId] = poolInfo
-          return acc
-        },
-        {} as {
-          [id: string]: TPool
-        }
-      )
+      .map((asset) => {
+        return {
+          firstTokenId: asset.symbol.split('-')[0],
+          secondTokenId: asset.symbol.split('-')[1],
+          firstTokenAmount: poolBalances[asset.id][0],
+          secondTokenAmount: poolBalances[asset.id][1],
+          liquidityTokenId: asset.id,
+        } as TPool
+      })
   }
 }
 
