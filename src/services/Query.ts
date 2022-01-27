@@ -11,6 +11,9 @@ import { balancesMap } from '../utils/balancesMap'
 import { accountEntriesMap } from '../utils/accountEntriesMap'
 import { getCorrectSymbol } from '../utils/getCorrectSymbol'
 import { getAssetsInfoMapWithIds } from '../utils/getAssetsInfoMapWithIds'
+import { calculateLiquidityShare } from '../utils/calculateLiquidityShare'
+import { getRatio } from '../utils/getRatio'
+import { BN_ZERO } from '..'
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : ''
 const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
@@ -198,10 +201,7 @@ class Query {
     ])
 
     return Object.values(assetsInfo)
-      .reduce(
-        (acc, asset) => (accountEntries[asset.id] ? acc.concat(asset) : acc),
-        [] as TAssetInfo[]
-      )
+      .filter((asset) => accountEntries[asset.id] && accountEntries[asset.id].gt(BN_ZERO))
       .reduce((acc, assetInfo) => {
         const asset = {
           ...assetInfo,
@@ -215,6 +215,45 @@ class Query {
 
   static async getBalances(api: ApiPromise): Promise<TBalances> {
     return await balancesMap(api)
+  }
+
+  static async getInvestedPools(api: ApiPromise, address: string) {
+    const [assetsInfo, accountEntries] = await Promise.all([
+      getAssetsInfoMapWithIds(api),
+      accountEntriesMap(api, address),
+    ])
+
+    return Object.values(assetsInfo)
+      .reduce(
+        (acc, asset) => (accountEntries[asset.id] ? acc.concat(asset) : acc),
+        [] as TAssetInfo[]
+      )
+      .filter(
+        (asset) =>
+          asset.name.includes('Liquidity Pool Token') && accountEntries[asset.id].gt(BN_ZERO)
+      )
+      .map(async (asset) => {
+        const userLiquidityBalance = accountEntries[asset.id]
+        const firstTokenId = asset.symbol.split('-')[0]
+        const secondTokenId = asset.symbol.split('-')[1]
+        const [firstTokenAmount, secondTokenAmount] = await this.getAmountOfTokenIdInPool(
+          api,
+          firstTokenId.toString(),
+          secondTokenId.toString()
+        )
+        const poolInfo = {
+          firstTokenId,
+          secondTokenId,
+          firstTokenAmount,
+          secondTokenAmount,
+          liquidityTokenId: asset.id,
+          share: await calculateLiquidityShare(api, asset.id, userLiquidityBalance),
+          firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
+          secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount),
+        } as TPool & { share: BN; firstTokenRatio: BN; secondTokenRatio: BN }
+
+        return poolInfo
+      })
   }
 
   static async getPools(api: ApiPromise) {
@@ -231,13 +270,16 @@ class Query {
         [] as TAssetInfo[]
       )
       .map((asset) => {
+        const [firstTokenAmount, secondTokenAmount] = poolBalances[asset.id]
         return {
           firstTokenId: asset.symbol.split('-')[0],
           secondTokenId: asset.symbol.split('-')[1],
-          firstTokenAmount: poolBalances[asset.id][0],
-          secondTokenAmount: poolBalances[asset.id][1],
+          firstTokenAmount,
+          secondTokenAmount,
           liquidityTokenId: asset.id,
-        } as TPool
+          firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
+          secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount),
+        } as TPool & { firstTokenRatio: BN; secondTokenRatio: BN }
       })
   }
 }

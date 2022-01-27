@@ -12,7 +12,7 @@ import { options } from './utils/options'
 import { MangataGenericEvent } from './types/MangataGenericEvent'
 import { TxOptions } from './types/TxOptions'
 import Tx from './services/Tx'
-import { TAsset, TAssetInfo, TBalances, TMainAssets, TokenBalance } from './types/AssetInfo'
+import { TPool, TBalances, TMainAssets, TokenBalance } from './types/AssetInfo'
 
 /**
  * @class Mangata
@@ -662,6 +662,23 @@ export class Mangata {
   ) {
     const api = await this.getApi()
     return await Tx.bridgeEthToEthereum(api, account, ethereumAddress, amount, txOptions)
+  }
+
+  public async getInvestedPools(address: string) {
+    const api = await this.getApi()
+    const investedPools = await Query.getInvestedPools(api, address)
+
+    let investedPoolsFormatted = []
+    for (const pool of investedPools) {
+      const awaitedPool = await pool
+      investedPoolsFormatted.push(awaitedPool)
+    }
+
+    return investedPoolsFormatted as (TPool & {
+      share: BN
+      firstTokenRatio: BN
+      secondTokenRatio: BN
+    })[]
   }
 
   public async getPools() {
