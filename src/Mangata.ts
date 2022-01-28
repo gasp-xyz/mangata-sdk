@@ -688,7 +688,7 @@ export class Mangata {
     const api = await this.getApi()
     const investedPools = await Query.getInvestedPools(api, address)
 
-    let investedPoolsFormatted = []
+    const investedPoolsFormatted = []
     for (const pool of investedPools) {
       const awaitedPool = await pool
       investedPoolsFormatted.push(awaitedPool)
