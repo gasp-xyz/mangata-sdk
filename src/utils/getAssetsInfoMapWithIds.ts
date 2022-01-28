@@ -1,8 +1,7 @@
 import { ApiPromise } from '@polkadot/api'
-import { TAssetInfo } from '../types/AssetInfo'
+import { TTokenInfo } from '../types/AssetInfo'
 import { hexToBn } from '@polkadot/util'
 import { ETHaddress } from './ETHaddress'
-import { getCorrectSymbol } from './getCorrectSymbol'
 import { MGAaddress } from './MGAaddress'
 
 export const getAssetsInfoMapWithIds = async (api: ApiPromise) => {
@@ -35,5 +34,5 @@ export const getAssetsInfoMapWithIds = async (api: ApiPromise) => {
 
     obj[id] = assetInfo
     return obj
-  }, {} as { [id: string]: TAssetInfo })
+  }, {} as { [id: string]: TTokenInfo })
 }

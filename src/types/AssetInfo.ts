@@ -37,6 +37,10 @@ export type TMainTokens = {
   [id: TTokenId]: TTokenInfo
 }
 
+export type TLiquidityTokens = {
+  [identificator: string]: string
+}
+
 export type TPool = {
   firstTokenId: TTokenId
   secondTokenId: TTokenId

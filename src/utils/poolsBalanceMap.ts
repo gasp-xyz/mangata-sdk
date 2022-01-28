@@ -1,9 +1,9 @@
 import { ApiPromise } from '@polkadot/api'
 import { hexToBn, isHex } from '@polkadot/util'
 import BN from 'bn.js'
-import { TLiquidityAssets } from '../types/AssetInfo'
+import { TLiquidityTokens } from '../types/AssetInfo'
 
-export const poolsBalanceMap = async (api: ApiPromise, liquidityAssets: TLiquidityAssets) => {
+export const poolsBalanceMap = async (api: ApiPromise, liquidityAssets: TLiquidityTokens) => {
   const poolsBalanceResponse = await api.query.xyk.pools.entries()
 
   return poolsBalanceResponse.reduce((acc, [key, value]) => {

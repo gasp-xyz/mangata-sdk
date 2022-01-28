@@ -1,10 +1,10 @@
 import { hexToBn } from '@polkadot/util'
-import { TAssetInfo } from '../types/AssetInfo'
+import { TTokenInfo } from '../types/AssetInfo'
 
 export const getSymbol = (
   symbol: string,
   assets: {
-    [id: string]: TAssetInfo
+    [id: string]: TTokenInfo
   }
 ) => {
   return symbol
