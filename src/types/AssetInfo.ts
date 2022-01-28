@@ -1,44 +1,48 @@
 import BN from 'bn.js'
 
-export type TAsset = {
-  id: string
+export type TToken = {
+  id: TTokenId
   chainId: number
-  name: string
-  symbol: string
-  address: string
+  name: TTokenName
+  symbol: TTokenSymbol
+  address: TTokenAddress
   decimals: number
   balance: BN
 }
 
-export type TAssetMainInfo = Omit<TAsset, 'id' | 'balance' | 'chainId'>
-export type TAssetInfo = Omit<TAsset, 'balance'>
+export type TTokenMainInfo = Omit<TToken, 'id' | 'balance' | 'chainId'>
+export type TTokenInfo = Omit<TToken, 'balance'>
+export type TTokenId = string
+export type TTokenAddress = string
+export type TTokenName = string
+export type TTokenSymbol = string
 
 export type TBalances = {
-  [id: string]: BN
+  [id: TTokenId]: BN
 }
 
 export type TBridgeIds = {
-  [id: string]: string
+  [id: TTokenId]: TTokenAddress
+}
+
+export type TBridgeAddresses = {
+  [id: TTokenAddress]: TTokenId
 }
 
 export type TBridgeTokens = {
-  [id: string]: TAssetInfo
+  [id: TTokenId]: TTokenInfo
 }
 
-export type TMainAssets = {
-  [id: string]: TAssetInfo
+export type TMainTokens = {
+  [id: TTokenId]: TTokenInfo
 }
 
 export type TPool = {
-  firstTokenId: string
-  secondTokenId: string
+  firstTokenId: TTokenId
+  secondTokenId: TTokenId
   firstTokenAmount: BN
   secondTokenAmount: BN
-  liquidityTokenId: string
-}
-
-export type TLiquidityAssets = {
-  [identificator: string]: string
+  liquidityTokenId: TTokenId
 }
 
 export type TokenBalance = {

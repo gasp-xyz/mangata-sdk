@@ -4,11 +4,16 @@ export { MangataHelpers } from './MangataHelpers'
 export { MangataEventData } from './types/MangataEventData'
 export { MangataGenericEvent } from './types/MangataGenericEvent'
 export {
-  TAssetInfo,
-  TAsset,
+  TTokenInfo,
+  TToken,
+  TTokenId,
+  TTokenAddress,
+  TTokenName,
+  TTokenSymbol,
   TBalances,
-  TMainAssets,
-  TLiquidityAssets,
+  TMainTokens,
+  TBridgeAddresses,
+  TokenBalance,
   TPool,
   TBridgeTokens,
   TBridgeIds,
