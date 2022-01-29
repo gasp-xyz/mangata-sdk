@@ -16,30 +16,16 @@ export type TTokenId = string
 export type TTokenAddress = string
 export type TTokenName = string
 export type TTokenSymbol = string
+export type TFreeBalance = BN
+export type TReservedBalance = BN
+export type TFrozenBalance = BN
 
-export type TBalances = {
-  [id: TTokenId]: BN
-}
-
-export type TBridgeIds = {
-  [id: TTokenId]: TTokenAddress
-}
-
-export type TBridgeAddresses = {
-  [id: TTokenAddress]: TTokenId
-}
-
-export type TBridgeTokens = {
-  [id: TTokenId]: TTokenInfo
-}
-
-export type TMainTokens = {
-  [id: TTokenId]: TTokenInfo
-}
-
-export type TLiquidityTokens = {
-  [identificator: string]: string
-}
+export type TTokens = Record<TTokenId, TToken>
+export type TBalances = Record<TTokenId, BN>
+export type TBridgeIds = Record<TTokenId, TTokenAddress>
+export type TBridgeAddresses = Record<TTokenAddress, TTokenId>
+export type TBridgeTokens = Record<TTokenId, TTokenInfo>
+export type TMainTokens = Record<TTokenId, TTokenInfo>
 
 export type TPool = {
   firstTokenId: TTokenId
@@ -49,8 +35,19 @@ export type TPool = {
   liquidityTokenId: TTokenId
 }
 
+export type TPoolWithShare = TPool & {
+  share: BN
+  firstTokenRatio: BN
+  secondTokenRatio: BN
+}
+
+export type TPoolWithRatio = TPool & {
+  firstTokenRatio: BN
+  secondTokenRatio: BN
+}
+
 export type TokenBalance = {
-  free: BN
-  reserved: BN
-  frozen: BN
+  free: TFreeBalance
+  reserved: TReservedBalance
+  frozen: TFreeBalance
 }

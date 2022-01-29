@@ -14,6 +14,8 @@ import {
   TBridgeTokens,
   TTokenId,
   TBridgeAddresses,
+  TPoolWithRatio,
+  TPoolWithShare,
 } from '../types/AssetInfo'
 import { getAssetsInfoMap } from '../utils/getAssetsInfoMap'
 import { liquidityAssetsMap } from '../utils/liquidityAssetsMap'
@@ -234,15 +236,7 @@ class Query {
   static async getInvestedPools(
     api: ApiPromise,
     address: TTokenAddress
-  ): Promise<
-    Promise<
-      TPool & {
-        share: BN
-        firstTokenRatio: BN
-        secondTokenRatio: BN
-      }
-    >[]
-  > {
+  ): Promise<Promise<TPoolWithShare>[]> {
     const [assetsInfo, accountEntries] = await Promise.all([
       getAssetsInfoMapWithIds(api),
       accountEntriesMap(api, address),
@@ -281,12 +275,7 @@ class Query {
       })
   }
 
-  static async getPools(api: ApiPromise): Promise<
-    (TPool & {
-      firstTokenRatio: BN
-      secondTokenRatio: BN
-    })[]
-  > {
+  static async getPools(api: ApiPromise): Promise<TPoolWithRatio[]> {
     const [assetsInfo, liquidityAssets] = await Promise.all([
       getAssetsInfoMapWithIds(api),
       liquidityAssetsMap(api),

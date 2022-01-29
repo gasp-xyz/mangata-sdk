@@ -19,7 +19,8 @@ import { BN_TEN_THOUSAND } from '.'
 import { BIG_HUNDRED } from './utils/bigConstants'
 
 /**
- * @class MangataHelpers
+ * @class Mangata Helpers
+ * @author Mangata Finance
  */
 export class MangataHelpers {
   public static getApiOptions(provider: WsProvider): ApiOptions {

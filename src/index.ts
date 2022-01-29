@@ -6,6 +6,7 @@ export { MangataGenericEvent } from './types/MangataGenericEvent'
 export {
   TTokenInfo,
   TToken,
+  TTokens,
   TTokenId,
   TTokenAddress,
   TTokenName,
@@ -17,6 +18,11 @@ export {
   TPool,
   TBridgeTokens,
   TBridgeIds,
+  TFreeBalance,
+  TReservedBalance,
+  TFrozenBalance,
+  TPoolWithShare,
+  TPoolWithRatio,
 } from './types/AssetInfo'
 export { TxOptions } from './types/TxOptions'
 export { signTx } from './services/Tx'

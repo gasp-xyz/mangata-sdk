@@ -20,10 +20,14 @@ import {
   TMainTokens,
   TokenBalance,
   TTokenId,
+  TBridgeAddresses,
+  TPoolWithShare,
+  TPoolWithRatio,
 } from './types/AssetInfo'
 
 /**
  * @class Mangata
+ * @author Mangata Finance
  * The Mangata class defines the `getInstance` method that lets clients access the unique singleton instance.
  */
 export class Mangata {
@@ -599,9 +603,7 @@ export class Mangata {
     return await Query.getBlockNumber(api)
   }
 
-  public async getOwnedTokens(address: string): Promise<{
-    [id: TTokenId]: TToken
-  } | null> {
+  public async getOwnedTokens(address: string): Promise<Record<TTokenId, TToken> | null> {
     const api = await this.getApi()
     return await Query.getOwnedTokens(api, address)
   }
@@ -629,7 +631,7 @@ export class Mangata {
     return await Query.getBalances(api)
   }
 
-  public async getBridgeAddresses() {
+  public async getBridgeAddresses(): Promise<TBridgeAddresses> {
     const api = await this.getApi()
     return await Query.getBridgeAddresses(api)
   }
@@ -678,13 +680,7 @@ export class Mangata {
     return await Tx.bridgeEthToEthereum(api, account, ethereumAddress, amount, txOptions)
   }
 
-  public async getInvestedPools(address: string): Promise<
-    (TPool & {
-      share: BN
-      firstTokenRatio: BN
-      secondTokenRatio: BN
-    })[]
-  > {
+  public async getInvestedPools(address: string): Promise<TPoolWithShare[]> {
     const api = await this.getApi()
     const investedPools = await Query.getInvestedPools(api, address)
 
@@ -694,19 +690,10 @@ export class Mangata {
       investedPoolsFormatted.push(awaitedPool)
     }
 
-    return investedPoolsFormatted as (TPool & {
-      share: BN
-      firstTokenRatio: BN
-      secondTokenRatio: BN
-    })[]
+    return investedPoolsFormatted as TPoolWithShare[]
   }
 
-  public async getPools(): Promise<
-    (TPool & {
-      firstTokenRatio: BN
-      secondTokenRatio: BN
-    })[]
-  > {
+  public async getPools(): Promise<TPoolWithRatio[]> {
     const api = await this.getApi()
     return await Query.getPools(api)
   }
