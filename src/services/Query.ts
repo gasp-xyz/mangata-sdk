@@ -275,6 +275,26 @@ class Query {
       })
   }
 
+  static async getPool(api: ApiPromise, liquidityTokenId: TTokenId) {
+    const liquidityPool = await api.query.xyk.liquidityPools(liquidityTokenId)
+    const liquidityPoolId = JSON.parse(JSON.stringify(liquidityPool)) as [TTokenId, TTokenId]
+    const [firstTokenId, secondTokenId] = liquidityPoolId
+    const [firstTokenAmount, secondTokenAmount] = await this.getAmountOfTokenIdInPool(
+      api,
+      firstTokenId.toString(),
+      secondTokenId.toString()
+    )
+    return {
+      firstTokenId,
+      secondTokenId,
+      firstTokenAmount,
+      secondTokenAmount,
+      liquidityTokenId,
+      firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
+      secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount),
+    } as TPool
+  }
+
   static async getPools(api: ApiPromise): Promise<TPoolWithRatio[]> {
     const [assetsInfo, liquidityAssets] = await Promise.all([
       getAssetsInfoMapWithIds(api),
