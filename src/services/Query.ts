@@ -292,7 +292,7 @@ class Query {
       liquidityTokenId,
       firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
       secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount),
-    } as TPool
+    } as TPoolWithRatio
   }
 
   static async getPools(api: ApiPromise): Promise<TPoolWithRatio[]> {

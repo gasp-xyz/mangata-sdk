@@ -680,7 +680,7 @@ export class Mangata {
     return await Tx.bridgeEthToEthereum(api, account, ethereumAddress, amount, txOptions)
   }
 
-  public async getPool(liquditityTokenId: TTokenId): Promise<TPool> {
+  public async getPool(liquditityTokenId: TTokenId): Promise<TPoolWithRatio> {
     const api = await this.getApi()
     return await Query.getPool(api, liquditityTokenId)
   }
