@@ -630,6 +630,44 @@ export class Mangata {
     return await Query.getAllAssetsInfo(api)
   }
 
+  public async sendTokensFromMGAtoParachain(
+    fromAccount: KeyringPair,
+    toAccount: string,
+    amount: BN,
+    assetId: string,
+    parachainId: number,
+    txOptions?: TxOptions
+  ) {
+    const api = await this.getApi()
+    return await TX.sendTokensFromMGAtoParachain(
+      api,
+      fromAccount,
+      toAccount,
+      amount,
+      assetId,
+      parachainId,
+      txOptions
+    )
+  }
+
+  public async sendTokensFromParachainToRely(
+    fromAccount: KeyringPair,
+    toAccount: string,
+    amount: BN,
+    assetId: string,
+    txOptions?: TxOptions
+  ) {
+    const api = await this.getApi()
+    return await TX.sendTokensFromParachainToRely(
+      api,
+      fromAccount,
+      toAccount,
+      amount,
+      assetId,
+      txOptions
+    )
+  }
+
   /**
    * @deprecated This method will be deprecated
    */
