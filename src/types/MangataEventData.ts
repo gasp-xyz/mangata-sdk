@@ -1,6 +1,6 @@
 import { Codec } from '@polkadot/types/types'
 
 export interface MangataEventData {
-  type: string
+  lookupName: string
   data: Codec
 }

@@ -31,14 +31,11 @@ export const signTx = async (
         { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
         async (result) => {
           txOptions && txOptions.statusCallback && txOptions.statusCallback(result)
-          const blockNumber = await api.query.system.number()
           if (result.status.isFinalized) {
             const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
               async (lastHeader) => {
                 if (lastHeader.parentHash.toString() === result.status.asFinalized.toString()) {
                   unsubscribeNewHeads()
-                  //const previousBlock = await api.rpc.chain.getBlock(lastHeader.parentHash)
-                  //const previousBlockExtrinsics = previousBlock.block.extrinsics
                   const currentBlock = await api.rpc.chain.getBlock(lastHeader.hash)
                   const currentBlockExtrinsics = currentBlock.block.extrinsics
                   const currentBlockEvents = await api.query.system.events.at(lastHeader.hash)
@@ -88,7 +85,7 @@ export const signTx = async (
                       const types = event.typeDef
                       const eventData: MangataEventData[] = event.data.map((d, i) => {
                         return {
-                          type: types[i].type,
+                          lookupName: types[i].lookupName!,
                           data: d,
                         }
                       })
@@ -105,9 +102,9 @@ export const signTx = async (
                     })
 
                   output = output.concat(reqEvents)
+                  txOptions && txOptions.extrinsicStatus && txOptions.extrinsicStatus(output)
                   resolve(output)
                   unsub()
-                } else if (lastHeader.hash.toString() === result.status.asFinalized.toString()) {
                 } else {
                   unsubscribeNewHeads()
                   reject()
@@ -116,7 +113,7 @@ export const signTx = async (
               }
             )
           } else if (result.isError) {
-            reject(`W[${process.env.JEST_WORKER_ID}]  - ${tx.hash} ` + 'Transaction error')
+            reject(`${tx.hash} ` + 'Transaction error')
             const currentNonce: BN = await Query.getNonce(api, extractedAccount)
             memoryDatabase.setNonce(extractedAccount, currentNonce)
           }
@@ -150,7 +147,7 @@ const getError = (
   const failedEvent = method === 'ExtrinsicFailed'
 
   if (failedEvent) {
-    const error = eventData.find((item) => item.type === 'DispatchError')
+    const error = eventData.find((item) => item.lookupName.includes('DispatchError'))
     const errorData = error?.data?.toHuman?.() as TErrorData | undefined
     const errorIdx = errorData?.Module?.error
     const moduleIdx = errorData?.Module?.index
