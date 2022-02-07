@@ -12,10 +12,22 @@ import { options } from './utils/options'
 import { MangataGenericEvent } from './types/MangataGenericEvent'
 import { TxOptions } from './types/TxOptions'
 import Tx from './services/Tx'
-import { AssetInfo } from './types/AssetInfo'
+import {
+  TTokenAddress,
+  TToken,
+  TPool,
+  TBalances,
+  TMainTokens,
+  TokenBalance,
+  TTokenId,
+  TBridgeAddresses,
+  TPoolWithShare,
+  TPoolWithRatio,
+} from './types/AssetInfo'
 
 /**
  * @class Mangata
+ * @author Mangata Finance
  * The Mangata class defines the `getInstance` method that lets clients access the unique singleton instance.
  */
 export class Mangata {
@@ -81,12 +93,16 @@ export class Mangata {
   /**
    * Wait for the new block
    */
-  public async waitNewBlock(): Promise<boolean> {
+  public async waitForNewBlock(blockCount?: number): Promise<boolean> {
     let count = 0
     const api = await this.getApi()
+
+    const numberOfBlocks = blockCount || 1
+
+    console.log(`Waiting for ${numberOfBlocks} blocks`)
     return new Promise(async (resolve) => {
       const unsubscribe = await api.rpc.chain.subscribeNewHeads(() => {
-        if (++count === 2) {
+        if (++count === numberOfBlocks) {
           unsubscribe()
           resolve(true)
         }
@@ -121,7 +137,7 @@ export class Mangata {
   /**
    * Get the current nonce of the account
    */
-  public async getNonce(address: string): Promise<BN> {
+  public async getNonce(address: TTokenAddress): Promise<BN> {
     const api = await this.getApi()
     return Query.getNonce(api, address)
   }
@@ -427,8 +443,8 @@ export class Mangata {
    * @returns {BN | Array}
    */
   public async getAmountOfTokenIdInPool(
-    firstTokenId: string,
-    secondTokenId: string
+    firstTokenId: TTokenId,
+    secondTokenId: TTokenId
   ): Promise<BN[]> {
     const api = await this.getApi()
     return await Query.getAmountOfTokenIdInPool(api, firstTokenId, secondTokenId)
@@ -444,9 +460,9 @@ export class Mangata {
    *
    * @returns {BN}
    */
-  public async getLiquidityAssetId(firstTokenId: string, secondTokenId: string): Promise<BN> {
+  public async getLiquidityTokenId(firstTokenId: TTokenId, secondTokenId: TTokenId): Promise<BN> {
     const api = await this.getApi()
-    return await Query.getLiquidityAssetId(api, firstTokenId, secondTokenId)
+    return await Query.getLiquidityTokenId(api, firstTokenId, secondTokenId)
   }
 
   /**
@@ -551,7 +567,7 @@ export class Mangata {
    *
    * @returns {AccountData}
    */
-  public async getTokenBalance(tokenId: string, address: string): Promise<AccountData> {
+  public async getTokenBalance(tokenId: string, address: string): Promise<TokenBalance> {
     const api = await this.getApi()
     return await Query.getTokenBalance(api, address, tokenId)
   }
@@ -568,39 +584,9 @@ export class Mangata {
    * Returns bridge tokens
    */
 
-  public async getBridgeTokens(): Promise<
-    {
-      assetId: string
-      info: {
-        name: string
-        symbol: string
-        decimals: number
-        description: string
-      }
-      ethereumAddress: string
-    }[]
-  > {
+  public async getBridgeTokens() {
     const api = await this.getApi()
-    const bridgedTokens = await Query.getBridgedTokens(api)
-    const bridgedTokensFormatted: {
-      assetId: string
-      info: {
-        name: string
-        symbol: string
-        decimals: number
-        description: string
-      }
-      ethereumAddress: string
-    }[] = []
-
-    for (const item of bridgedTokens) {
-      // `item` is a Promise, therefore we await it
-      const bridgedAsset = await item
-
-      bridgedTokensFormatted.push(bridgedAsset)
-    }
-
-    return bridgedTokensFormatted
+    return await Query.getBridgedTokens(api)
   }
 
   /**
@@ -610,6 +596,16 @@ export class Mangata {
   public async getTokenInfo(tokenId: string) {
     const api = await this.getApi()
     return await Query.getTokenInfo(api, tokenId)
+  }
+
+  public async getBlockNumber(): Promise<string> {
+    const api = await this.getApi()
+    return await Query.getBlockNumber(api)
+  }
+
+  public async getOwnedTokens(address: string): Promise<Record<TTokenId, TToken> | null> {
+    const api = await this.getApi()
+    return await Query.getOwnedTokens(api, address)
   }
 
   /**
@@ -625,47 +621,29 @@ export class Mangata {
    * Returns info about all assets
    */
 
-  public async getAllAssetsInfo(): Promise<AssetInfo[]> {
+  public async getAssetsInfo(): Promise<TMainTokens> {
     const api = await this.getApi()
-    return await Query.getAllAssetsInfo(api)
+    return await Query.getAssetsInfo(api)
   }
 
-  public async sendTokensFromMGAtoParachain(
-    fromAccount: KeyringPair,
-    toAccount: string,
-    amount: BN,
-    assetId: string,
-    parachainId: number,
-    txOptions?: TxOptions
-  ) {
+  public async getBalances(): Promise<TBalances> {
     const api = await this.getApi()
-    return await TX.sendTokensFromMGAtoParachain(
-      api,
-      fromAccount,
-      toAccount,
-      amount,
-      assetId,
-      parachainId,
-      txOptions
-    )
+    return await Query.getBalances(api)
   }
 
-  public async sendTokensFromParachainToRely(
-    fromAccount: KeyringPair,
-    toAccount: string,
-    amount: BN,
-    assetId: string,
-    txOptions?: TxOptions
-  ) {
+  public async getBridgeAddresses(): Promise<TBridgeAddresses> {
     const api = await this.getApi()
-    return await TX.sendTokensFromParachainToRely(
-      api,
-      fromAccount,
-      toAccount,
-      amount,
-      assetId,
-      txOptions
-    )
+    return await Query.getBridgeAddresses(api)
+  }
+
+  public async getBridgeIds() {
+    const api = await this.getApi()
+    return await Query.getBridgeIds(api)
+  }
+
+  public async getLiquidityTokens(): Promise<TMainTokens> {
+    const api = await this.getApi()
+    return await Query.getLiquidityTokens(api)
   }
 
   /**
@@ -700,5 +678,28 @@ export class Mangata {
   ) {
     const api = await this.getApi()
     return await Tx.bridgeEthToEthereum(api, account, ethereumAddress, amount, txOptions)
+  }
+
+  public async getPool(liquditityTokenId: TTokenId): Promise<TPoolWithRatio> {
+    const api = await this.getApi()
+    return await Query.getPool(api, liquditityTokenId)
+  }
+
+  public async getInvestedPools(address: string): Promise<TPoolWithShare[]> {
+    const api = await this.getApi()
+    const investedPools = await Query.getInvestedPools(api, address)
+
+    const investedPoolsFormatted = []
+    for (const pool of investedPools) {
+      const awaitedPool = await pool
+      investedPoolsFormatted.push(awaitedPool)
+    }
+
+    return investedPoolsFormatted as TPoolWithShare[]
+  }
+
+  public async getPools(): Promise<TPoolWithRatio[]> {
+    const api = await this.getApi()
+    return await Query.getPools(api)
   }
 }
