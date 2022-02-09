@@ -1,7 +1,4 @@
 /* eslint-disable no-console */
-import BN from 'bn.js'
-import { mangataInstance } from './mangataInstanceCreation'
-import { getXoshiro } from '../src/utils/getXorshiroStates'
 import recreateExtrinsicsOrder from '../src/utils/recreateExtrinsicsOrder'
 
 describe('compare with rust impl', () => {

@@ -13,11 +13,11 @@ let firstCurrency: string
 let secondCurrency: string
 
 beforeEach(async () => {
-  await mangataInstance.waitNewBlock()
+  await mangataInstance.waitForNewBlock(2)
   const keyring = MangataHelpers.createKeyring('sr25519')
   testUser = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring)
   sudoUser = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring, SUDO_USER_NAME)
-  await mangataInstance.waitNewBlock()
+  await mangataInstance.waitForNewBlock(2)
   const currencies = await addAccountCurrencies(mangataInstance, testUser, sudoUser, [
     new BN(500000),
     new BN(500000).add(new BN(1)),
@@ -25,7 +25,7 @@ beforeEach(async () => {
   firstCurrency = currencies[0].toString()
   secondCurrency = currencies[1].toString()
   await addMGAToken(mangataInstance, sudoUser, testUser)
-  await mangataInstance.waitNewBlock()
+  await mangataInstance.waitForNewBlock(2)
 })
 
 describe('test create pool', () => {
@@ -79,7 +79,7 @@ describe('test buy asset', () => {
       secondCurrency,
       new BN(25000)
     )
-    await mangataInstance.waitNewBlock()
+    await mangataInstance.waitForNewBlock(2)
     await mangataInstance.buyAsset(
       testUser,
       firstCurrency,
@@ -144,7 +144,7 @@ describe('test sell asset', () => {
       secondCurrency,
       new BN(25000)
     )
-    await mangataInstance.waitNewBlock()
+    await mangataInstance.waitForNewBlock(2)
     await mangataInstance.sellAsset(
       testUser,
       firstCurrency,
@@ -174,7 +174,7 @@ describe('test mint liquidity', () => {
       secondCurrency,
       new BN(25000)
     )
-    await mangataInstance.waitNewBlock()
+    await mangataInstance.waitForNewBlock(2)
     await mangataInstance.mintLiquidity(
       testUser,
       firstCurrency,
@@ -200,7 +200,7 @@ describe('test burn liquidity', () => {
       secondCurrency,
       new BN(25000)
     )
-    await mangataInstance.waitNewBlock()
+    await mangataInstance.waitForNewBlock(2)
     await mangataInstance.burnLiquidity(testUser, firstCurrency, secondCurrency, new BN(10000), {
       extrinsicStatus: (result) => {
         const eventResult = getEventResultFromTxWait(result)
