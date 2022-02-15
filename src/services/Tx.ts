@@ -24,7 +24,7 @@ export const signTx = async (
     const extractedAccount = typeof account === 'string' ? account : account.address
 
     const nonce = await getTxNonce(api, extractedAccount, txOptions)
-
+    let retries = 0
     try {
       const unsub = await tx.signAndSend(
         account,
@@ -105,7 +105,8 @@ export const signTx = async (
                   txOptions && txOptions.extrinsicStatus && txOptions.extrinsicStatus(output)
                   resolve(output)
                   unsub()
-                } else {
+                } else if (retries++ > 2) {
+                  //Lets retry this for 3 times until we reject the promise.
                   unsubscribeNewHeads()
                   reject(
                     `Transaction was not finalized: Last Header Parent hash: ${lastHeader.parentHash.toString()} and Status finalized: ${result.status.asFinalized.toString()}`
