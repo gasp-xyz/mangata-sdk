@@ -107,7 +107,9 @@ export const signTx = async (
                   unsub()
                 } else {
                   unsubscribeNewHeads()
-                  reject()
+                  reject(
+                    `Transaction was not finalized: Last Header Parent hash: ${lastHeader.parentHash.toString()} and Status finalized: ${result.status.asFinalized.toString()}`
+                  )
                   unsub()
                 }
               }
