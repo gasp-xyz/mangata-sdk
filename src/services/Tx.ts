@@ -56,14 +56,26 @@ export const signTx = async (
                     currentBlockExtrinsics.length
                   )
                   const bothBlocksExtrinsics = currentBlockInherents.concat(previousBlockExtrinsics)
-                  const shuffledExtrinsics = recreateExtrinsicsOrder(
-                    bothBlocksExtrinsics.map((tx) => {
-                      const who = tx.isSigned ? tx.signer.toString() : '0000'
-                      return [who, tx]
-                    }),
+
+                  const unshuffledInherents = bothBlocksExtrinsics.filter((tx) => {
+                    return !tx.isSigned
+                  })
+
+                  const shuffledExtrinscs = recreateExtrinsicsOrder(
+                    bothBlocksExtrinsics
+                      .filter((tx) => {
+                        return tx.isSigned
+                      })
+                      .map((tx) => {
+                        const who = tx.isSigned ? tx.signer.toString() : '0000'
+                        return [who, tx]
+                      }),
                     Uint8Array.from(buffer)
                   )
-                  const index = shuffledExtrinsics.findIndex((shuffledExtrinsic) => {
+
+                  const executionOrder = unshuffledInherents.concat(shuffledExtrinscs)
+
+                  const index = executionOrder.findIndex((shuffledExtrinsic) => {
                     return (
                       shuffledExtrinsic?.isSigned &&
                       shuffledExtrinsic?.signer.toString() === extractedAccount &&
