@@ -30,6 +30,7 @@ export const signTx = async (
         account,
         { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
         async (result) => {
+          console.info('Hash:[' + tx.hash + '] \n      Status-' + result.status)
           txOptions && txOptions.statusCallback && txOptions.statusCallback(result)
           if (result.status.isFinalized) {
             const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
@@ -117,11 +118,24 @@ export const signTx = async (
                   txOptions && txOptions.extrinsicStatus && txOptions.extrinsicStatus(output)
                   resolve(output)
                   unsub()
-                } else if (retries++ > 2) {
+                } else if (retries++ < 10) {
+                  console.info(
+                    'Retry [' +
+                      retries +
+                      '] \n      Hash:[' +
+                      tx.hash +
+                      '] \n      Status-' +
+                      result.status +
+                      ' \n     Parent[' +
+                      lastHeader.parentHash.toString() +
+                      ' \n     Finalized in:' +
+                      result.status.asFinalized.toString()
+                  )
+                } else {
                   //Lets retry this for 3 times until we reject the promise.
                   unsubscribeNewHeads()
                   reject(
-                    `Transaction was not finalized: Last Header Parent hash: ${lastHeader.parentHash.toString()} and Status finalized: ${result.status.asFinalized.toString()}`
+                    `Transaction was not finalized: Last Header Parent hash: ${lastHeader.parentHash.toString()} and \n     Status finalized: ${result.status.asFinalized.toString()}`
                   )
                   unsub()
                 }
