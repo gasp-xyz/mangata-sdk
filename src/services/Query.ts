@@ -70,16 +70,14 @@ class Query {
     return poolAssetIds.map((num: any) => new BN(num.toString()))
   }
 
-  static async getTreasury(api: ApiPromise, tokenId: TTokenId): Promise<AccountData> {
+  static async getTreasury(api: ApiPromise, tokenId: TTokenId) {
     const treasuryBalance = await api.query.tokens.accounts(TREASURY_ADDRESS, tokenId)
-    const accountData = treasuryBalance as AccountData
-    return accountData
+    return treasuryBalance
   }
 
-  static async getTreasuryBurn(api: ApiPromise, tokenId: TTokenId): Promise<AccountData> {
+  static async getTreasuryBurn(api: ApiPromise, tokenId: TTokenId) {
     const treasuryBalance = await api.query.tokens.accounts(TREASURY_BURN_ADDRESS, tokenId)
-    const accountData = treasuryBalance as AccountData
-    return accountData
+    return treasuryBalance
   }
 
   static async getTotalIssuance(api: ApiPromise, tokenId: TTokenId): Promise<BN> {

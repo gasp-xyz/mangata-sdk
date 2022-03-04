@@ -1,21 +1,19 @@
 /* eslint-disable no-console */
-import { ApiPromise, WsProvider } from '@polkadot/api'
+import { ApiPromise } from '@polkadot/api'
 import { KeyringPair } from '@polkadot/keyring/types'
-import { AccountData } from '@polkadot/types/interfaces/balances'
+import { WsProvider } from '@polkadot/rpc-provider/ws'
 import BN from 'bn.js'
 
 import Rpc from './services/Rpc'
 import TX from './services/Tx'
 import Query from './services/Query'
-
-import { options } from './utils/options'
 import { MangataGenericEvent } from './types/MangataGenericEvent'
 import { TxOptions } from './types/TxOptions'
+import rpcOptions from './utils/mangata-rpc'
 import Tx from './services/Tx'
 import {
   TTokenAddress,
   TToken,
-  TPool,
   TBalances,
   TMainTokens,
   TokenBalance,
@@ -24,6 +22,10 @@ import {
   TPoolWithShare,
   TPoolWithRatio,
 } from './types/AssetInfo'
+
+import './interfaces/augment-api'
+import './interfaces/augment-types'
+import * as definitions from './interfaces/definitions'
 
 /**
  * @class Mangata
@@ -50,11 +52,11 @@ export class Mangata {
    */
   private async connectToNode(uri: string) {
     const provider = new WsProvider(uri)
-    const api = await ApiPromise.create(
-      options({
-        provider,
-      })
+    const types = Object.values(definitions).reduce(
+      (res, { types }): object => ({ ...res, ...types }),
+      {}
     )
+    const api = await ApiPromise.create({ provider, types, rpc: rpcOptions })
     return api
   }
 
@@ -482,7 +484,7 @@ export class Mangata {
    *
    * @returns {AccountData}
    */
-  public async getTreasury(tokenId: string): Promise<AccountData> {
+  public async getTreasury(tokenId: string) {
     const api = await this.getApi()
     return await Query.getTreasury(api, tokenId)
   }
@@ -493,7 +495,7 @@ export class Mangata {
    *
    * @returns {AccountData}
    */
-  public async getTreasuryBurn(tokenId: string): Promise<AccountData> {
+  public async getTreasuryBurn(tokenId: string) {
     const api = await this.getApi()
     return await Query.getTreasuryBurn(api, tokenId)
   }

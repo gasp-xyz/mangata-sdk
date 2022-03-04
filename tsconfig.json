@@ -1,17 +1,22 @@
 {
   "include": ["src"],
-  "exclude": [
-        "test",
-        "dist",
-        "node_modules"
-    ],
+  "exclude": ["test", "dist", "node_modules"],
+  "paths": {
+    // this is the package name we use (in the interface imports, --package for generators)
+    "mangata-sdk/*": ["src/*"],
+    // here we replace the @polkadot/api augmentation with our own, generated from chain
+    "@polkadot/api/augment": ["src/interfaces/augment-api.ts"],
+    // replace the augmented types with our own, as generated from definitions
+    "@polkadot/types/augment": ["src/interfaces/augment-types.ts"],
+    "@polkadot/types/lookup": ["src/interfaces/types-lookup.ts"]
+  },
   "compilerOptions": {
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es6",
+    "target": "esnext",
     "noImplicitAny": true,
-     // I use commonJS / nodeJS as its the module system on NodeJS
-    "module": "commonjs",
+    // I use commonJS / nodeJS as its the module system on NodeJS
+    "module": "esnext",
     "moduleResolution": "node",
     "strict": true,
     "sourceMap": true,
@@ -20,6 +25,8 @@
     // It tells typescript to generate the typings ( important if we want some "automatic" docs for our code
     "declaration": true,
     "declarationMap": true,
-    "rootDir": "src"
+    "skipLibCheck": true,
+    "rootDir": "src",
+    "typeRoots": ["./node_modules/@types"]
   }
 }
