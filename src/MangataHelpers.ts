@@ -1,16 +1,10 @@
 /* eslint-disable no-console */
-import { WsProvider, Keyring } from '@polkadot/api'
+import { Keyring } from '@polkadot/api'
 import { KeypairType } from '@polkadot/util-crypto/types'
 import { KeyringPair } from '@polkadot/keyring/types'
-import type { DefinitionRpc, DefinitionRpcSub, RegistryTypes } from '@polkadot/types/types'
-import { ApiOptions } from '@polkadot/api/types'
 import { v4 as uuid } from 'uuid'
 import BN from 'bn.js'
 import Big from 'big.js'
-
-import { options } from './utils/options'
-import rpcOptions from './utils/mangata-rpc'
-import typesOptions from './utils/mangata-types'
 import { getXoshiro } from './utils/getXorshiroStates'
 import { isInputValid } from './utils/isInputValid'
 import { toBN } from './utils/toBn'
@@ -23,18 +17,6 @@ import { BIG_HUNDRED } from './utils/bigConstants'
  * @author Mangata Finance
  */
 export class MangataHelpers {
-  public static getApiOptions(provider: WsProvider): ApiOptions {
-    return options({ provider })
-  }
-
-  public static getMangataRpc(): Record<string, Record<string, DefinitionRpc | DefinitionRpcSub>> {
-    return rpcOptions
-  }
-
-  public static getMangataTypes(): RegistryTypes {
-    return typesOptions
-  }
-
   public static createKeyring(type: KeypairType): Keyring {
     return new Keyring({ type })
   }
