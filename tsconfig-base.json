@@ -1,0 +1,35 @@
+{
+  "paths": {
+    // this is the package name we use (in the interface imports, --package for generators)
+    "mangata-sdk/*": ["src/*"],
+    // here we replace the @polkadot/api augmentation with our own, generated from chain
+    "@polkadot/api/augment": ["src/interfaces/augment-api.ts"],
+    // replace the augmented types with our own, as generated from definitions
+    "@polkadot/types/augment": ["src/interfaces/augment-types.ts"],
+    "@polkadot/types/lookup": ["src/interfaces/types-lookup.ts"]
+  },
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "src",
+    "declaration": true,
+    "esModuleInterop": true,
+    "inlineSourceMap": false,
+    "lib": ["esnext"],
+    "listEmittedFiles": false,
+    "listFiles": false,
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "pretty": true,
+    "resolveJsonModule": true,
+    "declarationMap": true,
+    "rootDir": "src",
+    "skipLibCheck": true,
+    "strict": true,
+    "traceResolution": false,
+    "types": ["node", "jest"]
+  },
+  "compileOnSave": false,
+  "exclude": ["node_modules", "build"],
+  "include": ["src"]
+}
