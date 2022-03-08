@@ -1,12 +1,19 @@
 {
   "name": "mangata-sdk",
-  "version": "0.17.8",
+  "version": "0.18.1",
   "description": "SDK for communication with Mangata node",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "build/cjs/index.js",
+  "module": "build/mjs/index.js",
+  "types": "build/cjs/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./build/mjs/index.js",
+      "require": "./build/cjs/index.js"
+    }
+  },
   "scripts": {
+    "build": "rm -fr build/* && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./fixup",
     "test": "jest --runInBand --detectOpenHandles --verbose",
-    "build": "tsc -p tsconfig.json",
     "start": "yarn build && node ./build/index.js",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "eslint": "node_modules/.bin/eslint --max-warnings 0 . --ext .ts",
