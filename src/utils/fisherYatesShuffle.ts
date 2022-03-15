@@ -27,7 +27,7 @@ export class FisherYates {
       // The number 4294967295, equivalent to the hexadecimal value FFFFFFFF, is the
       // maximum value for a 32-bit unsigned integer in computing.
       const random = this.next_u64()
-      const j = random.modn(i)
+      const j = random.modn(i+1)
       const tmp = arr[i]
       arr[i] = arr[j]
       arr[j] = tmp
