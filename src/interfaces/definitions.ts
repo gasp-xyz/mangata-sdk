@@ -13,5 +13,13 @@ export default {
       seed: 'ShufflingSeed',
       count: 'BlockNumber',
     },
+    RpcResult: {
+      price: 'Balance',
+    },
+    RPCAmountsResult: {
+      firstAssetAmount: 'Balance',
+      secondAssetAmount: 'Balance',
+    },
+    TokenId: 'u32',
   },
 }

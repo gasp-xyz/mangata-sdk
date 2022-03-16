@@ -1113,7 +1113,7 @@ import type {
   XcmVersion,
   XcmpMessageFormat,
 } from '@polkadot/types/interfaces/xcm'
-import type { ShufflingSeed } from '../interfaces/default'
+import type { RPCAmountsResult, RpcResult, ShufflingSeed, TokenId } from '../interfaces/default'
 
 declare module '@polkadot/types/types/registry' {
   export interface InterfaceTypes {
@@ -1865,7 +1865,9 @@ declare module '@polkadot/types/types/registry' {
     RewardPoint: RewardPoint
     RoundSnapshot: RoundSnapshot
     RoundState: RoundState
+    RPCAmountsResult: RPCAmountsResult
     RpcMethods: RpcMethods
+    RpcResult: RpcResult
     RuntimeDbWeight: RuntimeDbWeight
     RuntimeDispatchInfo: RuntimeDispatchInfo
     RuntimeVersion: RuntimeVersion
@@ -2041,6 +2043,7 @@ declare module '@polkadot/types/types/registry' {
     Text: Text
     Timepoint: Timepoint
     TokenError: TokenError
+    TokenId: TokenId
     TombstoneContractInfo: TombstoneContractInfo
     TraceBlockResponse: TraceBlockResponse
     TraceError: TraceError
