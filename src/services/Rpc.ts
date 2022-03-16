@@ -25,7 +25,8 @@ class Rpc {
     const result = await (api.rpc as any).xyk.calculate_buy_price(
       inputReserve,
       outputReserve,
-      amount
+      amount,
+      null
     )
     return new BN(result.price)
   }
@@ -39,7 +40,8 @@ class Rpc {
     const result = await (api.rpc as any).xyk.calculate_sell_price(
       inputReserve,
       outputReserve,
-      amount
+      amount,
+      null
     )
     return new BN(result.price)
   }
@@ -51,7 +53,12 @@ class Rpc {
     secondTokenId: string,
     amount: BN
   ) {
-    const result = await (api.rpc as any).xyk.get_burn_amount(firstTokenId, secondTokenId, amount)
+    const result = await (api.rpc as any).xyk.get_burn_amount(
+      firstTokenId,
+      secondTokenId,
+      amount,
+      null
+    )
     const resultAsJson = JSON.parse(result.toString())
     return resultAsJson
   }
@@ -65,7 +72,8 @@ class Rpc {
     const result = await (api.rpc as any).xyk.calculate_sell_price_id(
       firstTokenId,
       secondTokenId,
-      amount
+      amount,
+      null
     )
     return new BN(result.price)
   }
@@ -79,7 +87,8 @@ class Rpc {
     const result = await (api.rpc as any).xyk.calculate_buy_price_id(
       firstTokenId,
       secondTokenId,
-      amount
+      amount,
+      null
     )
     return new BN(result.price)
   }

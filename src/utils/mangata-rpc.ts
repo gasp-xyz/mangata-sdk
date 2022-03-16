@@ -17,6 +17,10 @@ const rpcOptions: Record<string, Record<string, DefinitionRpc | DefinitionRpcSub
           name: 'sell_amount',
           type: 'Balance',
         },
+        {
+          name: 'at',
+          type: 'Option<BlockHash>',
+        },
       ],
       type: 'RpcResult<Balance>',
     },
@@ -34,6 +38,10 @@ const rpcOptions: Record<string, Record<string, DefinitionRpc | DefinitionRpcSub
         {
           name: 'sell_amount',
           type: 'Balance',
+        },
+        {
+          name: 'at',
+          type: 'Option<BlockHash>',
         },
       ],
       type: 'RpcResult<Balance>',
@@ -53,6 +61,10 @@ const rpcOptions: Record<string, Record<string, DefinitionRpc | DefinitionRpcSub
           name: 'liquidity_asset_amount',
           type: 'Balance',
         },
+        {
+          name: 'at',
+          type: 'Option<BlockHash>',
+        },
       ],
       type: 'RPCAmountsResult<Balance>',
     },
@@ -71,6 +83,10 @@ const rpcOptions: Record<string, Record<string, DefinitionRpc | DefinitionRpcSub
           name: 'sell_amount',
           type: 'Balance',
         },
+        {
+          name: 'at',
+          type: 'Option<BlockHash>',
+        },
       ],
       type: 'RpcResult<Balance>',
     },
@@ -88,6 +104,10 @@ const rpcOptions: Record<string, Record<string, DefinitionRpc | DefinitionRpcSub
         {
           name: 'buy_amount',
           type: 'Balance',
+        },
+        {
+          name: 'at',
+          type: 'Option<BlockHash>',
         },
       ],
       type: 'RpcResult<Balance>',
