@@ -1,9 +1,8 @@
 /* eslint-disable no-console */
 import { KeyringPair } from '@polkadot/keyring/types'
-import BN from 'bn.js'
+import { BN } from '@polkadot/util'
 
 import { Mangata } from '../src/Mangata'
-import { MangataHelpers } from '../src/MangataHelpers'
 import ExtrinsicResult from '../src/enums/ExtrinsicResult'
 import { MangataGenericEvent } from '../src/types/MangataGenericEvent'
 
@@ -15,7 +14,7 @@ export const addAccountCurrencies = async (
 ): Promise<BN[]> => {
   const currencies: BN[] = []
   for (let currency = 0; currency < currencyValues.length; currency++) {
-    await mangataInstance.waitNewBlock()
+    await mangataInstance.waitForNewBlock()
     const nonce = await mangataInstance.getNonce(sudo.address)
     await mangataInstance
       .createToken(user.address, sudo, currencyValues[currency], {
@@ -33,7 +32,7 @@ export const addAccountCurrencies = async (
         currencies.push(currencyId)
       })
   }
-  await mangataInstance.waitNewBlock()
+  await mangataInstance.waitForNewBlock()
   return currencies
 }
 
@@ -85,7 +84,7 @@ export const addMGAToken = async (
   freeAmount: BN = new BN(10).pow(new BN(18))
 ): Promise<void> => {
   const sudoNonce = await mangataInstance.getNonce(sudoUser.address)
-  await mangataInstance.waitNewBlock()
+  await mangataInstance.waitForNewBlock()
   await mangataInstance.mintAsset(sudoUser, '0', user.address, new BN(freeAmount), {
     nonce: sudoNonce,
   })

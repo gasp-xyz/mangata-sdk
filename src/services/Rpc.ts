@@ -1,5 +1,5 @@
 import { ApiPromise } from '@polkadot/api'
-import BN from 'bn.js'
+import { BN } from '@polkadot/util'
 
 class Rpc {
   static async getChain(api: ApiPromise): Promise<string> {
@@ -25,8 +25,7 @@ class Rpc {
     const result = await (api.rpc as any).xyk.calculate_buy_price(
       inputReserve,
       outputReserve,
-      amount,
-      null
+      amount
     )
     return new BN(result.price)
   }
@@ -40,8 +39,7 @@ class Rpc {
     const result = await (api.rpc as any).xyk.calculate_sell_price(
       inputReserve,
       outputReserve,
-      amount,
-      null
+      amount
     )
     return new BN(result.price)
   }
@@ -53,12 +51,7 @@ class Rpc {
     secondTokenId: string,
     amount: BN
   ) {
-    const result = await (api.rpc as any).xyk.get_burn_amount(
-      firstTokenId,
-      secondTokenId,
-      amount,
-      null
-    )
+    const result = await (api.rpc as any).xyk.get_burn_amount(firstTokenId, secondTokenId, amount)
     const resultAsJson = JSON.parse(result.toString())
     return resultAsJson
   }
@@ -72,8 +65,7 @@ class Rpc {
     const result = await (api.rpc as any).xyk.calculate_sell_price_id(
       firstTokenId,
       secondTokenId,
-      amount,
-      null
+      amount
     )
     return new BN(result.price)
   }
@@ -87,8 +79,7 @@ class Rpc {
     const result = await (api.rpc as any).xyk.calculate_buy_price_id(
       firstTokenId,
       secondTokenId,
-      amount,
-      null
+      amount
     )
     return new BN(result.price)
   }

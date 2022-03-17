@@ -1,5 +1,5 @@
 import { ApiPromise } from '@polkadot/api'
-import BN from 'bn.js'
+import { BN } from '@polkadot/util'
 
 export const balancesMap = async (api: ApiPromise) => {
   const balancesResponse = await api.query.tokens.totalIssuance.entries()

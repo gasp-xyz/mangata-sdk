@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import BN from 'bn.js'
+import { BN } from '@polkadot/util'
 import { KeyringPair } from '@polkadot/keyring/types'
 
 import { mangataInstance, SUDO_USER_NAME } from './mangataInstanceCreation'

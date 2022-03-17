@@ -1,4 +1,4 @@
-import BN from 'bn.js'
+import { BN } from '@polkadot/util'
 import Big from 'big.js'
 
 Big.PE = 256

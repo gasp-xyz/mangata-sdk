@@ -1,6 +1,6 @@
 import { ApiPromise } from '@polkadot/api'
 import { hexToBn, isHex } from '@polkadot/util'
-import BN from 'bn.js'
+import { BN } from '@polkadot/util'
 
 type TLiquidityTokens = {
   [identificator: string]: string

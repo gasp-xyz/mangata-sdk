@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import BN from 'bn.js'
+import { BN } from '@polkadot/util'
 import { mangataInstance } from './mangataInstanceCreation'
 
 describe('Calculate Price', () => {

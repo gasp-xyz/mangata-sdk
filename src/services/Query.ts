@@ -1,7 +1,5 @@
 import { ApiPromise } from '@polkadot/api'
-import { AccountData } from '@polkadot/types/interfaces/balances'
-import { hexToBn, isHex } from '@polkadot/util'
-import BN from 'bn.js'
+import { hexToBn, isHex, BN } from '@polkadot/util'
 import {
   TToken,
   TTokenInfo,

@@ -2,7 +2,7 @@
 import { ApiPromise } from '@polkadot/api'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { SubmittableExtrinsic } from '@polkadot/api/types'
-import BN from 'bn.js'
+import { BN } from '@polkadot/util'
 
 import recreateExtrinsicsOrder from '../utils/recreateExtrinsicsOrder'
 import memoryDatabase from '../utils/MemoryDatabase'

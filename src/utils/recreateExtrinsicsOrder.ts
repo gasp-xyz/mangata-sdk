@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-import { GenericExtrinsic } from '@polkadot/types'
 import { FisherYates } from './fisherYatesShuffle'
 
 const recreateExtrinsicsOrder = <K>(extrinsics: [string, K][], seedBytes: Uint8Array) => {

@@ -1,4 +1,4 @@
-import BN from 'bn.js'
+import { BN } from '@polkadot/util'
 
 export const BN_ZERO = new BN('0')
 export const BN_ONE = new BN('1')

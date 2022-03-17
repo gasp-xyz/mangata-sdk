@@ -2,7 +2,7 @@
 import { ApiPromise } from '@polkadot/api'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { WsProvider } from '@polkadot/rpc-provider/ws'
-import BN from 'bn.js'
+import { BN } from '@polkadot/util'
 
 import Rpc from './services/Rpc'
 import TX from './services/Tx'

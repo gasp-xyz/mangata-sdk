@@ -1,5 +1,5 @@
 import { ApiPromise } from '@polkadot/api'
-import BN from 'bn.js'
+import { BN } from '@polkadot/util'
 
 export const accountEntriesMap = async (api: ApiPromise, address: string) => {
   const ownedAssetsResponse = await api.query.tokens.accounts.entries(address)

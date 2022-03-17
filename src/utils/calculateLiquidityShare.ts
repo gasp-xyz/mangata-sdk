@@ -1,5 +1,5 @@
 import { ApiPromise } from '@polkadot/api'
-import BN from 'bn.js'
+import { BN } from '@polkadot/util'
 import { BN_DIV_NUMERATOR_MULTIPLIER, BN_ZERO } from '..'
 
 export const calculateLiquidityShare = async (

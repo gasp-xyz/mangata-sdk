@@ -1,5 +1,5 @@
 import { ApiPromise } from '@polkadot/api'
-import BN from 'bn.js'
+import { BN } from '@polkadot/util'
 
 import Query from '../services/Query'
 import memoryDatabase from '../utils/MemoryDatabase'

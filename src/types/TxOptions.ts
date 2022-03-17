@@ -1,6 +1,6 @@
 import { Signer } from '@polkadot/types/types'
 import type { ISubmittableResult } from '@polkadot/types/types'
-import BN from 'bn.js'
+import { BN } from '@polkadot/util'
 import { MangataGenericEvent } from './MangataGenericEvent'
 
 export type TxOptions = Partial<{

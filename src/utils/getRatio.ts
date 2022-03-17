@@ -1,4 +1,4 @@
-import BN from 'bn.js'
+import { BN } from '@polkadot/util'
 import { BN_DIV_NUMERATOR_MULTIPLIER, BN_ZERO } from '..'
 
 const getGcd = (a: BN, b: BN): BN => {
