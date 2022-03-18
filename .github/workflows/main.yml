@@ -6,13 +6,13 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      API_URL: 'ws://172.16.238.10:9944'
+      API_URL: 'ws://10.0.0.6:9944'
       TEST_PALLET_ADDRESS: ${{ secrets.TEST_PALLET_ADDRESS }}
       TEST_SUDO_NAME: ${{ secrets.TEST_SUDO_NAME }}
 
     steps:
       - name: set registry
-        run: yarn config set registry https://registry.npmjs.org  
+        run: yarn config set registry https://registry.npmjs.org
 
       - uses: actions/checkout@v2
       - name: install
@@ -26,6 +26,9 @@ jobs:
 
       - name: Docker ps
         run: docker ps
+
+      - name: Sleep for 2 minutes
+        run: sleep 120s
 
       - name: Test
         run: yarn test
