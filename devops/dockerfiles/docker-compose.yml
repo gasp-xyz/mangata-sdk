@@ -127,27 +127,3 @@ services:
     networks:
       test_net:
         ipv4_address: 10.0.0.6
-
-  ui:
-    build:
-      context: ../../
-      dockerfile: devops/dockerfiles/polkadot-ui/Dockerfile
-    ports:
-      - 3000:3000
-    networks:
-      test_net:
-        ipv4_address: 10.0.0.10
-
-  sidecar:
-    image: parity/substrate-api-sidecar:latest
-    container_name: para_alice_sidecar
-    depends_on:
-      - para_alice
-    ports:
-      - '8080:8080'
-    networks:
-      test_net:
-        ipv4_address: 10.0.0.11
-    environment:
-      SAS_SUBSTRATE_WS_URL: ws://para_alice:9944
-      SAS_EXPRESS_LOG_MODE: all
