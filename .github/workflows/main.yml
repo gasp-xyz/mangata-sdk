@@ -24,11 +24,11 @@ jobs:
       - name: Start mangata-node node
         run: docker-compose -f devops/dockerfiles/docker-compose.yml up -d
 
-      - name: Docker ps
-        run: docker ps
-
       - name: Sleep for 2 minutes
         run: sleep 120s
+
+      - name: Docker ps
+        run: docker ps
 
       - name: Test
         run: yarn test
