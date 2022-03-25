@@ -96,7 +96,7 @@ export const signTx = async (
                     .map((eventRecord) => {
                       const { event, phase } = eventRecord
                       const types = event.typeDef
-                      const eventData: MangataEventData[] = event.data.map((d, i) => {
+                      const eventData: MangataEventData[] = event.data.map((d: any, i: any) => {
                         return {
                           lookupName: types[i].lookupName!,
                           data: d,

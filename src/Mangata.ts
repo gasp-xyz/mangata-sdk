@@ -2,6 +2,7 @@
 import { ApiPromise } from '@polkadot/api'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { WsProvider } from '@polkadot/rpc-provider/ws'
+import { options } from '@mangata-finance/types'
 import { BN } from '@polkadot/util'
 
 import Rpc from './services/Rpc'
@@ -9,7 +10,6 @@ import TX from './services/Tx'
 import Query from './services/Query'
 import { MangataGenericEvent } from './types/MangataGenericEvent'
 import { TxOptions } from './types/TxOptions'
-import rpcOptions from './utils/mangata-rpc'
 import Tx from './services/Tx'
 import {
   TTokenAddress,
@@ -22,10 +22,6 @@ import {
   TPoolWithShare,
   TPoolWithRatio,
 } from './types/AssetInfo'
-
-import './interfaces/augment-api'
-import './interfaces/augment-types'
-import * as definitions from './interfaces/definitions'
 
 /**
  * @class Mangata
@@ -52,11 +48,9 @@ export class Mangata {
    */
   private async connectToNode(uri: string) {
     const provider = new WsProvider(uri)
-    const types = Object.values(definitions).reduce(
-      (res, { types }): object => ({ ...res, ...types }),
-      {}
+    const api = await ApiPromise.create(
+      options({ provider, throwOnConnect: true, throwOnUnknown: true })
     )
-    const api = await ApiPromise.create({ provider, types, rpc: rpcOptions })
     return api
   }
 
@@ -101,7 +95,6 @@ export class Mangata {
 
     const numberOfBlocks = blockCount || 1
 
-    console.log(`Waiting for ${numberOfBlocks} blocks`)
     return new Promise(async (resolve) => {
       const unsubscribe = await api.rpc.chain.subscribeNewHeads(() => {
         if (++count === numberOfBlocks) {

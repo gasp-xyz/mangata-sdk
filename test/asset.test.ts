@@ -7,7 +7,7 @@ describe('Asset', () => {
       const asset = await mangataInstance.getTokenInfo('0')
       expect(asset.name).toBe('Mangata')
       expect(asset.symbol).toBe('MGA')
-      expect(asset.decimals).toBe('18')
+      expect(asset.decimals).toBe(18)
     }
   })
 })
