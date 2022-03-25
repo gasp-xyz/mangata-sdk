@@ -1,4 +1,4 @@
-export { fromBN, toBN } from 'utils/toBn'
+export { fromBN, toBN } from './utils/toBn'
 
 export { Mangata } from './Mangata'
 export { MangataHelpers } from './MangataHelpers'
