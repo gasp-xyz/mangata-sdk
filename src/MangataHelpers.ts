@@ -56,6 +56,8 @@ export class MangataHelpers {
     const soldAmount = toBN(firstTokenAmount, poolDecimals.firstTokenDecimals)
     const boughtAmount = toBN(secondTokenAmount, poolDecimals.secondTokenDecimals)
 
+    if (soldAmount.gte(firstReserveBefore) || boughtAmount.gte(secondReserveBefore)) return ''
+
     const numerator = firstReserveBefore
       .add(soldAmount)
       .mul(BN_TEN_THOUSAND)
