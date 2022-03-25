@@ -1,30 +1,55 @@
 import { BN } from '@polkadot/util'
 import Big from 'big.js'
+import { BIG_TEN } from './bigConstants'
+import { BN_ZERO } from './bnConstants'
 
-Big.PE = 256
-Big.DP = 40
-Big.NE = -40
+Big.PE = 256 // The positive exponent value at and above which toString returns exponential notation.
+Big.NE = -256 // The negative exponent value at and below which toString returns exponential notation.
+Big.DP = 40 // The maximum number of decimal places of the results of operations involving division.
+Big.RM = Big.roundUp // Rounding mode
 
-const BIG_10 = Big('10')
-const DEFAULT_ASSET_DECIMALS = 18
-const DEFAULT_DECIMAL_MULTIPLIER = BIG_10.pow(DEFAULT_ASSET_DECIMALS)
+const DEFAULT_TOKEN_DECIMALS = 18
+const DEFAULT_DECIMAL_MULTIPLIER = BIG_TEN.pow(DEFAULT_TOKEN_DECIMALS)
 
-export const toBN = (n: string, decimals?: number): BN => {
-  if (!n) return new BN('0')
+export const toBN = (value: string, exponent?: number): BN => {
+  if (!value) return BN_ZERO
 
   try {
-    const inputNumber = Big(n)
+    const inputNumber = Big(value)
     const decimalMultiplier =
-      !decimals || decimals === DEFAULT_ASSET_DECIMALS
+      !exponent || exponent === DEFAULT_TOKEN_DECIMALS
         ? DEFAULT_DECIMAL_MULTIPLIER
-        : BIG_10.pow(decimals)
+        : BIG_TEN.pow(exponent)
+
     const res = inputNumber.mul(decimalMultiplier)
-    const resStr = res.toString()
+    const resStr = res.round().toString()
+
+    if (/\D/gm.test(resStr)) return BN_ZERO
 
     return new BN(resStr)
   } catch (err) {
     console.error('Could not convert to BN:', err)
 
-    return new BN('0')
+    return BN_ZERO
+  }
+}
+
+export const fromBN = (value: BN, exponent?: number): string => {
+  if (!value) return '0'
+
+  try {
+    const inputNumber = Big(value.toString())
+    const decimalMultiplier =
+      !exponent || exponent === DEFAULT_TOKEN_DECIMALS
+        ? DEFAULT_DECIMAL_MULTIPLIER
+        : BIG_TEN.pow(exponent)
+    const res = inputNumber.div(decimalMultiplier)
+    const resStr = res.round().toString()
+
+    return resStr
+  } catch (err) {
+    console.error('Could not convert from BN:', err)
+
+    return '0'
   }
 }
