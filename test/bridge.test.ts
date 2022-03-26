@@ -5,8 +5,6 @@ describe('Bridge', () => {
     const api = await mangataInstance.getApi()
     if (api.isConnected) {
       const tokens = await mangataInstance.getBridgeTokens()
-
-      console.log(tokens)
       expect(tokens[0].name).toEqual('Mangata')
       expect(tokens[1].name).toEqual('Ether')
 

@@ -19,6 +19,7 @@ beforeEach(async () => {
   testUser = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring)
   testUser1 = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring)
   sudoUser = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring, SUDO_USER_NAME)
+
   await mangataInstance.waitForNewBlock(2)
   const currencies = await addAccountCurrencies(mangataInstance, testUser, sudoUser, [
     new BN(500000),
@@ -42,7 +43,6 @@ describe('Testing additional methods', () => {
         expect(eventTransfer.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
       },
     })
-
     await mangataInstance.transferTokenAll(testUser, firstCurrency, testUser1.address, {
       extrinsicStatus: (resultTransferAll) => {
         const eventTransferAll = getEventResultFromTxWait(resultTransferAll, [
@@ -53,17 +53,11 @@ describe('Testing additional methods', () => {
         expect(eventTransferAll.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
       },
     })
-
     const issuance = await mangataInstance.getTotalIssuance(firstCurrency)
-
     expect(issuance.toNumber()).toEqual(500000)
-
     const tokenBalance = await mangataInstance.getTokenBalance(firstCurrency, testUser1.address)
-
     expect(tokenBalance.free.toNumber()).toEqual(500000)
-
     const lock = await mangataInstance.getLock(testUser.address, firstCurrency)
-
     expect(lock).toEqual([])
   })
 })

@@ -13,7 +13,7 @@
   },
   "scripts": {
     "build": "rm -fr build/* && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./fixup",
-    "test": "jest --runInBand --verbose",
+    "test": "jest --runInBand --verbose --detectOpenHandles",
     "start": "yarn build && node ./build/index.js",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "eslint": "node_modules/.bin/eslint --max-warnings 0 . --ext .ts",
