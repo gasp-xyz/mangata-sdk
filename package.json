@@ -1,6 +1,6 @@
 {
   "name": "mangata-sdk",
-  "version": "0.19.4",
+  "version": "0.19.5",
   "description": "SDK for communication with Mangata node",
   "main": "build/cjs/index.js",
   "module": "build/mjs/index.js",
