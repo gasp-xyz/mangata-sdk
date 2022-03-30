@@ -22,7 +22,7 @@ export const toBN = (value: string, exponent?: number): BN => {
         : BIG_TEN.pow(exponent)
 
     const res = inputNumber.mul(decimalMultiplier)
-    const resStr = res.round().toString()
+    const resStr = res.toString()
 
     if (/\D/gm.test(resStr)) return BN_ZERO
 
@@ -44,7 +44,7 @@ export const fromBN = (value: BN, exponent?: number): string => {
         ? DEFAULT_DECIMAL_MULTIPLIER
         : BIG_TEN.pow(exponent)
     const res = inputNumber.div(decimalMultiplier)
-    const resStr = res.round().toString()
+    const resStr = res.toString()
 
     return resStr
   } catch (err) {
