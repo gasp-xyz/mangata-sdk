@@ -8,6 +8,7 @@ import { BN } from '@polkadot/util'
 import Rpc from './services/Rpc'
 import TX from './services/Tx'
 import Query from './services/Query'
+import Fee from './services/Fee'
 import { MangataGenericEvent } from './types/MangataGenericEvent'
 import { TxOptions } from './types/TxOptions'
 import Tx from './services/Tx'
@@ -142,7 +143,27 @@ export class Mangata {
    */
   public async disconnect(): Promise<void> {
     const api = await this.getApi()
-    api.disconnect()
+    await api.disconnect()
+  }
+
+  public async createPoolFee(
+    account: string | KeyringPair,
+    firstTokenId: string,
+    firstTokenAmount: BN,
+    secondTokenId: string,
+    secondTokenAmount: BN,
+    txOptions?: TxOptions
+  ) {
+    const api = await this.getApi()
+    return await Fee.createPoolFee(
+      api,
+      account,
+      firstTokenId,
+      firstTokenAmount,
+      secondTokenId,
+      secondTokenAmount,
+      txOptions
+    )
   }
 
   /**
@@ -172,6 +193,26 @@ export class Mangata {
       firstTokenAmount,
       secondTokenId,
       secondTokenAmount,
+      txOptions
+    )
+  }
+
+  public async sellAssetFee(
+    account: string | KeyringPair,
+    soldAssetId: string,
+    boughtAssetId: string,
+    amount: BN,
+    minAmountOut: BN,
+    txOptions?: TxOptions
+  ): Promise<string> {
+    const api = await this.getApi()
+    return await Fee.sellAssetFee(
+      api,
+      account,
+      soldAssetId,
+      boughtAssetId,
+      amount,
+      minAmountOut,
       txOptions
     )
   }
@@ -209,6 +250,26 @@ export class Mangata {
     )
   }
 
+  public async mintLiquidityFee(
+    account: string | KeyringPair,
+    firstTokenId: string,
+    secondTokenId: string,
+    firstTokenAmount: BN,
+    expectedSecondTokenAmount: BN,
+    txOptions?: TxOptions
+  ): Promise<string> {
+    const api = await this.getApi()
+    return await Fee.mintLiquidityFee(
+      api,
+      account,
+      firstTokenId,
+      secondTokenId,
+      firstTokenAmount,
+      expectedSecondTokenAmount,
+      txOptions
+    )
+  }
+
   /**
    * Extrinsic to add liquidity to pool, while specifying first token id
    * and second token id and first token amount. Second token amount is calculated in block, * but cannot exceed expected second token amount
@@ -242,6 +303,24 @@ export class Mangata {
     )
   }
 
+  public async burnLiquidityFee(
+    account: string | KeyringPair,
+    firstTokenId: string,
+    secondTokenId: string,
+    liquidityTokenAmount: BN,
+    txOptions?: TxOptions
+  ): Promise<string> {
+    const api = await this.getApi()
+    return await Fee.burnLiquidityFee(
+      api,
+      account,
+      firstTokenId,
+      secondTokenId,
+      liquidityTokenAmount,
+      txOptions
+    )
+  }
+
   /**
    * Extrinsic to remove liquidity from liquidity pool, specifying first token id and
    * second token id of a pool and liquidity token amount you wish to burn
@@ -268,6 +347,26 @@ export class Mangata {
       firstTokenId,
       secondTokenId,
       liquidityTokenAmount,
+      txOptions
+    )
+  }
+
+  public async buyAssetFee(
+    account: string | KeyringPair,
+    soldAssetId: string,
+    boughtAssetId: string,
+    amount: BN,
+    maxAmountIn: BN,
+    txOptions?: TxOptions
+  ): Promise<string> {
+    const api = await this.getApi()
+    return await Fee.buyAssetFee(
+      api,
+      account,
+      soldAssetId,
+      boughtAssetId,
+      amount,
+      maxAmountIn,
       txOptions
     )
   }
@@ -493,6 +592,17 @@ export class Mangata {
     return await Query.getTreasuryBurn(api, tokenId)
   }
 
+  public async transferTokenFee(
+    account: string | KeyringPair,
+    tokenId: string,
+    address: string,
+    amount: BN,
+    txOptions?: TxOptions
+  ): Promise<string> {
+    const api = await this.getApi()
+    return await Fee.transferTokenFee(api, account, tokenId, address, amount, txOptions)
+  }
+
   /**
    * Extrinsic that transfers Token Id in value amount from origin to destination
    * @param {string | Keyringpair} account
@@ -512,6 +622,16 @@ export class Mangata {
   ): Promise<MangataGenericEvent[]> {
     const api = await this.getApi()
     return await TX.transferToken(api, account, tokenId, address, amount, txOptions)
+  }
+
+  public async transferTokenAllFee(
+    account: string | KeyringPair,
+    tokenId: string,
+    address: string,
+    txOptions?: TxOptions
+  ): Promise<string> {
+    const api = await this.getApi()
+    return await Fee.transferAllTokenFee(api, account, tokenId, address, txOptions)
   }
 
   /**
