@@ -8,6 +8,7 @@ import { BN } from '@polkadot/util'
 import Rpc from './services/Rpc'
 import TX from './services/Tx'
 import Query from './services/Query'
+import Fee from './services/Fee'
 import { MangataGenericEvent } from './types/MangataGenericEvent'
 import { TxOptions } from './types/TxOptions'
 import Tx from './services/Tx'
@@ -142,7 +143,27 @@ export class Mangata {
    */
   public async disconnect(): Promise<void> {
     const api = await this.getApi()
-    api.disconnect()
+    await api.disconnect()
+  }
+
+  public async createPoolFee(
+    account: string | KeyringPair,
+    firstTokenId: string,
+    firstTokenAmount: BN,
+    secondTokenId: string,
+    secondTokenAmount: BN,
+    txOptions?: TxOptions
+  ) {
+    const api = await this.getApi()
+    return await Fee.createPoolFee(
+      api,
+      account,
+      firstTokenId,
+      firstTokenAmount,
+      secondTokenId,
+      secondTokenAmount,
+      txOptions
+    )
   }
 
   /**
