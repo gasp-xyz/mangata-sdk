@@ -32,13 +32,7 @@ const recreateExtrinsicsOrder = <K>(extrinsics: [string, K][], seedBytes: Uint8A
         map.delete(key)
       }
     }
-    let txs = slots.map((tx) => {
-      return (tx as any).hash.toHex()
-    })
     fy.shuffle(slots)
-    txs = slots.map((tx) => {
-      return (tx as any).hash.toHex()
-    })
     result = result.concat(slots)
   }
   return result
