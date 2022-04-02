@@ -397,7 +397,13 @@ class Tx {
     amount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    return await signTx(api, api.tx.tokens.transfer(address, tokenId, amount), account, txOptions)
+    const result = await signTx(
+      api,
+      api.tx.tokens.transfer(address, tokenId, amount),
+      account,
+      txOptions
+    )
+    return result
   }
 
   static async transferAllToken(

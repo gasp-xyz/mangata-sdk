@@ -32,12 +32,13 @@ beforeEach(async () => {
 })
 
 describe('Testing additional methods', () => {
-  it('should trasnfer tokens from testUser1 to testUser2', async () => {
+  it('should transfer tokens from testUser1 to testUser2', async () => {
+    console.log('Transferring tokens from testUser1 to testUser2')
     await mangataInstance.transferToken(testUser, secondCurrency, testUser1.address, new BN(100), {
       extrinsicStatus: (result) => {
         const eventTransfer = getEventResultFromTxWait(result, [
           'tokens',
-          'Transferred',
+          'Transfer',
           testUser.address,
         ])
         expect(eventTransfer.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)
@@ -47,7 +48,7 @@ describe('Testing additional methods', () => {
       extrinsicStatus: (resultTransferAll) => {
         const eventTransferAll = getEventResultFromTxWait(resultTransferAll, [
           'tokens',
-          'Transferred',
+          'Transfer',
           testUser.address,
         ])
         expect(eventTransferAll.state).toEqual(ExtrinsicResult.ExtrinsicSuccess)

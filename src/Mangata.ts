@@ -49,9 +49,9 @@ export class Mangata {
    */
   private async connectToNode(uri: string) {
     const provider = new WsProvider(uri)
-    const api = await ApiPromise.create(
+    const api = await new ApiPromise(
       options({ provider, throwOnConnect: true, throwOnUnknown: true })
-    )
+    ).isReady
     return api
   }
 
@@ -621,7 +621,8 @@ export class Mangata {
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     const api = await this.getApi()
-    return await TX.transferToken(api, account, tokenId, address, amount, txOptions)
+    const result = await TX.transferToken(api, account, tokenId, address, amount, txOptions)
+    return result
   }
 
   public async transferTokenAllFee(

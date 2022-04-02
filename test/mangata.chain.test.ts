@@ -3,8 +3,9 @@ import { mangataInstance } from './mangataInstanceCreation'
 
 describe('Chain, Node and Version', () => {
   it('should retrive chain name when calling getChain method', async () => {
+    const chainName = 'Mangata Local'
     const chain = await mangataInstance.getChain()
-    expect(chain).toEqual('Mangata Public Testnet')
+    expect(chain).toMatch(new RegExp(`^${chainName}?`))
   })
 
   it('should match version 0.4.0 node version when calling getNodeVersion method', async () => {
