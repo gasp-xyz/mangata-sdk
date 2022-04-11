@@ -1425,10 +1425,10 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@mangata-finance/types@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.npmjs.org/@mangata-finance/types/-/types-0.1.0.tgz#384e047c5efca28e426fbce7eee78c5b0a781938"
-  integrity sha512-Bmw4B4Jk1+ZCjogy3moumRXiXk/nP3r7IXrpL/gTgZPUGRj51zy9NaVrsWKPlPxDn+8eBPjNzXtual27aJDDNA==
+"@mangata-finance/types@^0.1.3":
+  version "0.1.4"
+  resolved "https://registry.npmjs.org/@mangata-finance/types/-/types-0.1.4.tgz#3c890b26bebcdc6fa4cbd67459dbe4fb5174fcf5"
+  integrity sha512-FC0fzaLUcCfjJK5Ni4ok1zKvZJdZgtKSJLwa0r2tZn+6Y3HAVLziEcfhtH3AcprgZIRgpl8CFDaZ2n2eMfKhag==
   dependencies:
     "@polkadot/api" "^7.13.1"
 

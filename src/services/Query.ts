@@ -24,6 +24,7 @@ import { getAssetsInfoMapWithIds } from '../utils/getAssetsInfoMapWithIds'
 import { calculateLiquidityShare } from '../utils/calculateLiquidityShare'
 import { getRatio } from '../utils/getRatio'
 import { BN_ZERO } from '..'
+import { liquidityPromotedTokenMap } from '../utils/liquidityPromotedTokenMap'
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : ''
 const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
@@ -237,6 +238,8 @@ class Query {
       accountEntriesMap(api, address),
     ])
 
+    const liquidityTokensPromoted = await liquidityPromotedTokenMap(api)
+
     return Object.values(assetsInfo)
       .reduce(
         (acc, asset) => (accountEntries[asset.id] ? acc.concat(asset) : acc),
@@ -261,6 +264,7 @@ class Query {
           firstTokenAmount,
           secondTokenAmount,
           liquidityTokenId: asset.id,
+          isPromoted: liquidityTokensPromoted.includes(asset.id),
           share: await calculateLiquidityShare(api, asset.id, userLiquidityBalance),
           firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
           secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount),
@@ -273,6 +277,7 @@ class Query {
   static async getPool(api: ApiPromise, liquidityTokenId: TTokenId) {
     const liquidityPool = await api.query.xyk.liquidityPools(liquidityTokenId)
     const liquidityPoolId = JSON.parse(JSON.stringify(liquidityPool)) as [TTokenId, TTokenId]
+    const liquidityTokensPromoted = await liquidityPromotedTokenMap(api)
     const [firstTokenId, secondTokenId] = liquidityPoolId
     const [firstTokenAmount, secondTokenAmount] = await this.getAmountOfTokenIdInPool(
       api,
@@ -285,6 +290,7 @@ class Query {
       firstTokenAmount,
       secondTokenAmount,
       liquidityTokenId,
+      isPromoted: liquidityTokensPromoted.includes(liquidityTokenId),
       firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
       secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount),
     } as TPoolWithRatio
@@ -296,6 +302,7 @@ class Query {
       liquidityAssetsMap(api),
     ])
     const poolBalances = await poolsBalanceMap(api, liquidityAssets)
+    const liquidityTokensPromoted = await liquidityPromotedTokenMap(api)
 
     return Object.values(assetsInfo)
       .reduce(
@@ -313,6 +320,7 @@ class Query {
           liquidityTokenId: asset.id,
           firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
           secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount),
+          isPromoted: liquidityTokensPromoted.includes(asset.id),
         } as TPool & { firstTokenRatio: BN; secondTokenRatio: BN }
       })
   }

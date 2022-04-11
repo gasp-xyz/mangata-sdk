@@ -1,5 +1,6 @@
 import { ApiPromise } from '@polkadot/api'
-import { BN } from '@polkadot/util'
+import { BN, isHex, hexToBn } from '@polkadot/util'
+import { fromBN } from '../utils/toBn'
 
 class Rpc {
   static async getChain(api: ApiPromise): Promise<string> {
@@ -14,6 +15,22 @@ class Rpc {
   static async getNodeVersion(api: ApiPromise): Promise<string> {
     const version = await api.rpc.system.version()
     return version.toHuman()
+  }
+
+  static async calculateRewardsAmount(api: ApiPromise, address: string, liquidityTokenId: string) {
+    const rewards = await (api.rpc as any).xyk.calculate_rewards_amount(address, liquidityTokenId)
+
+    const notYetClaimed = isHex(rewards.notYetClaimed.toString())
+      ? hexToBn(rewards.notYetClaimed.toString())
+      : new BN(rewards.notYetClaimed)
+    const toBeClaimed = isHex(rewards.toBeClaimed.toString())
+      ? hexToBn(rewards.toBeClaimed.toString())
+      : new BN(rewards.toBeClaimed.toString())
+
+    return {
+      notYetClaimed,
+      toBeClaimed,
+    }
   }
 
   static async calculateBuyPrice(

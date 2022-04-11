@@ -5,6 +5,19 @@ import { TxOptions } from '../types/TxOptions'
 import { fromBN } from '../utils/toBn'
 
 class Fee {
+  static async claimRewardsFee(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    liquidityTokenId: string,
+    amount: BN,
+    txOptions?: TxOptions
+  ): Promise<string> {
+    const dispatchInfo = await api.tx.xyk
+      .claimRewards(liquidityTokenId, amount)
+      .paymentInfo(account, { nonce: txOptions?.nonce, signer: txOptions?.signer })
+    return fromBN(new BN(dispatchInfo.partialFee.toString()))
+  }
+
   static async createPoolFee(
     api: ApiPromise,
     account: string | KeyringPair,

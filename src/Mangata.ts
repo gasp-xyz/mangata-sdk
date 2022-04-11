@@ -12,6 +12,7 @@ import Fee from './services/Fee'
 import { MangataGenericEvent } from './types/MangataGenericEvent'
 import { TxOptions } from './types/TxOptions'
 import Tx from './services/Tx'
+import { calculateFutureRewardsAmount } from './utils/calculateFutureRewardsAmount'
 import {
   TTokenAddress,
   TToken,
@@ -22,6 +23,7 @@ import {
   TBridgeAddresses,
   TPoolWithShare,
   TPoolWithRatio,
+  Reward,
 } from './types/AssetInfo'
 
 /**
@@ -144,6 +146,40 @@ export class Mangata {
   public async disconnect(): Promise<void> {
     const api = await this.getApi()
     await api.disconnect()
+  }
+
+  public async calculateFutureRewardsAmount(
+    address: string,
+    liquidityTokenId: string,
+    futureBlockNumber: BN
+  ) {
+    const api = await this.getApi()
+    return await calculateFutureRewardsAmount(api, address, liquidityTokenId, futureBlockNumber)
+  }
+
+  public async calculateRewardsAmount(address: string, liquidityTokenId: string): Promise<Reward> {
+    const api = await this.getApi()
+    return await Rpc.calculateRewardsAmount(api, address, liquidityTokenId)
+  }
+
+  public async claimRewardsFee(
+    account: string | KeyringPair,
+    liquditityTokenId: string,
+    amount: BN,
+    txOptions?: TxOptions
+  ) {
+    const api = await this.getApi()
+    return await Fee.claimRewardsFee(api, account, liquditityTokenId, amount, txOptions)
+  }
+
+  public async claimRewards(
+    account: string | KeyringPair,
+    liquditityTokenId: string,
+    amount: BN,
+    txOptions?: TxOptions
+  ) {
+    const api = await this.getApi()
+    return await TX.claimRewards(api, account, liquditityTokenId, amount, txOptions)
   }
 
   public async createPoolFee(
