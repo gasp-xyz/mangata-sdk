@@ -43,6 +43,7 @@ export type TPool = {
   firstTokenAmount: BN
   secondTokenAmount: BN
   liquidityTokenId: TTokenId
+  isPromoted: boolean
 }
 
 export type TPoolWithShare = TPool & {
@@ -60,4 +61,9 @@ export type TokenBalance = {
   free: TFreeBalance
   reserved: TReservedBalance
   frozen: TFreeBalance
+}
+
+export type Reward = {
+  notYetClaimed: BN
+  toBeClaimed: BN
 }

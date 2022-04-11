@@ -300,6 +300,16 @@ class Tx {
     )
   }
 
+  static async claimRewards(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    liquidityTokenId: string,
+    amount: BN,
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    return await signTx(api, api.tx.xyk.claimRewards(liquidityTokenId, amount), account, txOptions)
+  }
+
   static async createPool(
     api: ApiPromise,
     account: string | KeyringPair,
