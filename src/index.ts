@@ -25,6 +25,7 @@ export {
   TFrozenBalance,
   TPoolWithShare,
   TPoolWithRatio,
+  Reward,
 } from './types/AssetInfo'
 export { TxOptions } from './types/TxOptions'
 export { signTx } from './services/Tx'
