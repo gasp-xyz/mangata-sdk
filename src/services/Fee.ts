@@ -1,10 +1,10 @@
 import { ApiPromise } from '@polkadot/api'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { BN } from '@polkadot/util'
-import { TxOptions } from '../types/TxOptions'
-import { fromBN } from '../utils/toBn'
+import { TxOptions } from 'types/'
+import { fromBN } from 'utils/'
 
-class Fee {
+export class Fee {
   static async claimRewardsFee(
     api: ApiPromise,
     account: string | KeyringPair,
@@ -119,5 +119,3 @@ class Fee {
     return fromBN(new BN(dispatchInfo.partialFee.toString()))
   }
 }
-
-export default Fee

@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { FisherYates } from './fisherYatesShuffle'
 
-const recreateExtrinsicsOrder = <K>(extrinsics: [string, K][], seedBytes: Uint8Array) => {
+export const recreateExtrinsicsOrder = <K>(extrinsics: [string, K][], seedBytes: Uint8Array) => {
   let result: K[] = []
   const fy = new FisherYates(seedBytes)
 
@@ -37,5 +37,3 @@ const recreateExtrinsicsOrder = <K>(extrinsics: [string, K][], seedBytes: Uint8A
   }
   return result
 }
-
-export default recreateExtrinsicsOrder

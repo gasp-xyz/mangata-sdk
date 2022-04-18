@@ -1,9 +1,9 @@
 import { ApiPromise } from '@polkadot/api'
 import { BN } from '@polkadot/util'
 
-import Query from '../services/Query'
-import memoryDatabase from '../utils/MemoryDatabase'
-import { TxOptions } from '../types/TxOptions'
+import { Query } from 'services/'
+import { instance } from 'utils/'
+import { TxOptions } from 'types/'
 
 export const getTxNonce = async (
   api: ApiPromise,
@@ -15,8 +15,8 @@ export const getTxNonce = async (
     nonce = txOptions.nonce
   } else {
     const onChainNonce = await Query.getNonce(api, address)
-    if (memoryDatabase.hasAddressNonce(address)) {
-      nonce = memoryDatabase.getNonce(address)
+    if (instance.hasAddressNonce(address)) {
+      nonce = instance.getNonce(address)
     } else {
       nonce = onChainNonce
     }
@@ -26,7 +26,7 @@ export const getTxNonce = async (
     }
 
     const nextNonce: BN = nonce.addn(1)
-    memoryDatabase.setNonce(address, nextNonce)
+    instance.setNonce(address, nextNonce)
   }
 
   return nonce

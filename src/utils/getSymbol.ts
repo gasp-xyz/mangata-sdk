@@ -1,5 +1,5 @@
 import { hexToBn } from '@polkadot/util'
-import { TTokenInfo } from '../types/AssetInfo'
+import { TTokenInfo } from 'types/'
 
 export const getSymbol = (
   symbol: string,

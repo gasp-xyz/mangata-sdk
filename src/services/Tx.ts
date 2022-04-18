@@ -4,14 +4,10 @@ import { KeyringPair } from '@polkadot/keyring/types'
 import { SubmittableExtrinsic } from '@polkadot/api/types'
 import { BN } from '@polkadot/util'
 
-import recreateExtrinsicsOrder from '../utils/recreateExtrinsicsOrder'
-import memoryDatabase from '../utils/MemoryDatabase'
-import Query from './Query'
-import { getTxNonce } from '../utils/nonce.tracker'
+import { instance, getTxNonce, recreateExtrinsicsOrder } from 'utils/'
+import { Query } from 'services/'
 
-import { TxOptions } from '../types/TxOptions'
-import { MangataGenericEvent } from '../types/MangataGenericEvent'
-import { MangataEventData } from '../types/MangataEventData'
+import { TxOptions, MangataGenericEvent, MangataEventData } from 'types/'
 
 export const signTx = async (
   api: ApiPromise,
@@ -144,13 +140,13 @@ export const signTx = async (
           } else if (result.isError) {
             reject(`${tx.hash} ` + 'Transaction error')
             const currentNonce: BN = await Query.getNonce(api, extractedAccount)
-            memoryDatabase.setNonce(extractedAccount, currentNonce)
+            instance.setNonce(extractedAccount, currentNonce)
           }
         }
       )
     } catch (error: any) {
       const currentNonce: BN = await Query.getNonce(api, extractedAccount)
-      memoryDatabase.setNonce(extractedAccount, currentNonce)
+      instance.setNonce(extractedAccount, currentNonce)
       reject({
         data: error.message || error.description || error.data?.toString() || error.toString(),
       })
@@ -208,7 +204,7 @@ const getError = (
   return null
 }
 
-class Tx {
+export class Tx {
   static async sendTokensFromParachainToRely(
     api: ApiPromise,
     fromAccount: KeyringPair,
@@ -483,5 +479,3 @@ class Tx {
     return await signTx(api, api.tx.eth.burn(ethereumAddress, amount), account, txOptions)
   }
 }
-
-export default Tx

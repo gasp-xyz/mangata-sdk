@@ -5,15 +5,10 @@ import { WsProvider } from '@polkadot/rpc-provider/ws'
 import { options } from '@mangata-finance/types'
 import { BN } from '@polkadot/util'
 
-import Rpc from './services/Rpc'
-import TX from './services/Tx'
-import Query from './services/Query'
-import Fee from './services/Fee'
-import { MangataGenericEvent } from './types/MangataGenericEvent'
-import { TxOptions } from './types/TxOptions'
-import Tx from './services/Tx'
-import { calculateFutureRewardsAmount } from './utils/calculateFutureRewardsAmount'
+import { Rpc, Tx, Query, Fee } from 'services/'
 import {
+  MangataGenericEvent,
+  TxOptions,
   TTokenAddress,
   TToken,
   TBalances,
@@ -24,7 +19,8 @@ import {
   TPoolWithShare,
   TPoolWithRatio,
   Reward,
-} from './types/AssetInfo'
+} from 'types/'
+import { calculateFutureRewardsAmount } from 'utils/'
 
 /**
  * @class Mangata
@@ -179,7 +175,7 @@ export class Mangata {
     txOptions?: TxOptions
   ) {
     const api = await this.getApi()
-    return await TX.claimRewards(api, account, liquditityTokenId, amount, txOptions)
+    return await Tx.claimRewards(api, account, liquditityTokenId, amount, txOptions)
   }
 
   public async createPoolFee(
@@ -222,7 +218,7 @@ export class Mangata {
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     const api = await this.getApi()
-    return await TX.createPool(
+    return await Tx.createPool(
       api,
       account,
       firstTokenId,
@@ -275,7 +271,7 @@ export class Mangata {
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     const api = await this.getApi()
-    return await TX.sellAsset(
+    return await Tx.sellAsset(
       api,
       account,
       soldAssetId,
@@ -328,7 +324,7 @@ export class Mangata {
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     const api = await this.getApi()
-    return await TX.mintLiquidity(
+    return await Tx.mintLiquidity(
       api,
       account,
       firstTokenId,
@@ -377,7 +373,7 @@ export class Mangata {
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     const api = await this.getApi()
-    return await TX.burnLiquidity(
+    return await Tx.burnLiquidity(
       api,
       account,
       firstTokenId,
@@ -430,7 +426,7 @@ export class Mangata {
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     const api = await this.getApi()
-    return await TX.buyAsset(
+    return await Tx.buyAsset(
       api,
       account,
       soldAssetId,
@@ -487,7 +483,7 @@ export class Mangata {
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     const api = await this.getApi()
-    return await TX.createToken(api, targetAddress, sudoAccount, currencyValue, txOptions)
+    return await Tx.createToken(api, targetAddress, sudoAccount, currencyValue, txOptions)
   }
 
   /**
@@ -501,7 +497,7 @@ export class Mangata {
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     const api = await this.getApi()
-    return await TX.mintAsset(api, sudoAccount, tokenId, address, amount, txOptions)
+    return await Tx.mintAsset(api, sudoAccount, tokenId, address, amount, txOptions)
   }
 
   /**
@@ -657,7 +653,7 @@ export class Mangata {
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     const api = await this.getApi()
-    const result = await TX.transferToken(api, account, tokenId, address, amount, txOptions)
+    const result = await Tx.transferToken(api, account, tokenId, address, amount, txOptions)
     return result
   }
 
@@ -687,7 +683,7 @@ export class Mangata {
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     const api = await this.getApi()
-    return await TX.transferAllToken(api, account, tokenId, address, txOptions)
+    return await Tx.transferAllToken(api, account, tokenId, address, txOptions)
   }
 
   /**

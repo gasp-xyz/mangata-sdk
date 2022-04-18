@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { BN } from '@polkadot/util'
-import { Database } from '../types/Database'
+import { Database } from 'types/'
 
 class InMemoryDatabase implements Database {
   static instance: InMemoryDatabase
@@ -33,4 +33,4 @@ export const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-export default InMemoryDatabase.getInstance()
+export const instance = InMemoryDatabase.getInstance()

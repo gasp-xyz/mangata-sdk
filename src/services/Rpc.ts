@@ -1,8 +1,7 @@
 import { ApiPromise } from '@polkadot/api'
 import { BN, isHex, hexToBn } from '@polkadot/util'
-import { fromBN } from '../utils/toBn'
 
-class Rpc {
+export class Rpc {
   static async getChain(api: ApiPromise): Promise<string> {
     const chain = await api.rpc.system.chain()
     return chain.toHuman()
@@ -101,5 +100,3 @@ class Rpc {
     return new BN(result.price)
   }
 }
-
-export default Rpc

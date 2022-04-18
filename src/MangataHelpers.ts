@@ -2,15 +2,12 @@
 import { Keyring } from '@polkadot/api'
 import { KeypairType } from '@polkadot/util-crypto/types'
 import { KeyringPair } from '@polkadot/keyring/types'
-import { v4 as uuid } from 'uuid'
 import { BN } from '@polkadot/util'
+
+import { v4 as uuid } from 'uuid'
 import Big from 'big.js'
-import { getXoshiro } from './utils/getXorshiroStates'
-import { isInputValid } from './utils/isInputValid'
-import { toBN } from './utils/toBn'
-import { toFixed } from './utils/toFixed'
-import { BN_TEN_THOUSAND } from '.'
-import { BIG_HUNDRED } from './utils/bigConstants'
+
+import { toBN, toFixed, isInputValid, getXoshiro, BIG_HUNDRED, BN_TEN_THOUSAND } from 'utils/'
 
 /**
  * @class MangataHelpers

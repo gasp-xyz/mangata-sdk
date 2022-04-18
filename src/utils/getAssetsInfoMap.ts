@@ -1,8 +1,9 @@
 import { ApiPromise } from '@polkadot/api'
-import { TTokenInfo, TTokenId } from '../types/AssetInfo'
-import { ETHaddress } from './ETHaddress'
+import { TTokenInfo, TTokenId } from 'types/'
 import { getCorrectSymbol } from './getCorrectSymbol'
-import { MGAaddress } from './MGAaddress'
+
+const ETHaddress = '0x0000000000000000000000000000000000000000'
+const MGAaddress = '0xc7e3bda797d2ceb740308ec40142ae235e08144a'
 
 export const getAssetsInfoMap = async (api: ApiPromise) => {
   const assetsInfoResponse = await api.query.assetsInfo.assetsInfo.entries()

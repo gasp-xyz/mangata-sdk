@@ -13,25 +13,27 @@ import {
   TBridgeAddresses,
   TPoolWithRatio,
   TPoolWithShare,
-} from '../types/AssetInfo'
-import { getAssetsInfoMap } from '../utils/getAssetsInfoMap'
-import { liquidityAssetsMap } from '../utils/liquidityAssetsMap'
-import { poolsBalanceMap } from '../utils/poolsBalanceMap'
-import { balancesMap } from '../utils/balancesMap'
-import { accountEntriesMap } from '../utils/accountEntriesMap'
-import { getCorrectSymbol } from '../utils/getCorrectSymbol'
-import { getAssetsInfoMapWithIds } from '../utils/getAssetsInfoMapWithIds'
-import { calculateLiquidityShare } from '../utils/calculateLiquidityShare'
-import { getRatio } from '../utils/getRatio'
-import { BN_ZERO } from '..'
-import { liquidityPromotedTokenMap } from '../utils/liquidityPromotedTokenMap'
+} from 'types/'
+import {
+  getAssetsInfoMap,
+  liquidityAssetsMap,
+  poolsBalanceMap,
+  balancesMap,
+  accountEntriesMap,
+  getCorrectSymbol,
+  getAssetsInfoMapWithIds,
+  calculateLiquidityShare,
+  getRatio,
+  BN_ZERO,
+  liquidityPromotedTokenMap,
+} from 'utils/'
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : ''
 const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
   ? process.env.TREASURY_BURN_ADDRESS
   : ''
 
-class Query {
+export class Query {
   static async getNonce(api: ApiPromise, address: TTokenAddress): Promise<BN> {
     const nonce = await api.rpc.system.accountNextIndex(address)
     return nonce.toBn()
@@ -325,5 +327,3 @@ class Query {
       })
   }
 }
-
-export default Query

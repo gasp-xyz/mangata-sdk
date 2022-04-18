@@ -1,4 +1,4 @@
-import { TMainTokens, TTokenSymbol } from '../types/AssetInfo'
+import { TMainTokens, TTokenSymbol } from 'types/'
 import { getSymbol } from './getSymbol'
 
 export const getCorrectSymbol = (symbol: string, assets: TMainTokens): TTokenSymbol => {
