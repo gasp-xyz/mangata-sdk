@@ -4,10 +4,10 @@ import { KeyringPair } from '@polkadot/keyring/types'
 import { SubmittableExtrinsic } from '@polkadot/api/types'
 import { BN } from '@polkadot/util'
 
-import { instance, getTxNonce, recreateExtrinsicsOrder } from 'utils/'
-import { Query } from 'services/'
+import { instance, getTxNonce, recreateExtrinsicsOrder } from '../utils'
+import { Query } from '../services'
 
-import { TxOptions, MangataGenericEvent, MangataEventData } from 'types/'
+import { TxOptions, MangataGenericEvent, MangataEventData } from '../types'
 
 export const signTx = async (
   api: ApiPromise,

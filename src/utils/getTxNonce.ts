@@ -1,9 +1,9 @@
 import { ApiPromise } from '@polkadot/api'
 import { BN } from '@polkadot/util'
 
-import { Query } from 'services/'
-import { instance } from 'utils/'
-import { TxOptions } from 'types/'
+import { Query } from '../services'
+import { instance } from '../utils'
+import { TxOptions } from '../types'
 
 export const getTxNonce = async (
   api: ApiPromise,

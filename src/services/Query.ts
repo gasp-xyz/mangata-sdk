@@ -13,7 +13,7 @@ import {
   TBridgeAddresses,
   TPoolWithRatio,
   TPoolWithShare,
-} from 'types/'
+} from '../types'
 import {
   getAssetsInfoMap,
   liquidityAssetsMap,
@@ -26,7 +26,7 @@ import {
   getRatio,
   BN_ZERO,
   liquidityPromotedTokenMap,
-} from 'utils/'
+} from '../utils'
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : ''
 const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS

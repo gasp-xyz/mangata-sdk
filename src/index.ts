@@ -1,9 +1,10 @@
-export { Mangata } from './Mangata'
-export { MangataHelpers } from './MangataHelpers'
-export { signTx } from 'services/'
+export { Mangata } from "./Mangata";
+export { MangataHelpers } from "./MangataHelpers";
+export { signTx } from "./services";
 export {
   fromBN,
   toBN,
+  toFixed,
   BN_DIV_NUMERATOR_MULTIPLIER,
   BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS,
   BN_HUNDRED,
@@ -33,8 +34,8 @@ export {
   BIG_BILLION,
   BIG_TEN_BILLIONS,
   BIG_HUNDRED_BILLIONS,
-  BIG_TRILLION,
-} from 'utils/'
+  BIG_TRILLION
+} from "./utils";
 export {
   MangataEventData,
   MangataGenericEvent,
@@ -58,5 +59,5 @@ export {
   TPoolWithShare,
   TPoolWithRatio,
   Reward,
-  TxOptions,
-} from 'types/'
+  TxOptions
+} from "./types";

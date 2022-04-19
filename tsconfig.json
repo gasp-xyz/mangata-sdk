@@ -1,8 +1,34 @@
 {
-  "extends": "./tsconfig-base.json",
+  "ts-node": {
+    "moduleTypes": {
+      "jest.config.ts": "cjs"
+    }
+  },
   "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "declaration": true,
+    "esModuleInterop": true,
+    "inlineSourceMap": false,
+    "lib": ["esnext"],
+    "listEmittedFiles": false,
+    "listFiles": false,
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "pretty": true,
+    "resolveJsonModule": true,
+    "declarationMap": true,
+    "rootDir": "src",
+    "skipLibCheck": true,
+    "strict": true,
+    "traceResolution": false,
+    "types": ["node", "jest"],
     "module": "esnext",
-    "outDir": "build/mjs",
+    "outDir": "build",
     "target": "esnext"
-  }
+  },
+  "compileOnSave": false,
+  "exclude": ["node_modules", "build"],
+  "include": ["src"]
 }

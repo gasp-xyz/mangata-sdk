@@ -1,5 +1,5 @@
 import { ApiPromise } from '@polkadot/api'
-import { TTokenInfo } from 'types/'
+import { TTokenInfo } from '../types'
 import { hexToBn } from '@polkadot/util'
 
 const ETHaddress = '0x0000000000000000000000000000000000000000'

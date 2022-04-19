@@ -1,5 +1,5 @@
 import { BN } from '@polkadot/util'
-import { BN_DIV_NUMERATOR_MULTIPLIER, BN_ZERO } from '..'
+import { BN_DIV_NUMERATOR_MULTIPLIER, BN_ZERO } from './bnConstants'
 
 const getGcd = (a: BN, b: BN): BN => {
   return b.gt(BN_ZERO) ? getGcd(b, a.mod(b)) : a

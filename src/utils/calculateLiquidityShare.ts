@@ -1,6 +1,6 @@
 import { ApiPromise } from '@polkadot/api'
 import { BN } from '@polkadot/util'
-import { BN_DIV_NUMERATOR_MULTIPLIER, BN_ZERO } from '..'
+import { BN_DIV_NUMERATOR_MULTIPLIER, BN_ZERO } from './bnConstants'
 
 export const calculateLiquidityShare = async (
   api: ApiPromise,

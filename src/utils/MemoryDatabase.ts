@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { BN } from '@polkadot/util'
-import { Database } from 'types/'
+import { Database } from '../types'
 
 class InMemoryDatabase implements Database {
   static instance: InMemoryDatabase

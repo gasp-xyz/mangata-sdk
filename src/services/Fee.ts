@@ -1,8 +1,8 @@
 import { ApiPromise } from '@polkadot/api'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { BN } from '@polkadot/util'
-import { TxOptions } from 'types/'
-import { fromBN } from 'utils/'
+import { TxOptions } from '../types'
+import { fromBN } from '../utils'
 
 export class Fee {
   static async claimRewardsFee(

@@ -7,7 +7,7 @@ import { BN } from '@polkadot/util'
 import { v4 as uuid } from 'uuid'
 import Big from 'big.js'
 
-import { toBN, toFixed, isInputValid, getXoshiro, BIG_HUNDRED, BN_TEN_THOUSAND } from 'utils/'
+import { toBN, toFixed, isInputValid, getXoshiro, BIG_HUNDRED, BN_TEN_THOUSAND } from './utils'
 
 /**
  * @class MangataHelpers

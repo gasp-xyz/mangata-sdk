@@ -5,7 +5,7 @@ import { WsProvider } from '@polkadot/rpc-provider/ws'
 import { options } from '@mangata-finance/types'
 import { BN } from '@polkadot/util'
 
-import { Rpc, Tx, Query, Fee } from 'services/'
+import { Rpc, Tx, Query, Fee } from './services'
 import {
   MangataGenericEvent,
   TxOptions,
@@ -19,8 +19,8 @@ import {
   TPoolWithShare,
   TPoolWithRatio,
   Reward,
-} from 'types/'
-import { calculateFutureRewardsAmount } from 'utils/'
+} from './types'
+import { calculateFutureRewardsAmount } from './utils'
 
 /**
  * @class Mangata
