@@ -1,8 +1,10 @@
 import { SubmittableExtrinsic } from "@polkadot/api/types";
+import type { ISubmittableResult } from "@polkadot/types/types";
 
 export { Mangata } from "./Mangata";
 export { MangataHelpers } from "./MangataHelpers";
 export { SubmittableExtrinsic };
+export { ISubmittableResult };
 export { signTx } from "./services";
 export {
   fromBN,
