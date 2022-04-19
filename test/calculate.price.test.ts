@@ -1,27 +1,19 @@
 /* eslint-disable no-console */
 import { BN } from '@polkadot/util'
-import { mangataInstance } from './mangataInstanceCreation'
+import { instance } from './instanceCreation'
 
 describe('Calculate Price', () => {
   it('should calculate buy price', async () => {
-    const buyPrice = await mangataInstance.calculateBuyPrice(
-      new BN(50000),
-      new BN(25000),
-      new BN(1000)
-    )
+    const buyPrice = await instance.calculateBuyPrice(new BN(50000), new BN(25000), new BN(1000))
     expect(buyPrice.toNumber()).toEqual(2090)
   })
 
   it('should calculate sell price', async () => {
-    const buyPrice = await mangataInstance.calculateSellPrice(
-      new BN(50000),
-      new BN(25000),
-      new BN(1000)
-    )
+    const buyPrice = await instance.calculateSellPrice(new BN(50000), new BN(25000), new BN(1000))
     expect(buyPrice.toNumber()).toEqual(488)
   })
 })
 
 afterAll(async () => {
-  await mangataInstance.disconnect()
+  await instance.disconnect()
 })

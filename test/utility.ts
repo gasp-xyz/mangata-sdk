@@ -3,8 +3,13 @@ import { KeyringPair } from '@polkadot/keyring/types'
 import { BN } from '@polkadot/util'
 
 import { Mangata } from '../src/Mangata'
-import ExtrinsicResult from '../src/enums/ExtrinsicResult'
 import { MangataGenericEvent } from '../src/types/MangataGenericEvent'
+
+export enum ExtrinsicResult {
+  ExtrinsicSuccess,
+  ExtrinsicFailed,
+  ExtrinsicUndefined,
+}
 
 export const addAccountCurrencies = async (
   mangataInstance: Mangata,

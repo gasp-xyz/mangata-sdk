@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import recreateExtrinsicsOrder from '../src/utils/recreateExtrinsicsOrder'
+import { recreateExtrinsicsOrder } from '../src/utils/recreateExtrinsicsOrder'
 
 describe('compare with rust impl', () => {
   it('reference test', () => {

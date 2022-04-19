@@ -1,19 +1,19 @@
-import { mangataInstance } from './mangataInstanceCreation'
+import { instance } from './instanceCreation'
 
 describe('Bridge', () => {
   it('should get bridge tokens', async () => {
-    const api = await mangataInstance.getApi()
+    const api = await instance.getApi()
     if (api.isConnected) {
-      const tokens = await mangataInstance.getBridgeTokens()
+      const tokens = await instance.getBridgeTokens()
       expect(tokens[0].name).toEqual('Mangata')
       expect(tokens[1].name).toEqual('Ether')
 
-      const tokenInfo = await mangataInstance.getTokenInfo(tokens[0].id)
+      const tokenInfo = await instance.getTokenInfo(tokens[0].id)
       expect(tokenInfo.name).toEqual('Mangata')
     }
   })
 })
 
 afterAll(async () => {
-  await mangataInstance.disconnect()
+  await instance.disconnect()
 })
