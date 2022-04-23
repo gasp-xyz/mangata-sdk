@@ -1,8 +1,9 @@
-import { ApiPromise } from '@polkadot/api'
-import { KeyringPair } from '@polkadot/keyring/types'
-import { BN } from '@polkadot/util'
-import { TxOptions } from '../types'
-import { fromBN } from '../utils'
+import { ApiPromise } from "@polkadot/api";
+import { KeyringPair } from "@polkadot/keyring/types";
+import { BN } from "@polkadot/util";
+
+import { TxOptions } from "../types";
+import { fromBN } from "../utils";
 
 export class Fee {
   static async claimRewardsFee(
@@ -14,8 +15,11 @@ export class Fee {
   ): Promise<string> {
     const dispatchInfo = await api.tx.xyk
       .claimRewards(liquidityTokenId, amount)
-      .paymentInfo(account, { nonce: txOptions?.nonce, signer: txOptions?.signer })
-    return fromBN(new BN(dispatchInfo.partialFee.toString()))
+      .paymentInfo(account, {
+        nonce: txOptions?.nonce,
+        signer: txOptions?.signer
+      });
+    return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
 
   static async createPoolFee(
@@ -28,9 +32,17 @@ export class Fee {
     txOptions?: TxOptions
   ): Promise<string> {
     const dispatchInfo = await api.tx.xyk
-      .createPool(firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount)
-      .paymentInfo(account, { nonce: txOptions?.nonce, signer: txOptions?.signer })
-    return fromBN(new BN(dispatchInfo.partialFee.toString()))
+      .createPool(
+        firstTokenId,
+        firstTokenAmount,
+        secondTokenId,
+        secondTokenAmount
+      )
+      .paymentInfo(account, {
+        nonce: txOptions?.nonce,
+        signer: txOptions?.signer
+      });
+    return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
 
   static async sellAssetFee(
@@ -44,8 +56,11 @@ export class Fee {
   ): Promise<string> {
     const dispatchInfo = await api.tx.xyk
       .sellAsset(soldTokenId, boughtTokenId, amount, minAmountOut)
-      .paymentInfo(account, { nonce: txOptions?.nonce, signer: txOptions?.signer })
-    return fromBN(new BN(dispatchInfo.partialFee.toString()))
+      .paymentInfo(account, {
+        nonce: txOptions?.nonce,
+        signer: txOptions?.signer
+      });
+    return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
 
   static async buyAssetFee(
@@ -59,8 +74,11 @@ export class Fee {
   ): Promise<string> {
     const dispatchInfo = await api.tx.xyk
       .buyAsset(soldTokenId, boughtTokenId, amount, maxAmountIn)
-      .paymentInfo(account, { nonce: txOptions?.nonce, signer: txOptions?.signer })
-    return fromBN(new BN(dispatchInfo.partialFee.toString()))
+      .paymentInfo(account, {
+        nonce: txOptions?.nonce,
+        signer: txOptions?.signer
+      });
+    return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
 
   static async mintLiquidityFee(
@@ -73,9 +91,17 @@ export class Fee {
     txOptions?: TxOptions
   ): Promise<string> {
     const dispatchInfo = await api.tx.xyk
-      .mintLiquidity(firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount)
-      .paymentInfo(account, { nonce: txOptions?.nonce, signer: txOptions?.signer })
-    return fromBN(new BN(dispatchInfo.partialFee.toString()))
+      .mintLiquidity(
+        firstTokenId,
+        secondTokenId,
+        firstTokenAmount,
+        expectedSecondTokenAmount
+      )
+      .paymentInfo(account, {
+        nonce: txOptions?.nonce,
+        signer: txOptions?.signer
+      });
+    return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
 
   static async burnLiquidityFee(
@@ -88,8 +114,11 @@ export class Fee {
   ): Promise<string> {
     const dispatchInfo = await api.tx.xyk
       .burnLiquidity(firstTokenId, secondTokenId, liquidityTokenAmount)
-      .paymentInfo(account, { nonce: txOptions?.nonce, signer: txOptions?.signer })
-    return fromBN(new BN(dispatchInfo.partialFee.toString()))
+      .paymentInfo(account, {
+        nonce: txOptions?.nonce,
+        signer: txOptions?.signer
+      });
+    return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
 
   static async transferTokenFee(
@@ -102,8 +131,11 @@ export class Fee {
   ): Promise<string> {
     const dispatchInfo = await api.tx.tokens
       .transfer(address, tokenId, amount)
-      .paymentInfo(account, { nonce: txOptions?.nonce, signer: txOptions?.signer })
-    return fromBN(new BN(dispatchInfo.partialFee.toString()))
+      .paymentInfo(account, {
+        nonce: txOptions?.nonce,
+        signer: txOptions?.signer
+      });
+    return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
 
   static async transferAllTokenFee(
@@ -115,7 +147,10 @@ export class Fee {
   ): Promise<string> {
     const dispatchInfo = await api.tx.tokens
       .transferAll(address, tokenId, true)
-      .paymentInfo(account, { nonce: txOptions?.nonce, signer: txOptions?.signer })
-    return fromBN(new BN(dispatchInfo.partialFee.toString()))
+      .paymentInfo(account, {
+        nonce: txOptions?.nonce,
+        signer: txOptions?.signer
+      });
+    return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
 }

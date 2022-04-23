@@ -1,6 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
-import { TTokenInfo } from "../types";
 import { hexToBn } from "@polkadot/util";
+
+import { TTokenInfo } from "../types";
 
 const ETHaddress = "0x0000000000000000000000000000000000000000";
 const MGAaddress = "0xc7e3bda797d2ceb740308ec40142ae235e08144a";

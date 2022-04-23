@@ -1,11 +1,12 @@
-import { Signer } from '@polkadot/types/types'
-import type { ISubmittableResult } from '@polkadot/types/types'
-import { BN } from '@polkadot/util'
-import { MangataGenericEvent } from './MangataGenericEvent'
+import { Signer } from "@polkadot/types/types";
+import type { ISubmittableResult } from "@polkadot/types/types";
+import { BN } from "@polkadot/util";
+
+import { MangataGenericEvent } from "./MangataGenericEvent";
 
 export type TxOptions = Partial<{
-  nonce: BN
-  signer: Signer
-  statusCallback: (result: ISubmittableResult) => void
-  extrinsicStatus: (events: MangataGenericEvent[]) => void
-}>
+  nonce: BN;
+  signer: Signer;
+  statusCallback: (result: ISubmittableResult) => void;
+  extrinsicStatus: (events: MangataGenericEvent[]) => void;
+}>;

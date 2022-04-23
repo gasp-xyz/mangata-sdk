@@ -6,7 +6,6 @@ import { BN } from "@polkadot/util";
 
 import { instance, getTxNonce, recreateExtrinsicsOrder } from "../utils";
 import { Query } from "../services";
-
 import { TxOptions, MangataGenericEvent, MangataEventData } from "../types";
 
 export const signTx = async (
@@ -27,15 +26,13 @@ export const signTx = async (
         account,
         {
           nonce,
-          signer: txOptions && txOptions.signer ? txOptions.signer : undefined
+          signer: txOptions?.signer
         },
         async (result) => {
           console.info(
             "Hash:[" + tx.hash + "] \n      Status-" + result.status
           );
-          txOptions &&
-            txOptions.statusCallback &&
-            txOptions.statusCallback(result);
+          txOptions?.statusCallback?.(result);
           if (result.status.isFinalized) {
             const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
               async (lastHeader) => {
@@ -138,9 +135,7 @@ export const signTx = async (
                     });
 
                   output = output.concat(reqEvents);
-                  txOptions &&
-                    txOptions.extrinsicStatus &&
-                    txOptions.extrinsicStatus(output);
+                  txOptions?.extrinsicStatus?.(output);
                   resolve(output);
                   unsub();
                 } else if (retries++ < 10) {
@@ -157,11 +152,16 @@ export const signTx = async (
                       result.status.asFinalized.toString()
                   );
                 } else {
-                  //Lets retry this for 3 times until we reject the promise.
+                  //Lets retry this for 10 times until we reject the promise.
                   unsubscribeNewHeads();
                   reject(
                     `Transaction was not finalized: Last Header Parent hash: ${lastHeader.parentHash.toString()} and \n     Status finalized: ${result.status.asFinalized.toString()}`
                   );
+                  const currentNonce: BN = await Query.getNonce(
+                    api,
+                    extractedAccount
+                  );
+                  instance.setNonce(extractedAccount, currentNonce);
                   unsub();
                 }
               }

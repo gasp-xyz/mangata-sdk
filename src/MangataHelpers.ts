@@ -1,13 +1,19 @@
 /* eslint-disable no-console */
-import { Keyring } from '@polkadot/api'
-import { KeypairType } from '@polkadot/util-crypto/types'
-import { KeyringPair } from '@polkadot/keyring/types'
-import { BN } from '@polkadot/util'
+import { Keyring } from "@polkadot/api";
+import { KeypairType } from "@polkadot/util-crypto/types";
+import { KeyringPair } from "@polkadot/keyring/types";
+import { BN } from "@polkadot/util";
+import { v4 as uuid } from "uuid";
+import Big from "big.js";
 
-import { v4 as uuid } from 'uuid'
-import Big from 'big.js'
-
-import { toBN, toFixed, isInputValid, getXoshiro, BIG_HUNDRED, BN_TEN_THOUSAND } from './utils'
+import {
+  toBN,
+  toFixed,
+  isInputValid,
+  getXoshiro,
+  BIG_HUNDRED,
+  BN_TEN_THOUSAND
+} from "./utils";
 
 /**
  * @class MangataHelpers
@@ -15,21 +21,21 @@ import { toBN, toFixed, isInputValid, getXoshiro, BIG_HUNDRED, BN_TEN_THOUSAND }
  */
 export class MangataHelpers {
   public static createKeyring(type: KeypairType): Keyring {
-    return new Keyring({ type })
+    return new Keyring({ type });
   }
 
   public static createKeyPairFromNameAndStoreAccountToKeyring(
     keyring: Keyring,
-    name: string = ''
+    name: string = ""
   ): KeyringPair {
-    const userName: string = name ? name : '//testUser_' + uuid()
-    const account = keyring.createFromUri(userName)
-    keyring.addPair(account)
-    return account
+    const userName: string = name ? name : "//testUser_" + uuid();
+    const account = keyring.createFromUri(userName);
+    keyring.addPair(account);
+    return account;
   }
 
   public static getXoshiro(seed: Uint8Array) {
-    return getXoshiro(seed)
+    return getXoshiro(seed);
   }
 
   public static getPriceImpact(
@@ -44,29 +50,34 @@ export class MangataHelpers {
       !isInputValid(firstTokenAmount) ||
       !isInputValid(secondTokenAmount)
     ) {
-      return
+      return;
     }
 
-    const firstReserveBefore = poolBalance.firstTokenBalance
-    const secondReserveBefore = poolBalance.secondTokenBalance
+    const firstReserveBefore = poolBalance.firstTokenBalance;
+    const secondReserveBefore = poolBalance.secondTokenBalance;
 
-    const soldAmount = toBN(firstTokenAmount, poolDecimals.firstTokenDecimals)
-    const boughtAmount = toBN(secondTokenAmount, poolDecimals.secondTokenDecimals)
+    const soldAmount = toBN(firstTokenAmount, poolDecimals.firstTokenDecimals);
+    const boughtAmount = toBN(
+      secondTokenAmount,
+      poolDecimals.secondTokenDecimals
+    );
 
-    if (boughtAmount.gte(secondReserveBefore)) return ''
+    if (boughtAmount.gte(secondReserveBefore)) return "";
 
     const numerator = firstReserveBefore
       .add(soldAmount)
       .mul(BN_TEN_THOUSAND)
-      .mul(secondReserveBefore)
-    const denominator = secondReserveBefore.sub(boughtAmount).mul(firstReserveBefore)
+      .mul(secondReserveBefore);
+    const denominator = secondReserveBefore
+      .sub(boughtAmount)
+      .mul(firstReserveBefore);
 
-    const res = numerator.div(denominator).sub(BN_TEN_THOUSAND)
+    const res = numerator.div(denominator).sub(BN_TEN_THOUSAND);
 
-    const resStr = res.toString()
-    const resBig = Big(resStr)
-    const resFormatted = toFixed(resBig.div(BIG_HUNDRED).toString(), 2)
+    const resStr = res.toString();
+    const resBig = Big(resStr);
+    const resFormatted = toFixed(resBig.div(BIG_HUNDRED).toString(), 2);
 
-    return resFormatted
+    return resFormatted;
   }
 }
