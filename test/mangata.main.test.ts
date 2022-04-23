@@ -235,26 +235,6 @@ describe("test burn liquidity", () => {
   });
 });
 
-describe("test create token", () => {
-  it("should create token", async () => {
-    await instance.createToken(
-      testUser.address,
-      sudoUser,
-      new BN(firstCurrency),
-      {
-        extrinsicStatus: (result) => {
-          const eventResult = getEventResultFromTxWait(result, [
-            "tokens",
-            "Issued",
-            testUser.address
-          ]);
-          expect(eventResult.data).not.toBeNull();
-        }
-      }
-    );
-  });
-});
-
 afterAll(async () => {
   await instance.disconnect();
 });

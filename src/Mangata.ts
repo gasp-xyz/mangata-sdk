@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
-import { ApiPromise } from '@polkadot/api'
-import { KeyringPair } from '@polkadot/keyring/types'
-import { WsProvider } from '@polkadot/rpc-provider/ws'
-import { options } from '@mangata-finance/types'
-import { BN } from '@polkadot/util'
+import { ApiPromise } from "@polkadot/api";
+import { KeyringPair } from "@polkadot/keyring/types";
+import { WsProvider } from "@polkadot/rpc-provider/ws";
+import { options } from "@mangata-finance/types";
+import { BN } from "@polkadot/util";
 
-import { Rpc, Tx, Query, Fee } from './services'
+import { Rpc, Tx, Query, Fee } from "./services";
 import {
   MangataGenericEvent,
   TxOptions,
@@ -18,9 +18,9 @@ import {
   TBridgeAddresses,
   TPoolWithShare,
   TPoolWithRatio,
-  Reward,
-} from './types'
-import { calculateFutureRewardsAmount } from './utils'
+  Reward
+} from "./types";
+import { calculateFutureRewardsAmount } from "./utils";
 
 /**
  * @class Mangata
@@ -28,17 +28,17 @@ import { calculateFutureRewardsAmount } from './utils'
  * The Mangata class defines the `getInstance` method that lets clients access the unique singleton instance.
  */
 export class Mangata {
-  private api: Promise<ApiPromise> | null
-  private uri: string
-  private static instanceMap: Map<string, Mangata> = new Map<string, Mangata>()
+  private api: Promise<ApiPromise> | null;
+  private uri: string;
+  private static instanceMap: Map<string, Mangata> = new Map<string, Mangata>();
 
   /**
    * The Mangata's constructor is private to prevent direct
    * construction calls with the `new` operator.
    */
   private constructor(uri: string) {
-    this.api = null
-    this.uri = uri
+    this.api = null;
+    this.uri = uri;
   }
 
   /**
@@ -46,11 +46,11 @@ export class Mangata {
    * for Mangata
    */
   private async connectToNode(uri: string) {
-    const provider = new WsProvider(uri)
+    const provider = new WsProvider(uri);
     const api = await new ApiPromise(
       options({ provider, throwOnConnect: true, throwOnUnknown: true })
-    ).isReady
-    return api
+    ).isReady;
+    return api;
   }
 
   /**
@@ -58,10 +58,10 @@ export class Mangata {
    */
   public static getInstance(uri: string): Mangata {
     if (!Mangata.instanceMap.has(uri)) {
-      this.instanceMap.set(uri, new Mangata(uri))
-      return this.instanceMap.get(uri)!
+      this.instanceMap.set(uri, new Mangata(uri));
+      return this.instanceMap.get(uri)!;
     } else {
-      return this.instanceMap.get(uri)!
+      return this.instanceMap.get(uri)!;
     }
   }
 
@@ -72,76 +72,108 @@ export class Mangata {
     // Because we assign this.api synchronously, repeated calls to
     // method() are guaranteed to always reuse the same promise.
     if (!this.api) {
-      this.api = this.connectToNode(this.uri)
+      this.api = this.connectToNode(this.uri);
     }
 
-    return this.api
+    return this.api;
   }
 
   /**
    * Uri of the connected node
    */
   public getUri(): string {
-    return this.uri
+    return this.uri;
   }
 
   /**
    * Wait for the new block
    */
   public async waitForNewBlock(blockCount?: number): Promise<boolean> {
-    let count = 0
-    const api = await this.getApi()
+    let count = 0;
+    const api = await this.getApi();
 
-    const numberOfBlocks = blockCount || 1
+    const numberOfBlocks = blockCount || 1;
 
     return new Promise(async (resolve) => {
       const unsubscribe = await api.rpc.chain.subscribeNewHeads(() => {
         if (++count === numberOfBlocks) {
-          unsubscribe()
-          resolve(true)
+          unsubscribe();
+          resolve(true);
         }
-      })
-    })
+      });
+    });
   }
 
   /**
    * Chain name of the connected node
    */
   public async getChain(): Promise<string> {
-    const api = await this.getApi()
-    return Rpc.getChain(api)
+    const api = await this.getApi();
+    return Rpc.getChain(api);
   }
 
   /**
    * Node name of the connected node
    */
   public async getNodeName(): Promise<string> {
-    const api = await this.getApi()
-    return Rpc.getNodeName(api)
+    const api = await this.getApi();
+    return Rpc.getNodeName(api);
   }
 
   /**
    * Node version of the connected node
    */
   public async getNodeVersion(): Promise<string> {
-    const api = await this.getApi()
-    return Rpc.getNodeVersion(api)
+    const api = await this.getApi();
+    return Rpc.getNodeVersion(api);
   }
 
   /**
    * Get the current nonce of the account
    */
   public async getNonce(address: TTokenAddress): Promise<BN> {
-    const api = await this.getApi()
-    return Query.getNonce(api, address)
+    const api = await this.getApi();
+    return Query.getNonce(api, address);
   }
 
   /**
    * Disconnect from the node
    */
   public async disconnect(): Promise<void> {
-    const api = await this.getApi()
-    await api.disconnect()
+    const api = await this.getApi();
+    await api.disconnect();
+  }
+
+  public async activateLiquidity(
+    account: string | KeyringPair,
+    liquditityTokenId: string,
+    amount: BN,
+    txOptions?: TxOptions
+  ) {
+    const api = await this.getApi();
+    return await Tx.activateLiquidity(
+      api,
+      account,
+      liquditityTokenId,
+      amount,
+      txOptions
+    );
+  }
+
+  public async deactivateLiquidity(
+    account: string | KeyringPair,
+    liquditityTokenId: string,
+    amount: BN,
+    txOptions?: TxOptions
+  ) {
+    const api = await this.getApi();
+    return await Tx.deactivateLiquidity(
+      api,
+      account,
+      liquditityTokenId,
+      amount,
+      txOptions
+    );
   }
 
   public async calculateFutureRewardsAmount(
@@ -149,13 +181,21 @@ export class Mangata {
     liquidityTokenId: string,
     futureBlockNumber: BN
   ) {
-    const api = await this.getApi()
-    return await calculateFutureRewardsAmount(api, address, liquidityTokenId, futureBlockNumber)
+    const api = await this.getApi();
+    return await calculateFutureRewardsAmount(
+      api,
+      address,
+      liquidityTokenId,
+      futureBlockNumber
+    );
   }
 
-  public async calculateRewardsAmount(address: string, liquidityTokenId: string): Promise<Reward> {
-    const api = await this.getApi()
-    return await Rpc.calculateRewardsAmount(api, address, liquidityTokenId)
+  public async calculateRewardsAmount(
+    address: string,
+    liquidityTokenId: string
+  ): Promise<Reward> {
+    const api = await this.getApi();
+    return await Rpc.calculateRewardsAmount(api, address, liquidityTokenId);
   }
 
   public async claimRewardsFee(
@@ -164,8 +204,14 @@ export class Mangata {
     amount: BN,
     txOptions?: TxOptions
   ) {
-    const api = await this.getApi()
-    return await Fee.claimRewardsFee(api, account, liquditityTokenId, amount, txOptions)
+    const api = await this.getApi();
+    return await Fee.claimRewardsFee(
+      api,
+      account,
+      liquditityTokenId,
+      amount,
+      txOptions
+    );
   }
 
   public async claimRewards(
@@ -174,8 +220,14 @@ export class Mangata {
     amount: BN,
     txOptions?: TxOptions
   ) {
-    const api = await this.getApi()
-    return await Tx.claimRewards(api, account, liquditityTokenId, amount, txOptions)
+    const api = await this.getApi();
+    return await Tx.claimRewards(
+      api,
+      account,
+      liquditityTokenId,
+      amount,
+      txOptions
+    );
   }
 
   public async createPoolFee(
@@ -186,7 +238,7 @@ export class Mangata {
     secondTokenAmount: BN,
     txOptions?: TxOptions
   ) {
-    const api = await this.getApi()
+    const api = await this.getApi();
     return await Fee.createPoolFee(
       api,
       account,
@@ -195,7 +247,7 @@ export class Mangata {
       secondTokenId,
       secondTokenAmount,
       txOptions
-    )
+    );
   }
 
   /**
@@ -217,7 +269,7 @@ export class Mangata {
     secondTokenAmount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    const api = await this.getApi()
+    const api = await this.getApi();
     return await Tx.createPool(
       api,
       account,
@@ -226,7 +278,7 @@ export class Mangata {
       secondTokenId,
       secondTokenAmount,
       txOptions
-    )
+    );
   }
 
   public async sellAssetFee(
@@ -237,7 +289,7 @@ export class Mangata {
     minAmountOut: BN,
     txOptions?: TxOptions
   ): Promise<string> {
-    const api = await this.getApi()
+    const api = await this.getApi();
     return await Fee.sellAssetFee(
       api,
       account,
@@ -246,7 +298,7 @@ export class Mangata {
       amount,
       minAmountOut,
       txOptions
-    )
+    );
   }
 
   /**
@@ -270,7 +322,7 @@ export class Mangata {
     minAmountOut: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    const api = await this.getApi()
+    const api = await this.getApi();
     return await Tx.sellAsset(
       api,
       account,
@@ -279,7 +331,7 @@ export class Mangata {
       amount,
       minAmountOut,
       txOptions
-    )
+    );
   }
 
   public async mintLiquidityFee(
@@ -290,7 +342,7 @@ export class Mangata {
     expectedSecondTokenAmount: BN,
     txOptions?: TxOptions
   ): Promise<string> {
-    const api = await this.getApi()
+    const api = await this.getApi();
     return await Fee.mintLiquidityFee(
       api,
       account,
@@ -299,7 +351,7 @@ export class Mangata {
       firstTokenAmount,
       expectedSecondTokenAmount,
       txOptions
-    )
+    );
   }
 
   /**
@@ -323,7 +375,7 @@ export class Mangata {
     expectedSecondTokenAmount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    const api = await this.getApi()
+    const api = await this.getApi();
     return await Tx.mintLiquidity(
       api,
       account,
@@ -332,7 +384,7 @@ export class Mangata {
       firstTokenAmount,
       expectedSecondTokenAmount,
       txOptions
-    )
+    );
   }
 
   public async burnLiquidityFee(
@@ -342,7 +394,7 @@ export class Mangata {
     liquidityTokenAmount: BN,
     txOptions?: TxOptions
   ): Promise<string> {
-    const api = await this.getApi()
+    const api = await this.getApi();
     return await Fee.burnLiquidityFee(
       api,
       account,
@@ -350,7 +402,7 @@ export class Mangata {
       secondTokenId,
       liquidityTokenAmount,
       txOptions
-    )
+    );
   }
 
   /**
@@ -372,7 +424,7 @@ export class Mangata {
     liquidityTokenAmount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    const api = await this.getApi()
+    const api = await this.getApi();
     return await Tx.burnLiquidity(
       api,
       account,
@@ -380,7 +432,7 @@ export class Mangata {
       secondTokenId,
       liquidityTokenAmount,
       txOptions
-    )
+    );
   }
 
   public async buyAssetFee(
@@ -391,7 +443,7 @@ export class Mangata {
     maxAmountIn: BN,
     txOptions?: TxOptions
   ): Promise<string> {
-    const api = await this.getApi()
+    const api = await this.getApi();
     return await Fee.buyAssetFee(
       api,
       account,
@@ -400,7 +452,7 @@ export class Mangata {
       amount,
       maxAmountIn,
       txOptions
-    )
+    );
   }
 
   /**
@@ -425,7 +477,7 @@ export class Mangata {
     maxAmountIn: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    const api = await this.getApi()
+    const api = await this.getApi();
     return await Tx.buyAsset(
       api,
       account,
@@ -434,7 +486,7 @@ export class Mangata {
       amount,
       maxAmountIn,
       txOptions
-    )
+    );
   }
 
   /**
@@ -448,9 +500,18 @@ export class Mangata {
    *
    * @returns {BN}
    */
-  public async calculateBuyPrice(inputReserve: BN, outputReserve: BN, buyAmount: BN): Promise<BN> {
-    const api = await this.getApi()
-    return await Rpc.calculateBuyPrice(api, inputReserve, outputReserve, buyAmount)
+  public async calculateBuyPrice(
+    inputReserve: BN,
+    outputReserve: BN,
+    buyAmount: BN
+  ): Promise<BN> {
+    const api = await this.getApi();
+    return await Rpc.calculateBuyPrice(
+      api,
+      inputReserve,
+      outputReserve,
+      buyAmount
+    );
   }
 
   /**
@@ -469,35 +530,13 @@ export class Mangata {
     outputReserve: BN,
     sellAmount: BN
   ): Promise<BN> {
-    const api = await this.getApi()
-    return await Rpc.calculateSellPrice(api, inputReserve, outputReserve, sellAmount)
-  }
-
-  /**
-   * Create Token (SUDO)
-   */
-  public async createToken(
-    targetAddress: string,
-    sudoAccount: string | KeyringPair,
-    currencyValue: BN,
-    txOptions?: TxOptions
-  ): Promise<MangataGenericEvent[]> {
-    const api = await this.getApi()
-    return await Tx.createToken(api, targetAddress, sudoAccount, currencyValue, txOptions)
-  }
-
-  /**
-   * Mint Asset (SUDO)
-   */
-  public async mintAsset(
-    sudoAccount: string | KeyringPair,
-    tokenId: string,
-    address: string,
-    amount: BN,
-    txOptions?: TxOptions
-  ): Promise<MangataGenericEvent[]> {
-    const api = await this.getApi()
-    return await Tx.mintAsset(api, sudoAccount, tokenId, address, amount, txOptions)
+    const api = await this.getApi();
+    return await Rpc.calculateSellPrice(
+      api,
+      inputReserve,
+      outputReserve,
+      sellAmount
+    );
   }
 
   /**
@@ -516,8 +555,13 @@ export class Mangata {
     secondTokenId: string,
     liquidityAssetAmount: BN
   ): Promise<any> {
-    const api = await this.getApi()
-    return await Rpc.getBurnAmount(api, firstTokenId, secondTokenId, liquidityAssetAmount)
+    const api = await this.getApi();
+    return await Rpc.getBurnAmount(
+      api,
+      firstTokenId,
+      secondTokenId,
+      liquidityAssetAmount
+    );
   }
 
   /**
@@ -536,8 +580,13 @@ export class Mangata {
     boughtTokenId: string,
     sellAmount: BN
   ): Promise<BN> {
-    const api = await this.getApi()
-    return await Rpc.calculateSellPriceId(api, soldTokenId, boughtTokenId, sellAmount)
+    const api = await this.getApi();
+    return await Rpc.calculateSellPriceId(
+      api,
+      soldTokenId,
+      boughtTokenId,
+      sellAmount
+    );
   }
 
   /**
@@ -556,8 +605,13 @@ export class Mangata {
     boughtTokenId: string,
     buyAmount: BN
   ): Promise<BN> {
-    const api = await this.getApi()
-    return await Rpc.calculateBuyPriceId(api, soldTokenId, boughtTokenId, buyAmount)
+    const api = await this.getApi();
+    return await Rpc.calculateBuyPriceId(
+      api,
+      soldTokenId,
+      boughtTokenId,
+      buyAmount
+    );
   }
 
   /**
@@ -572,8 +626,12 @@ export class Mangata {
     firstTokenId: TTokenId,
     secondTokenId: TTokenId
   ): Promise<BN[]> {
-    const api = await this.getApi()
-    return await Query.getAmountOfTokenIdInPool(api, firstTokenId, secondTokenId)
+    const api = await this.getApi();
+    return await Query.getAmountOfTokenIdInPool(
+      api,
+      firstTokenId,
+      secondTokenId
+    );
   }
 
   /**
@@ -586,9 +644,12 @@ export class Mangata {
    *
    * @returns {BN}
    */
-  public async getLiquidityTokenId(firstTokenId: TTokenId, secondTokenId: TTokenId): Promise<BN> {
-    const api = await this.getApi()
-    return await Query.getLiquidityTokenId(api, firstTokenId, secondTokenId)
+  public async getLiquidityTokenId(
+    firstTokenId: TTokenId,
+    secondTokenId: TTokenId
+  ): Promise<BN> {
+    const api = await this.getApi();
+    return await Query.getLiquidityTokenId(api, firstTokenId, secondTokenId);
   }
 
   /**
@@ -598,8 +659,8 @@ export class Mangata {
    * @returns {BN | Array}
    */
   public async getLiquidityPool(liquidityAssetId: string): Promise<BN[]> {
-    const api = await this.getApi()
-    return await Query.getLiquidityPool(api, liquidityAssetId)
+    const api = await this.getApi();
+    return await Query.getLiquidityPool(api, liquidityAssetId);
   }
 
   /**
@@ -609,8 +670,8 @@ export class Mangata {
    * @returns {AccountData}
    */
   public async getTreasury(tokenId: string) {
-    const api = await this.getApi()
-    return await Query.getTreasury(api, tokenId)
+    const api = await this.getApi();
+    return await Query.getTreasury(api, tokenId);
   }
 
   /**
@@ -620,8 +681,8 @@ export class Mangata {
    * @returns {AccountData}
    */
   public async getTreasuryBurn(tokenId: string) {
-    const api = await this.getApi()
-    return await Query.getTreasuryBurn(api, tokenId)
+    const api = await this.getApi();
+    return await Query.getTreasuryBurn(api, tokenId);
   }
 
   public async transferTokenFee(
@@ -631,8 +692,15 @@ export class Mangata {
     amount: BN,
     txOptions?: TxOptions
   ): Promise<string> {
-    const api = await this.getApi()
-    return await Fee.transferTokenFee(api, account, tokenId, address, amount, txOptions)
+    const api = await this.getApi();
+    return await Fee.transferTokenFee(
+      api,
+      account,
+      tokenId,
+      address,
+      amount,
+      txOptions
+    );
   }
 
   /**
@@ -652,9 +720,16 @@ export class Mangata {
     amount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    const api = await this.getApi()
-    const result = await Tx.transferToken(api, account, tokenId, address, amount, txOptions)
-    return result
+    const api = await this.getApi();
+    const result = await Tx.transferToken(
+      api,
+      account,
+      tokenId,
+      address,
+      amount,
+      txOptions
+    );
+    return result;
   }
 
   public async transferTokenAllFee(
@@ -663,8 +738,14 @@ export class Mangata {
     address: string,
     txOptions?: TxOptions
   ): Promise<string> {
-    const api = await this.getApi()
-    return await Fee.transferAllTokenFee(api, account, tokenId, address, txOptions)
+    const api = await this.getApi();
+    return await Fee.transferAllTokenFee(
+      api,
+      account,
+      tokenId,
+      address,
+      txOptions
+    );
   }
 
   /**
@@ -682,8 +763,8 @@ export class Mangata {
     address: string,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    const api = await this.getApi()
-    return await Tx.transferAllToken(api, account, tokenId, address, txOptions)
+    const api = await this.getApi();
+    return await Tx.transferAllToken(api, account, tokenId, address, txOptions);
   }
 
   /**
@@ -693,8 +774,8 @@ export class Mangata {
    * @returns {BN}
    */
   public async getTotalIssuance(tokenId: string): Promise<BN> {
-    const api = await this.getApi()
-    return await Query.getTotalIssuance(api, tokenId)
+    const api = await this.getApi();
+    return await Query.getTotalIssuance(api, tokenId);
   }
 
   /**
@@ -704,8 +785,8 @@ export class Mangata {
    *
    */
   public async getLock(address: string, tokenId: string) {
-    const api = await this.getApi()
-    return await Query.getLock(api, address, tokenId)
+    const api = await this.getApi();
+    return await Query.getLock(api, address, tokenId);
   }
 
   /**
@@ -715,17 +796,20 @@ export class Mangata {
    *
    * @returns {AccountData}
    */
-  public async getTokenBalance(tokenId: string, address: string): Promise<TokenBalance> {
-    const api = await this.getApi()
-    return await Query.getTokenBalance(api, address, tokenId)
+  public async getTokenBalance(
+    tokenId: string,
+    address: string
+  ): Promise<TokenBalance> {
+    const api = await this.getApi();
+    return await Query.getTokenBalance(api, address, tokenId);
   }
 
   /**
    * Returns next CurencyId, CurrencyId that will be used for next created token
    */
   public async getNextTokenId(): Promise<BN> {
-    const api = await this.getApi()
-    return await Query.getNextTokenId(api)
+    const api = await this.getApi();
+    return await Query.getNextTokenId(api);
   }
 
   /*
@@ -733,8 +817,8 @@ export class Mangata {
    */
 
   public async getBridgeTokens() {
-    const api = await this.getApi()
-    return await Query.getBridgedTokens(api)
+    const api = await this.getApi();
+    return await Query.getBridgedTokens(api);
   }
 
   /**
@@ -742,18 +826,20 @@ export class Mangata {
    * @param {string} tokenId
    */
   public async getTokenInfo(tokenId: string) {
-    const api = await this.getApi()
-    return await Query.getTokenInfo(api, tokenId)
+    const api = await this.getApi();
+    return await Query.getTokenInfo(api, tokenId);
   }
 
   public async getBlockNumber(): Promise<string> {
-    const api = await this.getApi()
-    return await Query.getBlockNumber(api)
+    const api = await this.getApi();
+    return await Query.getBlockNumber(api);
   }
 
-  public async getOwnedTokens(address: string): Promise<Record<TTokenId, TToken> | null> {
-    const api = await this.getApi()
-    return await Query.getOwnedTokens(api, address)
+  public async getOwnedTokens(
+    address: string
+  ): Promise<Record<TTokenId, TToken> | null> {
+    const api = await this.getApi();
+    return await Query.getOwnedTokens(api, address);
   }
 
   /**
@@ -761,8 +847,8 @@ export class Mangata {
    * @returns {string | Array}
    */
   public async getLiquidityTokenIds(): Promise<string[]> {
-    const api = await this.getApi()
-    return await Query.getLiquidityTokenIds(api)
+    const api = await this.getApi();
+    return await Query.getLiquidityTokenIds(api);
   }
 
   /**
@@ -770,28 +856,28 @@ export class Mangata {
    */
 
   public async getAssetsInfo(): Promise<TMainTokens> {
-    const api = await this.getApi()
-    return await Query.getAssetsInfo(api)
+    const api = await this.getApi();
+    return await Query.getAssetsInfo(api);
   }
 
   public async getBalances(): Promise<TBalances> {
-    const api = await this.getApi()
-    return await Query.getBalances(api)
+    const api = await this.getApi();
+    return await Query.getBalances(api);
   }
 
   public async getBridgeAddresses(): Promise<TBridgeAddresses> {
-    const api = await this.getApi()
-    return await Query.getBridgeAddresses(api)
+    const api = await this.getApi();
+    return await Query.getBridgeAddresses(api);
   }
 
   public async getBridgeIds() {
-    const api = await this.getApi()
-    return await Query.getBridgeIds(api)
+    const api = await this.getApi();
+    return await Query.getBridgeIds(api);
   }
 
   public async getLiquidityTokens(): Promise<TMainTokens> {
-    const api = await this.getApi()
-    return await Query.getLiquidityTokens(api)
+    const api = await this.getApi();
+    return await Query.getLiquidityTokens(api);
   }
 
   /**
@@ -804,7 +890,7 @@ export class Mangata {
     amount: BN,
     txOptions?: TxOptions
   ) {
-    const api = await this.getApi()
+    const api = await this.getApi();
     return await Tx.bridgeERC20ToEthereum(
       api,
       account,
@@ -812,7 +898,7 @@ export class Mangata {
       ethereumAddress,
       amount,
       txOptions
-    )
+    );
   }
 
   /**
@@ -824,30 +910,36 @@ export class Mangata {
     amount: BN,
     txOptions?: TxOptions
   ) {
-    const api = await this.getApi()
-    return await Tx.bridgeEthToEthereum(api, account, ethereumAddress, amount, txOptions)
+    const api = await this.getApi();
+    return await Tx.bridgeEthToEthereum(
+      api,
+      account,
+      ethereumAddress,
+      amount,
+      txOptions
+    );
   }
 
   public async getPool(liquditityTokenId: TTokenId): Promise<TPoolWithRatio> {
-    const api = await this.getApi()
-    return await Query.getPool(api, liquditityTokenId)
+    const api = await this.getApi();
+    return await Query.getPool(api, liquditityTokenId);
   }
 
   public async getInvestedPools(address: string): Promise<TPoolWithShare[]> {
-    const api = await this.getApi()
-    const investedPools = await Query.getInvestedPools(api, address)
+    const api = await this.getApi();
+    const investedPools = await Query.getInvestedPools(api, address);
 
-    const investedPoolsFormatted = []
+    const investedPoolsFormatted = [];
     for (const pool of investedPools) {
-      const awaitedPool = await pool
-      investedPoolsFormatted.push(awaitedPool)
+      const awaitedPool = await pool;
+      investedPoolsFormatted.push(awaitedPool);
     }
 
-    return investedPoolsFormatted as TPoolWithShare[]
+    return investedPoolsFormatted as TPoolWithShare[];
   }
 
   public async getPools(): Promise<TPoolWithRatio[]> {
-    const api = await this.getApi()
-    return await Query.getPools(api)
+    const api = await this.getApi();
+    return await Query.getPools(api);
   }
 }

@@ -1,103 +1,130 @@
 /* eslint-disable no-console */
-import { ApiPromise } from '@polkadot/api'
-import { KeyringPair } from '@polkadot/keyring/types'
-import { SubmittableExtrinsic } from '@polkadot/api/types'
-import { BN } from '@polkadot/util'
+import { ApiPromise } from "@polkadot/api";
+import { KeyringPair } from "@polkadot/keyring/types";
+import { SubmittableExtrinsic } from "@polkadot/api/types";
+import { BN } from "@polkadot/util";
 
-import { instance, getTxNonce, recreateExtrinsicsOrder } from '../utils'
-import { Query } from '../services'
+import { instance, getTxNonce, recreateExtrinsicsOrder } from "../utils";
+import { Query } from "../services";
 
-import { TxOptions, MangataGenericEvent, MangataEventData } from '../types'
+import { TxOptions, MangataGenericEvent, MangataEventData } from "../types";
 
 export const signTx = async (
   api: ApiPromise,
-  tx: SubmittableExtrinsic<'promise'>,
+  tx: SubmittableExtrinsic<"promise">,
   account: string | KeyringPair,
   txOptions?: TxOptions
 ): Promise<MangataGenericEvent[]> => {
   return new Promise<MangataGenericEvent[]>(async (resolve, reject) => {
-    let output: MangataGenericEvent[] = []
-    const extractedAccount = typeof account === 'string' ? account : account.address
+    let output: MangataGenericEvent[] = [];
+    const extractedAccount =
+      typeof account === "string" ? account : account.address;
 
-    const nonce = await getTxNonce(api, extractedAccount, txOptions)
-    let retries = 0
+    const nonce = await getTxNonce(api, extractedAccount, txOptions);
+    let retries = 0;
     try {
       const unsub = await tx.signAndSend(
         account,
-        { nonce, signer: txOptions && txOptions.signer ? txOptions.signer : undefined },
+        {
+          nonce,
+          signer: txOptions && txOptions.signer ? txOptions.signer : undefined
+        },
         async (result) => {
-          console.info('Hash:[' + tx.hash + '] \n      Status-' + result.status)
-          txOptions && txOptions.statusCallback && txOptions.statusCallback(result)
+          console.info(
+            "Hash:[" + tx.hash + "] \n      Status-" + result.status
+          );
+          txOptions &&
+            txOptions.statusCallback &&
+            txOptions.statusCallback(result);
           if (result.status.isFinalized) {
             const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
               async (lastHeader) => {
-                if (lastHeader.parentHash.toString() === result.status.asFinalized.toString()) {
-                  unsubscribeNewHeads()
-                  const currentBlock = await api.rpc.chain.getBlock(lastHeader.hash)
-                  const currentBlockExtrinsics = currentBlock.block.extrinsics
-                  const currentBlockEvents = await api.query.system.events.at(lastHeader.hash)
-                  const headerJsonResponse = JSON.parse(lastHeader.toString())
+                if (
+                  lastHeader.parentHash.toString() ===
+                  result.status.asFinalized.toString()
+                ) {
+                  unsubscribeNewHeads();
+                  const currentBlock = await api.rpc.chain.getBlock(
+                    lastHeader.hash
+                  );
+                  const currentBlockExtrinsics = currentBlock.block.extrinsics;
+                  const currentBlockEvents = await api.query.system.events.at(
+                    lastHeader.hash
+                  );
+                  const headerJsonResponse = JSON.parse(lastHeader.toString());
 
                   const buffer: Buffer = Buffer.from(
-                    headerJsonResponse['seed']['seed'].substring(2),
-                    'hex'
-                  )
-                  const countOfExtrinsicsFromThisBlock = headerJsonResponse['count']
+                    headerJsonResponse["seed"]["seed"].substring(2),
+                    "hex"
+                  );
+                  const countOfExtrinsicsFromThisBlock =
+                    headerJsonResponse["count"];
                   const currentBlockInherents = currentBlockExtrinsics
                     .slice(0, countOfExtrinsicsFromThisBlock)
                     .filter((tx) => {
-                      return !tx.isSigned
-                    })
+                      return !tx.isSigned;
+                    });
                   const previousBlockExtrinsics = currentBlockExtrinsics.slice(
                     countOfExtrinsicsFromThisBlock,
                     currentBlockExtrinsics.length
-                  )
-                  const bothBlocksExtrinsics = currentBlockInherents.concat(previousBlockExtrinsics)
+                  );
+                  const bothBlocksExtrinsics = currentBlockInherents.concat(
+                    previousBlockExtrinsics
+                  );
 
-                  const unshuffledInherents = bothBlocksExtrinsics.filter((tx) => {
-                    return !tx.isSigned
-                  })
+                  const unshuffledInherents = bothBlocksExtrinsics.filter(
+                    (tx) => {
+                      return !tx.isSigned;
+                    }
+                  );
 
                   const shuffledExtrinscs = recreateExtrinsicsOrder(
                     bothBlocksExtrinsics
                       .filter((tx) => {
-                        return tx.isSigned
+                        return tx.isSigned;
                       })
                       .map((tx) => {
-                        const who = tx.isSigned ? tx.signer.toString() : '0000'
-                        return [who, tx]
+                        const who = tx.isSigned ? tx.signer.toString() : "0000";
+                        return [who, tx];
                       }),
                     Uint8Array.from(buffer)
-                  )
+                  );
 
-                  const executionOrder = unshuffledInherents.concat(shuffledExtrinscs)
+                  const executionOrder =
+                    unshuffledInherents.concat(shuffledExtrinscs);
 
-                  const index = executionOrder.findIndex((shuffledExtrinsic) => {
-                    return (
-                      shuffledExtrinsic?.isSigned &&
-                      shuffledExtrinsic?.signer.toString() === extractedAccount &&
-                      shuffledExtrinsic?.nonce.toString() === nonce.toString()
-                    )
-                  })
+                  const index = executionOrder.findIndex(
+                    (shuffledExtrinsic) => {
+                      return (
+                        shuffledExtrinsic?.isSigned &&
+                        shuffledExtrinsic?.signer.toString() ===
+                          extractedAccount &&
+                        shuffledExtrinsic?.nonce.toString() === nonce.toString()
+                      );
+                    }
+                  );
                   if (index < 0) {
-                    return
+                    return;
                   }
                   const reqEvents: MangataGenericEvent[] = currentBlockEvents
                     .filter((currentBlockEvent) => {
                       return (
                         currentBlockEvent.phase.isApplyExtrinsic &&
-                        currentBlockEvent.phase.asApplyExtrinsic.toNumber() === index
-                      )
+                        currentBlockEvent.phase.asApplyExtrinsic.toNumber() ===
+                          index
+                      );
                     })
                     .map((eventRecord) => {
-                      const { event, phase } = eventRecord
-                      const types = event.typeDef
-                      const eventData: MangataEventData[] = event.data.map((d: any, i: any) => {
-                        return {
-                          lookupName: types[i].lookupName!,
-                          data: d,
+                      const { event, phase } = eventRecord;
+                      const types = event.typeDef;
+                      const eventData: MangataEventData[] = event.data.map(
+                        (d: any, i: any) => {
+                          return {
+                            lookupName: types[i].lookupName!,
+                            data: d
+                          };
                         }
-                      })
+                      );
 
                       return {
                         event,
@@ -106,105 +133,146 @@ export const signTx = async (
                         method: event.method,
                         metaDocumentation: event.meta.docs.toString(),
                         eventData,
-                        error: getError(api, event.method, eventData),
-                      } as MangataGenericEvent
-                    })
+                        error: getError(api, event.method, eventData)
+                      } as MangataGenericEvent;
+                    });
 
-                  output = output.concat(reqEvents)
-                  txOptions && txOptions.extrinsicStatus && txOptions.extrinsicStatus(output)
-                  resolve(output)
-                  unsub()
+                  output = output.concat(reqEvents);
+                  txOptions &&
+                    txOptions.extrinsicStatus &&
+                    txOptions.extrinsicStatus(output);
+                  resolve(output);
+                  unsub();
                 } else if (retries++ < 10) {
                   console.info(
-                    'Retry [' +
+                    "Retry [" +
                       retries +
-                      '] \n      Hash:[' +
+                      "] \n      Hash:[" +
                       tx.hash +
-                      '] \n      Status-' +
+                      "] \n      Status-" +
                       result.status +
-                      ' \n     Parent[' +
+                      " \n     Parent[" +
                       lastHeader.parentHash.toString() +
-                      ' \n     Finalized in:' +
+                      " \n     Finalized in:" +
                       result.status.asFinalized.toString()
-                  )
+                  );
                 } else {
                   //Lets retry this for 3 times until we reject the promise.
-                  unsubscribeNewHeads()
+                  unsubscribeNewHeads();
                   reject(
                     `Transaction was not finalized: Last Header Parent hash: ${lastHeader.parentHash.toString()} and \n     Status finalized: ${result.status.asFinalized.toString()}`
-                  )
-                  unsub()
+                  );
+                  unsub();
                 }
               }
-            )
+            );
           } else if (result.isError) {
-            reject(`${tx.hash} ` + 'Transaction error')
-            const currentNonce: BN = await Query.getNonce(api, extractedAccount)
-            instance.setNonce(extractedAccount, currentNonce)
+            reject(`${tx.hash} ` + "Transaction error");
+            const currentNonce: BN = await Query.getNonce(
+              api,
+              extractedAccount
+            );
+            instance.setNonce(extractedAccount, currentNonce);
           }
         }
-      )
+      );
     } catch (error: any) {
-      const currentNonce: BN = await Query.getNonce(api, extractedAccount)
-      instance.setNonce(extractedAccount, currentNonce)
+      const currentNonce: BN = await Query.getNonce(api, extractedAccount);
+      instance.setNonce(extractedAccount, currentNonce);
       reject({
-        data: error.message || error.description || error.data?.toString() || error.toString(),
-      })
+        data:
+          error.message ||
+          error.description ||
+          error.data?.toString() ||
+          error.toString()
+      });
     }
-  })
-}
+  });
+};
 
 type TErrorData = {
   Module?: {
-    index?: string
-    error?: string
-  }
-}
+    index?: string;
+    error?: string;
+  };
+};
 
 const getError = (
   api: ApiPromise,
   method: string,
   eventData: MangataEventData[]
 ): {
-  documentation: string[]
-  name: string
+  documentation: string[];
+  name: string;
 } | null => {
-  const failedEvent = method === 'ExtrinsicFailed'
+  const failedEvent = method === "ExtrinsicFailed";
 
   if (failedEvent) {
-    const error = eventData.find((item) => item.lookupName.includes('DispatchError'))
-    const errorData = error?.data?.toHuman?.() as TErrorData | undefined
-    const errorIdx = errorData?.Module?.error
-    const moduleIdx = errorData?.Module?.index
+    const error = eventData.find((item) =>
+      item.lookupName.includes("DispatchError")
+    );
+    const errorData = error?.data?.toHuman?.() as TErrorData | undefined;
+    const errorIdx = errorData?.Module?.error;
+    const moduleIdx = errorData?.Module?.index;
 
     if (errorIdx && moduleIdx) {
       try {
         const decode = api.registry.findMetaError({
           error: new BN(errorIdx),
-          index: new BN(moduleIdx),
-        })
+          index: new BN(moduleIdx)
+        });
         return {
           documentation: decode.docs,
-          name: decode.name,
-        }
+          name: decode.name
+        };
       } catch (error) {
         return {
-          documentation: ['Unknown error'],
-          name: 'UnknownError',
-        }
+          documentation: ["Unknown error"],
+          name: "UnknownError"
+        };
       }
     } else {
       return {
-        documentation: ['Unknown error'],
-        name: 'UnknownError',
-      }
+        documentation: ["Unknown error"],
+        name: "UnknownError"
+      };
     }
   }
 
-  return null
-}
+  return null;
+};
 
 export class Tx {
+  static async activateLiquidity(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    liquditityTokenId: string,
+    amount: BN,
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    return await signTx(
+      api,
+      api.tx.xyk.activateLiquidity(liquditityTokenId, amount),
+      account,
+      txOptions
+    );
+  }
+
+  static async deactivateLiquidity(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    liquditityTokenId: string,
+    amount: BN,
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    return await signTx(
+      api,
+      api.tx.xyk.deactivateLiquidity(liquditityTokenId, amount),
+      account,
+      txOptions
+    );
+  }
+
   static async sendTokensFromParachainToRely(
     api: ApiPromise,
     fromAccount: KeyringPair,
@@ -219,8 +287,8 @@ export class Tx {
         {
           V1: {
             parents: 1,
-            interior: 'Here',
-          },
+            interior: "Here"
+          }
         },
         {
           V1: {
@@ -228,12 +296,12 @@ export class Tx {
             interior: {
               X1: {
                 AccountId32: {
-                  network: 'Any',
-                  id: toAccount,
-                },
-              },
-            },
-          },
+                  network: "Any",
+                  id: toAccount
+                }
+              }
+            }
+          }
         },
         {
           V1: [
@@ -241,20 +309,20 @@ export class Tx {
               id: {
                 Concrete: {
                   parents: 1,
-                  interior: 'Here',
-                },
+                  interior: "Here"
+                }
               },
               fun: {
-                Fungible: amount,
-              },
-            },
-          ],
+                Fungible: amount
+              }
+            }
+          ]
         },
         assetId
       ),
       fromAccount,
       txOptions
-    )
+    );
   }
 
   static async sendTokensFromMGAtoParachain(
@@ -277,23 +345,23 @@ export class Tx {
             interior: {
               X2: [
                 {
-                  Parachain: parachainId,
+                  Parachain: parachainId
                 },
                 {
                   AccountId32: {
-                    network: 'Any',
-                    id: toAccount,
-                  },
-                },
-              ],
-            },
-          },
+                    network: "Any",
+                    id: toAccount
+                  }
+                }
+              ]
+            }
+          }
         },
-        new BN('6000000000')
+        new BN("6000000000")
       ),
       fromAccount,
       txOptions
-    )
+    );
   }
 
   static async claimRewards(
@@ -303,7 +371,12 @@ export class Tx {
     amount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    return await signTx(api, api.tx.xyk.claimRewards(liquidityTokenId, amount), account, txOptions)
+    return await signTx(
+      api,
+      api.tx.xyk.claimRewards(liquidityTokenId, amount),
+      account,
+      txOptions
+    );
   }
 
   static async createPool(
@@ -317,10 +390,15 @@ export class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      api.tx.xyk.createPool(firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount),
+      api.tx.xyk.createPool(
+        firstTokenId,
+        firstTokenAmount,
+        secondTokenId,
+        secondTokenAmount
+      ),
       account,
       txOptions
-    )
+    );
   }
 
   static async sellAsset(
@@ -337,7 +415,7 @@ export class Tx {
       api.tx.xyk.sellAsset(soldTokenId, boughtTokenId, amount, minAmountOut),
       account,
       txOptions
-    )
+    );
   }
 
   static async buyAsset(
@@ -354,7 +432,7 @@ export class Tx {
       api.tx.xyk.buyAsset(soldTokenId, boughtTokenId, amount, maxAmountIn),
       account,
       txOptions
-    )
+    );
   }
 
   static async mintLiquidity(
@@ -376,7 +454,7 @@ export class Tx {
       ),
       account,
       txOptions
-    )
+    );
   }
 
   static async burnLiquidity(
@@ -389,10 +467,14 @@ export class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      api.tx.xyk.burnLiquidity(firstTokenId, secondTokenId, liquidityTokenAmount),
+      api.tx.xyk.burnLiquidity(
+        firstTokenId,
+        secondTokenId,
+        liquidityTokenAmount
+      ),
       account,
       txOptions
-    )
+    );
   }
 
   static async transferToken(
@@ -408,8 +490,8 @@ export class Tx {
       api.tx.tokens.transfer(address, tokenId, amount),
       account,
       txOptions
-    )
-    return result
+    );
+    return result;
   }
 
   static async transferAllToken(
@@ -419,38 +501,12 @@ export class Tx {
     address: string,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
-    return await signTx(api, api.tx.tokens.transferAll(address, tokenId, true), account, txOptions)
-  }
-
-  static async createToken(
-    api: ApiPromise,
-    address: string,
-    sudoAccount: string | KeyringPair,
-    tokenValue: BN,
-    txOptions?: TxOptions
-  ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      api.tx.sudo.sudo(api.tx.tokens.create(address, tokenValue)),
-      sudoAccount,
+      api.tx.tokens.transferAll(address, tokenId, true),
+      account,
       txOptions
-    )
-  }
-
-  static async mintAsset(
-    api: ApiPromise,
-    sudoAccount: string | KeyringPair,
-    tokenId: string,
-    address: string,
-    amount: BN,
-    txOptions?: TxOptions
-  ): Promise<MangataGenericEvent[]> {
-    return await signTx(
-      api,
-      api.tx.sudo.sudo(api.tx.tokens.mint(tokenId, address, amount)),
-      sudoAccount,
-      txOptions
-    )
+    );
   }
 
   static async bridgeERC20ToEthereum(
@@ -466,7 +522,7 @@ export class Tx {
       api.tx.erc20.burn(tokenAddress, ethereumAddress, amount),
       account,
       txOptions
-    )
+    );
   }
 
   static async bridgeEthToEthereum(
@@ -476,6 +532,11 @@ export class Tx {
     amount: BN,
     txOptions?: TxOptions
   ) {
-    return await signTx(api, api.tx.eth.burn(ethereumAddress, amount), account, txOptions)
+    return await signTx(
+      api,
+      api.tx.eth.burn(ethereumAddress, amount),
+      account,
+      txOptions
+    );
   }
 }
