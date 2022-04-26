@@ -12,6 +12,15 @@ import { Event, Phase } from '@polkadot/types/interfaces';
 import { KeypairType } from '@polkadot/util-crypto/types';
 import Big from 'big.js';
 
+declare type AssetInfo = {
+    id: string;
+    infoToken: {
+        name: string;
+        symbol: string;
+        description: string;
+        decimals: string;
+    };
+};
 declare type TToken = {
     id: TTokenId;
     chainId: number;
@@ -21,6 +30,7 @@ declare type TToken = {
     decimals: number;
     balance: BN;
 };
+declare type TTokenMainInfo = Omit<TToken, 'id' | 'balance' | 'chainId'>;
 declare type TTokenInfo = Omit<TToken, 'balance'>;
 declare type TTokenId = string;
 declare type TTokenAddress = string;
@@ -28,7 +38,10 @@ declare type TTokenName = string;
 declare type TTokenSymbol = string;
 declare type TFreeBalance = BN;
 declare type TReservedBalance = BN;
+declare type TFrozenBalance = BN;
+declare type TTokens = Record<TTokenId, TToken>;
 declare type TBalances = Record<TTokenId, BN>;
+declare type TBridgeIds = Record<TTokenId, TTokenAddress>;
 declare type TBridgeAddresses = Record<TTokenAddress, TTokenId>;
 declare type TBridgeTokens = Record<TTokenId, TTokenInfo>;
 declare type TMainTokens = Record<TTokenId, TTokenInfo>;
@@ -463,4 +476,4 @@ declare const signTx: (api: ApiPromise, tx: SubmittableExtrinsic<"promise">, acc
     extrinsicStatus: (events: MangataGenericEvent[]) => void;
 }> | undefined) => Promise<MangataGenericEvent[]>;
 
-export { BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Mangata, MangataHelpers, fromBN, signTx, toBN, toFixed };
+export { AssetInfo, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Mangata, MangataEventData, MangataGenericEvent, MangataHelpers, Reward, TBalances, TBridgeAddresses, TBridgeIds, TBridgeTokens, TFreeBalance, TFrozenBalance, TMainTokens, TPool, TPoolWithRatio, TPoolWithShare, TReservedBalance, TToken, TTokenAddress, TTokenId, TTokenInfo, TTokenMainInfo, TTokenName, TTokenSymbol, TTokens, TokenBalance, TxOptions, fromBN, signTx, toBN, toFixed };

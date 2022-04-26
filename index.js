@@ -254,8 +254,13 @@ const getRatio = (left, right) => {
 };
 
 const liquidityPromotedTokenMap = async (api) => {
-    const liquidityAssetsResponse = await api.query.issuance.promotedPoolsRewards.entries();
-    return liquidityAssetsResponse.map(([key]) => key.args.map((k) => k.toHuman())[0]);
+    try {
+        const liquidityAssetsResponse = await api.query.issuance.promotedPoolsRewards.entries();
+        return liquidityAssetsResponse.map(([key]) => key.args.map((k) => k.toHuman())[0]);
+    }
+    catch (error) {
+        return [];
+    }
 };
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS
