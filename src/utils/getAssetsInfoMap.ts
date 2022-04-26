@@ -1,6 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 
-import { TTokenInfo, TTokenId } from "../types";
+import { TTokenInfo, TTokenId } from "../types/AssetInfo";
 import { getCorrectSymbol } from "./getCorrectSymbol";
 
 const ETHaddress = "0x0000000000000000000000000000000000000000";

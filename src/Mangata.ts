@@ -5,10 +5,11 @@ import { WsProvider } from "@polkadot/rpc-provider/ws";
 import { options } from "@mangata-finance/types";
 import { BN } from "@polkadot/util";
 
-import { Rpc, Tx, Query, Fee } from "./services";
+import { Rpc } from "./services/Rpc";
+import { Tx } from "./services/Tx";
+import { Query } from "./services/Query";
+import { Fee } from "./services/Fee";
 import {
-  MangataGenericEvent,
-  TxOptions,
   TTokenAddress,
   TToken,
   TBalances,
@@ -19,8 +20,10 @@ import {
   TPoolWithShare,
   TPoolWithRatio,
   Reward
-} from "./types";
-import { calculateFutureRewardsAmount } from "./utils";
+} from "./types/AssetInfo";
+import { MangataGenericEvent } from "./types/MangataGenericEvent";
+import { TxOptions } from "./types/TxOptions";
+import { calculateFutureRewardsAmount } from "./utils/calculateFutureRewardsAmount";
 
 /**
  * @class Mangata

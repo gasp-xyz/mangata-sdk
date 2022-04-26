@@ -2,13 +2,15 @@
   "name": "mangata-sdk",
   "version": "0.31.2",
   "description": "SDK for communication with Mangata node",
-  "types": "build/index.d.ts",
-  "exports": "./build/index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": "./index.js"
+  },
   "type": "module",
   "scripts": {
-    "build": "rm -fr build/* && tsc -p tsconfig.json",
+    "build": "rm -fr build/* && tsc -p tsconfig.json && rollup -c",
     "test": "jest --runInBand --verbose --forceExit",
-    "start": "yarn build && node ./build/index.js",
+    "start": "yarn build && node ./index.js",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "eslint": "node_modules/.bin/eslint --max-warnings 0 . --ext .ts",
     "eslint-fix": "yarn eslint --fix",
@@ -17,7 +19,8 @@
     "bump:patch": "standard-version --release-as patch"
   },
   "files": [
-    "build"
+    "index.js",
+    "index.d.ts"
   ],
   "engines": {
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
@@ -48,6 +51,8 @@
     "dotenv": "^10.0.0",
     "jest": "^27.5.1",
     "process": "^0.11.10",
+    "rollup": "^2.70.2",
+    "rollup-plugin-dts": "^4.2.1",
     "standard-version": "^9.3.1",
     "ts-jest": "^27.1.4",
     "ts-node": "^10.5.0",
@@ -56,7 +61,7 @@
   "dependencies": {
     "@mangata-finance/types": "^0.1.5",
     "big.js": "^6.1.1",
-    "mangata-prng-xoshiro": "^1.2.0",
+    "mangata-prng-xoshiro": "^2.0.0",
     "uuid": "^8.3.2"
   }
 }

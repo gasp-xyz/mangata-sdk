@@ -6,14 +6,12 @@ import { BN } from "@polkadot/util";
 import { v4 as uuid } from "uuid";
 import Big from "big.js";
 
-import {
-  toBN,
-  toFixed,
-  isInputValid,
-  getXoshiro,
-  BIG_HUNDRED,
-  BN_TEN_THOUSAND
-} from "./utils";
+import { toBN } from "./utils/BNutility";
+import { toFixed } from "./utils/toFixed";
+import { isInputValid } from "./utils/isInputValid";
+import { getXoshiro } from "./utils/getXorshiroStates";
+import { BIG_HUNDRED } from "./utils/bigConstants";
+import { BN_TEN_THOUSAND } from "./utils/bnConstants";
 
 /**
  * @class MangataHelpers

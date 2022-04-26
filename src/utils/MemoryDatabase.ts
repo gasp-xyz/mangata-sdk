@@ -1,6 +1,6 @@
 import { BN } from "@polkadot/util";
 
-import { Database } from "../types";
+import { Database } from "../types/Database";
 
 class InMemoryDatabase implements Database {
   static instance: InMemoryDatabase;

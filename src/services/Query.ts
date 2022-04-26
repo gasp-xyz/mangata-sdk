@@ -14,20 +14,18 @@ import {
   TBridgeAddresses,
   TPoolWithRatio,
   TPoolWithShare
-} from "../types";
-import {
-  getAssetsInfoMap,
-  liquidityAssetsMap,
-  poolsBalanceMap,
-  balancesMap,
-  accountEntriesMap,
-  getCorrectSymbol,
-  getAssetsInfoMapWithIds,
-  calculateLiquidityShare,
-  getRatio,
-  BN_ZERO,
-  liquidityPromotedTokenMap
-} from "../utils";
+} from "../types/AssetInfo";
+import { getAssetsInfoMap } from "../utils/getAssetsInfoMap";
+import { liquidityAssetsMap } from "../utils/liquidityAssetsMap";
+import { poolsBalanceMap } from "../utils/poolsBalanceMap";
+import { balancesMap } from "../utils/balancesMap";
+import { accountEntriesMap } from "../utils/accountEntriesMap";
+import { getCorrectSymbol } from "../utils/getCorrectSymbol";
+import { getAssetsInfoMapWithIds } from "../utils/getAssetsInfoMapWithIds";
+import { calculateLiquidityShare } from "../utils/calculateLiquidityShare";
+import { getRatio } from "../utils/getRatio";
+import { liquidityPromotedTokenMap } from "../utils/liquidityPromotedTokenMap";
+import { BN_ZERO } from "../utils/bnConstants";
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS
   ? process.env.TREASURY_ADDRESS

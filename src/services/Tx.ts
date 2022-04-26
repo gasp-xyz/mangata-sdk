@@ -4,9 +4,13 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { BN } from "@polkadot/util";
 
-import { instance, getTxNonce, recreateExtrinsicsOrder } from "../utils";
-import { Query } from "../services";
-import { TxOptions, MangataGenericEvent, MangataEventData } from "../types";
+import { instance } from "../utils/MemoryDatabase";
+import { getTxNonce } from "../utils/getTxNonce";
+import { recreateExtrinsicsOrder } from "../utils/recreateExtrinsicsOrder";
+import { Query } from "../services/Query";
+import { TxOptions } from "../types/TxOptions";
+import { MangataGenericEvent } from "../types/MangataGenericEvent";
+import { MangataEventData } from "../types/MangataEventData";
 
 export const signTx = async (
   api: ApiPromise,
