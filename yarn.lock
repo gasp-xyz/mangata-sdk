@@ -1391,10 +1391,10 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@mangata-finance/types@^0.1.5":
-  version "0.1.5"
-  resolved "https://registry.npmjs.org/@mangata-finance/types/-/types-0.1.5.tgz#07d33a6596c610889dfd15245628737dd2de4bc8"
-  integrity sha512-KeH0hBlEGsSH+NgItlQrT/wsigpHa/ZOMgT0dIPf5kxTgSWxUM/7ni/gAwH+9xbkY4FIcopIvsbA2HmUJ24Q3A==
+"@mangata-finance/types@^0.1.6":
+  version "0.1.6"
+  resolved "https://registry.npmjs.org/@mangata-finance/types/-/types-0.1.6.tgz#c0aea1c409a94936fb1fb46d1e18e6d1c95e3f36"
+  integrity sha512-QZh+USWn+1CMYfwV9z6Thvr4Tg20MzO2De2luC3Cb7KJ+QFsVHcxKY84LljLIk9sVCdtHtvMu7bbbYFYsKePYA==
   dependencies:
     "@polkadot/api" "^7.13.1"
 

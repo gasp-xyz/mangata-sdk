@@ -1,7 +1,6 @@
 import { MangataHelpers, signTx } from "../src";
 import { instance, SUDO_USER_NAME } from "./instanceCreation";
 import { BN } from "@polkadot/util";
-import { getAssetsInfoMapWithIds } from "../src/utils";
 
 describe("Rewards", () => {
   it("user should be able to claim rewards and check whether pool is promoted", async () => {
