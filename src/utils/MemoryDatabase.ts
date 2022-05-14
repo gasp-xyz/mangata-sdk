@@ -6,7 +6,9 @@ class InMemoryDatabase implements Database {
   static instance: InMemoryDatabase;
   private db: Record<string, BN> = {};
 
-  private constructor() {}
+  private constructor() {
+    // empty constructor
+  }
 
   public static getInstance(): InMemoryDatabase {
     if (!InMemoryDatabase.instance) {

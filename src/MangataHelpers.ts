@@ -24,7 +24,7 @@ export class MangataHelpers {
 
   public static createKeyPairFromNameAndStoreAccountToKeyring(
     keyring: Keyring,
-    name: string = ""
+    name = ""
   ): KeyringPair {
     const userName: string = name ? name : "//testUser_" + uuid();
     const account = keyring.createFromUri(userName);

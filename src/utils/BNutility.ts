@@ -29,8 +29,6 @@ export const toBN = (value: string, exponent?: number): BN => {
 
     return new BN(resStr);
   } catch (err) {
-    console.error("Could not convert to BN:", err);
-
     return BN_ZERO;
   }
 };
@@ -49,8 +47,6 @@ export const fromBN = (value: BN, exponent?: number): string => {
 
     return resStr;
   } catch (err) {
-    console.error("Could not convert from BN:", err);
-
     return "0";
   }
 };
