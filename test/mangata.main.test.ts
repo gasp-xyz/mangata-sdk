@@ -32,7 +32,7 @@ beforeEach(async () => {
     new BN(500000).add(new BN(1))
   ]);
   firstCurrency = currencies[0].toString();
-  secondCurrency = currencies[2].toString();
+  secondCurrency = currencies[1].toString();
   await addMGAToken(instance, sudoUser, testUser);
   await instance.waitForNewBlock(2);
 });
