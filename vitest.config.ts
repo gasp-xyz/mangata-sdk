@@ -12,7 +12,7 @@ export default defineConfig({
     /**
      * A default timeout of 5000ms is sometimes not enough for playwright.
      */
-    testTimeout: 360000,
-    hookTimeout: 360000
+    testTimeout: 3600000,
+    hookTimeout: 3600000
   }
 });
