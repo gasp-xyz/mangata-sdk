@@ -1,11 +1,12 @@
 /// <reference types="bn.js" />
 import * as _polkadot_api_types from '@polkadot/api/types';
-import { SubmittableExtrinsic } from '@polkadot/api/types';
+import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 export { SubmittableExtrinsic } from '@polkadot/api/types';
 import * as _polkadot_types_types from '@polkadot/types/types';
-import { Codec, Signer, ISubmittableResult } from '@polkadot/types/types';
+import { Codec, ISubmittableResult } from '@polkadot/types/types';
 export { ISubmittableResult } from '@polkadot/types/types';
 import { BN } from '@polkadot/util';
+export { BN } from '@polkadot/util';
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { Event, Phase } from '@polkadot/types/interfaces';
@@ -322,14 +323,22 @@ declare class Mangata {
      *
      * @returns {AccountData}
      */
-    getTreasury(tokenId: string): Promise<OrmlTokensAccountData>;
+    getTreasury(tokenId: string): Promise<{
+        free: BN;
+        reserved: BN;
+        frozen: BN;
+    }>;
     /**
      * Returns amount of token Id in Treasury Burn
      * @param {string} tokenId
      *
      * @returns {AccountData}
      */
-    getTreasuryBurn(tokenId: string): Promise<OrmlTokensAccountData>;
+    getTreasuryBurn(tokenId: string): Promise<{
+        free: BN;
+        reserved: BN;
+        frozen: BN;
+    }>;
     transferTokenFee(account: string | KeyringPair, tokenId: string, address: string, amount: BN, txOptions?: TxOptions): Promise<string>;
     /**
      * Extrinsic that transfers Token Id in value amount from origin to destination

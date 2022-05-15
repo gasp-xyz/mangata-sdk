@@ -1,9 +1,8 @@
-/* eslint-disable no-console */
 import { BN } from "@polkadot/util";
 import { KeyringPair } from "@polkadot/keyring/types";
 
 import { instance, SUDO_USER_NAME } from "./instanceCreation";
-import { MangataHelpers } from "../src";
+import { MangataHelpers } from "../index";
 import {
   addAccountCurrencies,
   addMGAToken,
@@ -37,202 +36,184 @@ beforeEach(async () => {
   await instance.waitForNewBlock(2);
 });
 
-describe("test create pool", () => {
-  it("should create pool", async () => {
-    await instance.createPool(
-      testUser,
-      firstCurrency,
-      new BN(50000),
-      secondCurrency,
-      new BN(50000),
-      {
-        extrinsicStatus: (result: MangataGenericEvent[]) => {
-          const eventResult = getEventResultFromTxWait(result, [
-            "xyk",
-            "PoolCreated",
-            testUser.address
-          ]);
-          expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
-        }
+it.concurrent("should create pool", async () => {
+  await instance.createPool(
+    testUser,
+    firstCurrency,
+    new BN(50000),
+    secondCurrency,
+    new BN(50000),
+    {
+      extrinsicStatus: (result: MangataGenericEvent[]) => {
+        const eventResult = getEventResultFromTxWait(result, [
+          "xyk",
+          "PoolCreated",
+          testUser.address
+        ]);
+        expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
       }
-    );
-  });
-});
-
-describe("test amount of token in pool", () => {
-  it("should test the balance", async () => {
-    await instance.createPool(
-      testUser,
-      firstCurrency,
-      new BN(50000),
-      secondCurrency,
-      new BN(60000)
-    );
-
-    const balance1 = await instance.getAmountOfTokenIdInPool(
-      firstCurrency,
-      secondCurrency
-    );
-    const balance2 = await instance.getAmountOfTokenIdInPool(
-      secondCurrency,
-      firstCurrency
-    );
-
-    expect(balance1[0].toNumber()).toEqual(50000);
-    expect(balance1[1].toNumber()).toEqual(60000);
-    expect(balance2[0].toNumber()).toEqual(0);
-    expect(balance2[1].toNumber()).toEqual(0);
-  });
-});
-
-describe("test buy asset", () => {
-  it("should buy asset", async () => {
-    await instance.createPool(
-      testUser,
-      firstCurrency,
-      new BN(50000),
-      secondCurrency,
-      new BN(25000)
-    );
-    await instance.waitForNewBlock(2);
-    await instance.buyAsset(
-      testUser,
-      firstCurrency,
-      secondCurrency,
-      new BN(1000),
-      new BN(60000),
-      {
-        extrinsicStatus: (result) => {
-          const eventResult = getEventResultFromTxWait(result, [
-            "xyk",
-            "AssetsSwapped",
-            testUser.address
-          ]);
-          expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
-        }
-      }
-    );
-  });
-});
-
-describe("test sellasset four times at the same time", () => {
-  it("should sell asset 4 times", async () => {
-    await instance.createPool(
-      testUser,
-      firstCurrency,
-      new BN(100000),
-      secondCurrency,
-      new BN(100000)
-    );
-    const userNonce = [];
-    userNonce.push(await instance.getNonce(testUser.address));
-    const promises = [];
-    const maxFutureNonce = userNonce[0].toNumber() + 3;
-    for (
-      let index = maxFutureNonce;
-      index >= userNonce[0].toNumber();
-      index--
-    ) {
-      promises.push(
-        instance.sellAsset(
-          testUser,
-          firstCurrency,
-          secondCurrency,
-          new BN(1000 + index),
-          new BN(0),
-          {
-            nonce: new BN(index)
-          }
-        )
-      );
     }
-    const promisesEvents = await Promise.all(promises);
-    promisesEvents.forEach((events) => {
-      const result = getEventResultFromTxWait(events);
-      expect(result.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
-    });
+  );
+});
+
+it.concurrent("should test the balance", async () => {
+  await instance.createPool(
+    testUser,
+    firstCurrency,
+    new BN(50000),
+    secondCurrency,
+    new BN(60000)
+  );
+
+  const balance1 = await instance.getAmountOfTokenIdInPool(
+    firstCurrency,
+    secondCurrency
+  );
+  const balance2 = await instance.getAmountOfTokenIdInPool(
+    secondCurrency,
+    firstCurrency
+  );
+
+  expect(balance1[0].toNumber()).toEqual(50000);
+  expect(balance1[1].toNumber()).toEqual(60000);
+  expect(balance2[0].toNumber()).toEqual(0);
+  expect(balance2[1].toNumber()).toEqual(0);
+});
+
+it.concurrent("should buy asset", async () => {
+  await instance.createPool(
+    testUser,
+    firstCurrency,
+    new BN(50000),
+    secondCurrency,
+    new BN(25000)
+  );
+  await instance.waitForNewBlock(2);
+  await instance.buyAsset(
+    testUser,
+    firstCurrency,
+    secondCurrency,
+    new BN(1000),
+    new BN(60000),
+    {
+      extrinsicStatus: (result) => {
+        const eventResult = getEventResultFromTxWait(result, [
+          "xyk",
+          "AssetsSwapped",
+          testUser.address
+        ]);
+        expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
+      }
+    }
+  );
+});
+
+it.concurrent("should sell asset 4 times", async () => {
+  await instance.createPool(
+    testUser,
+    firstCurrency,
+    new BN(100000),
+    secondCurrency,
+    new BN(100000)
+  );
+  const userNonce = [];
+  userNonce.push(await instance.getNonce(testUser.address));
+  const promises = [];
+  const maxFutureNonce = userNonce[0].toNumber() + 3;
+  for (let index = maxFutureNonce; index >= userNonce[0].toNumber(); index--) {
+    promises.push(
+      instance.sellAsset(
+        testUser,
+        firstCurrency,
+        secondCurrency,
+        new BN(1000 + index),
+        new BN(0),
+        {
+          nonce: new BN(index)
+        }
+      )
+    );
+  }
+  const promisesEvents = await Promise.all(promises);
+  promisesEvents.forEach((events) => {
+    const result = getEventResultFromTxWait(events);
+    expect(result.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
   });
 });
 
-describe("test sell asset", () => {
-  it("should sell asset", async () => {
-    await instance.createPool(
-      testUser,
-      firstCurrency,
-      new BN(50000),
-      secondCurrency,
-      new BN(25000)
-    );
-    await instance.waitForNewBlock(2);
-    await instance.sellAsset(
-      testUser,
-      firstCurrency,
-      secondCurrency,
-      new BN(10000),
-      new BN(100),
-      {
-        extrinsicStatus: (result) => {
-          const eventResult = getEventResultFromTxWait(result, [
-            "xyk",
-            "AssetsSwapped",
-            testUser.address
-          ]);
-          expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
-        }
+it.concurrent("should sell asset", async () => {
+  await instance.createPool(
+    testUser,
+    firstCurrency,
+    new BN(50000),
+    secondCurrency,
+    new BN(25000)
+  );
+  await instance.waitForNewBlock(2);
+  await instance.sellAsset(
+    testUser,
+    firstCurrency,
+    secondCurrency,
+    new BN(10000),
+    new BN(100),
+    {
+      extrinsicStatus: (result) => {
+        const eventResult = getEventResultFromTxWait(result, [
+          "xyk",
+          "AssetsSwapped",
+          testUser.address
+        ]);
+        expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
       }
-    );
-  });
+    }
+  );
 });
 
-describe("test mint liquidity", () => {
-  it("should mint liquidity", async () => {
-    await instance.createPool(
-      testUser,
-      firstCurrency,
-      new BN(50000),
-      secondCurrency,
-      new BN(25000)
-    );
-    await instance.waitForNewBlock(2);
-    await instance.mintLiquidity(
-      testUser,
-      firstCurrency,
-      secondCurrency,
-      new BN(10000),
-      new BN(5001),
-      {
-        extrinsicStatus: (result) => {
-          const eventResult = getEventResultFromTxWait(result);
-          expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
-        }
+it.concurrent("should mint liquidity", async () => {
+  await instance.createPool(
+    testUser,
+    firstCurrency,
+    new BN(50000),
+    secondCurrency,
+    new BN(25000)
+  );
+  await instance.waitForNewBlock(2);
+  await instance.mintLiquidity(
+    testUser,
+    firstCurrency,
+    secondCurrency,
+    new BN(10000),
+    new BN(5001),
+    {
+      extrinsicStatus: (result) => {
+        const eventResult = getEventResultFromTxWait(result);
+        expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
       }
-    );
-  });
+    }
+  );
 });
 
-describe("test burn liquidity", () => {
-  it("should burn liquidity", async () => {
-    await instance.createPool(
-      testUser,
-      firstCurrency,
-      new BN(50000),
-      secondCurrency,
-      new BN(25000)
-    );
-    await instance.waitForNewBlock(2);
-    await instance.burnLiquidity(
-      testUser,
-      firstCurrency,
-      secondCurrency,
-      new BN(10000),
-      {
-        extrinsicStatus: (result) => {
-          const eventResult = getEventResultFromTxWait(result);
-          expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
-        }
+it.concurrent("should burn liquidity", async () => {
+  await instance.createPool(
+    testUser,
+    firstCurrency,
+    new BN(50000),
+    secondCurrency,
+    new BN(25000)
+  );
+  await instance.waitForNewBlock(2);
+  await instance.burnLiquidity(
+    testUser,
+    firstCurrency,
+    secondCurrency,
+    new BN(10000),
+    {
+      extrinsicStatus: (result) => {
+        const eventResult = getEventResultFromTxWait(result);
+        expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
       }
-    );
-  });
+    }
+  );
 });
 
 afterAll(async () => {

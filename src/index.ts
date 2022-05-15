@@ -1,5 +1,6 @@
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import type { ISubmittableResult } from "@polkadot/types/types";
+import { BN } from "@polkadot/util";
 
 export * from "./Mangata";
 export * from "./MangataHelpers";
@@ -13,5 +14,5 @@ export * from "./types/MangataEventData";
 export * from "./types/MangataGenericEvent";
 export * from "./types/TxOptions";
 
-export { SubmittableExtrinsic, ISubmittableResult };
+export { SubmittableExtrinsic, ISubmittableResult, BN };
 export { signTx } from "./services/Tx";

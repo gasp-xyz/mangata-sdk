@@ -1,9 +1,8 @@
 /* eslint-disable no-console */
 import { KeyringPair } from "@polkadot/keyring/types";
 import { BN } from "@polkadot/util";
-import { signTx } from "../src";
 
-import { Mangata } from "../src/Mangata";
+import { Mangata, signTx } from "../index";
 import { MangataGenericEvent } from "../src/types/MangataGenericEvent";
 
 export enum ExtrinsicResult {

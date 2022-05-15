@@ -87,7 +87,21 @@ export class Query {
       TREASURY_ADDRESS,
       tokenId
     );
-    return treasuryBalance;
+    const balance = JSON.parse(JSON.stringify(treasuryBalance)) as {
+      free: string;
+      reserved: string;
+      frozen: string;
+    };
+
+    return {
+      free: isHex(balance.free) ? hexToBn(balance.free) : new BN(balance.free),
+      reserved: isHex(balance.reserved)
+        ? hexToBn(balance.reserved)
+        : new BN(balance.reserved),
+      frozen: isHex(balance.frozen)
+        ? hexToBn(balance.frozen)
+        : new BN(balance.frozen)
+    };
   }
 
   static async getTreasuryBurn(api: ApiPromise, tokenId: TTokenId) {
@@ -95,7 +109,21 @@ export class Query {
       TREASURY_BURN_ADDRESS,
       tokenId
     );
-    return treasuryBalance;
+    const balance = JSON.parse(JSON.stringify(treasuryBalance)) as {
+      free: string;
+      reserved: string;
+      frozen: string;
+    };
+
+    return {
+      free: isHex(balance.free) ? hexToBn(balance.free) : new BN(balance.free),
+      reserved: isHex(balance.reserved)
+        ? hexToBn(balance.reserved)
+        : new BN(balance.reserved),
+      frozen: isHex(balance.frozen)
+        ? hexToBn(balance.frozen)
+        : new BN(balance.frozen)
+    };
   }
 
   static async getTotalIssuance(

@@ -1,9 +1,7 @@
-/* eslint-disable no-console */
 import { BN } from "@polkadot/util";
 import { KeyringPair } from "@polkadot/keyring/types";
-
 import { instance, SUDO_USER_NAME } from "./instanceCreation";
-import { MangataHelpers } from "../src";
+import { MangataHelpers } from "../index";
 import {
   addAccountCurrencies,
   addMGAToken,
@@ -40,9 +38,9 @@ beforeEach(async () => {
   await instance.waitForNewBlock(2);
 });
 
-describe("Testing additional methods", () => {
-  it("should transfer tokens from testUser1 to testUser2", async () => {
-    console.log("Transferring tokens from testUser1 to testUser2");
+it.concurrent(
+  "should transfer tokens from testUser1 to testUser2",
+  async () => {
     await instance.transferToken(
       testUser,
       secondCurrency,
@@ -85,38 +83,22 @@ describe("Testing additional methods", () => {
     expect(tokenBalance.free.toNumber()).toEqual(500000);
     const lock = await instance.getLock(testUser.address, firstCurrency);
     expect(lock).toEqual([]);
-  });
-});
+  }
+);
 
-it("should get next token id", async () => {
-  await instance.createPool(
-    testUser,
-    firstCurrency,
-    new BN(50000),
-    secondCurrency,
-    new BN(25000)
-  );
-  await instance.waitForNewBlock(2);
-  const liquidityAssetId = await instance.getLiquidityTokenId(
-    firstCurrency,
-    secondCurrency
-  );
-  expect(liquidityAssetId.toNumber()).toBeGreaterThanOrEqual(0);
-});
-
-it("should get next token id", async () => {
+it.concurrent("should get next token id", async () => {
   const tokenId = await instance.getNextTokenId();
   expect(tokenId.toNumber()).toBeGreaterThanOrEqual(0);
 });
 
-it("should get treasury", async () => {
+it.concurrent("should get treasury", async () => {
   const accountData = await instance.getTreasury(firstCurrency);
-  expect(accountData.free.toBn().toNumber()).toBeGreaterThanOrEqual(0);
+  expect(accountData.free.toNumber()).toBeGreaterThanOrEqual(0);
 });
 
-it("should get treasury burn", async () => {
+it.concurrent("should get treasury burn", async () => {
   const accountData = await instance.getTreasuryBurn(firstCurrency);
-  expect(accountData.free.toBn().toNumber()).toBeGreaterThanOrEqual(0);
+  expect(accountData.free.toNumber()).toBeGreaterThanOrEqual(0);
 });
 
 afterAll(async () => {

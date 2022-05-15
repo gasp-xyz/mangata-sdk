@@ -1,7 +1,8 @@
+import { isHex, hexToBn, BN } from '@polkadot/util';
+export { BN } from '@polkadot/util';
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { WsProvider } from '@polkadot/rpc-provider/ws';
 import { options } from '@mangata-finance/types';
-import { isHex, hexToBn, BN } from '@polkadot/util';
 import { XoShiRo256Plus } from 'mangata-prng-xoshiro';
 import Big from 'big.js';
 import { v4 } from 'uuid';
@@ -59,7 +60,9 @@ class Rpc {
 class InMemoryDatabase {
     static instance;
     db = {};
-    constructor() { }
+    constructor() {
+        // empty constructor
+    }
     static getInstance() {
         if (!InMemoryDatabase.instance) {
             InMemoryDatabase.instance = new InMemoryDatabase();
@@ -307,11 +310,29 @@ class Query {
     }
     static async getTreasury(api, tokenId) {
         const treasuryBalance = await api.query.tokens.accounts(TREASURY_ADDRESS, tokenId);
-        return treasuryBalance;
+        const balance = JSON.parse(JSON.stringify(treasuryBalance));
+        return {
+            free: isHex(balance.free) ? hexToBn(balance.free) : new BN(balance.free),
+            reserved: isHex(balance.reserved)
+                ? hexToBn(balance.reserved)
+                : new BN(balance.reserved),
+            frozen: isHex(balance.frozen)
+                ? hexToBn(balance.frozen)
+                : new BN(balance.frozen)
+        };
     }
     static async getTreasuryBurn(api, tokenId) {
         const treasuryBalance = await api.query.tokens.accounts(TREASURY_BURN_ADDRESS, tokenId);
-        return treasuryBalance;
+        const balance = JSON.parse(JSON.stringify(treasuryBalance));
+        return {
+            free: isHex(balance.free) ? hexToBn(balance.free) : new BN(balance.free),
+            reserved: isHex(balance.reserved)
+                ? hexToBn(balance.reserved)
+                : new BN(balance.reserved),
+            frozen: isHex(balance.frozen)
+                ? hexToBn(balance.frozen)
+                : new BN(balance.frozen)
+        };
     }
     static async getTotalIssuance(api, tokenId) {
         const tokenSupply = await api.query.tokens.totalIssuance(tokenId);
@@ -914,7 +935,6 @@ const toBN = (value, exponent) => {
         return new BN(resStr);
     }
     catch (err) {
-        console.error("Could not convert to BN:", err);
         return BN_ZERO;
     }
 };
@@ -931,7 +951,6 @@ const fromBN = (value, exponent) => {
         return resStr;
     }
     catch (err) {
-        console.error("Could not convert from BN:", err);
         return "0";
     }
 };

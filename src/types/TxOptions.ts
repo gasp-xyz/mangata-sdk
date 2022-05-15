@@ -1,4 +1,4 @@
-import { Signer } from "@polkadot/types/types";
+import { Signer } from "@polkadot/api/types";
 import type { ISubmittableResult } from "@polkadot/types/types";
 import { BN } from "@polkadot/util";
 
