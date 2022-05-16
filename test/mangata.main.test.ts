@@ -36,7 +36,7 @@ beforeEach(async () => {
   await instance.waitForNewBlock(2);
 });
 
-it.concurrent("should create pool", async () => {
+it("should create pool", async () => {
   await instance.createPool(
     testUser,
     firstCurrency,
@@ -56,7 +56,7 @@ it.concurrent("should create pool", async () => {
   );
 });
 
-it.concurrent("should test the balance", async () => {
+it("should test the balance", async () => {
   await instance.createPool(
     testUser,
     firstCurrency,
@@ -80,7 +80,7 @@ it.concurrent("should test the balance", async () => {
   expect(balance2[1].toNumber()).toEqual(0);
 });
 
-it.concurrent("should buy asset", async () => {
+it("should buy asset", async () => {
   await instance.createPool(
     testUser,
     firstCurrency,
@@ -108,7 +108,7 @@ it.concurrent("should buy asset", async () => {
   );
 });
 
-it.concurrent("should sell asset 4 times", async () => {
+it("should sell asset 4 times", async () => {
   await instance.createPool(
     testUser,
     firstCurrency,
@@ -141,7 +141,7 @@ it.concurrent("should sell asset 4 times", async () => {
   });
 });
 
-it.concurrent("should sell asset", async () => {
+it("should sell asset", async () => {
   await instance.createPool(
     testUser,
     firstCurrency,
@@ -169,7 +169,7 @@ it.concurrent("should sell asset", async () => {
   );
 });
 
-it.concurrent("should mint liquidity", async () => {
+it("should mint liquidity", async () => {
   await instance.createPool(
     testUser,
     firstCurrency,
@@ -193,7 +193,7 @@ it.concurrent("should mint liquidity", async () => {
   );
 });
 
-it.concurrent("should burn liquidity", async () => {
+it("should burn liquidity", async () => {
   await instance.createPool(
     testUser,
     firstCurrency,

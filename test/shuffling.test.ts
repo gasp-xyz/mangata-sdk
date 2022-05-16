@@ -1,6 +1,6 @@
 import { recreateExtrinsicsOrder } from "../src/utils/recreateExtrinsicsOrder";
 
-it.concurrent("reference test", () => {
+it("reference test", () => {
   const input: [string, number][] = [
     ["A", 1],
     ["A", 2],

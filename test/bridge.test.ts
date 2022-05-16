@@ -1,6 +1,6 @@
 import { instance } from "./instanceCreation";
 
-it.concurrent("should get bridge tokens", async () => {
+it("should get bridge tokens", async () => {
   const api = await instance.getApi();
   if (api.isConnected) {
     const tokens = await instance.getBridgeTokens();

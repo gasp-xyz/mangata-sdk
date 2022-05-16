@@ -2,7 +2,7 @@
 import { BN } from "@polkadot/util";
 import { instance } from "./instanceCreation";
 
-it.concurrent("should calculate buy price", async () => {
+it("should calculate buy price", async () => {
   const buyPrice = await instance.calculateBuyPrice(
     new BN(50000),
     new BN(25000),
@@ -11,7 +11,7 @@ it.concurrent("should calculate buy price", async () => {
   expect(buyPrice.toNumber()).toEqual(2090);
 });
 
-it.concurrent("should calculate sell price", async () => {
+it("should calculate sell price", async () => {
   const buyPrice = await instance.calculateSellPrice(
     new BN(50000),
     new BN(25000),

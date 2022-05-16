@@ -9,7 +9,7 @@
   "type": "module",
   "scripts": {
     "build": "rm -fr build/* && tsc -p tsconfig.json && rollup -c",
-    "test": "vitest --config ./vitest.config.ts",
+    "test": "vitest --config ./vitest.config.ts --run",
     "start": "yarn build && node ./index.js",
     "eslint": "node_modules/.bin/eslint --max-warnings 0 . --ext .ts",
     "eslint-fix": "yarn eslint --fix",
