@@ -666,28 +666,6 @@ export class Mangata {
     return await Query.getLiquidityPool(api, liquidityAssetId);
   }
 
-  /**
-   * Returns amount of token Id in Treasury
-   * @param {string} token Id
-   *
-   * @returns {AccountData}
-   */
-  public async getTreasury(tokenId: string) {
-    const api = await this.getApi();
-    return await Query.getTreasury(api, tokenId);
-  }
-
-  /**
-   * Returns amount of token Id in Treasury Burn
-   * @param {string} tokenId
-   *
-   * @returns {AccountData}
-   */
-  public async getTreasuryBurn(tokenId: string) {
-    const api = await this.getApi();
-    return await Query.getTreasuryBurn(api, tokenId);
-  }
-
   public async transferTokenFee(
     account: string | KeyringPair,
     tokenId: string,

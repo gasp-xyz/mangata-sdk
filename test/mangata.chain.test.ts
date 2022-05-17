@@ -1,3 +1,4 @@
+import { it, expect, afterAll } from "vitest";
 import { instance } from "./instanceCreation";
 
 it("should retrive chain name when calling getChain method", async () => {

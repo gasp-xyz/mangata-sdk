@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+import { it, expect, afterAll } from "vitest";
 import { BN } from "@polkadot/util";
 import { instance } from "./instanceCreation";
 

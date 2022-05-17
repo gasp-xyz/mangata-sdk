@@ -27,13 +27,6 @@ import { getRatio } from "../utils/getRatio";
 import { liquidityPromotedTokenMap } from "../utils/liquidityPromotedTokenMap";
 import { BN_ZERO } from "../utils/bnConstants";
 
-const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS
-  ? process.env.TREASURY_ADDRESS
-  : "";
-const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
-  ? process.env.TREASURY_BURN_ADDRESS
-  : "";
-
 export class Query {
   static async getNonce(api: ApiPromise, address: TTokenAddress): Promise<BN> {
     const nonce = await api.rpc.system.accountNextIndex(address);
@@ -80,50 +73,6 @@ export class Query {
     }
 
     return poolAssetIds.map((num: any) => new BN(num.toString()));
-  }
-
-  static async getTreasury(api: ApiPromise, tokenId: TTokenId) {
-    const treasuryBalance = await api.query.tokens.accounts(
-      TREASURY_ADDRESS,
-      tokenId
-    );
-    const balance = JSON.parse(JSON.stringify(treasuryBalance)) as {
-      free: string;
-      reserved: string;
-      frozen: string;
-    };
-
-    return {
-      free: isHex(balance.free) ? hexToBn(balance.free) : new BN(balance.free),
-      reserved: isHex(balance.reserved)
-        ? hexToBn(balance.reserved)
-        : new BN(balance.reserved),
-      frozen: isHex(balance.frozen)
-        ? hexToBn(balance.frozen)
-        : new BN(balance.frozen)
-    };
-  }
-
-  static async getTreasuryBurn(api: ApiPromise, tokenId: TTokenId) {
-    const treasuryBalance = await api.query.tokens.accounts(
-      TREASURY_BURN_ADDRESS,
-      tokenId
-    );
-    const balance = JSON.parse(JSON.stringify(treasuryBalance)) as {
-      free: string;
-      reserved: string;
-      frozen: string;
-    };
-
-    return {
-      free: isHex(balance.free) ? hexToBn(balance.free) : new BN(balance.free),
-      reserved: isHex(balance.reserved)
-        ? hexToBn(balance.reserved)
-        : new BN(balance.reserved),
-      frozen: isHex(balance.frozen)
-        ? hexToBn(balance.frozen)
-        : new BN(balance.frozen)
-    };
   }
 
   static async getTotalIssuance(

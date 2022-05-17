@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { KeyringPair } from "@polkadot/keyring/types";
 import { BN } from "@polkadot/util";
 
