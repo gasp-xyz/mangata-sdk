@@ -228,10 +228,7 @@ export class Query {
     ]);
 
     return Object.values(assetsInfo)
-      .filter(
-        (asset) =>
-          accountEntries[asset.id] && accountEntries[asset.id].gt(BN_ZERO)
-      )
+      .filter((assetInfo) => accountEntries[assetInfo.id])
       .reduce((acc, assetInfo) => {
         const asset = {
           ...assetInfo,
@@ -263,10 +260,8 @@ export class Query {
         (acc, asset) => (accountEntries[asset.id] ? acc.concat(asset) : acc),
         [] as TTokenInfo[]
       )
-      .filter(
-        (asset: TTokenInfo) =>
-          asset.name.includes("Liquidity Pool Token") &&
-          accountEntries[asset.id].gt(BN_ZERO)
+      .filter((asset: TTokenInfo) =>
+        asset.name.includes("Liquidity Pool Token")
       )
       .map(async (asset: TTokenInfo) => {
         const userLiquidityBalance = accountEntries[asset.id];
@@ -288,7 +283,7 @@ export class Query {
           share: await calculateLiquidityShare(
             api,
             asset.id,
-            userLiquidityBalance
+            userLiquidityBalance.free
           ),
           firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
           secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount)

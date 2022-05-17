@@ -29,10 +29,10 @@ declare type TToken = {
     symbol: TTokenSymbol;
     address: TTokenAddress;
     decimals: number;
-    balance: BN;
+    balance: TokenBalance;
 };
-declare type TTokenMainInfo = Omit<TToken, 'id' | 'balance' | 'chainId'>;
-declare type TTokenInfo = Omit<TToken, 'balance'>;
+declare type TTokenMainInfo = Omit<TToken, "id" | "balance" | "chainId">;
+declare type TTokenInfo = Omit<TToken, "balance">;
 declare type TTokenId = string;
 declare type TTokenAddress = string;
 declare type TTokenName = string;

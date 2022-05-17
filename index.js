@@ -176,10 +176,16 @@ const accountEntriesMap = async (api, address) => {
     return ownedAssetsResponse.reduce((acc, [key, value]) => {
         const free = JSON.parse(JSON.stringify(value)).free.toString();
         const frozen = JSON.parse(JSON.stringify(value)).frozen.toString();
+        const reserved = JSON.parse(JSON.stringify(value)).reserved.toString();
         const freeBN = isHex(free) ? hexToBn(free) : new BN(free);
         const frozenBN = isHex(frozen) ? hexToBn(frozen) : new BN(frozen);
+        const reservedBN = isHex(reserved) ? hexToBn(reserved) : new BN(reserved);
         const id = key.toHuman()[1].replace(/[, ]/g, "");
-        const balance = freeBN.sub(frozenBN);
+        const balance = {
+            free: freeBN,
+            frozen: frozenBN,
+            reserved: reservedBN
+        };
         acc[id] = balance;
         return acc;
     }, {});
@@ -233,6 +239,9 @@ const BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS = 18;
 const BN_DIV_NUMERATOR_MULTIPLIER = new BN('10').pow(new BN(BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS));
 
 const calculateLiquidityShare = async (api, liquidityAssetId, userLiquidityTokenAmount) => {
+    // userLiquidityTokenAmount is the amount of liquidity token the user has but FREE ..
+    // when the pool is promoted and user will receive rewards those tokens are no longer free but RESERVED
+    // TODO: from FREE to RESERVeD
     if (userLiquidityTokenAmount.isZero())
         return BN_ZERO;
     const tokenSupply = await api.query.tokens.totalIssuance(liquidityAssetId);
@@ -405,7 +414,7 @@ class Query {
             accountEntriesMap(api, address)
         ]);
         return Object.values(assetsInfo)
-            .filter((asset) => accountEntries[asset.id] && accountEntries[asset.id].gt(BN_ZERO))
+            .filter((assetInfo) => accountEntries[assetInfo.id])
             .reduce((acc, assetInfo) => {
             const asset = {
                 ...assetInfo,
@@ -426,8 +435,7 @@ class Query {
         const liquidityTokensPromoted = await liquidityPromotedTokenMap(api);
         return Object.values(assetsInfo)
             .reduce((acc, asset) => (accountEntries[asset.id] ? acc.concat(asset) : acc), [])
-            .filter((asset) => asset.name.includes("Liquidity Pool Token") &&
-            accountEntries[asset.id].gt(BN_ZERO))
+            .filter((asset) => asset.name.includes("Liquidity Pool Token"))
             .map(async (asset) => {
             const userLiquidityBalance = accountEntries[asset.id];
             const firstTokenId = asset.symbol.split("-")[0];
@@ -440,7 +448,7 @@ class Query {
                 secondTokenAmount,
                 liquidityTokenId: asset.id,
                 isPromoted: liquidityTokensPromoted.includes(asset.id),
-                share: await calculateLiquidityShare(api, asset.id, userLiquidityBalance),
+                share: await calculateLiquidityShare(api, asset.id, userLiquidityBalance.free),
                 firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
                 secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount)
             };

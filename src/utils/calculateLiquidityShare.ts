@@ -8,6 +8,9 @@ export const calculateLiquidityShare = async (
   liquidityAssetId: string,
   userLiquidityTokenAmount: BN
 ) => {
+  // userLiquidityTokenAmount is the amount of liquidity token the user has but FREE ..
+  // when the pool is promoted and user will receive rewards those tokens are no longer free but RESERVED
+  // TODO: from FREE to RESERVeD
   if (userLiquidityTokenAmount.isZero()) return BN_ZERO;
 
   const tokenSupply = await api.query.tokens.totalIssuance(liquidityAssetId);
