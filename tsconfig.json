@@ -1,9 +1,4 @@
 {
-  "ts-node": {
-    "moduleTypes": {
-      "jest.config.ts": "cjs"
-    }
-  },
   "compilerOptions": {
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
@@ -23,7 +18,7 @@
     "skipLibCheck": true,
     "strict": true,
     "traceResolution": false,
-    "types": ["node", "jest"],
+    "types": ["node"],
     "module": "esnext",
     "outDir": "build",
     "target": "esnext"

@@ -1,9 +1,8 @@
-/* eslint-disable no-console */
 import { BN } from "@polkadot/util";
+import { it, expect, afterAll, beforeEach } from "vitest";
 import { KeyringPair } from "@polkadot/keyring/types";
-
 import { instance, SUDO_USER_NAME } from "./instanceCreation";
-import { MangataHelpers } from "../src";
+import { MangataHelpers } from "../index";
 import {
   addAccountCurrencies,
   addMGAToken,
@@ -40,68 +39,42 @@ beforeEach(async () => {
   await instance.waitForNewBlock(2);
 });
 
-describe("Testing additional methods", () => {
-  it("should transfer tokens from testUser1 to testUser2", async () => {
-    console.log("Transferring tokens from testUser1 to testUser2");
-    await instance.transferToken(
-      testUser,
-      secondCurrency,
-      testUser1.address,
-      new BN(100),
-      {
-        extrinsicStatus: (result) => {
-          const eventTransfer = getEventResultFromTxWait(result, [
-            "tokens",
-            "Transfer",
-            testUser.address
-          ]);
-          expect(eventTransfer.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
-        }
-      }
-    );
-    await instance.transferTokenAll(
-      testUser,
-      firstCurrency,
-      testUser1.address,
-      {
-        extrinsicStatus: (resultTransferAll) => {
-          const eventTransferAll = getEventResultFromTxWait(resultTransferAll, [
-            "tokens",
-            "Transfer",
-            testUser.address
-          ]);
-          expect(eventTransferAll.state).toEqual(
-            ExtrinsicResult.ExtrinsicSuccess
-          );
-        }
-      }
-    );
-    const issuance = await instance.getTotalIssuance(firstCurrency);
-    expect(issuance.toNumber()).toEqual(500000);
-    const tokenBalance = await instance.getTokenBalance(
-      firstCurrency,
-      testUser1.address
-    );
-    expect(tokenBalance.free.toNumber()).toEqual(500000);
-    const lock = await instance.getLock(testUser.address, firstCurrency);
-    expect(lock).toEqual([]);
-  });
-});
-
-it("should get next token id", async () => {
-  await instance.createPool(
+it("should transfer tokens from testUser1 to testUser2", async () => {
+  await instance.transferToken(
     testUser,
-    firstCurrency,
-    new BN(50000),
     secondCurrency,
-    new BN(25000)
+    testUser1.address,
+    new BN(100),
+    {
+      extrinsicStatus: (result) => {
+        const eventTransfer = getEventResultFromTxWait(result, [
+          "tokens",
+          "Transfer",
+          testUser.address
+        ]);
+        expect(eventTransfer.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
+      }
+    }
   );
-  await instance.waitForNewBlock(2);
-  const liquidityAssetId = await instance.getLiquidityTokenId(
+  await instance.transferTokenAll(testUser, firstCurrency, testUser1.address, {
+    extrinsicStatus: (resultTransferAll) => {
+      const eventTransferAll = getEventResultFromTxWait(resultTransferAll, [
+        "tokens",
+        "Transfer",
+        testUser.address
+      ]);
+      expect(eventTransferAll.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
+    }
+  });
+  const issuance = await instance.getTotalIssuance(firstCurrency);
+  expect(issuance.toNumber()).toEqual(500000);
+  const tokenBalance = await instance.getTokenBalance(
     firstCurrency,
-    secondCurrency
+    testUser1.address
   );
-  expect(liquidityAssetId.toNumber()).toBeGreaterThanOrEqual(0);
+  expect(tokenBalance.free.toNumber()).toEqual(500000);
+  const lock = await instance.getLock(testUser.address, firstCurrency);
+  expect(lock).toEqual([]);
 });
 
 it("should get next token id", async () => {
@@ -111,12 +84,12 @@ it("should get next token id", async () => {
 
 it("should get treasury", async () => {
   const accountData = await instance.getTreasury(firstCurrency);
-  expect(accountData.free.toBn().toNumber()).toBeGreaterThanOrEqual(0);
+  expect(accountData.free.toNumber()).toBeGreaterThanOrEqual(0);
 });
 
 it("should get treasury burn", async () => {
   const accountData = await instance.getTreasuryBurn(firstCurrency);
-  expect(accountData.free.toBn().toNumber()).toBeGreaterThanOrEqual(0);
+  expect(accountData.free.toNumber()).toBeGreaterThanOrEqual(0);
 });
 
 afterAll(async () => {

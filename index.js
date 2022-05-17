@@ -1,7 +1,8 @@
+import { isHex, hexToBn, BN } from '@polkadot/util';
+export { BN } from '@polkadot/util';
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { WsProvider } from '@polkadot/rpc-provider/ws';
 import { options } from '@mangata-finance/types';
-import { isHex, hexToBn, BN } from '@polkadot/util';
 import { XoShiRo256Plus } from 'mangata-prng-xoshiro';
 import Big from 'big.js';
 import { v4 } from 'uuid';
@@ -59,7 +60,9 @@ class Rpc {
 class InMemoryDatabase {
     static instance;
     db = {};
-    constructor() { }
+    constructor() {
+        // empty constructor
+    }
     static getInstance() {
         if (!InMemoryDatabase.instance) {
             InMemoryDatabase.instance = new InMemoryDatabase();
@@ -267,12 +270,6 @@ const liquidityPromotedTokenMap = async (api) => {
     }
 };
 
-const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS
-    ? process.env.TREASURY_ADDRESS
-    : "";
-const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
-    ? process.env.TREASURY_BURN_ADDRESS
-    : "";
 class Query {
     static async getNonce(api, address) {
         const nonce = await api.rpc.system.accountNextIndex(address);
@@ -304,14 +301,6 @@ class Query {
             return [new BN(-1), new BN(-1)];
         }
         return poolAssetIds.map((num) => new BN(num.toString()));
-    }
-    static async getTreasury(api, tokenId) {
-        const treasuryBalance = await api.query.tokens.accounts(TREASURY_ADDRESS, tokenId);
-        return treasuryBalance;
-    }
-    static async getTreasuryBurn(api, tokenId) {
-        const treasuryBalance = await api.query.tokens.accounts(TREASURY_BURN_ADDRESS, tokenId);
-        return treasuryBalance;
     }
     static async getTotalIssuance(api, tokenId) {
         const tokenSupply = await api.query.tokens.totalIssuance(tokenId);
@@ -914,7 +903,6 @@ const toBN = (value, exponent) => {
         return new BN(resStr);
     }
     catch (err) {
-        console.error("Could not convert to BN:", err);
         return BN_ZERO;
     }
 };
@@ -931,7 +919,6 @@ const fromBN = (value, exponent) => {
         return resStr;
     }
     catch (err) {
-        console.error("Could not convert from BN:", err);
         return "0";
     }
 };
@@ -1449,26 +1436,6 @@ class Mangata {
     async getLiquidityPool(liquidityAssetId) {
         const api = await this.getApi();
         return await Query.getLiquidityPool(api, liquidityAssetId);
-    }
-    /**
-     * Returns amount of token Id in Treasury
-     * @param {string} token Id
-     *
-     * @returns {AccountData}
-     */
-    async getTreasury(tokenId) {
-        const api = await this.getApi();
-        return await Query.getTreasury(api, tokenId);
-    }
-    /**
-     * Returns amount of token Id in Treasury Burn
-     * @param {string} tokenId
-     *
-     * @returns {AccountData}
-     */
-    async getTreasuryBurn(tokenId) {
-        const api = await this.getApi();
-        return await Query.getTreasuryBurn(api, tokenId);
     }
     async transferTokenFee(account, tokenId, address, amount, txOptions) {
         const api = await this.getApi();
