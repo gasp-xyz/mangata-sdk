@@ -270,12 +270,6 @@ const liquidityPromotedTokenMap = async (api) => {
     }
 };
 
-const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS
-    ? process.env.TREASURY_ADDRESS
-    : "";
-const TREASURY_BURN_ADDRESS = process.env.TREASURY_BURN_ADDRESS
-    ? process.env.TREASURY_BURN_ADDRESS
-    : "";
 class Query {
     static async getNonce(api, address) {
         const nonce = await api.rpc.system.accountNextIndex(address);
@@ -307,32 +301,6 @@ class Query {
             return [new BN(-1), new BN(-1)];
         }
         return poolAssetIds.map((num) => new BN(num.toString()));
-    }
-    static async getTreasury(api, tokenId) {
-        const treasuryBalance = await api.query.tokens.accounts(TREASURY_ADDRESS, tokenId);
-        const balance = JSON.parse(JSON.stringify(treasuryBalance));
-        return {
-            free: isHex(balance.free) ? hexToBn(balance.free) : new BN(balance.free),
-            reserved: isHex(balance.reserved)
-                ? hexToBn(balance.reserved)
-                : new BN(balance.reserved),
-            frozen: isHex(balance.frozen)
-                ? hexToBn(balance.frozen)
-                : new BN(balance.frozen)
-        };
-    }
-    static async getTreasuryBurn(api, tokenId) {
-        const treasuryBalance = await api.query.tokens.accounts(TREASURY_BURN_ADDRESS, tokenId);
-        const balance = JSON.parse(JSON.stringify(treasuryBalance));
-        return {
-            free: isHex(balance.free) ? hexToBn(balance.free) : new BN(balance.free),
-            reserved: isHex(balance.reserved)
-                ? hexToBn(balance.reserved)
-                : new BN(balance.reserved),
-            frozen: isHex(balance.frozen)
-                ? hexToBn(balance.frozen)
-                : new BN(balance.frozen)
-        };
     }
     static async getTotalIssuance(api, tokenId) {
         const tokenSupply = await api.query.tokens.totalIssuance(tokenId);
@@ -1468,26 +1436,6 @@ class Mangata {
     async getLiquidityPool(liquidityAssetId) {
         const api = await this.getApi();
         return await Query.getLiquidityPool(api, liquidityAssetId);
-    }
-    /**
-     * Returns amount of token Id in Treasury
-     * @param {string} token Id
-     *
-     * @returns {AccountData}
-     */
-    async getTreasury(tokenId) {
-        const api = await this.getApi();
-        return await Query.getTreasury(api, tokenId);
-    }
-    /**
-     * Returns amount of token Id in Treasury Burn
-     * @param {string} tokenId
-     *
-     * @returns {AccountData}
-     */
-    async getTreasuryBurn(tokenId) {
-        const api = await this.getApi();
-        return await Query.getTreasuryBurn(api, tokenId);
     }
     async transferTokenFee(account, tokenId, address, amount, txOptions) {
         const api = await this.getApi();

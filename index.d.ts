@@ -317,28 +317,6 @@ declare class Mangata {
      * @returns {BN | Array}
      */
     getLiquidityPool(liquidityAssetId: string): Promise<BN[]>;
-    /**
-     * Returns amount of token Id in Treasury
-     * @param {string} token Id
-     *
-     * @returns {AccountData}
-     */
-    getTreasury(tokenId: string): Promise<{
-        free: BN;
-        reserved: BN;
-        frozen: BN;
-    }>;
-    /**
-     * Returns amount of token Id in Treasury Burn
-     * @param {string} tokenId
-     *
-     * @returns {AccountData}
-     */
-    getTreasuryBurn(tokenId: string): Promise<{
-        free: BN;
-        reserved: BN;
-        frozen: BN;
-    }>;
     transferTokenFee(account: string | KeyringPair, tokenId: string, address: string, amount: BN, txOptions?: TxOptions): Promise<string>;
     /**
      * Extrinsic that transfers Token Id in value amount from origin to destination
