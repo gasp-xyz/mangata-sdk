@@ -82,16 +82,6 @@ it("should get next token id", async () => {
   expect(tokenId.toNumber()).toBeGreaterThanOrEqual(0);
 });
 
-it("should get treasury", async () => {
-  const accountData = await instance.getTreasury(firstCurrency);
-  expect(accountData.free.toNumber()).toBeGreaterThanOrEqual(0);
-});
-
-it("should get treasury burn", async () => {
-  const accountData = await instance.getTreasuryBurn(firstCurrency);
-  expect(accountData.free.toNumber()).toBeGreaterThanOrEqual(0);
-});
-
 afterAll(async () => {
   await instance.disconnect();
 });
