@@ -1,4 +1,4 @@
-import { isHex, hexToBn, BN } from '@polkadot/util';
+import { isHex, hexToBn, BN, BN_ZERO as BN_ZERO$1 } from '@polkadot/util';
 export { BN } from '@polkadot/util';
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { WsProvider } from '@polkadot/rpc-provider/ws';
@@ -286,8 +286,8 @@ class Query {
     }
     static async getAmountOfTokenIdInPool(api, firstTokenId, secondTokenId) {
         const balance = await api.query.xyk.pools([firstTokenId, secondTokenId]);
-        const tokenValue1 = JSON.parse(balance.toString())[0];
-        const tokenValue2 = JSON.parse(balance.toString())[1];
+        const tokenValue1 = balance[0].toString();
+        const tokenValue2 = balance[1].toString();
         const token1 = isHex(tokenValue1)
             ? hexToBn(tokenValue1)
             : new BN(tokenValue1);
@@ -301,21 +301,20 @@ class Query {
             firstTokenId,
             secondTokenId
         ]);
+        if (!liquidityAssetId.isSome)
+            return BN_ZERO$1;
         return new BN(liquidityAssetId.toString());
     }
     static async getLiquidityPool(api, liquidityTokenId) {
         const liquidityPool = await api.query.xyk.liquidityPools(liquidityTokenId);
-        const poolAssetIds = JSON.parse(JSON.stringify(liquidityPool));
-        if (!poolAssetIds) {
+        if (!liquidityPool.isSome)
             return [new BN(-1), new BN(-1)];
-        }
-        return poolAssetIds.map((num) => new BN(num.toString()));
+        return liquidityPool.unwrap().map((num) => new BN(num));
     }
     static async getTotalIssuance(api, tokenId) {
         const tokenSupply = await api.query.tokens.totalIssuance(tokenId);
-        return new BN(tokenSupply.toString());
+        return new BN(tokenSupply);
     }
-    // TODO: find the return type
     static async getLock(api, address, tokenId) {
         const locksResponse = await api.query.tokens.locks(address, tokenId);
         return JSON.parse(JSON.stringify(locksResponse.toHuman()));
@@ -428,11 +427,11 @@ class Query {
         return await balancesMap(api);
     }
     static async getInvestedPools(api, address) {
-        const [assetsInfo, accountEntries] = await Promise.all([
+        const [assetsInfo, accountEntries, liquidityTokensPromoted] = await Promise.all([
             getAssetsInfoMapWithIds(api),
-            accountEntriesMap(api, address)
+            accountEntriesMap(api, address),
+            liquidityPromotedTokenMap(api)
         ]);
-        const liquidityTokensPromoted = await liquidityPromotedTokenMap(api);
         return Object.values(assetsInfo)
             .reduce((acc, asset) => (accountEntries[asset.id] ? acc.concat(asset) : acc), [])
             .filter((asset) => asset.name.includes("Liquidity Pool Token"))
@@ -448,9 +447,11 @@ class Query {
                 secondTokenAmount,
                 liquidityTokenId: asset.id,
                 isPromoted: liquidityTokensPromoted.includes(asset.id),
-                share: await calculateLiquidityShare(api, asset.id, userLiquidityBalance.free),
+                share: await calculateLiquidityShare(api, asset.id, userLiquidityBalance.free.add(userLiquidityBalance.reserved)),
                 firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
-                secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount)
+                secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount),
+                activatedLPTokens: userLiquidityBalance.reserved,
+                nonActivatedLPTokens: userLiquidityBalance.free
             };
             return poolInfo;
         });
@@ -788,60 +789,6 @@ class Tx {
     static async deactivateLiquidity(api, account, liquditityTokenId, amount, txOptions) {
         return await signTx(api, api.tx.xyk.deactivateLiquidity(liquditityTokenId, amount), account, txOptions);
     }
-    static async sendTokensFromParachainToRely(api, fromAccount, toAccount, amount, assetId, txOptions) {
-        return await signTx(api, api?.tx.polkadotXcm.reserveTransferAssets({
-            V1: {
-                parents: 1,
-                interior: "Here"
-            }
-        }, {
-            V1: {
-                parents: 1,
-                interior: {
-                    X1: {
-                        AccountId32: {
-                            network: "Any",
-                            id: toAccount
-                        }
-                    }
-                }
-            }
-        }, {
-            V1: [
-                {
-                    id: {
-                        Concrete: {
-                            parents: 1,
-                            interior: "Here"
-                        }
-                    },
-                    fun: {
-                        Fungible: amount
-                    }
-                }
-            ]
-        }, assetId), fromAccount, txOptions);
-    }
-    static async sendTokensFromMGAtoParachain(api, fromAccount, toAccount, amount, assetId, parachainId, txOptions) {
-        return await signTx(api, api.tx.xTokens.transfer(assetId, amount, {
-            V1: {
-                parents: 1,
-                interior: {
-                    X2: [
-                        {
-                            Parachain: parachainId
-                        },
-                        {
-                            AccountId32: {
-                                network: "Any",
-                                id: toAccount
-                            }
-                        }
-                    ]
-                }
-            }
-        }, new BN("6000000000")), fromAccount, txOptions);
-    }
     static async claimRewards(api, account, liquidityTokenId, amount, txOptions) {
         return await signTx(api, api.tx.xyk.claimRewards(liquidityTokenId, amount), account, txOptions);
     }
@@ -1102,7 +1049,6 @@ const calculateFutureRewardsAmount = async (api, address, liquidityTokenId, futu
     return totalAvailableRewardsFuture;
 };
 
-/* eslint-disable no-console */
 /**
  * @class Mangata
  * @author Mangata Finance

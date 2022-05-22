@@ -58,7 +58,7 @@
     "vitest": "^0.12.6"
   },
   "dependencies": {
-    "@mangata-finance/types": "^0.1.6",
+    "@mangata-finance/types": "^0.2.0",
     "big.js": "^6.1.1",
     "mangata-prng-xoshiro": "^2.0.0",
     "uuid": "^8.3.2"

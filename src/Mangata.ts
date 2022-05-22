@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { WsProvider } from "@polkadot/rpc-provider/ws";
@@ -757,17 +756,6 @@ export class Mangata {
   public async getTotalIssuance(tokenId: string): Promise<BN> {
     const api = await this.getApi();
     return await Query.getTotalIssuance(api, tokenId);
-  }
-
-  /**
-   * Returns vec of locked token Id of an specified address and tokenId
-   * @param {string} address
-   * @param {string} tokenId
-   *
-   */
-  public async getLock(address: string, tokenId: string) {
-    const api = await this.getApi();
-    return await Query.getLock(api, address, tokenId);
   }
 
   /**

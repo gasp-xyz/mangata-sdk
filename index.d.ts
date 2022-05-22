@@ -58,6 +58,8 @@ declare type TPoolWithShare = TPool & {
     share: BN;
     firstTokenRatio: BN;
     secondTokenRatio: BN;
+    activatedLPTokens: BN;
+    nonActivatedLPTokens: BN;
 };
 declare type TPoolWithRatio = TPool & {
     firstTokenRatio: BN;

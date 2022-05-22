@@ -50,6 +50,8 @@ export type TPoolWithShare = TPool & {
   share: BN;
   firstTokenRatio: BN;
   secondTokenRatio: BN;
+  activatedLPTokens: BN;
+  nonActivatedLPTokens: BN;
 };
 
 export type TPoolWithRatio = TPool & {

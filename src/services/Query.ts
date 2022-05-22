@@ -1,5 +1,5 @@
 import { ApiPromise } from "@polkadot/api";
-import { hexToBn, isHex, BN } from "@polkadot/util";
+import { hexToBn, isHex, BN, BN_ZERO } from "@polkadot/util";
 
 import {
   TToken,
@@ -25,7 +25,6 @@ import { getAssetsInfoMapWithIds } from "../utils/getAssetsInfoMapWithIds";
 import { calculateLiquidityShare } from "../utils/calculateLiquidityShare";
 import { getRatio } from "../utils/getRatio";
 import { liquidityPromotedTokenMap } from "../utils/liquidityPromotedTokenMap";
-import { BN_ZERO } from "../utils/bnConstants";
 
 export class Query {
   static async getNonce(api: ApiPromise, address: TTokenAddress): Promise<BN> {
@@ -39,8 +38,8 @@ export class Query {
     secondTokenId: TTokenId
   ): Promise<BN[]> {
     const balance = await api.query.xyk.pools([firstTokenId, secondTokenId]);
-    const tokenValue1 = JSON.parse(balance.toString())[0];
-    const tokenValue2 = JSON.parse(balance.toString())[1];
+    const tokenValue1 = balance[0].toString();
+    const tokenValue2 = balance[1].toString();
     const token1: BN = isHex(tokenValue1)
       ? hexToBn(tokenValue1)
       : new BN(tokenValue1);
@@ -59,6 +58,7 @@ export class Query {
       firstTokenId,
       secondTokenId
     ]);
+    if (!liquidityAssetId.isSome) return BN_ZERO;
     return new BN(liquidityAssetId.toString());
   }
 
@@ -67,12 +67,8 @@ export class Query {
     liquidityTokenId: TTokenId
   ): Promise<BN[]> {
     const liquidityPool = await api.query.xyk.liquidityPools(liquidityTokenId);
-    const poolAssetIds = JSON.parse(JSON.stringify(liquidityPool));
-    if (!poolAssetIds) {
-      return [new BN(-1), new BN(-1)];
-    }
-
-    return poolAssetIds.map((num: any) => new BN(num.toString()));
+    if (!liquidityPool.isSome) return [new BN(-1), new BN(-1)];
+    return liquidityPool.unwrap().map((num) => new BN(num));
   }
 
   static async getTotalIssuance(
@@ -80,17 +76,7 @@ export class Query {
     tokenId: TTokenId
   ): Promise<BN> {
     const tokenSupply = await api.query.tokens.totalIssuance(tokenId);
-    return new BN(tokenSupply.toString());
-  }
-
-  // TODO: find the return type
-  static async getLock(
-    api: ApiPromise,
-    address: TTokenAddress,
-    tokenId: TTokenId
-  ) {
-    const locksResponse = await api.query.tokens.locks(address, tokenId);
-    return JSON.parse(JSON.stringify(locksResponse.toHuman()));
+    return new BN(tokenSupply);
   }
 
   static async getTokenBalance(
@@ -118,7 +104,7 @@ export class Query {
 
   static async getNextTokenId(api: ApiPromise): Promise<BN> {
     const nextTokenId = await api.query.tokens.nextCurrencyId();
-    return new BN(nextTokenId.toString());
+    return new BN(nextTokenId);
   }
 
   static async getBridgeAddresses(api: ApiPromise): Promise<TBridgeAddresses> {
@@ -248,12 +234,12 @@ export class Query {
     api: ApiPromise,
     address: TTokenAddress
   ): Promise<Promise<TPoolWithShare>[]> {
-    const [assetsInfo, accountEntries] = await Promise.all([
-      getAssetsInfoMapWithIds(api),
-      accountEntriesMap(api, address)
-    ]);
-
-    const liquidityTokensPromoted = await liquidityPromotedTokenMap(api);
+    const [assetsInfo, accountEntries, liquidityTokensPromoted] =
+      await Promise.all([
+        getAssetsInfoMapWithIds(api),
+        accountEntriesMap(api, address),
+        liquidityPromotedTokenMap(api)
+      ]);
 
     return Object.values(assetsInfo)
       .reduce(
@@ -283,11 +269,19 @@ export class Query {
           share: await calculateLiquidityShare(
             api,
             asset.id,
-            userLiquidityBalance.free
+            userLiquidityBalance.free.add(userLiquidityBalance.reserved)
           ),
           firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
-          secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount)
-        } as TPool & { share: BN; firstTokenRatio: BN; secondTokenRatio: BN };
+          secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount),
+          activatedLPTokens: userLiquidityBalance.reserved,
+          nonActivatedLPTokens: userLiquidityBalance.free
+        } as TPool & {
+          share: BN;
+          firstTokenRatio: BN;
+          secondTokenRatio: BN;
+          activatedLPTokens: BN;
+          nonActivatedLPTokens: BN;
+        };
 
         return poolInfo;
       });
