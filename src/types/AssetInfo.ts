@@ -32,9 +32,6 @@ export type TFrozenBalance = BN;
 
 export type TTokens = Record<TTokenId, TToken>;
 export type TBalances = Record<TTokenId, BN>;
-export type TBridgeIds = Record<TTokenId, TTokenAddress>;
-export type TBridgeAddresses = Record<TTokenAddress, TTokenId>;
-export type TBridgeTokens = Record<TTokenId, TTokenInfo>;
 export type TMainTokens = Record<TTokenId, TTokenInfo>;
 
 export type TPool = {

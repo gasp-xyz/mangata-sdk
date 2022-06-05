@@ -15,7 +15,6 @@ import {
   TMainTokens,
   TokenBalance,
   TTokenId,
-  TBridgeAddresses,
   TPoolWithShare,
   TPoolWithRatio,
   Reward
@@ -781,15 +780,6 @@ export class Mangata {
     return await Query.getNextTokenId(api);
   }
 
-  /*
-   * Returns bridge tokens
-   */
-
-  public async getBridgeTokens() {
-    const api = await this.getApi();
-    return await Query.getBridgedTokens(api);
-  }
-
   /**
    * Returns token info
    * @param {string} tokenId
@@ -834,59 +824,9 @@ export class Mangata {
     return await Query.getBalances(api);
   }
 
-  public async getBridgeAddresses(): Promise<TBridgeAddresses> {
-    const api = await this.getApi();
-    return await Query.getBridgeAddresses(api);
-  }
-
-  public async getBridgeIds() {
-    const api = await this.getApi();
-    return await Query.getBridgeIds(api);
-  }
-
   public async getLiquidityTokens(): Promise<TMainTokens> {
     const api = await this.getApi();
     return await Query.getLiquidityTokens(api);
-  }
-
-  /**
-   * @deprecated This method will be deprecated
-   */
-  public async bridgeERC20ToEthereum(
-    account: string | KeyringPair,
-    tokenAddress: string,
-    ethereumAddress: string,
-    amount: BN,
-    txOptions?: TxOptions
-  ) {
-    const api = await this.getApi();
-    return await Tx.bridgeERC20ToEthereum(
-      api,
-      account,
-      tokenAddress,
-      ethereumAddress,
-      amount,
-      txOptions
-    );
-  }
-
-  /**
-   * @deprecated This method will be deprecated
-   */
-  public async bridgeEthToEthereum(
-    account: string | KeyringPair,
-    ethereumAddress: string,
-    amount: BN,
-    txOptions?: TxOptions
-  ) {
-    const api = await this.getApi();
-    return await Tx.bridgeEthToEthereum(
-      api,
-      account,
-      ethereumAddress,
-      amount,
-      txOptions
-    );
   }
 
   public async getPool(liquditityTokenId: TTokenId): Promise<TPoolWithRatio> {

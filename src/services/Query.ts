@@ -9,9 +9,7 @@ import {
   TokenBalance,
   TPool,
   TTokenAddress,
-  TBridgeTokens,
   TTokenId,
-  TBridgeAddresses,
   TPoolWithRatio,
   TPoolWithShare
 } from "../types/AssetInfo";
@@ -105,52 +103,6 @@ export class Query {
   static async getNextTokenId(api: ApiPromise): Promise<BN> {
     const nextTokenId = await api.query.tokens.nextCurrencyId();
     return new BN(nextTokenId);
-  }
-
-  static async getBridgeAddresses(api: ApiPromise): Promise<TBridgeAddresses> {
-    const bridgedAssets = await api.query.bridgedAsset.bridgedAsset.entries();
-    return bridgedAssets.reduce((obj, [key, exposure]) => {
-      const id = (key.toHuman() as string[])[0].replace(/[, ]/g, "");
-      const address = exposure.toString();
-      obj[address] = id;
-      return obj;
-    }, {} as { [address: TTokenAddress]: TTokenId });
-  }
-
-  static async getBridgeIds(api: ApiPromise) {
-    const bridgedAssets = await api.query.bridgedAsset.bridgedAsset.entries();
-
-    return bridgedAssets.reduce((obj, [key, exposure]) => {
-      const id = (key.toHuman() as string[])[0].replace(/[, ]/g, "");
-      const address = exposure.toString();
-      obj[id] = address;
-      return obj;
-    }, {} as { [id: TTokenId]: TTokenAddress });
-  }
-
-  static async getBridgedTokens(api: ApiPromise): Promise<TBridgeTokens> {
-    const assetsInfo = await this.getAssetsInfo(api);
-    const bridgedAssets = await this.getBridgeIds(api);
-
-    const bridgedAssetsFormatted = Object.values(assetsInfo)
-      .filter((item: TTokenInfo) => bridgedAssets[item.id])
-      .map((item: TTokenInfo) => {
-        return {
-          ...item,
-          description: bridgedAssets[item.id]
-        };
-      });
-
-    const map = new Map<string, TTokenInfo>();
-    bridgedAssetsFormatted.forEach((asset: TTokenInfo) =>
-      map.set(asset.id, asset)
-    );
-    const result = Array.from(map).reduce((obj, [key, value]) => {
-      obj[key] = value;
-      return obj;
-    }, {} as { [id: TTokenId]: TTokenInfo });
-
-    return result;
   }
 
   static async getTokenInfo(

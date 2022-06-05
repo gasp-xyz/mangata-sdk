@@ -42,9 +42,6 @@ declare type TReservedBalance = BN;
 declare type TFrozenBalance = BN;
 declare type TTokens = Record<TTokenId, TToken>;
 declare type TBalances = Record<TTokenId, BN>;
-declare type TBridgeIds = Record<TTokenId, TTokenAddress>;
-declare type TBridgeAddresses = Record<TTokenAddress, TTokenId>;
-declare type TBridgeTokens = Record<TTokenId, TTokenInfo>;
 declare type TMainTokens = Record<TTokenId, TTokenInfo>;
 declare type TPool = {
     firstTokenId: TTokenId;
@@ -350,13 +347,6 @@ declare class Mangata {
      */
     getTotalIssuance(tokenId: string): Promise<BN>;
     /**
-     * Returns vec of locked token Id of an specified address and tokenId
-     * @param {string} address
-     * @param {string} tokenId
-     *
-     */
-    getLock(address: string, tokenId: string): Promise<any>;
-    /**
      * Returns token balance for address
      * @param {string} tokenId
      * @param {string} address
@@ -368,7 +358,6 @@ declare class Mangata {
      * Returns next CurencyId, CurrencyId that will be used for next created token
      */
     getNextTokenId(): Promise<BN>;
-    getBridgeTokens(): Promise<TBridgeTokens>;
     /**
      * Returns token info
      * @param {string} tokenId
@@ -386,19 +375,7 @@ declare class Mangata {
      */
     getAssetsInfo(): Promise<TMainTokens>;
     getBalances(): Promise<TBalances>;
-    getBridgeAddresses(): Promise<TBridgeAddresses>;
-    getBridgeIds(): Promise<{
-        [id: string]: string;
-    }>;
     getLiquidityTokens(): Promise<TMainTokens>;
-    /**
-     * @deprecated This method will be deprecated
-     */
-    bridgeERC20ToEthereum(account: string | KeyringPair, tokenAddress: string, ethereumAddress: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
-    /**
-     * @deprecated This method will be deprecated
-     */
-    bridgeEthToEthereum(account: string | KeyringPair, ethereumAddress: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     getPool(liquditityTokenId: TTokenId): Promise<TPoolWithRatio>;
     getInvestedPools(address: string): Promise<TPoolWithShare[]>;
     getPools(): Promise<TPoolWithRatio[]>;
@@ -410,7 +387,7 @@ declare class Mangata {
  */
 declare class MangataHelpers {
     static createKeyring(type: KeypairType): Keyring;
-    static createKeyPairFromNameAndStoreAccountToKeyring(keyring: Keyring, name?: string): KeyringPair;
+    static createKeyPairFromName(keyring: Keyring, name?: string): KeyringPair;
     static getXoshiro(seed: Uint8Array): any;
     static getPriceImpact(poolBalance: {
         firstTokenBalance: BN;
@@ -465,4 +442,4 @@ declare const signTx: (api: ApiPromise, tx: SubmittableExtrinsic<"promise">, acc
     extrinsicStatus: (events: MangataGenericEvent[]) => void;
 }> | undefined) => Promise<MangataGenericEvent[]>;
 
-export { AssetInfo, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Mangata, MangataEventData, MangataGenericEvent, MangataHelpers, Reward, TBalances, TBridgeAddresses, TBridgeIds, TBridgeTokens, TFreeBalance, TFrozenBalance, TMainTokens, TPool, TPoolWithRatio, TPoolWithShare, TReservedBalance, TToken, TTokenAddress, TTokenId, TTokenInfo, TTokenMainInfo, TTokenName, TTokenSymbol, TTokens, TokenBalance, TxOptions, fromBN, signTx, toBN, toFixed };
+export { AssetInfo, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Mangata, MangataEventData, MangataGenericEvent, MangataHelpers, Reward, TBalances, TFreeBalance, TFrozenBalance, TMainTokens, TPool, TPoolWithRatio, TPoolWithShare, TReservedBalance, TToken, TTokenAddress, TTokenId, TTokenInfo, TTokenMainInfo, TTokenName, TTokenSymbol, TTokens, TokenBalance, TxOptions, fromBN, signTx, toBN, toFixed };

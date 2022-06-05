@@ -315,10 +315,6 @@ class Query {
         const tokenSupply = await api.query.tokens.totalIssuance(tokenId);
         return new BN(tokenSupply);
     }
-    static async getLock(api, address, tokenId) {
-        const locksResponse = await api.query.tokens.locks(address, tokenId);
-        return JSON.parse(JSON.stringify(locksResponse.toHuman()));
-    }
     static async getTokenBalance(api, address, tokenId) {
         const balanceResponse = await api.query.tokens.accounts(address, tokenId);
         const balance = JSON.parse(JSON.stringify(balanceResponse));
@@ -334,44 +330,7 @@ class Query {
     }
     static async getNextTokenId(api) {
         const nextTokenId = await api.query.tokens.nextCurrencyId();
-        return new BN(nextTokenId.toString());
-    }
-    static async getBridgeAddresses(api) {
-        const bridgedAssets = await api.query.bridgedAsset.bridgedAsset.entries();
-        return bridgedAssets.reduce((obj, [key, exposure]) => {
-            const id = key.toHuman()[0].replace(/[, ]/g, "");
-            const address = exposure.toString();
-            obj[address] = id;
-            return obj;
-        }, {});
-    }
-    static async getBridgeIds(api) {
-        const bridgedAssets = await api.query.bridgedAsset.bridgedAsset.entries();
-        return bridgedAssets.reduce((obj, [key, exposure]) => {
-            const id = key.toHuman()[0].replace(/[, ]/g, "");
-            const address = exposure.toString();
-            obj[id] = address;
-            return obj;
-        }, {});
-    }
-    static async getBridgedTokens(api) {
-        const assetsInfo = await this.getAssetsInfo(api);
-        const bridgedAssets = await this.getBridgeIds(api);
-        const bridgedAssetsFormatted = Object.values(assetsInfo)
-            .filter((item) => bridgedAssets[item.id])
-            .map((item) => {
-            return {
-                ...item,
-                description: bridgedAssets[item.id]
-            };
-        });
-        const map = new Map();
-        bridgedAssetsFormatted.forEach((asset) => map.set(asset.id, asset));
-        const result = Array.from(map).reduce((obj, [key, value]) => {
-            obj[key] = value;
-            return obj;
-        }, {});
-        return result;
+        return new BN(nextTokenId);
     }
     static async getTokenInfo(api, tokenId) {
         const assetsInfo = await getAssetsInfoMap(api);
@@ -813,12 +772,6 @@ class Tx {
     }
     static async transferAllToken(api, account, tokenId, address, txOptions) {
         return await signTx(api, api.tx.tokens.transferAll(address, tokenId, true), account, txOptions);
-    }
-    static async bridgeERC20ToEthereum(api, account, tokenAddress, ethereumAddress, amount, txOptions) {
-        return await signTx(api, api.tx.erc20.burn(tokenAddress, ethereumAddress, amount), account, txOptions);
-    }
-    static async bridgeEthToEthereum(api, account, ethereumAddress, amount, txOptions) {
-        return await signTx(api, api.tx.eth.burn(ethereumAddress, amount), account, txOptions);
     }
 }
 
@@ -1438,16 +1391,6 @@ class Mangata {
         return await Query.getTotalIssuance(api, tokenId);
     }
     /**
-     * Returns vec of locked token Id of an specified address and tokenId
-     * @param {string} address
-     * @param {string} tokenId
-     *
-     */
-    async getLock(address, tokenId) {
-        const api = await this.getApi();
-        return await Query.getLock(api, address, tokenId);
-    }
-    /**
      * Returns token balance for address
      * @param {string} tokenId
      * @param {string} address
@@ -1464,13 +1407,6 @@ class Mangata {
     async getNextTokenId() {
         const api = await this.getApi();
         return await Query.getNextTokenId(api);
-    }
-    /*
-     * Returns bridge tokens
-     */
-    async getBridgeTokens() {
-        const api = await this.getApi();
-        return await Query.getBridgedTokens(api);
     }
     /**
      * Returns token info
@@ -1507,31 +1443,9 @@ class Mangata {
         const api = await this.getApi();
         return await Query.getBalances(api);
     }
-    async getBridgeAddresses() {
-        const api = await this.getApi();
-        return await Query.getBridgeAddresses(api);
-    }
-    async getBridgeIds() {
-        const api = await this.getApi();
-        return await Query.getBridgeIds(api);
-    }
     async getLiquidityTokens() {
         const api = await this.getApi();
         return await Query.getLiquidityTokens(api);
-    }
-    /**
-     * @deprecated This method will be deprecated
-     */
-    async bridgeERC20ToEthereum(account, tokenAddress, ethereumAddress, amount, txOptions) {
-        const api = await this.getApi();
-        return await Tx.bridgeERC20ToEthereum(api, account, tokenAddress, ethereumAddress, amount, txOptions);
-    }
-    /**
-     * @deprecated This method will be deprecated
-     */
-    async bridgeEthToEthereum(account, ethereumAddress, amount, txOptions) {
-        const api = await this.getApi();
-        return await Tx.bridgeEthToEthereum(api, account, ethereumAddress, amount, txOptions);
     }
     async getPool(liquditityTokenId) {
         const api = await this.getApi();
@@ -1585,7 +1499,7 @@ class MangataHelpers {
     static createKeyring(type) {
         return new Keyring({ type });
     }
-    static createKeyPairFromNameAndStoreAccountToKeyring(keyring, name = "") {
+    static createKeyPairFromName(keyring, name = "") {
         const userName = name ? name : "//testUser_" + v4();
         const account = keyring.createFromUri(userName);
         keyring.addPair(account);

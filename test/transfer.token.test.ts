@@ -1,48 +1,52 @@
 import { BN } from "@polkadot/util";
 import { it, expect, afterAll, beforeEach } from "vitest";
 import { KeyringPair } from "@polkadot/keyring/types";
+
 import { instance, SUDO_USER_NAME } from "./instanceCreation";
 import { MangataHelpers } from "../index";
 import {
-  addAccountCurrencies,
-  addMGAToken,
+  createMGXToken,
   getEventResultFromTxWait,
-  ExtrinsicResult
+  ExtrinsicResult,
+  createTokenForUser
 } from "./utility";
 
 let testUser: KeyringPair;
 let testUser1: KeyringPair;
 let sudoUser: KeyringPair;
-let firstCurrency: string;
-let secondCurrency: string;
+let firstTokenId: BN;
+let secondTokenId: BN;
 
 beforeEach(async () => {
   await instance.waitForNewBlock(2);
+
   const keyring = MangataHelpers.createKeyring("sr25519");
-  testUser =
-    MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring);
-  testUser1 =
-    MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring);
-  sudoUser = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(
-    keyring,
-    SUDO_USER_NAME
-  );
+  testUser = MangataHelpers.createKeyPairFromName(keyring);
+  testUser1 = MangataHelpers.createKeyPairFromName(keyring);
+  sudoUser = MangataHelpers.createKeyPairFromName(keyring, SUDO_USER_NAME);
 
   await instance.waitForNewBlock(2);
-  const currencies = await addAccountCurrencies(instance, testUser, sudoUser, [
-    new BN(500000),
-    new BN(500000).add(new BN(1))
-  ]);
-  firstCurrency = currencies[0].toString();
-  secondCurrency = currencies[1].toString();
-  await addMGAToken(instance, sudoUser, testUser);
+
+  firstTokenId = await createTokenForUser(
+    testUser,
+    sudoUser,
+    new BN("10000000000000000000000")
+  );
+  secondTokenId = await createTokenForUser(
+    testUser,
+    sudoUser,
+    new BN("10000000000000000000000")
+  );
+
+  await createMGXToken(sudoUser, testUser, new BN("1000000000000000000000"));
+
   await instance.waitForNewBlock(2);
 });
 
 it("should transfer tokens from testUser1 to testUser2", async () => {
   await instance.transferToken(
     testUser,
-    secondCurrency,
+    secondTokenId.toString(),
     testUser1.address,
     new BN(100),
     {
@@ -56,30 +60,33 @@ it("should transfer tokens from testUser1 to testUser2", async () => {
       }
     }
   );
-  await instance.transferTokenAll(testUser, firstCurrency, testUser1.address, {
-    extrinsicStatus: (resultTransferAll) => {
-      const eventTransferAll = getEventResultFromTxWait(resultTransferAll, [
-        "tokens",
-        "Transfer",
-        testUser.address
-      ]);
-      expect(eventTransferAll.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
+
+  await instance.transferTokenAll(
+    testUser,
+    firstTokenId.toString(),
+    testUser1.address,
+    {
+      extrinsicStatus: (resultTransferAll) => {
+        const eventTransferAll = getEventResultFromTxWait(resultTransferAll, [
+          "tokens",
+          "Transfer",
+          testUser.address
+        ]);
+        expect(eventTransferAll.state).toEqual(
+          ExtrinsicResult.ExtrinsicSuccess
+        );
+      }
     }
-  });
-  const issuance = await instance.getTotalIssuance(firstCurrency);
-  expect(issuance.toNumber()).toEqual(500000);
+  );
+
+  const issuance = await instance.getTotalIssuance(firstTokenId.toString());
+  expect(issuance.toString()).toEqual("10000000000000000000000");
+
   const tokenBalance = await instance.getTokenBalance(
-    firstCurrency,
+    firstTokenId.toString(),
     testUser1.address
   );
-  expect(tokenBalance.free.toNumber()).toEqual(500000);
-  const lock = await instance.getLock(testUser.address, firstCurrency);
-  expect(lock).toEqual([]);
-});
-
-it("should get next token id", async () => {
-  const tokenId = await instance.getNextTokenId();
-  expect(tokenId.toNumber()).toBeGreaterThanOrEqual(0);
+  expect(tokenBalance.free.toString()).toEqual("10000000000000000000000");
 });
 
 afterAll(async () => {

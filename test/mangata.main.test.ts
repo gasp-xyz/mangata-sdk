@@ -5,44 +5,49 @@ import { it, expect, afterAll, beforeEach } from "vitest";
 import { instance, SUDO_USER_NAME } from "./instanceCreation";
 import { MangataHelpers } from "../index";
 import {
-  addAccountCurrencies,
-  addMGAToken,
+  createMGXToken,
   getEventResultFromTxWait,
-  ExtrinsicResult
+  ExtrinsicResult,
+  createTokenForUser
 } from "./utility";
 import { MangataGenericEvent } from "../src/types/MangataGenericEvent";
 
 let testUser: KeyringPair;
 let sudoUser: KeyringPair;
-let firstCurrency: string;
-let secondCurrency: string;
+let firstTokenId: BN;
+let secondTokenId: BN;
 
 beforeEach(async () => {
   await instance.waitForNewBlock(2);
+
   const keyring = MangataHelpers.createKeyring("sr25519");
-  testUser =
-    MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(keyring);
-  sudoUser = MangataHelpers.createKeyPairFromNameAndStoreAccountToKeyring(
-    keyring,
-    SUDO_USER_NAME
-  );
+  testUser = MangataHelpers.createKeyPairFromName(keyring);
+  sudoUser = MangataHelpers.createKeyPairFromName(keyring, SUDO_USER_NAME);
+
   await instance.waitForNewBlock(2);
-  const currencies = await addAccountCurrencies(instance, testUser, sudoUser, [
-    new BN(500000),
-    new BN(500000).add(new BN(1))
-  ]);
-  firstCurrency = currencies[0].toString();
-  secondCurrency = currencies[1].toString();
-  await addMGAToken(instance, sudoUser, testUser);
+  firstTokenId = await createTokenForUser(
+    testUser,
+    sudoUser,
+    new BN("10000000000000000000000")
+  );
+
+  secondTokenId = await createTokenForUser(
+    testUser,
+    sudoUser,
+    new BN("10000000000000000000000")
+  );
+
+  await createMGXToken(sudoUser, testUser, new BN("1000000000000000000000"));
+
   await instance.waitForNewBlock(2);
 });
 
 it("should create pool", async () => {
   await instance.createPool(
     testUser,
-    firstCurrency,
+    firstTokenId.toString(),
     new BN(50000),
-    secondCurrency,
+    secondTokenId.toString(),
     new BN(50000),
     {
       extrinsicStatus: (result: MangataGenericEvent[]) => {
@@ -60,19 +65,19 @@ it("should create pool", async () => {
 it("should test the balance", async () => {
   await instance.createPool(
     testUser,
-    firstCurrency,
+    firstTokenId.toString(),
     new BN(50000),
-    secondCurrency,
+    secondTokenId.toString(),
     new BN(60000)
   );
 
   const balance1 = await instance.getAmountOfTokenIdInPool(
-    firstCurrency,
-    secondCurrency
+    firstTokenId.toString(),
+    secondTokenId.toString()
   );
   const balance2 = await instance.getAmountOfTokenIdInPool(
-    secondCurrency,
-    firstCurrency
+    secondTokenId.toString(),
+    firstTokenId.toString()
   );
 
   expect(balance1[0].toNumber()).toEqual(50000);
@@ -84,16 +89,16 @@ it("should test the balance", async () => {
 it("should buy asset", async () => {
   await instance.createPool(
     testUser,
-    firstCurrency,
+    firstTokenId.toString(),
     new BN(50000),
-    secondCurrency,
+    secondTokenId.toString(),
     new BN(25000)
   );
   await instance.waitForNewBlock(2);
   await instance.buyAsset(
     testUser,
-    firstCurrency,
-    secondCurrency,
+    firstTokenId.toString(),
+    secondTokenId.toString(),
     new BN(1000),
     new BN(60000),
     {
@@ -112,9 +117,9 @@ it("should buy asset", async () => {
 it("should sell asset 4 times", async () => {
   await instance.createPool(
     testUser,
-    firstCurrency,
+    firstTokenId.toString(),
     new BN(100000),
-    secondCurrency,
+    secondTokenId.toString(),
     new BN(100000)
   );
   const userNonce = [];
@@ -125,8 +130,8 @@ it("should sell asset 4 times", async () => {
     promises.push(
       instance.sellAsset(
         testUser,
-        firstCurrency,
-        secondCurrency,
+        firstTokenId.toString(),
+        secondTokenId.toString(),
         new BN(1000 + index),
         new BN(0),
         {
@@ -145,16 +150,16 @@ it("should sell asset 4 times", async () => {
 it("should sell asset", async () => {
   await instance.createPool(
     testUser,
-    firstCurrency,
+    firstTokenId.toString(),
     new BN(50000),
-    secondCurrency,
+    secondTokenId.toString(),
     new BN(25000)
   );
   await instance.waitForNewBlock(2);
   await instance.sellAsset(
     testUser,
-    firstCurrency,
-    secondCurrency,
+    firstTokenId.toString(),
+    secondTokenId.toString(),
     new BN(10000),
     new BN(100),
     {
@@ -173,16 +178,16 @@ it("should sell asset", async () => {
 it("should mint liquidity", async () => {
   await instance.createPool(
     testUser,
-    firstCurrency,
+    firstTokenId.toString(),
     new BN(50000),
-    secondCurrency,
+    secondTokenId.toString(),
     new BN(25000)
   );
   await instance.waitForNewBlock(2);
   await instance.mintLiquidity(
     testUser,
-    firstCurrency,
-    secondCurrency,
+    firstTokenId.toString(),
+    secondTokenId.toString(),
     new BN(10000),
     new BN(5001),
     {
@@ -197,16 +202,16 @@ it("should mint liquidity", async () => {
 it("should burn liquidity", async () => {
   await instance.createPool(
     testUser,
-    firstCurrency,
+    firstTokenId.toString(),
     new BN(50000),
-    secondCurrency,
+    secondTokenId.toString(),
     new BN(25000)
   );
   await instance.waitForNewBlock(2);
   await instance.burnLiquidity(
     testUser,
-    firstCurrency,
-    secondCurrency,
+    firstTokenId.toString(),
+    secondTokenId.toString(),
     new BN(10000),
     {
       extrinsicStatus: (result) => {

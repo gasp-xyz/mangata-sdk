@@ -22,7 +22,7 @@ export class MangataHelpers {
     return new Keyring({ type });
   }
 
-  public static createKeyPairFromNameAndStoreAccountToKeyring(
+  public static createKeyPairFromName(
     keyring: Keyring,
     name = ""
   ): KeyringPair {

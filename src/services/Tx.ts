@@ -421,35 +421,4 @@ export class Tx {
       txOptions
     );
   }
-
-  static async bridgeERC20ToEthereum(
-    api: ApiPromise,
-    account: string | KeyringPair,
-    tokenAddress: string,
-    ethereumAddress: string,
-    amount: BN,
-    txOptions?: TxOptions
-  ): Promise<MangataGenericEvent[]> {
-    return await signTx(
-      api,
-      api.tx.erc20.burn(tokenAddress, ethereumAddress, amount),
-      account,
-      txOptions
-    );
-  }
-
-  static async bridgeEthToEthereum(
-    api: ApiPromise,
-    account: string | KeyringPair,
-    ethereumAddress: string,
-    amount: BN,
-    txOptions?: TxOptions
-  ) {
-    return await signTx(
-      api,
-      api.tx.eth.burn(ethereumAddress, amount),
-      account,
-      txOptions
-    );
-  }
 }

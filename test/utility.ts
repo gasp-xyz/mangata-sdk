@@ -2,6 +2,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { BN } from "@polkadot/util";
 
 import { Mangata, signTx } from "../index";
+import { instance } from "./instanceCreation";
 import { MangataGenericEvent } from "../src/types/MangataGenericEvent";
 
 export enum ExtrinsicResult {
@@ -10,40 +11,34 @@ export enum ExtrinsicResult {
   ExtrinsicUndefined
 }
 
-export const addAccountCurrencies = async (
-  mangataInstance: Mangata,
+export const createTokenForUser = async (
   user: KeyringPair,
   sudo: KeyringPair,
-  currencyValues: BN[] = [new BN(250000), new BN(250001)]
-): Promise<BN[]> => {
-  const currencies: BN[] = [];
-  for (let currency = 0; currency < currencyValues.length; currency++) {
-    const api = await mangataInstance.getApi();
-    await mangataInstance.waitForNewBlock();
-    const nonce = await mangataInstance.getNonce(sudo.address);
-    await signTx(
-      api,
-      api.tx.sudo.sudo(
-        api.tx.tokens.create(user.address, currencyValues[currency])
-      ),
-      sudo,
-      {
-        nonce,
-        extrinsicStatus: (result) => {
-          const eventResult = getEventResultFromTxWait(result, [
-            "tokens",
-            "Issued",
-            user.address
-          ]);
+  amount: BN
+): Promise<BN> => {
+  const api = await instance.getApi();
+  await instance.waitForNewBlock();
+  const nonce = await instance.getNonce(sudo.address);
+  let tokenId: BN;
+  await signTx(
+    api,
+    api.tx.sudo.sudo(api.tx.tokens.create(user.address, amount)),
+    sudo,
+    {
+      nonce,
+      extrinsicStatus: (result) => {
+        const eventResult = getEventResultFromTxWait(result, [
+          "tokens",
+          "Issued",
+          user.address
+        ]);
 
-          const currencyId = new BN(eventResult.data[0]["data"]);
-          currencies.push(currencyId);
-        }
+        tokenId = new BN(eventResult.data[0]["data"]);
       }
-    );
-  }
-  await mangataInstance.waitForNewBlock();
-  return currencies;
+    }
+  );
+
+  return tokenId;
 };
 
 export const getEventResultFromTxWait = (
@@ -98,21 +93,20 @@ export const getEventResultFromTxWait = (
   return { state: -1, data: "ERROR: NO TX FOUND" };
 };
 
-export const addMGAToken = async (
-  mangataInstance: Mangata,
+export const createMGXToken = async (
   sudoUser: KeyringPair,
   user: KeyringPair,
-  freeAmount: BN = new BN(10).pow(new BN(18))
+  amount: BN
 ): Promise<void> => {
-  const api = await mangataInstance.getApi();
-  const sudoNonce = await mangataInstance.getNonce(sudoUser.address);
-  await mangataInstance.waitForNewBlock();
+  const api = await instance.getApi();
+  const nonce = await instance.getNonce(sudoUser.address);
+  await instance.waitForNewBlock();
   await signTx(
     api,
-    api.tx.sudo.sudo(api.tx.tokens.mint("0", user.address, new BN(freeAmount))),
+    api.tx.sudo.sudo(api.tx.tokens.mint("0", user.address, new BN(amount))),
     sudoUser,
     {
-      nonce: sudoNonce
+      nonce
     }
   );
 };
