@@ -202,17 +202,10 @@ export class Mangata {
   public async claimRewardsFee(
     account: string | KeyringPair,
     liquditityTokenId: string,
-    amount: BN,
-    txOptions?: TxOptions
+    amount: BN
   ) {
     const api = await this.getApi();
-    return await Fee.claimRewardsFee(
-      api,
-      account,
-      liquditityTokenId,
-      amount,
-      txOptions
-    );
+    return await Fee.claimRewardsFee(api, account, liquditityTokenId, amount);
   }
 
   public async claimRewards(
@@ -236,8 +229,7 @@ export class Mangata {
     firstTokenId: string,
     firstTokenAmount: BN,
     secondTokenId: string,
-    secondTokenAmount: BN,
-    txOptions?: TxOptions
+    secondTokenAmount: BN
   ) {
     const api = await this.getApi();
     return await Fee.createPoolFee(
@@ -246,8 +238,7 @@ export class Mangata {
       firstTokenId,
       firstTokenAmount,
       secondTokenId,
-      secondTokenAmount,
-      txOptions
+      secondTokenAmount
     );
   }
 
@@ -287,8 +278,7 @@ export class Mangata {
     soldAssetId: string,
     boughtAssetId: string,
     amount: BN,
-    minAmountOut: BN,
-    txOptions?: TxOptions
+    minAmountOut: BN
   ): Promise<string> {
     const api = await this.getApi();
     return await Fee.sellAssetFee(
@@ -297,8 +287,7 @@ export class Mangata {
       soldAssetId,
       boughtAssetId,
       amount,
-      minAmountOut,
-      txOptions
+      minAmountOut
     );
   }
 
@@ -340,8 +329,7 @@ export class Mangata {
     firstTokenId: string,
     secondTokenId: string,
     firstTokenAmount: BN,
-    expectedSecondTokenAmount: BN,
-    txOptions?: TxOptions
+    expectedSecondTokenAmount: BN
   ): Promise<string> {
     const api = await this.getApi();
     return await Fee.mintLiquidityFee(
@@ -350,8 +338,7 @@ export class Mangata {
       firstTokenId,
       secondTokenId,
       firstTokenAmount,
-      expectedSecondTokenAmount,
-      txOptions
+      expectedSecondTokenAmount
     );
   }
 
@@ -392,8 +379,7 @@ export class Mangata {
     account: string | KeyringPair,
     firstTokenId: string,
     secondTokenId: string,
-    liquidityTokenAmount: BN,
-    txOptions?: TxOptions
+    liquidityTokenAmount: BN
   ): Promise<string> {
     const api = await this.getApi();
     return await Fee.burnLiquidityFee(
@@ -401,8 +387,7 @@ export class Mangata {
       account,
       firstTokenId,
       secondTokenId,
-      liquidityTokenAmount,
-      txOptions
+      liquidityTokenAmount
     );
   }
 
@@ -441,8 +426,7 @@ export class Mangata {
     soldAssetId: string,
     boughtAssetId: string,
     amount: BN,
-    maxAmountIn: BN,
-    txOptions?: TxOptions
+    maxAmountIn: BN
   ): Promise<string> {
     const api = await this.getApi();
     return await Fee.buyAssetFee(
@@ -451,8 +435,7 @@ export class Mangata {
       soldAssetId,
       boughtAssetId,
       amount,
-      maxAmountIn,
-      txOptions
+      maxAmountIn
     );
   }
 
@@ -668,18 +651,10 @@ export class Mangata {
     account: string | KeyringPair,
     tokenId: string,
     address: string,
-    amount: BN,
-    txOptions?: TxOptions
+    amount: BN
   ): Promise<string> {
     const api = await this.getApi();
-    return await Fee.transferTokenFee(
-      api,
-      account,
-      tokenId,
-      address,
-      amount,
-      txOptions
-    );
+    return await Fee.transferTokenFee(api, account, tokenId, address, amount);
   }
 
   /**
@@ -714,17 +689,10 @@ export class Mangata {
   public async transferTokenAllFee(
     account: string | KeyringPair,
     tokenId: string,
-    address: string,
-    txOptions?: TxOptions
+    address: string
   ): Promise<string> {
     const api = await this.getApi();
-    return await Fee.transferAllTokenFee(
-      api,
-      account,
-      tokenId,
-      address,
-      txOptions
-    );
+    return await Fee.transferAllTokenFee(api, account, tokenId, address);
   }
 
   /**

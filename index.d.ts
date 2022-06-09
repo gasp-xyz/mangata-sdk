@@ -156,9 +156,9 @@ declare class Mangata {
     deactivateLiquidity(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     calculateFutureRewardsAmount(address: string, liquidityTokenId: string, futureBlockNumber: BN): Promise<BN>;
     calculateRewardsAmount(address: string, liquidityTokenId: string): Promise<Reward>;
-    claimRewardsFee(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<string>;
+    claimRewardsFee(account: string | KeyringPair, liquditityTokenId: string, amount: BN): Promise<string>;
     claimRewards(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
-    createPoolFee(account: string | KeyringPair, firstTokenId: string, firstTokenAmount: BN, secondTokenId: string, secondTokenAmount: BN, txOptions?: TxOptions): Promise<string>;
+    createPoolFee(account: string | KeyringPair, firstTokenId: string, firstTokenAmount: BN, secondTokenId: string, secondTokenAmount: BN): Promise<string>;
     /**
      * Extrinsic to create pool
      * @param {string | Keyringpair} account
@@ -171,7 +171,7 @@ declare class Mangata {
      * @returns {(MangataGenericEvent|Array)}
      */
     createPool(account: string | KeyringPair, firstTokenId: string, firstTokenAmount: BN, secondTokenId: string, secondTokenAmount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
-    sellAssetFee(account: string | KeyringPair, soldAssetId: string, boughtAssetId: string, amount: BN, minAmountOut: BN, txOptions?: TxOptions): Promise<string>;
+    sellAssetFee(account: string | KeyringPair, soldAssetId: string, boughtAssetId: string, amount: BN, minAmountOut: BN): Promise<string>;
     /**
      * Extrinsic to sell/swap sold token id in sold token amount for bought token id,
      * while specifying min amount out: minimal expected bought token amount
@@ -186,7 +186,7 @@ declare class Mangata {
      * @returns {(MangataGenericEvent|Array)}
      */
     sellAsset(account: string | KeyringPair, soldAssetId: string, boughtAssetId: string, amount: BN, minAmountOut: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
-    mintLiquidityFee(account: string | KeyringPair, firstTokenId: string, secondTokenId: string, firstTokenAmount: BN, expectedSecondTokenAmount: BN, txOptions?: TxOptions): Promise<string>;
+    mintLiquidityFee(account: string | KeyringPair, firstTokenId: string, secondTokenId: string, firstTokenAmount: BN, expectedSecondTokenAmount: BN): Promise<string>;
     /**
      * Extrinsic to add liquidity to pool, while specifying first token id
      * and second token id and first token amount. Second token amount is calculated in block, * but cannot exceed expected second token amount
@@ -201,7 +201,7 @@ declare class Mangata {
      * @returns {(MangataGenericEvent|Array)}
      */
     mintLiquidity(account: string | KeyringPair, firstTokenId: string, secondTokenId: string, firstTokenAmount: BN, expectedSecondTokenAmount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
-    burnLiquidityFee(account: string | KeyringPair, firstTokenId: string, secondTokenId: string, liquidityTokenAmount: BN, txOptions?: TxOptions): Promise<string>;
+    burnLiquidityFee(account: string | KeyringPair, firstTokenId: string, secondTokenId: string, liquidityTokenAmount: BN): Promise<string>;
     /**
      * Extrinsic to remove liquidity from liquidity pool, specifying first token id and
      * second token id of a pool and liquidity token amount you wish to burn
@@ -215,7 +215,7 @@ declare class Mangata {
      * @returns {(MangataGenericEvent|Array)}
      */
     burnLiquidity(account: string | KeyringPair, firstTokenId: string, secondTokenId: string, liquidityTokenAmount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
-    buyAssetFee(account: string | KeyringPair, soldAssetId: string, boughtAssetId: string, amount: BN, maxAmountIn: BN, txOptions?: TxOptions): Promise<string>;
+    buyAssetFee(account: string | KeyringPair, soldAssetId: string, boughtAssetId: string, amount: BN, maxAmountIn: BN): Promise<string>;
     /**
      * Extrinsic to buy/swap bought token id in bought token amount for sold token id, while
      * specifying max amount in: maximal amount you are willing to pay in sold token id to
@@ -316,7 +316,7 @@ declare class Mangata {
      * @returns {BN | Array}
      */
     getLiquidityPool(liquidityAssetId: string): Promise<BN[]>;
-    transferTokenFee(account: string | KeyringPair, tokenId: string, address: string, amount: BN, txOptions?: TxOptions): Promise<string>;
+    transferTokenFee(account: string | KeyringPair, tokenId: string, address: string, amount: BN): Promise<string>;
     /**
      * Extrinsic that transfers Token Id in value amount from origin to destination
      * @param {string | Keyringpair} account
@@ -328,7 +328,7 @@ declare class Mangata {
      * @returns {(MangataGenericEvent|Array)}
      */
     transferToken(account: string | KeyringPair, tokenId: string, address: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
-    transferTokenAllFee(account: string | KeyringPair, tokenId: string, address: string, txOptions?: TxOptions): Promise<string>;
+    transferTokenAllFee(account: string | KeyringPair, tokenId: string, address: string): Promise<string>;
     /**
      * Extrinsic that transfers all token Id from origin to destination
      * @param {string | Keyringpair} account

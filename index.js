@@ -832,76 +832,64 @@ const fromBN = (value, exponent) => {
 };
 
 class Fee {
-    static async claimRewardsFee(api, account, liquidityTokenId, amount, txOptions) {
+    static async activateLiquidity(api, account, liquditityTokenId, amount) {
+        const dispatchInfo = await api.tx.xyk
+            .activateLiquidity(liquditityTokenId, amount)
+            .paymentInfo(account);
+        return fromBN(new BN(dispatchInfo.partialFee.toString()));
+    }
+    static async deactivateLiquidity(api, account, liquditityTokenId, amount) {
+        const dispatchInfo = await api.tx.xyk
+            .deactivateLiquidity(liquditityTokenId, amount)
+            .paymentInfo(account);
+        return fromBN(new BN(dispatchInfo.partialFee.toString()));
+    }
+    static async claimRewardsFee(api, account, liquidityTokenId, amount) {
         const dispatchInfo = await api.tx.xyk
             .claimRewards(liquidityTokenId, amount)
-            .paymentInfo(account, {
-            nonce: txOptions?.nonce,
-            signer: txOptions?.signer
-        });
+            .paymentInfo(account);
         return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
-    static async createPoolFee(api, account, firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount, txOptions) {
+    static async createPoolFee(api, account, firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount) {
         const dispatchInfo = await api.tx.xyk
             .createPool(firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount)
-            .paymentInfo(account, {
-            nonce: txOptions?.nonce,
-            signer: txOptions?.signer
-        });
+            .paymentInfo(account);
         return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
-    static async sellAssetFee(api, account, soldTokenId, boughtTokenId, amount, minAmountOut, txOptions) {
+    static async sellAssetFee(api, account, soldTokenId, boughtTokenId, amount, minAmountOut) {
         const dispatchInfo = await api.tx.xyk
             .sellAsset(soldTokenId, boughtTokenId, amount, minAmountOut)
-            .paymentInfo(account, {
-            nonce: txOptions?.nonce,
-            signer: txOptions?.signer
-        });
+            .paymentInfo(account);
         return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
-    static async buyAssetFee(api, account, soldTokenId, boughtTokenId, amount, maxAmountIn, txOptions) {
+    static async buyAssetFee(api, account, soldTokenId, boughtTokenId, amount, maxAmountIn) {
         const dispatchInfo = await api.tx.xyk
             .buyAsset(soldTokenId, boughtTokenId, amount, maxAmountIn)
-            .paymentInfo(account, {
-            nonce: txOptions?.nonce,
-            signer: txOptions?.signer
-        });
+            .paymentInfo(account);
         return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
-    static async mintLiquidityFee(api, account, firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount = new BN(Number.MAX_SAFE_INTEGER), txOptions) {
+    static async mintLiquidityFee(api, account, firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount = new BN(Number.MAX_SAFE_INTEGER)) {
         const dispatchInfo = await api.tx.xyk
             .mintLiquidity(firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount)
-            .paymentInfo(account, {
-            nonce: txOptions?.nonce,
-            signer: txOptions?.signer
-        });
+            .paymentInfo(account);
         return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
-    static async burnLiquidityFee(api, account, firstTokenId, secondTokenId, liquidityTokenAmount, txOptions) {
+    static async burnLiquidityFee(api, account, firstTokenId, secondTokenId, liquidityTokenAmount) {
         const dispatchInfo = await api.tx.xyk
             .burnLiquidity(firstTokenId, secondTokenId, liquidityTokenAmount)
-            .paymentInfo(account, {
-            nonce: txOptions?.nonce,
-            signer: txOptions?.signer
-        });
+            .paymentInfo(account);
         return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
-    static async transferTokenFee(api, account, tokenId, address, amount, txOptions) {
+    static async transferTokenFee(api, account, tokenId, address, amount) {
         const dispatchInfo = await api.tx.tokens
             .transfer(address, tokenId, amount)
-            .paymentInfo(account, {
-            nonce: txOptions?.nonce,
-            signer: txOptions?.signer
-        });
+            .paymentInfo(account);
         return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
-    static async transferAllTokenFee(api, account, tokenId, address, txOptions) {
+    static async transferAllTokenFee(api, account, tokenId, address) {
         const dispatchInfo = await api.tx.tokens
             .transferAll(address, tokenId, true)
-            .paymentInfo(account, {
-            nonce: txOptions?.nonce,
-            signer: txOptions?.signer
-        });
+            .paymentInfo(account);
         return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
 }
@@ -1124,17 +1112,17 @@ class Mangata {
         const api = await this.getApi();
         return await Rpc.calculateRewardsAmount(api, address, liquidityTokenId);
     }
-    async claimRewardsFee(account, liquditityTokenId, amount, txOptions) {
+    async claimRewardsFee(account, liquditityTokenId, amount) {
         const api = await this.getApi();
-        return await Fee.claimRewardsFee(api, account, liquditityTokenId, amount, txOptions);
+        return await Fee.claimRewardsFee(api, account, liquditityTokenId, amount);
     }
     async claimRewards(account, liquditityTokenId, amount, txOptions) {
         const api = await this.getApi();
         return await Tx.claimRewards(api, account, liquditityTokenId, amount, txOptions);
     }
-    async createPoolFee(account, firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount, txOptions) {
+    async createPoolFee(account, firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount) {
         const api = await this.getApi();
-        return await Fee.createPoolFee(api, account, firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount, txOptions);
+        return await Fee.createPoolFee(api, account, firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount);
     }
     /**
      * Extrinsic to create pool
@@ -1151,9 +1139,9 @@ class Mangata {
         const api = await this.getApi();
         return await Tx.createPool(api, account, firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount, txOptions);
     }
-    async sellAssetFee(account, soldAssetId, boughtAssetId, amount, minAmountOut, txOptions) {
+    async sellAssetFee(account, soldAssetId, boughtAssetId, amount, minAmountOut) {
         const api = await this.getApi();
-        return await Fee.sellAssetFee(api, account, soldAssetId, boughtAssetId, amount, minAmountOut, txOptions);
+        return await Fee.sellAssetFee(api, account, soldAssetId, boughtAssetId, amount, minAmountOut);
     }
     /**
      * Extrinsic to sell/swap sold token id in sold token amount for bought token id,
@@ -1172,9 +1160,9 @@ class Mangata {
         const api = await this.getApi();
         return await Tx.sellAsset(api, account, soldAssetId, boughtAssetId, amount, minAmountOut, txOptions);
     }
-    async mintLiquidityFee(account, firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount, txOptions) {
+    async mintLiquidityFee(account, firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount) {
         const api = await this.getApi();
-        return await Fee.mintLiquidityFee(api, account, firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount, txOptions);
+        return await Fee.mintLiquidityFee(api, account, firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount);
     }
     /**
      * Extrinsic to add liquidity to pool, while specifying first token id
@@ -1193,9 +1181,9 @@ class Mangata {
         const api = await this.getApi();
         return await Tx.mintLiquidity(api, account, firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount, txOptions);
     }
-    async burnLiquidityFee(account, firstTokenId, secondTokenId, liquidityTokenAmount, txOptions) {
+    async burnLiquidityFee(account, firstTokenId, secondTokenId, liquidityTokenAmount) {
         const api = await this.getApi();
-        return await Fee.burnLiquidityFee(api, account, firstTokenId, secondTokenId, liquidityTokenAmount, txOptions);
+        return await Fee.burnLiquidityFee(api, account, firstTokenId, secondTokenId, liquidityTokenAmount);
     }
     /**
      * Extrinsic to remove liquidity from liquidity pool, specifying first token id and
@@ -1213,9 +1201,9 @@ class Mangata {
         const api = await this.getApi();
         return await Tx.burnLiquidity(api, account, firstTokenId, secondTokenId, liquidityTokenAmount, txOptions);
     }
-    async buyAssetFee(account, soldAssetId, boughtAssetId, amount, maxAmountIn, txOptions) {
+    async buyAssetFee(account, soldAssetId, boughtAssetId, amount, maxAmountIn) {
         const api = await this.getApi();
-        return await Fee.buyAssetFee(api, account, soldAssetId, boughtAssetId, amount, maxAmountIn, txOptions);
+        return await Fee.buyAssetFee(api, account, soldAssetId, boughtAssetId, amount, maxAmountIn);
     }
     /**
      * Extrinsic to buy/swap bought token id in bought token amount for sold token id, while
@@ -1344,9 +1332,9 @@ class Mangata {
         const api = await this.getApi();
         return await Query.getLiquidityPool(api, liquidityAssetId);
     }
-    async transferTokenFee(account, tokenId, address, amount, txOptions) {
+    async transferTokenFee(account, tokenId, address, amount) {
         const api = await this.getApi();
-        return await Fee.transferTokenFee(api, account, tokenId, address, amount, txOptions);
+        return await Fee.transferTokenFee(api, account, tokenId, address, amount);
     }
     /**
      * Extrinsic that transfers Token Id in value amount from origin to destination
@@ -1363,9 +1351,9 @@ class Mangata {
         const result = await Tx.transferToken(api, account, tokenId, address, amount, txOptions);
         return result;
     }
-    async transferTokenAllFee(account, tokenId, address, txOptions) {
+    async transferTokenAllFee(account, tokenId, address) {
         const api = await this.getApi();
-        return await Fee.transferAllTokenFee(api, account, tokenId, address, txOptions);
+        return await Fee.transferAllTokenFee(api, account, tokenId, address);
     }
     /**
      * Extrinsic that transfers all token Id from origin to destination
