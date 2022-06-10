@@ -11,6 +11,7 @@ import { Query } from "../services/Query";
 import { TxOptions } from "../types/TxOptions";
 import { MangataGenericEvent } from "../types/MangataGenericEvent";
 import { MangataEventData } from "../types/MangataEventData";
+import { truncatedString } from "../utils/truncatedString";
 
 export const signTx = async (
   api: ApiPromise,
@@ -33,9 +34,16 @@ export const signTx = async (
           signer: txOptions?.signer
         },
         async (result) => {
-          console.info(
-            "Hash:[" + tx.hash + "] \n      Status-" + result.status
+          console.log(
+            `Tx ([${truncatedString(
+              tx.hash.toString(),
+              tx.hash.toString().length
+            )}]): ${result.status.type} (${truncatedString(
+              result.status.value.toString(),
+              result.status.value.toString().length
+            )})`
           );
+
           txOptions?.statusCallback?.(result);
           if (result.status.isFinalized) {
             const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
@@ -138,28 +146,44 @@ export const signTx = async (
                       } as MangataGenericEvent;
                     });
 
+                  for (const event of reqEvents) {
+                    console.info(`${event.section}::${event.method}`);
+                  }
+
                   output = output.concat(reqEvents);
                   txOptions?.extrinsicStatus?.(output);
                   resolve(output);
                   unsub();
                 } else if (retries++ < 10) {
                   console.info(
-                    "Retry [" +
-                      retries +
-                      "] \n      Hash:[" +
-                      tx.hash +
-                      "] \n      Status-" +
-                      result.status +
-                      " \n     Parent[" +
-                      lastHeader.parentHash.toString() +
-                      " \n     Finalized in:" +
-                      result.status.asFinalized.toString()
+                    `Retry [${retries}]: Tx: ([${truncatedString(
+                      tx.hash.toString(),
+                      tx.hash.toString().length
+                    )}]): ${result.status.type} (${truncatedString(
+                      result.status.value.toString(),
+                      result.status.value.toString().length
+                    )}): parentHash: ([${truncatedString(
+                      lastHeader.parentHash.toString(),
+                      lastHeader.parentHash.toString().length
+                    )}]): finalized in: ([${truncatedString(
+                      result.status.asFinalized.toString(),
+                      result.status.asFinalized.toString().length
+                    )}]) `
                   );
                 } else {
                   //Lets retry this for 10 times until we reject the promise.
                   unsubscribeNewHeads();
                   reject(
-                    `Transaction was not finalized: Last Header Parent hash: ${lastHeader.parentHash.toString()} and \n     Status finalized: ${result.status.asFinalized.toString()}`
+                    `Transaction was not finalized: Tx ([${truncatedString(
+                      tx.hash.toString(),
+                      tx.hash.toString().length
+                    )}]): parent hash: ([${truncatedString(
+                      lastHeader.parentHash.toString(),
+                      lastHeader.parentHash.toString().length
+                    )}]): Status finalized: ([${truncatedString(
+                      result.status.asFinalized.toString(),
+                      result.status.asFinalized.toString().length
+                    )}])`
                   );
                   const currentNonce: BN = await Query.getNonce(
                     api,
@@ -171,7 +195,12 @@ export const signTx = async (
               }
             );
           } else if (result.isError) {
-            reject(`${tx.hash} ` + "Transaction error");
+            reject(
+              `Tx ([${truncatedString(
+                tx.hash.toString(),
+                tx.hash.toString().length
+              )}]) Transaction error`
+            );
             const currentNonce: BN = await Query.getNonce(
               api,
               extractedAccount
