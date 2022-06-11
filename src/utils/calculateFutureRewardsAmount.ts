@@ -49,7 +49,7 @@ const getLiquidityMintingUser = async (
   const [
     lastCheckpoint,
     cummulativeWorkInLastCheckpoint,
-    missingAtLastCheckpoint
+    missingAtLastCheckpoint,
   ] = await api.query.xyk.liquidityMiningUser([address, liquditityTokenId]);
 
   if (
@@ -60,7 +60,7 @@ const getLiquidityMintingUser = async (
     return {
       lastCheckpoint: currentTime,
       cummulativeWorkInLastCheckpoint: Big(0),
-      missingAtLastCheckpoint: Big(0)
+      missingAtLastCheckpoint: Big(0),
     };
   } else {
     return {
@@ -68,7 +68,7 @@ const getLiquidityMintingUser = async (
       cummulativeWorkInLastCheckpoint: Big(
         cummulativeWorkInLastCheckpoint.toString()
       ),
-      missingAtLastCheckpoint: Big(missingAtLastCheckpoint.toString())
+      missingAtLastCheckpoint: Big(missingAtLastCheckpoint.toString()),
     };
   }
 };
@@ -81,7 +81,7 @@ const getLiquidityMintingPool = async (
   const [
     lastCheckpoint,
     cummulativeWorkInLastCheckpoint,
-    missingAtLastCheckpoint
+    missingAtLastCheckpoint,
   ] = await api.query.xyk.liquidityMiningPool(liquditityTokenId);
 
   if (
@@ -92,7 +92,7 @@ const getLiquidityMintingPool = async (
     return {
       lastCheckpoint: currentTime,
       cummulativeWorkInLastCheckpoint: new BN(0),
-      missingAtLastCheckpoint: new BN(0)
+      missingAtLastCheckpoint: new BN(0),
     };
   } else {
     return {
@@ -100,7 +100,7 @@ const getLiquidityMintingPool = async (
       cummulativeWorkInLastCheckpoint: new BN(
         cummulativeWorkInLastCheckpoint.toString()
       ),
-      missingAtLastCheckpoint: new BN(missingAtLastCheckpoint.toString())
+      missingAtLastCheckpoint: new BN(missingAtLastCheckpoint.toString()),
     };
   }
 };
@@ -115,7 +115,7 @@ const calculateWorkUser = async (
   const {
     lastCheckpoint,
     cummulativeWorkInLastCheckpoint,
-    missingAtLastCheckpoint
+    missingAtLastCheckpoint,
   } = await getLiquidityMintingUser(
     address,
     liquditityTokenId,
@@ -141,7 +141,7 @@ const calculateWorkPool = async (
   const {
     lastCheckpoint,
     cummulativeWorkInLastCheckpoint,
-    missingAtLastCheckpoint
+    missingAtLastCheckpoint,
   } = await getLiquidityMintingPool(liquidityTokenId, currentTime, api);
 
   return calculateWork(
@@ -189,8 +189,13 @@ export const calculateFutureRewardsAmount = async (
   const burnedNotClaimedRewards =
     await api.query.xyk.liquidityMiningUserToBeClaimed([
       address,
-      liquidityTokenId
+      liquidityTokenId,
     ]);
+
+  const alreadyClaimedRewards = await api.query.xyk.LiquidityMiningUserClaimed([
+    address,
+    liquidityTokenId,
+  ]);
 
   const currentAvailableRewardsForPool =
     await api.query.issuance.promotedPoolsRewards(liquidityTokenId);
@@ -214,9 +219,9 @@ export const calculateFutureRewardsAmount = async (
     futureRewards = futureAvailableRewardsForPool.mul(workUser).div(workPool);
   }
 
-  const totalAvailableRewardsFuture = futureRewards.add(
-    new BN(burnedNotClaimedRewards.toString())
-  );
+  const totalAvailableRewardsFuture = futureRewards
+    .add(new BN(burnedNotClaimedRewards.toString()))
+    .sub(new BN(alreadyClaimedRewards.toString()));
 
   return totalAvailableRewardsFuture;
 };
