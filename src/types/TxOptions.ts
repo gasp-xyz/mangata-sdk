@@ -10,3 +10,7 @@ export type TxOptions = Partial<{
   statusCallback: (result: ISubmittableResult) => void;
   extrinsicStatus: (events: MangataGenericEvent[]) => void;
 }>;
+
+export type XcmTxOptions = Partial<
+  Omit<TxOptions, "statusCallback" | "extrinsicStatus">
+>;

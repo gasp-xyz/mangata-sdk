@@ -730,7 +730,7 @@ export class Mangata {
    * @param {string} tokenId
    * @param {string} address
    *
-   * @returns {AccountData}
+   * @returns {TokenBalance}
    */
   public async getTokenBalance(
     tokenId: string,

@@ -1,14 +1,16 @@
 /* eslint-disable no-console */
 import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
+import { WsProvider } from "@polkadot/rpc-provider/ws";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { BN } from "@polkadot/util";
+import { encodeAddress } from "@polkadot/util-crypto";
 
 import { instance } from "../utils/MemoryDatabase";
 import { getTxNonce } from "../utils/getTxNonce";
 import { recreateExtrinsicsOrder } from "../utils/recreateExtrinsicsOrder";
 import { Query } from "../services/Query";
-import { TxOptions } from "../types/TxOptions";
+import { TxOptions, XcmTxOptions } from "../types/TxOptions";
 import { MangataGenericEvent } from "../types/MangataGenericEvent";
 import { MangataEventData } from "../types/MangataEventData";
 import { truncatedString } from "../utils/truncatedString";
@@ -276,6 +278,103 @@ const getError = (
 };
 
 export class Tx {
+  static async sendKusamaTokenFromRelayToParachain(
+    kusamaEndpointUrl: string,
+    ksmAccount: string | KeyringPair,
+    destinationMangataAddress: string,
+    amount: BN,
+    txOptions?: XcmTxOptions
+  ) {
+    const provider = new WsProvider(kusamaEndpointUrl);
+    const kusamaApi = await new ApiPromise({ provider }).isReady;
+
+    const destination = {
+      V1: {
+        interior: {
+          X1: {
+            ParaChain: 2110
+          }
+        },
+        parents: 0
+      }
+    };
+
+    const beneficiary = {
+      V1: {
+        interior: {
+          X1: {
+            AccountId32: {
+              id: kusamaApi
+                .createType(
+                  "AccountId32",
+                  encodeAddress(destinationMangataAddress, 42)
+                )
+                .toHex(),
+              network: "Any"
+            }
+          }
+        },
+        parents: 0
+      }
+    };
+
+    const assets = {
+      V1: [
+        {
+          fun: {
+            Fungible: amount
+          },
+          id: {
+            Concrete: {
+              interior: "Here",
+              parents: 0
+            }
+          }
+        }
+      ]
+    };
+
+    await kusamaApi.tx.xcmPallet
+      .reserveTransferAssets(destination, beneficiary, assets, 0)
+      .signAndSend(ksmAccount, {
+        signer: txOptions?.signer,
+        nonce: txOptions?.nonce
+      });
+  }
+  static async sendKusamaTokenFromParachainToRelay(
+    api: ApiPromise,
+    mangataAccount: string | KeyringPair,
+    destinationKusamaAddress: string,
+    amount: BN,
+    txOptions?: XcmTxOptions
+  ) {
+    const destination = {
+      V1: {
+        parents: 1,
+        interior: {
+          X1: {
+            AccountId32: {
+              network: "Any",
+              id: api
+                .createType(
+                  "AccountId32",
+                  encodeAddress(destinationKusamaAddress, 2)
+                )
+                .toHex()
+            }
+          }
+        }
+      }
+    };
+
+    await api.tx.xTokens
+      .transfer("4", amount, destination, new BN("6000000000"))
+      .signAndSend(mangataAccount, {
+        signer: txOptions?.signer,
+        nonce: txOptions?.nonce
+      });
+  }
+
   static async activateLiquidity(
     api: ApiPromise,
     account: string | KeyringPair,
