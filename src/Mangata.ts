@@ -194,7 +194,7 @@ export class Mangata {
   public async calculateRewardsAmount(
     address: string,
     liquidityTokenId: string
-  ): Promise<Reward> {
+  ): Promise<BN> {
     const api = await this.getApi();
     return await Rpc.calculateRewardsAmount(api, address, liquidityTokenId);
   }

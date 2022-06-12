@@ -96,6 +96,7 @@ declare type TxOptions = Partial<{
     statusCallback: (result: ISubmittableResult) => void;
     extrinsicStatus: (events: MangataGenericEvent[]) => void;
 }>;
+declare type XcmTxOptions = Partial<Omit<TxOptions, "statusCallback" | "extrinsicStatus">>;
 
 /**
  * @class Mangata
@@ -155,7 +156,7 @@ declare class Mangata {
     activateLiquidity(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     deactivateLiquidity(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     calculateFutureRewardsAmount(address: string, liquidityTokenId: string, futureBlockNumber: BN): Promise<BN>;
-    calculateRewardsAmount(address: string, liquidityTokenId: string): Promise<Reward>;
+    calculateRewardsAmount(address: string, liquidityTokenId: string): Promise<BN>;
     claimRewardsFee(account: string | KeyringPair, liquditityTokenId: string, amount: BN): Promise<string>;
     claimRewards(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     createPoolFee(account: string | KeyringPair, firstTokenId: string, firstTokenAmount: BN, secondTokenId: string, secondTokenAmount: BN): Promise<string>;
@@ -351,7 +352,7 @@ declare class Mangata {
      * @param {string} tokenId
      * @param {string} address
      *
-     * @returns {AccountData}
+     * @returns {TokenBalance}
      */
     getTokenBalance(tokenId: string, address: string): Promise<TokenBalance>;
     /**
@@ -442,4 +443,4 @@ declare const signTx: (api: ApiPromise, tx: SubmittableExtrinsic<"promise">, acc
     extrinsicStatus: (events: MangataGenericEvent[]) => void;
 }> | undefined) => Promise<MangataGenericEvent[]>;
 
-export { AssetInfo, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Mangata, MangataEventData, MangataGenericEvent, MangataHelpers, Reward, TBalances, TFreeBalance, TFrozenBalance, TMainTokens, TPool, TPoolWithRatio, TPoolWithShare, TReservedBalance, TToken, TTokenAddress, TTokenId, TTokenInfo, TTokenMainInfo, TTokenName, TTokenSymbol, TTokens, TokenBalance, TxOptions, fromBN, signTx, toBN, toFixed };
+export { AssetInfo, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Mangata, MangataEventData, MangataGenericEvent, MangataHelpers, Reward, TBalances, TFreeBalance, TFrozenBalance, TMainTokens, TPool, TPoolWithRatio, TPoolWithShare, TReservedBalance, TToken, TTokenAddress, TTokenId, TTokenInfo, TTokenMainInfo, TTokenName, TTokenSymbol, TTokens, TokenBalance, TxOptions, XcmTxOptions, fromBN, signTx, toBN, toFixed };

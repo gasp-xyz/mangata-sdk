@@ -1,35 +1,36 @@
-import { ApiPromise } from '@polkadot/api'
-import { BN, isHex, hexToBn } from '@polkadot/util'
+import { ApiPromise } from "@polkadot/api";
+import { BN, isHex, hexToBn } from "@polkadot/util";
 
 export class Rpc {
   static async getChain(api: ApiPromise): Promise<string> {
-    const chain = await api.rpc.system.chain()
-    return chain.toHuman()
+    const chain = await api.rpc.system.chain();
+    return chain.toHuman();
   }
 
   static async getNodeName(api: ApiPromise): Promise<string> {
-    const name = await api.rpc.system.name()
-    return name.toHuman()
+    const name = await api.rpc.system.name();
+    return name.toHuman();
   }
   static async getNodeVersion(api: ApiPromise): Promise<string> {
-    const version = await api.rpc.system.version()
-    return version.toHuman()
+    const version = await api.rpc.system.version();
+    return version.toHuman();
   }
 
-  static async calculateRewardsAmount(api: ApiPromise, address: string, liquidityTokenId: string) {
-    const rewards = await (api.rpc as any).xyk.calculate_rewards_amount(address, liquidityTokenId)
+  static async calculateRewardsAmount(
+    api: ApiPromise,
+    address: string,
+    liquidityTokenId: string
+  ): Promise<BN> {
+    const rewards = await (api.rpc as any).xyk.calculate_rewards_amount(
+      address,
+      liquidityTokenId
+    );
 
-    const notYetClaimed = isHex(rewards.notYetClaimed.toString())
-      ? hexToBn(rewards.notYetClaimed.toString())
-      : new BN(rewards.notYetClaimed)
-    const toBeClaimed = isHex(rewards.toBeClaimed.toString())
-      ? hexToBn(rewards.toBeClaimed.toString())
-      : new BN(rewards.toBeClaimed.toString())
+    const price = isHex(rewards.price.toString())
+      ? hexToBn(rewards.price.toString())
+      : new BN(rewards.price);
 
-    return {
-      notYetClaimed,
-      toBeClaimed,
-    }
+    return price;
   }
 
   static async calculateBuyPrice(
@@ -42,8 +43,8 @@ export class Rpc {
       inputReserve,
       outputReserve,
       amount
-    )
-    return new BN(result.price)
+    );
+    return new BN(result.price);
   }
 
   static async calculateSellPrice(
@@ -56,8 +57,8 @@ export class Rpc {
       inputReserve,
       outputReserve,
       amount
-    )
-    return new BN(result.price)
+    );
+    return new BN(result.price);
   }
 
   // TODO: Need to figure out the return value from this method
@@ -67,9 +68,13 @@ export class Rpc {
     secondTokenId: string,
     amount: BN
   ) {
-    const result = await (api.rpc as any).xyk.get_burn_amount(firstTokenId, secondTokenId, amount)
-    const resultAsJson = JSON.parse(result.toString())
-    return resultAsJson
+    const result = await (api.rpc as any).xyk.get_burn_amount(
+      firstTokenId,
+      secondTokenId,
+      amount
+    );
+    const resultAsJson = JSON.parse(result.toString());
+    return resultAsJson;
   }
 
   static async calculateSellPriceId(
@@ -82,8 +87,8 @@ export class Rpc {
       firstTokenId,
       secondTokenId,
       amount
-    )
-    return new BN(result.price)
+    );
+    return new BN(result.price);
   }
 
   static async calculateBuyPriceId(
@@ -96,7 +101,7 @@ export class Rpc {
       firstTokenId,
       secondTokenId,
       amount
-    )
-    return new BN(result.price)
+    );
+    return new BN(result.price);
   }
 }

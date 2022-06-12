@@ -3,6 +3,7 @@ export { BN } from '@polkadot/util';
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { WsProvider } from '@polkadot/rpc-provider/ws';
 import { options } from '@mangata-finance/types';
+import { encodeAddress } from '@polkadot/util-crypto';
 import { XoShiRo256Plus } from 'mangata-prng-xoshiro';
 import Big from 'big.js';
 import { v4 } from 'uuid';
@@ -22,16 +23,10 @@ class Rpc {
     }
     static async calculateRewardsAmount(api, address, liquidityTokenId) {
         const rewards = await api.rpc.xyk.calculate_rewards_amount(address, liquidityTokenId);
-        const notYetClaimed = isHex(rewards.notYetClaimed.toString())
-            ? hexToBn(rewards.notYetClaimed.toString())
-            : new BN(rewards.notYetClaimed);
-        const toBeClaimed = isHex(rewards.toBeClaimed.toString())
-            ? hexToBn(rewards.toBeClaimed.toString())
-            : new BN(rewards.toBeClaimed.toString());
-        return {
-            notYetClaimed,
-            toBeClaimed,
-        };
+        const price = isHex(rewards.price.toString())
+            ? hexToBn(rewards.price.toString())
+            : new BN(rewards.price);
+        return price;
     }
     static async calculateBuyPrice(api, inputReserve, outputReserve, amount) {
         const result = await api.rpc.xyk.calculate_buy_price(inputReserve, outputReserve, amount);
@@ -590,6 +585,7 @@ const truncatedString = (str, len) => {
     return str.substring(0, 7) + "..." + str.substring(len - 5, len);
 };
 
+/* eslint-disable no-console */
 const signTx = async (api, tx, account, txOptions) => {
     return new Promise(async (resolve, reject) => {
         let output = [];
@@ -742,6 +738,79 @@ const getError = (api, method, eventData) => {
     return null;
 };
 class Tx {
+    static async sendKusamaTokenFromRelayToParachain(kusamaEndpointUrl, ksmAccount, destinationMangataAddress, amount, txOptions) {
+        const provider = new WsProvider(kusamaEndpointUrl);
+        const kusamaApi = await new ApiPromise({ provider }).isReady;
+        const destination = {
+            V1: {
+                interior: {
+                    X1: {
+                        ParaChain: 2110
+                    }
+                },
+                parents: 0
+            }
+        };
+        const beneficiary = {
+            V1: {
+                interior: {
+                    X1: {
+                        AccountId32: {
+                            id: kusamaApi
+                                .createType("AccountId32", encodeAddress(destinationMangataAddress, 42))
+                                .toHex(),
+                            network: "Any"
+                        }
+                    }
+                },
+                parents: 0
+            }
+        };
+        const assets = {
+            V1: [
+                {
+                    fun: {
+                        Fungible: amount
+                    },
+                    id: {
+                        Concrete: {
+                            interior: "Here",
+                            parents: 0
+                        }
+                    }
+                }
+            ]
+        };
+        await kusamaApi.tx.xcmPallet
+            .reserveTransferAssets(destination, beneficiary, assets, 0)
+            .signAndSend(ksmAccount, {
+            signer: txOptions?.signer,
+            nonce: txOptions?.nonce
+        });
+    }
+    static async sendKusamaTokenFromParachainToRelay(api, mangataAccount, destinationKusamaAddress, amount, txOptions) {
+        const destination = {
+            V1: {
+                parents: 1,
+                interior: {
+                    X1: {
+                        AccountId32: {
+                            network: "Any",
+                            id: api
+                                .createType("AccountId32", encodeAddress(destinationKusamaAddress, 2))
+                                .toHex()
+                        }
+                    }
+                }
+            }
+        };
+        await api.tx.xTokens
+            .transfer("4", amount, destination, new BN("6000000000"))
+            .signAndSend(mangataAccount, {
+            signer: txOptions?.signer,
+            nonce: txOptions?.nonce
+        });
+    }
     static async activateLiquidity(api, account, liquditityTokenId, amount, txOptions) {
         return await signTx(api, api.tx.xyk.activateLiquidity(liquditityTokenId, amount), account, txOptions);
     }
@@ -963,14 +1032,18 @@ const calculateWorkPool = async (liquidityAssetsAmount, liquidityTokenId, curren
 const calculateFutureRewardsAmount = async (api, address, liquidityTokenId, futureTimeBlockNumber) => {
     const block = await api.rpc.chain.getBlock();
     const blockNumber = new BN(block.block.header.number.toString());
-    const currentTime = blockNumber.div(new BN(10000));
+    const currentTime = blockNumber.div(new BN(1200));
     const futureBlockNumber = blockNumber.add(new BN(futureTimeBlockNumber));
-    const futureTime = futureBlockNumber.div(new BN(10000));
+    const futureTime = futureBlockNumber.div(new BN(1200));
     const liquidityAssetsAmountUser = await api.query.xyk.liquidityMiningActiveUser([address, liquidityTokenId]);
     const liquidityAssetsAmountPool = await api.query.xyk.liquidityMiningActivePool([address, liquidityTokenId]);
     const workUser = await calculateWorkUser(address, new BN(liquidityAssetsAmountUser.toString()), liquidityTokenId, futureTime, api);
     const workPool = await calculateWorkPool(new BN(liquidityAssetsAmountPool.toString()), liquidityTokenId, futureTime, api);
     const burnedNotClaimedRewards = await api.query.xyk.liquidityMiningUserToBeClaimed([
+        address,
+        liquidityTokenId
+    ]);
+    const alreadyClaimedRewards = await api.query.xyk.liquidityMiningUserClaimed([
         address,
         liquidityTokenId
     ]);
@@ -986,7 +1059,9 @@ const calculateFutureRewardsAmount = async (api, address, liquidityTokenId, futu
     if (workUser.gt(new BN(0)) && workPool.gt(new BN(0))) {
         futureRewards = futureAvailableRewardsForPool.mul(workUser).div(workPool);
     }
-    const totalAvailableRewardsFuture = futureRewards.add(new BN(burnedNotClaimedRewards.toString()));
+    const totalAvailableRewardsFuture = futureRewards
+        .add(new BN(burnedNotClaimedRewards.toString()))
+        .sub(new BN(alreadyClaimedRewards.toString()));
     return totalAvailableRewardsFuture;
 };
 
@@ -1383,7 +1458,7 @@ class Mangata {
      * @param {string} tokenId
      * @param {string} address
      *
-     * @returns {AccountData}
+     * @returns {TokenBalance}
      */
     async getTokenBalance(tokenId, address) {
         const api = await this.getApi();
