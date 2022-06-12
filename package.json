@@ -1,12 +1,17 @@
 {
   "name": "mangata-sdk",
-  "version": "0.46.0",
+  "version": "0.47.0",
   "description": "SDK for communication with Mangata node",
-  "types": "index.d.ts",
+  "main": "./index.js",
+  "module": "./index.mjs",
+  "types": "./index.d.ts",
   "exports": {
-    ".": "./index.js"
+    ".": {
+      "require": "./index.js",
+      "import": "./index.mjs",
+      "types": "./index.d.ts"
+    }
   },
-  "type": "module",
   "scripts": {
     "build": "rm -fr build/* && tsc -p tsconfig.json && rollup -c",
     "test": "vitest --config ./vitest.config.ts --run",
@@ -19,6 +24,7 @@
   },
   "files": [
     "index.js",
+    "index.mjs",
     "index.d.ts"
   ],
   "engines": {
@@ -58,7 +64,7 @@
     "vitest": "^0.12.6"
   },
   "dependencies": {
-    "@mangata-finance/types": "^0.3.0",
+    "@mangata-finance/types": "^0.4.0",
     "big.js": "^6.1.1",
     "mangata-prng-xoshiro": "^2.0.0",
     "uuid": "^8.3.2"
