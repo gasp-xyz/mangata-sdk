@@ -1,19 +1,12 @@
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var util = require('@polkadot/util');
-var api = require('@polkadot/api');
-var ws = require('@polkadot/rpc-provider/ws');
-var types = require('@mangata-finance/types');
-var utilCrypto = require('@polkadot/util-crypto');
-var mangataPrngXoshiro = require('mangata-prng-xoshiro');
-var Big = require('big.js');
-var uuid = require('uuid');
-
-function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-var Big__default = /*#__PURE__*/_interopDefaultLegacy(Big);
+import { isHex, hexToBn, BN, BN_ZERO as BN_ZERO$1 } from '@polkadot/util';
+export { BN } from '@polkadot/util';
+import { ApiPromise, Keyring } from '@polkadot/api';
+import { WsProvider } from '@polkadot/rpc-provider/ws';
+import { options } from '@mangata-finance/types';
+import { encodeAddress } from '@polkadot/util-crypto';
+import { XoShiRo256Plus } from 'mangata-prng-xoshiro';
+import Big from 'big.js';
+import { v4 } from 'uuid';
 
 class Rpc {
     static async getChain(api) {
@@ -30,18 +23,18 @@ class Rpc {
     }
     static async calculateRewardsAmount(api, address, liquidityTokenId) {
         const rewards = await api.rpc.xyk.calculate_rewards_amount(address, liquidityTokenId);
-        const price = util.isHex(rewards.price.toString())
-            ? util.hexToBn(rewards.price.toString())
-            : new util.BN(rewards.price);
+        const price = isHex(rewards.price.toString())
+            ? hexToBn(rewards.price.toString())
+            : new BN(rewards.price);
         return price;
     }
     static async calculateBuyPrice(api, inputReserve, outputReserve, amount) {
         const result = await api.rpc.xyk.calculate_buy_price(inputReserve, outputReserve, amount);
-        return new util.BN(result.price);
+        return new BN(result.price);
     }
     static async calculateSellPrice(api, inputReserve, outputReserve, amount) {
         const result = await api.rpc.xyk.calculate_sell_price(inputReserve, outputReserve, amount);
-        return new util.BN(result.price);
+        return new BN(result.price);
     }
     // TODO: Need to figure out the return value from this method
     static async getBurnAmount(api, firstTokenId, secondTokenId, amount) {
@@ -51,11 +44,11 @@ class Rpc {
     }
     static async calculateSellPriceId(api, firstTokenId, secondTokenId, amount) {
         const result = await api.rpc.xyk.calculate_sell_price_id(firstTokenId, secondTokenId, amount);
-        return new util.BN(result.price);
+        return new BN(result.price);
     }
     static async calculateBuyPriceId(api, firstTokenId, secondTokenId, amount) {
         const result = await api.rpc.xyk.calculate_buy_price_id(firstTokenId, secondTokenId, amount);
-        return new util.BN(result.price);
+        return new BN(result.price);
     }
 }
 
@@ -87,7 +80,7 @@ const getSymbol = (symbol, assets) => {
     return symbol
         .split("-")
         .map((item) => item.replace("TKN", ""))
-        .map((tokenId) => tokenId.startsWith("0x") ? util.hexToBn(tokenId).toString() : tokenId)
+        .map((tokenId) => tokenId.startsWith("0x") ? hexToBn(tokenId).toString() : tokenId)
         .reduce((acc, curr, idx, arr) => {
         const isSymbol = isNaN(+curr);
         return (acc +
@@ -157,7 +150,7 @@ const poolsBalanceMap = async (api, liquidityAssets) => {
     return poolsBalanceResponse.reduce((acc, [key, value]) => {
         const identificator = key.args.map((k) => k.toHuman())[0];
         const balancesResponse = JSON.parse(JSON.stringify(value));
-        const balances = balancesResponse.map((balance) => util.isHex(balance) ? util.hexToBn(balance) : new util.BN(balance));
+        const balances = balancesResponse.map((balance) => isHex(balance) ? hexToBn(balance) : new BN(balance));
         acc[liquidityAssets[identificator]] = balances;
         return acc;
     }, {});
@@ -167,7 +160,7 @@ const balancesMap = async (api) => {
     const balancesResponse = await api.query.tokens.totalIssuance.entries();
     return balancesResponse.reduce((acc, [key, value]) => {
         const id = key.toHuman()[0].replace(/[, ]/g, '');
-        const balance = new util.BN(value.toString());
+        const balance = new BN(value.toString());
         acc[id] = balance;
         return acc;
     }, {});
@@ -179,9 +172,9 @@ const accountEntriesMap = async (api, address) => {
         const free = JSON.parse(JSON.stringify(value)).free.toString();
         const frozen = JSON.parse(JSON.stringify(value)).frozen.toString();
         const reserved = JSON.parse(JSON.stringify(value)).reserved.toString();
-        const freeBN = util.isHex(free) ? util.hexToBn(free) : new util.BN(free);
-        const frozenBN = util.isHex(frozen) ? util.hexToBn(frozen) : new util.BN(frozen);
-        const reservedBN = util.isHex(reserved) ? util.hexToBn(reserved) : new util.BN(reserved);
+        const freeBN = isHex(free) ? hexToBn(free) : new BN(free);
+        const frozenBN = isHex(frozen) ? hexToBn(frozen) : new BN(frozen);
+        const reservedBN = isHex(reserved) ? hexToBn(reserved) : new BN(reserved);
         const id = key.toHuman()[1].replace(/[, ]/g, "");
         const balance = {
             free: freeBN,
@@ -207,7 +200,7 @@ const getAssetsInfoMapWithIds = async (api) => {
                 ? info.symbol
                     .split("-")
                     .map((item) => item.replace("TKN", ""))
-                    .map((tokenId) => tokenId.startsWith("0x") ? util.hexToBn(tokenId).toString() : tokenId)
+                    .map((tokenId) => tokenId.startsWith("0x") ? hexToBn(tokenId).toString() : tokenId)
                     .join("-")
                 : info.symbol,
             address: info.symbol === "MGA"
@@ -223,22 +216,22 @@ const getAssetsInfoMapWithIds = async (api) => {
     }, {});
 };
 
-const BN_ZERO = new util.BN('0');
-const BN_ONE = new util.BN('1');
-const BN_TEN = new util.BN('10');
-const BN_HUNDRED = new util.BN('100');
-const BN_THOUSAND = new util.BN('1000');
-const BN_TEN_THOUSAND = new util.BN('10000');
-const BN_HUNDRED_THOUSAND = new util.BN('100000');
-const BN_MILLION = new util.BN('1000000');
-const BN_TEN_MILLIONS = new util.BN('10000000');
-const BN_HUNDRED_MILLIONS = new util.BN('100000000');
-const BN_BILLION = new util.BN('1000000000');
-const BN_TEN_BILLIONS = new util.BN('10000000000');
-const BN_HUNDRED_BILLIONS = new util.BN('100000000000');
-const BN_TRILLION = new util.BN('1000000000000');
+const BN_ZERO = new BN('0');
+const BN_ONE = new BN('1');
+const BN_TEN = new BN('10');
+const BN_HUNDRED = new BN('100');
+const BN_THOUSAND = new BN('1000');
+const BN_TEN_THOUSAND = new BN('10000');
+const BN_HUNDRED_THOUSAND = new BN('100000');
+const BN_MILLION = new BN('1000000');
+const BN_TEN_MILLIONS = new BN('10000000');
+const BN_HUNDRED_MILLIONS = new BN('100000000');
+const BN_BILLION = new BN('1000000000');
+const BN_TEN_BILLIONS = new BN('10000000000');
+const BN_HUNDRED_BILLIONS = new BN('100000000000');
+const BN_TRILLION = new BN('1000000000000');
 const BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS = 18;
-const BN_DIV_NUMERATOR_MULTIPLIER = new util.BN('10').pow(new util.BN(BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS));
+const BN_DIV_NUMERATOR_MULTIPLIER = new BN('10').pow(new BN(BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS));
 
 const calculateLiquidityShare = async (api, liquidityAssetId, userLiquidityTokenAmount) => {
     // userLiquidityTokenAmount is the amount of liquidity token the user has but FREE ..
@@ -247,7 +240,7 @@ const calculateLiquidityShare = async (api, liquidityAssetId, userLiquidityToken
     if (userLiquidityTokenAmount.isZero())
         return BN_ZERO;
     const tokenSupply = await api.query.tokens.totalIssuance(liquidityAssetId);
-    const totalLiquidityAsset = new util.BN(tokenSupply.toString());
+    const totalLiquidityAsset = new BN(tokenSupply.toString());
     const share = userLiquidityTokenAmount
         .mul(BN_DIV_NUMERATOR_MULTIPLIER)
         .div(totalLiquidityAsset);
@@ -290,12 +283,12 @@ class Query {
         const balance = await api.query.xyk.pools([firstTokenId, secondTokenId]);
         const tokenValue1 = balance[0].toString();
         const tokenValue2 = balance[1].toString();
-        const token1 = util.isHex(tokenValue1)
-            ? util.hexToBn(tokenValue1)
-            : new util.BN(tokenValue1);
-        const token2 = util.isHex(tokenValue2)
-            ? util.hexToBn(tokenValue2)
-            : new util.BN(tokenValue2);
+        const token1 = isHex(tokenValue1)
+            ? hexToBn(tokenValue1)
+            : new BN(tokenValue1);
+        const token2 = isHex(tokenValue2)
+            ? hexToBn(tokenValue2)
+            : new BN(tokenValue2);
         return [token1, token2];
     }
     static async getLiquidityTokenId(api, firstTokenId, secondTokenId) {
@@ -304,35 +297,35 @@ class Query {
             secondTokenId
         ]);
         if (!liquidityAssetId.isSome)
-            return util.BN_ZERO;
-        return new util.BN(liquidityAssetId.toString());
+            return BN_ZERO$1;
+        return new BN(liquidityAssetId.toString());
     }
     static async getLiquidityPool(api, liquidityTokenId) {
         const liquidityPool = await api.query.xyk.liquidityPools(liquidityTokenId);
         if (!liquidityPool.isSome)
-            return [new util.BN(-1), new util.BN(-1)];
-        return liquidityPool.unwrap().map((num) => new util.BN(num));
+            return [new BN(-1), new BN(-1)];
+        return liquidityPool.unwrap().map((num) => new BN(num));
     }
     static async getTotalIssuance(api, tokenId) {
         const tokenSupply = await api.query.tokens.totalIssuance(tokenId);
-        return new util.BN(tokenSupply);
+        return new BN(tokenSupply);
     }
     static async getTokenBalance(api, address, tokenId) {
         const balanceResponse = await api.query.tokens.accounts(address, tokenId);
         const balance = JSON.parse(JSON.stringify(balanceResponse));
         return {
-            free: util.isHex(balance.free) ? util.hexToBn(balance.free) : new util.BN(balance.free),
-            reserved: util.isHex(balance.reserved)
-                ? util.hexToBn(balance.reserved)
-                : new util.BN(balance.reserved),
-            frozen: util.isHex(balance.frozen)
-                ? util.hexToBn(balance.frozen)
-                : new util.BN(balance.frozen)
+            free: isHex(balance.free) ? hexToBn(balance.free) : new BN(balance.free),
+            reserved: isHex(balance.reserved)
+                ? hexToBn(balance.reserved)
+                : new BN(balance.reserved),
+            frozen: isHex(balance.frozen)
+                ? hexToBn(balance.frozen)
+                : new BN(balance.frozen)
         };
     }
     static async getNextTokenId(api) {
         const nextTokenId = await api.query.tokens.nextCurrencyId();
-        return new util.BN(nextTokenId);
+        return new BN(nextTokenId);
     }
     static async getTokenInfo(api, tokenId) {
         const assetsInfo = await getAssetsInfoMap(api);
@@ -520,7 +513,7 @@ function getXoshiroStates(seed) {
 }
 function getXoshiro(seed) {
     const { s0, s1, s2, s3 } = getXoshiroStates(seed);
-    return new mangataPrngXoshiro.XoShiRo256Plus(s0, s1, s2, s3);
+    return new XoShiRo256Plus(s0, s1, s2, s3);
 }
 
 class FisherYates {
@@ -532,8 +525,8 @@ class FisherYates {
     }
     next_u64() {
         // compute u64 same way as on the rust side
-        const first = new util.BN(this.xoshiro.nextBigInt(BigInt(0xffffffff)).toString());
-        const second = new util.BN(this.xoshiro.nextBigInt(BigInt(0xffffffff)).toString());
+        const first = new BN(this.xoshiro.nextBigInt(BigInt(0xffffffff)).toString());
+        const second = new BN(this.xoshiro.nextBigInt(BigInt(0xffffffff)).toString());
         return first.shln(32).or(second);
     }
     shuffle = (arr) => {
@@ -720,8 +713,8 @@ const getError = (api, method, eventData) => {
         if (errorIdx && moduleIdx) {
             try {
                 const decode = api.registry.findMetaError({
-                    error: new util.BN(errorIdx),
-                    index: new util.BN(moduleIdx)
+                    error: new BN(errorIdx),
+                    index: new BN(moduleIdx)
                 });
                 return {
                     documentation: decode.docs,
@@ -746,8 +739,8 @@ const getError = (api, method, eventData) => {
 };
 class Tx {
     static async sendKusamaTokenFromRelayToParachain(kusamaEndpointUrl, ksmAccount, destinationMangataAddress, amount, txOptions) {
-        const provider = new ws.WsProvider(kusamaEndpointUrl);
-        const kusamaApi = await new api.ApiPromise({ provider }).isReady;
+        const provider = new WsProvider(kusamaEndpointUrl);
+        const kusamaApi = await new ApiPromise({ provider }).isReady;
         const destination = {
             V1: {
                 interior: {
@@ -764,7 +757,7 @@ class Tx {
                     X1: {
                         AccountId32: {
                             id: kusamaApi
-                                .createType("AccountId32", utilCrypto.encodeAddress(destinationMangataAddress, 42))
+                                .createType("AccountId32", encodeAddress(destinationMangataAddress, 42))
                                 .toHex(),
                             network: "Any"
                         }
@@ -804,7 +797,7 @@ class Tx {
                         AccountId32: {
                             network: "Any",
                             id: api
-                                .createType("AccountId32", utilCrypto.encodeAddress(destinationKusamaAddress, 2))
+                                .createType("AccountId32", encodeAddress(destinationKusamaAddress, 2))
                                 .toHex()
                         }
                     }
@@ -812,7 +805,7 @@ class Tx {
             }
         };
         await api.tx.xTokens
-            .transfer("4", amount, destination, new util.BN("6000000000"))
+            .transfer("4", amount, destination, new BN("6000000000"))
             .signAndSend(mangataAccount, {
             signer: txOptions?.signer,
             nonce: txOptions?.nonce
@@ -836,7 +829,7 @@ class Tx {
     static async buyAsset(api, account, soldTokenId, boughtTokenId, amount, maxAmountIn, txOptions) {
         return await signTx(api, api.tx.xyk.buyAsset(soldTokenId, boughtTokenId, amount, maxAmountIn), account, txOptions);
     }
-    static async mintLiquidity(api, account, firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount = new util.BN(Number.MAX_SAFE_INTEGER), txOptions) {
+    static async mintLiquidity(api, account, firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount = new BN(Number.MAX_SAFE_INTEGER), txOptions) {
         return await signTx(api, api.tx.xyk.mintLiquidity(firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount), account, txOptions);
     }
     static async burnLiquidity(api, account, firstTokenId, secondTokenId, liquidityTokenAmount, txOptions) {
@@ -851,32 +844,32 @@ class Tx {
     }
 }
 
-const BIG_ZERO = Big__default["default"]('0');
-const BIG_ONE = Big__default["default"]('1');
-const BIG_TEN = Big__default["default"]('10');
-const BIG_HUNDRED = Big__default["default"]('100');
-const BIG_THOUSAND = Big__default["default"]('1000');
-const BIG_TEN_THOUSAND = Big__default["default"]('10000');
-const BIG_HUNDRED_THOUSAND = Big__default["default"]('100000');
-const BIG_MILLION = Big__default["default"]('1000000');
-const BIG_TEN_MILLIONS = Big__default["default"]('10000000');
-const BIG_HUNDRED_MILLIONS = Big__default["default"]('100000000');
-const BIG_BILLION = Big__default["default"]('1000000000');
-const BIG_TEN_BILLIONS = Big__default["default"]('10000000000');
-const BIG_HUNDRED_BILLIONS = Big__default["default"]('100000000000');
-const BIG_TRILLION = Big__default["default"]('1000000000000');
+const BIG_ZERO = Big('0');
+const BIG_ONE = Big('1');
+const BIG_TEN = Big('10');
+const BIG_HUNDRED = Big('100');
+const BIG_THOUSAND = Big('1000');
+const BIG_TEN_THOUSAND = Big('10000');
+const BIG_HUNDRED_THOUSAND = Big('100000');
+const BIG_MILLION = Big('1000000');
+const BIG_TEN_MILLIONS = Big('10000000');
+const BIG_HUNDRED_MILLIONS = Big('100000000');
+const BIG_BILLION = Big('1000000000');
+const BIG_TEN_BILLIONS = Big('10000000000');
+const BIG_HUNDRED_BILLIONS = Big('100000000000');
+const BIG_TRILLION = Big('1000000000000');
 
-Big__default["default"].PE = 256; // The positive exponent value at and above which toString returns exponential notation.
-Big__default["default"].NE = -256; // The negative exponent value at and below which toString returns exponential notation.
-Big__default["default"].DP = 40; // The maximum number of decimal places of the results of operations involving division.
-Big__default["default"].RM = Big__default["default"].roundUp; // Rounding mode
+Big.PE = 256; // The positive exponent value at and above which toString returns exponential notation.
+Big.NE = -256; // The negative exponent value at and below which toString returns exponential notation.
+Big.DP = 40; // The maximum number of decimal places of the results of operations involving division.
+Big.RM = Big.roundUp; // Rounding mode
 const DEFAULT_TOKEN_DECIMALS = 18;
 const DEFAULT_DECIMAL_MULTIPLIER = BIG_TEN.pow(DEFAULT_TOKEN_DECIMALS);
 const toBN = (value, exponent) => {
     if (!value)
         return BN_ZERO;
     try {
-        const inputNumber = Big__default["default"](value);
+        const inputNumber = Big(value);
         const decimalMultiplier = !exponent || exponent === DEFAULT_TOKEN_DECIMALS
             ? DEFAULT_DECIMAL_MULTIPLIER
             : BIG_TEN.pow(exponent);
@@ -884,7 +877,7 @@ const toBN = (value, exponent) => {
         const resStr = res.toString();
         if (/\D/gm.test(resStr))
             return BN_ZERO;
-        return new util.BN(resStr);
+        return new BN(resStr);
     }
     catch (err) {
         return BN_ZERO;
@@ -894,7 +887,7 @@ const fromBN = (value, exponent) => {
     if (!value)
         return "0";
     try {
-        const inputNumber = Big__default["default"](value.toString());
+        const inputNumber = Big(value.toString());
         const decimalMultiplier = !exponent || exponent === DEFAULT_TOKEN_DECIMALS
             ? DEFAULT_DECIMAL_MULTIPLIER
             : BIG_TEN.pow(exponent);
@@ -912,61 +905,61 @@ class Fee {
         const dispatchInfo = await api.tx.xyk
             .activateLiquidity(liquditityTokenId, amount)
             .paymentInfo(account);
-        return fromBN(new util.BN(dispatchInfo.partialFee.toString()));
+        return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
     static async deactivateLiquidity(api, account, liquditityTokenId, amount) {
         const dispatchInfo = await api.tx.xyk
             .deactivateLiquidity(liquditityTokenId, amount)
             .paymentInfo(account);
-        return fromBN(new util.BN(dispatchInfo.partialFee.toString()));
+        return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
     static async claimRewardsFee(api, account, liquidityTokenId, amount) {
         const dispatchInfo = await api.tx.xyk
             .claimRewards(liquidityTokenId, amount)
             .paymentInfo(account);
-        return fromBN(new util.BN(dispatchInfo.partialFee.toString()));
+        return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
     static async createPoolFee(api, account, firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount) {
         const dispatchInfo = await api.tx.xyk
             .createPool(firstTokenId, firstTokenAmount, secondTokenId, secondTokenAmount)
             .paymentInfo(account);
-        return fromBN(new util.BN(dispatchInfo.partialFee.toString()));
+        return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
     static async sellAssetFee(api, account, soldTokenId, boughtTokenId, amount, minAmountOut) {
         const dispatchInfo = await api.tx.xyk
             .sellAsset(soldTokenId, boughtTokenId, amount, minAmountOut)
             .paymentInfo(account);
-        return fromBN(new util.BN(dispatchInfo.partialFee.toString()));
+        return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
     static async buyAssetFee(api, account, soldTokenId, boughtTokenId, amount, maxAmountIn) {
         const dispatchInfo = await api.tx.xyk
             .buyAsset(soldTokenId, boughtTokenId, amount, maxAmountIn)
             .paymentInfo(account);
-        return fromBN(new util.BN(dispatchInfo.partialFee.toString()));
+        return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
-    static async mintLiquidityFee(api, account, firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount = new util.BN(Number.MAX_SAFE_INTEGER)) {
+    static async mintLiquidityFee(api, account, firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount = new BN(Number.MAX_SAFE_INTEGER)) {
         const dispatchInfo = await api.tx.xyk
             .mintLiquidity(firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount)
             .paymentInfo(account);
-        return fromBN(new util.BN(dispatchInfo.partialFee.toString()));
+        return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
     static async burnLiquidityFee(api, account, firstTokenId, secondTokenId, liquidityTokenAmount) {
         const dispatchInfo = await api.tx.xyk
             .burnLiquidity(firstTokenId, secondTokenId, liquidityTokenAmount)
             .paymentInfo(account);
-        return fromBN(new util.BN(dispatchInfo.partialFee.toString()));
+        return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
     static async transferTokenFee(api, account, tokenId, address, amount) {
         const dispatchInfo = await api.tx.tokens
             .transfer(address, tokenId, amount)
             .paymentInfo(account);
-        return fromBN(new util.BN(dispatchInfo.partialFee.toString()));
+        return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
     static async transferAllTokenFee(api, account, tokenId, address) {
         const dispatchInfo = await api.tx.tokens
             .transferAll(address, tokenId, true)
             .paymentInfo(account);
-        return fromBN(new util.BN(dispatchInfo.partialFee.toString()));
+        return fromBN(new BN(dispatchInfo.partialFee.toString()));
     }
 }
 
@@ -980,72 +973,72 @@ const toPlainString = (num) => {
 };
 const calculateWork = (asymptote, time, lastCheckpoint, cummulativeWorkInLastCheckpoint, missingAtLastCheckpoint) => {
     const timePassed = time.sub(lastCheckpoint);
-    const cummulativeWorkNewMaxPossible = new util.BN(asymptote).mul(timePassed);
-    const base = new util.BN(missingAtLastCheckpoint).mul(new util.BN(106)).div(new util.BN(6));
-    const precision = Big__default["default"](10000);
-    const qPow = Big__default["default"](1.06).pow(timePassed.toNumber()).mul(precision).round(0, 0);
+    const cummulativeWorkNewMaxPossible = new BN(asymptote).mul(timePassed);
+    const base = new BN(missingAtLastCheckpoint).mul(new BN(106)).div(new BN(6));
+    const precision = Big(10000);
+    const qPow = Big(1.06).pow(timePassed.toNumber()).mul(precision).round(0, 0);
     const qPowCorrect = toPlainString(qPow.toString());
-    const cummulativeMissingNew = new util.BN(base).sub(new util.BN(base).mul(new util.BN(precision.toString())).div(new util.BN(qPowCorrect)));
-    const cummulativeWorkNew = new util.BN(cummulativeWorkNewMaxPossible).sub(cummulativeMissingNew);
-    const workTotal = new util.BN(cummulativeWorkInLastCheckpoint).add(cummulativeWorkNew);
+    const cummulativeMissingNew = new BN(base).sub(new BN(base).mul(new BN(precision.toString())).div(new BN(qPowCorrect)));
+    const cummulativeWorkNew = new BN(cummulativeWorkNewMaxPossible).sub(cummulativeMissingNew);
+    const workTotal = new BN(cummulativeWorkInLastCheckpoint).add(cummulativeWorkNew);
     return workTotal;
 };
 const getLiquidityMintingUser = async (address, liquditityTokenId, currentTime, api) => {
     const [lastCheckpoint, cummulativeWorkInLastCheckpoint, missingAtLastCheckpoint] = await api.query.xyk.liquidityMiningUser([address, liquditityTokenId]);
-    if (new util.BN(lastCheckpoint.toString()).eq(new util.BN(0)) &&
-        new util.BN(cummulativeWorkInLastCheckpoint.toString()).eq(new util.BN(0)) &&
-        new util.BN(missingAtLastCheckpoint.toString()).eq(new util.BN(0))) {
+    if (new BN(lastCheckpoint.toString()).eq(new BN(0)) &&
+        new BN(cummulativeWorkInLastCheckpoint.toString()).eq(new BN(0)) &&
+        new BN(missingAtLastCheckpoint.toString()).eq(new BN(0))) {
         return {
             lastCheckpoint: currentTime,
-            cummulativeWorkInLastCheckpoint: Big__default["default"](0),
-            missingAtLastCheckpoint: Big__default["default"](0)
+            cummulativeWorkInLastCheckpoint: Big(0),
+            missingAtLastCheckpoint: Big(0)
         };
     }
     else {
         return {
-            lastCheckpoint: Big__default["default"](lastCheckpoint.toString()),
-            cummulativeWorkInLastCheckpoint: Big__default["default"](cummulativeWorkInLastCheckpoint.toString()),
-            missingAtLastCheckpoint: Big__default["default"](missingAtLastCheckpoint.toString())
+            lastCheckpoint: Big(lastCheckpoint.toString()),
+            cummulativeWorkInLastCheckpoint: Big(cummulativeWorkInLastCheckpoint.toString()),
+            missingAtLastCheckpoint: Big(missingAtLastCheckpoint.toString())
         };
     }
 };
 const getLiquidityMintingPool = async (liquditityTokenId, currentTime, api) => {
     const [lastCheckpoint, cummulativeWorkInLastCheckpoint, missingAtLastCheckpoint] = await api.query.xyk.liquidityMiningPool(liquditityTokenId);
-    if (new util.BN(lastCheckpoint.toString()).eq(new util.BN(0)) &&
-        new util.BN(cummulativeWorkInLastCheckpoint.toString()).eq(new util.BN(0)) &&
-        new util.BN(missingAtLastCheckpoint.toString()).eq(new util.BN(0))) {
+    if (new BN(lastCheckpoint.toString()).eq(new BN(0)) &&
+        new BN(cummulativeWorkInLastCheckpoint.toString()).eq(new BN(0)) &&
+        new BN(missingAtLastCheckpoint.toString()).eq(new BN(0))) {
         return {
             lastCheckpoint: currentTime,
-            cummulativeWorkInLastCheckpoint: new util.BN(0),
-            missingAtLastCheckpoint: new util.BN(0)
+            cummulativeWorkInLastCheckpoint: new BN(0),
+            missingAtLastCheckpoint: new BN(0)
         };
     }
     else {
         return {
-            lastCheckpoint: new util.BN(lastCheckpoint.toString()),
-            cummulativeWorkInLastCheckpoint: new util.BN(cummulativeWorkInLastCheckpoint.toString()),
-            missingAtLastCheckpoint: new util.BN(missingAtLastCheckpoint.toString())
+            lastCheckpoint: new BN(lastCheckpoint.toString()),
+            cummulativeWorkInLastCheckpoint: new BN(cummulativeWorkInLastCheckpoint.toString()),
+            missingAtLastCheckpoint: new BN(missingAtLastCheckpoint.toString())
         };
     }
 };
 const calculateWorkUser = async (address, liquidityAssetsAmount, liquditityTokenId, currentTime, api) => {
     const { lastCheckpoint, cummulativeWorkInLastCheckpoint, missingAtLastCheckpoint } = await getLiquidityMintingUser(address, liquditityTokenId, currentTime, api);
-    return calculateWork(liquidityAssetsAmount, currentTime, new util.BN(lastCheckpoint.toString()), new util.BN(cummulativeWorkInLastCheckpoint.toString()), new util.BN(missingAtLastCheckpoint.toString()));
+    return calculateWork(liquidityAssetsAmount, currentTime, new BN(lastCheckpoint.toString()), new BN(cummulativeWorkInLastCheckpoint.toString()), new BN(missingAtLastCheckpoint.toString()));
 };
 const calculateWorkPool = async (liquidityAssetsAmount, liquidityTokenId, currentTime, api) => {
     const { lastCheckpoint, cummulativeWorkInLastCheckpoint, missingAtLastCheckpoint } = await getLiquidityMintingPool(liquidityTokenId, currentTime, api);
-    return calculateWork(liquidityAssetsAmount, currentTime, new util.BN(lastCheckpoint.toString()), new util.BN(cummulativeWorkInLastCheckpoint.toString()), new util.BN(missingAtLastCheckpoint.toString()));
+    return calculateWork(liquidityAssetsAmount, currentTime, new BN(lastCheckpoint.toString()), new BN(cummulativeWorkInLastCheckpoint.toString()), new BN(missingAtLastCheckpoint.toString()));
 };
 const calculateFutureRewardsAmount = async (api, address, liquidityTokenId, futureTimeBlockNumber) => {
     const block = await api.rpc.chain.getBlock();
-    const blockNumber = new util.BN(block.block.header.number.toString());
-    const currentTime = blockNumber.div(new util.BN(10000));
-    const futureBlockNumber = blockNumber.add(new util.BN(futureTimeBlockNumber));
-    const futureTime = futureBlockNumber.div(new util.BN(10000));
+    const blockNumber = new BN(block.block.header.number.toString());
+    const currentTime = blockNumber.div(new BN(10000));
+    const futureBlockNumber = blockNumber.add(new BN(futureTimeBlockNumber));
+    const futureTime = futureBlockNumber.div(new BN(10000));
     const liquidityAssetsAmountUser = await api.query.xyk.liquidityMiningActiveUser([address, liquidityTokenId]);
     const liquidityAssetsAmountPool = await api.query.xyk.liquidityMiningActivePool([address, liquidityTokenId]);
-    const workUser = await calculateWorkUser(address, new util.BN(liquidityAssetsAmountUser.toString()), liquidityTokenId, futureTime, api);
-    const workPool = await calculateWorkPool(new util.BN(liquidityAssetsAmountPool.toString()), liquidityTokenId, futureTime, api);
+    const workUser = await calculateWorkUser(address, new BN(liquidityAssetsAmountUser.toString()), liquidityTokenId, futureTime, api);
+    const workPool = await calculateWorkPool(new BN(liquidityAssetsAmountPool.toString()), liquidityTokenId, futureTime, api);
     const burnedNotClaimedRewards = await api.query.xyk.liquidityMiningUserToBeClaimed([
         address,
         liquidityTokenId
@@ -1055,20 +1048,20 @@ const calculateFutureRewardsAmount = async (api, address, liquidityTokenId, futu
         liquidityTokenId
     ]);
     const currentAvailableRewardsForPool = await api.query.issuance.promotedPoolsRewards(liquidityTokenId);
-    const currentAvailableRewardsForPoolBN = new util.BN(currentAvailableRewardsForPool.toString());
-    const rewardsPerSession = new util.BN("136986000000000000000000");
-    const sessionsToPass = futureTime.sub(currentTime).div(new util.BN(1200));
+    const currentAvailableRewardsForPoolBN = new BN(currentAvailableRewardsForPool.toString());
+    const rewardsPerSession = new BN("136986000000000000000000");
+    const sessionsToPass = futureTime.sub(currentTime).div(new BN(1200));
     const numberOfPromotedPools = await api.query.issuance.promotedPoolsRewards.entries();
     const futureAvailableRewardsForPool = currentAvailableRewardsForPoolBN.add(rewardsPerSession
         .mul(sessionsToPass)
-        .div(new util.BN(numberOfPromotedPools.length)));
-    let futureRewards = new util.BN(0);
-    if (workUser.gt(new util.BN(0)) && workPool.gt(new util.BN(0))) {
+        .div(new BN(numberOfPromotedPools.length)));
+    let futureRewards = new BN(0);
+    if (workUser.gt(new BN(0)) && workPool.gt(new BN(0))) {
         futureRewards = futureAvailableRewardsForPool.mul(workUser).div(workPool);
     }
     const totalAvailableRewardsFuture = futureRewards
-        .add(new util.BN(burnedNotClaimedRewards.toString()))
-        .sub(new util.BN(alreadyClaimedRewards.toString()));
+        .add(new BN(burnedNotClaimedRewards.toString()))
+        .sub(new BN(alreadyClaimedRewards.toString()));
     return totalAvailableRewardsFuture;
 };
 
@@ -1094,9 +1087,9 @@ class Mangata {
      * for Mangata
      */
     async connectToNode(uri) {
-        const provider = new ws.WsProvider(uri);
-        const api$1 = await new api.ApiPromise(types.options({ provider, throwOnConnect: true, throwOnUnknown: true })).isReady;
-        return api$1;
+        const provider = new WsProvider(uri);
+        const api = await new ApiPromise(options({ provider, throwOnConnect: true, throwOnUnknown: true })).isReady;
+        return api;
     }
     /**
      * The static method that controls the access to the Mangata instance.
@@ -1567,10 +1560,10 @@ const isInputValid = (value) => {
  */
 class MangataHelpers {
     static createKeyring(type) {
-        return new api.Keyring({ type });
+        return new Keyring({ type });
     }
     static createKeyPairFromName(keyring, name = "") {
-        const userName = name ? name : "//testUser_" + uuid.v4();
+        const userName = name ? name : "//testUser_" + v4();
         const account = keyring.createFromUri(userName);
         keyring.addPair(account);
         return account;
@@ -1600,49 +1593,10 @@ class MangataHelpers {
             .mul(firstReserveBefore);
         const res = numerator.div(denominator).sub(BN_TEN_THOUSAND);
         const resStr = res.toString();
-        const resBig = Big__default["default"](resStr);
+        const resBig = Big(resStr);
         const resFormatted = toFixed(resBig.div(BIG_HUNDRED).toString(), 2);
         return resFormatted;
     }
 }
 
-Object.defineProperty(exports, 'BN', {
-    enumerable: true,
-    get: function () { return util.BN; }
-});
-exports.BIG_BILLION = BIG_BILLION;
-exports.BIG_HUNDRED = BIG_HUNDRED;
-exports.BIG_HUNDRED_BILLIONS = BIG_HUNDRED_BILLIONS;
-exports.BIG_HUNDRED_MILLIONS = BIG_HUNDRED_MILLIONS;
-exports.BIG_HUNDRED_THOUSAND = BIG_HUNDRED_THOUSAND;
-exports.BIG_MILLION = BIG_MILLION;
-exports.BIG_ONE = BIG_ONE;
-exports.BIG_TEN = BIG_TEN;
-exports.BIG_TEN_BILLIONS = BIG_TEN_BILLIONS;
-exports.BIG_TEN_MILLIONS = BIG_TEN_MILLIONS;
-exports.BIG_TEN_THOUSAND = BIG_TEN_THOUSAND;
-exports.BIG_THOUSAND = BIG_THOUSAND;
-exports.BIG_TRILLION = BIG_TRILLION;
-exports.BIG_ZERO = BIG_ZERO;
-exports.BN_BILLION = BN_BILLION;
-exports.BN_DIV_NUMERATOR_MULTIPLIER = BN_DIV_NUMERATOR_MULTIPLIER;
-exports.BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS = BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS;
-exports.BN_HUNDRED = BN_HUNDRED;
-exports.BN_HUNDRED_BILLIONS = BN_HUNDRED_BILLIONS;
-exports.BN_HUNDRED_MILLIONS = BN_HUNDRED_MILLIONS;
-exports.BN_HUNDRED_THOUSAND = BN_HUNDRED_THOUSAND;
-exports.BN_MILLION = BN_MILLION;
-exports.BN_ONE = BN_ONE;
-exports.BN_TEN = BN_TEN;
-exports.BN_TEN_BILLIONS = BN_TEN_BILLIONS;
-exports.BN_TEN_MILLIONS = BN_TEN_MILLIONS;
-exports.BN_TEN_THOUSAND = BN_TEN_THOUSAND;
-exports.BN_THOUSAND = BN_THOUSAND;
-exports.BN_TRILLION = BN_TRILLION;
-exports.BN_ZERO = BN_ZERO;
-exports.Mangata = Mangata;
-exports.MangataHelpers = MangataHelpers;
-exports.fromBN = fromBN;
-exports.signTx = signTx;
-exports.toBN = toBN;
-exports.toFixed = toFixed;
+export { BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Mangata, MangataHelpers, fromBN, signTx, toBN, toFixed };
