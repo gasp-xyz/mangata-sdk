@@ -15,6 +15,27 @@ import { MangataGenericEvent } from "../types/MangataGenericEvent";
 import { MangataEventData } from "../types/MangataEventData";
 import { truncatedString } from "../utils/truncatedString";
 
+function serializeTx(
+  api: ApiPromise,
+  tx: SubmittableExtrinsic<"promise">,
+){
+  if (!process.env.TX_VERBOSE){
+    return ""
+  }
+
+  const method_object = JSON.parse(tx.method.toString());
+  const args = JSON.stringify(method_object.args);
+  const call_decoded = api.registry.findMetaCall(tx.method.callIndex);
+  if ( call_decoded.method == "sudo" && call_decoded.method == "sudo" ){
+    const sudo_call_index = (tx.method.args[0] as any).callIndex;
+    const sudo_call_args = JSON.stringify(method_object.args.call.args);
+    const sudo_call_decoded = api.registry.findMetaCall(sudo_call_index);
+    return ` (sudo::${sudo_call_decoded.section}::${sudo_call_decoded.method}(${sudo_call_args})` 
+  }else{
+    return ` (${call_decoded.section}::${call_decoded.method}(${args}))`
+  }
+}
+
 export const signTx = async (
   api: ApiPromise,
   tx: SubmittableExtrinsic<"promise">,
@@ -36,14 +57,14 @@ export const signTx = async (
           signer: txOptions?.signer
         },
         async (result) => {
-          console.log(
-            `Tx ([${truncatedString(
+
+          console.info(
+            `Tx[${truncatedString(
               tx.hash.toString(),
               tx.hash.toString().length
-            )}]): ${result.status.type} (${truncatedString(
-              result.status.value.toString(),
-              result.status.value.toString().length
-            )})`
+            )}] => ${result.status.type}(${
+              result.status.value.toString()
+            })${serializeTx(api, tx)}`
           );
 
           txOptions?.statusCallback?.(result);

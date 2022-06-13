@@ -586,6 +586,23 @@ const truncatedString = (str, len) => {
 };
 
 /* eslint-disable no-console */
+function serializeTx(api, tx) {
+    if (!process.env.TX_VERBOSE) {
+        return "";
+    }
+    const method_object = JSON.parse(tx.method.toString());
+    const args = JSON.stringify(method_object.args);
+    const call_decoded = api.registry.findMetaCall(tx.method.callIndex);
+    if (call_decoded.method == "sudo" && call_decoded.method == "sudo") {
+        const sudo_call_index = tx.method.args[0].callIndex;
+        const sudo_call_args = JSON.stringify(method_object.args.call.args);
+        const sudo_call_decoded = api.registry.findMetaCall(sudo_call_index);
+        return ` (sudo::${sudo_call_decoded.section}::${sudo_call_decoded.method}(${sudo_call_args})`;
+    }
+    else {
+        return ` (${call_decoded.section}::${call_decoded.method}(${args}))`;
+    }
+}
 const signTx = async (api, tx, account, txOptions) => {
     return new Promise(async (resolve, reject) => {
         let output = [];
@@ -597,7 +614,7 @@ const signTx = async (api, tx, account, txOptions) => {
                 nonce,
                 signer: txOptions?.signer
             }, async (result) => {
-                console.log(`Tx ([${truncatedString(tx.hash.toString(), tx.hash.toString().length)}]): ${result.status.type} (${truncatedString(result.status.value.toString(), result.status.value.toString().length)})`);
+                console.info(`Tx[${truncatedString(tx.hash.toString(), tx.hash.toString().length)}] => ${result.status.type}(${result.status.value.toString()})${serializeTx(api, tx)}`);
                 txOptions?.statusCallback?.(result);
                 if (result.status.isFinalized) {
                     const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(async (lastHeader) => {
