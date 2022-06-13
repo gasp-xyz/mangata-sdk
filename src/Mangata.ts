@@ -20,7 +20,7 @@ import {
   Reward
 } from "./types/AssetInfo";
 import { MangataGenericEvent } from "./types/MangataGenericEvent";
-import { TxOptions } from "./types/TxOptions";
+import { TxOptions, XcmTxOptions } from "./types/TxOptions";
 import { calculateFutureRewardsAmount } from "./utils/calculateFutureRewardsAmount";
 
 /**
@@ -143,6 +143,70 @@ export class Mangata {
   public async disconnect(): Promise<void> {
     const api = await this.getApi();
     await api.disconnect();
+  }
+
+  public async sendKusamaTokenFromRelayToParachain(
+    kusamaEndpointUrl: string,
+    ksmAccount: string | KeyringPair,
+    destinationMangataAddress: string,
+    amount: BN,
+    parachainId: number = 2110,
+    txOptions?: XcmTxOptions
+  ) {
+    return await Tx.sendKusamaTokenFromRelayToParachain(
+      kusamaEndpointUrl,
+      ksmAccount,
+      destinationMangataAddress,
+      amount,
+      parachainId,
+      txOptions
+    );
+  }
+
+  public async sendKusamaTokenFromRelayToParachainFee(
+    kusamaEndpointUrl: string,
+    ksmAccount: string | KeyringPair,
+    destinationMangataAddress: string,
+    amount: BN,
+    parachainId: number = 2110
+  ) {
+    return await Fee.sendKusamaTokenFromRelayToParachainFee(
+      kusamaEndpointUrl,
+      ksmAccount,
+      destinationMangataAddress,
+      amount,
+      parachainId
+    );
+  }
+
+  public async sendKusamaTokenFromParachainToRelay(
+    mangataAccount: string | KeyringPair,
+    destinationKusamaAddress: string,
+    amount: BN,
+    txOptions?: XcmTxOptions
+  ) {
+    const api = await this.getApi();
+    return await Tx.sendKusamaTokenFromParachainToRelay(
+      api,
+      mangataAccount,
+      destinationKusamaAddress,
+      amount,
+      txOptions
+    );
+  }
+
+  public async sendKusamaTokenFromParachainToRelayFee(
+    mangataAccount: string | KeyringPair,
+    destinationKusamaAddress: string,
+    amount: BN
+  ) {
+    const api = await this.getApi();
+    return await Fee.sendKusamaTokenFromParachainToRelayFee(
+      api,
+      mangataAccount,
+      destinationKusamaAddress,
+      amount
+    );
   }
 
   public async activateLiquidity(

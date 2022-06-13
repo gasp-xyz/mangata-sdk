@@ -161,15 +161,17 @@ export const calculateFutureRewardsAmount = async (
 ) => {
   const block = await api.rpc.chain.getBlock();
   const blockNumber = new BN(block.block.header.number.toString());
-  const currentTime = blockNumber.div(new BN(10000));
   const futureBlockNumber = blockNumber.add(new BN(futureTimeBlockNumber));
   const futureTime = futureBlockNumber.div(new BN(10000));
 
   const liquidityAssetsAmountUser =
-    await api.query.xyk.liquidityMiningActiveUser([address, liquidityTokenId]);
+    await api.query.xyk.liquidityMiningActiveUser([
+      address,
+      new BN(liquidityTokenId)
+    ]);
 
   const liquidityAssetsAmountPool =
-    await api.query.xyk.liquidityMiningActivePool([address, liquidityTokenId]);
+    await api.query.xyk.liquidityMiningActivePool(new BN(liquidityTokenId));
 
   const workUser = await calculateWorkUser(
     address,
@@ -204,7 +206,9 @@ export const calculateFutureRewardsAmount = async (
     currentAvailableRewardsForPool.toString()
   );
   const rewardsPerSession = new BN("136986000000000000000000");
-  const sessionsToPass = futureTime.sub(currentTime).div(new BN(1200));
+  const sessionsToPass = futureTimeBlockNumber
+    .sub(blockNumber)
+    .div(new BN(1200));
   const numberOfPromotedPools =
     await api.query.issuance.promotedPoolsRewards.entries();
 
