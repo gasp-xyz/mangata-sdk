@@ -56,8 +56,7 @@ export const signTx = async (
         async (result) => {
           console.info(
             `Tx[${truncatedString(
-              tx.hash.toString(),
-              tx.hash.toString().length
+              tx.hash.toString()
             )}] => ${
               result.status.type
             }(${result.status.value.toString()})${serializeTx(api, tx)}`
@@ -121,18 +120,22 @@ export const signTx = async (
                   const executionOrder =
                     unshuffledInherents.concat(shuffledExtrinscs);
 
+
                   const index = executionOrder.findIndex(
-                    (shuffledExtrinsic) => {
-                      return (
-                        shuffledExtrinsic?.isSigned &&
-                        shuffledExtrinsic?.signer.toString() ===
-                          extractedAccount &&
-                        shuffledExtrinsic?.nonce.toString() === nonce.toString()
-                      );
+                    (extrinsic) => {
+                      return extrinsic.hash.toString() === tx.hash.toString();
                     }
                   );
+
+
                   if (index < 0) {
-                    return;
+                    bothBlocksExtrinsics.forEach((e) => {console.info(`Tx ([${truncatedString(tx.hash.toString())}]) origin ${e.hash.toString()}`)});
+                    executionOrder.forEach((e) => {console.info(`Tx ([${truncatedString(tx.hash.toString())}]) shuffled ${e.hash.toString()}`)});
+                    reject(
+                      `Tx ([${tx.hash.toString()}])
+                      could not be find in a block
+                      $([${truncatedString( result.status.asFinalized.toString())}])`
+                    );
                   }
                   const reqEvents: MangataGenericEvent[] = currentBlockEvents
                     .filter((currentBlockEvent) => {
@@ -165,10 +168,6 @@ export const signTx = async (
                       } as MangataGenericEvent;
                     });
 
-                  for (const event of reqEvents) {
-                    console.info(`${event.section}::${event.method}`);
-                  }
-
                   output = output.concat(reqEvents);
                   txOptions?.extrinsicStatus?.(output);
                   resolve(output);
@@ -177,16 +176,12 @@ export const signTx = async (
                   console.info(
                     `Retry [${retries}]: Tx: ([${truncatedString(
                       tx.hash.toString(),
-                      tx.hash.toString().length
                     )}]): ${result.status.type} (${truncatedString(
                       result.status.value.toString(),
-                      result.status.value.toString().length
                     )}): parentHash: ([${truncatedString(
                       lastHeader.parentHash.toString(),
-                      lastHeader.parentHash.toString().length
                     )}]): finalized in: ([${truncatedString(
                       result.status.asFinalized.toString(),
-                      result.status.asFinalized.toString().length
                     )}]) `
                   );
                 } else {
@@ -195,13 +190,10 @@ export const signTx = async (
                   reject(
                     `Transaction was not finalized: Tx ([${truncatedString(
                       tx.hash.toString(),
-                      tx.hash.toString().length
                     )}]): parent hash: ([${truncatedString(
                       lastHeader.parentHash.toString(),
-                      lastHeader.parentHash.toString().length
                     )}]): Status finalized: ([${truncatedString(
                       result.status.asFinalized.toString(),
-                      result.status.asFinalized.toString().length
                     )}])`
                   );
                   const currentNonce: BN = await Query.getNonce(
@@ -217,7 +209,6 @@ export const signTx = async (
             reject(
               `Tx ([${truncatedString(
                 tx.hash.toString(),
-                tx.hash.toString().length
               )}]) Transaction error`
             );
             const currentNonce: BN = await Query.getNonce(
