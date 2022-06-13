@@ -1,10 +1,104 @@
 import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { BN } from "@polkadot/util";
+import { WsProvider } from "@polkadot/rpc-provider/ws";
+import { encodeAddress } from "@polkadot/util-crypto";
 
 import { fromBN } from "../utils/BNutility";
 
 export class Fee {
+  static async sendKusamaTokenFromRelayToParachainFee(
+    kusamaEndpointUrl: string,
+    ksmAccount: string | KeyringPair,
+    destinationMangataAddress: string,
+    amount: BN,
+    parachainId: number
+  ): Promise<string> {
+    const provider = new WsProvider(kusamaEndpointUrl);
+    const kusamaApi = await new ApiPromise({ provider }).isReady;
+
+    const destination = {
+      V1: {
+        interior: {
+          X1: {
+            ParaChain: parachainId
+          }
+        },
+        parents: 0
+      }
+    };
+
+    const beneficiary = {
+      V1: {
+        interior: {
+          X1: {
+            AccountId32: {
+              id: kusamaApi
+                .createType(
+                  "AccountId32",
+                  encodeAddress(destinationMangataAddress, 42)
+                )
+                .toHex(),
+              network: "Any"
+            }
+          }
+        },
+        parents: 0
+      }
+    };
+
+    const assets = {
+      V1: [
+        {
+          fun: {
+            Fungible: amount
+          },
+          id: {
+            Concrete: {
+              interior: "Here",
+              parents: 0
+            }
+          }
+        }
+      ]
+    };
+
+    const dispatchInfo = await kusamaApi.tx.xcmPallet
+      .reserveTransferAssets(destination, beneficiary, assets, 0)
+      .paymentInfo(ksmAccount);
+    return fromBN(new BN(dispatchInfo.partialFee.toString()), 12);
+  }
+  static async sendKusamaTokenFromParachainToRelayFee(
+    api: ApiPromise,
+    mangataAccount: string | KeyringPair,
+    destinationKusamaAddress: string,
+    amount: BN
+  ) {
+    const destination = {
+      V1: {
+        parents: 1,
+        interior: {
+          X1: {
+            AccountId32: {
+              network: "Any",
+              id: api
+                .createType(
+                  "AccountId32",
+                  encodeAddress(destinationKusamaAddress, 2)
+                )
+                .toHex()
+            }
+          }
+        }
+      }
+    };
+
+    const dispatchInfo = await api.tx.xTokens
+      .transfer("4", amount, destination, new BN("6000000000"))
+      .paymentInfo(mangataAccount);
+
+    return fromBN(new BN(dispatchInfo.partialFee.toString()));
+  }
   static async activateLiquidity(
     api: ApiPromise,
     account: string | KeyringPair,

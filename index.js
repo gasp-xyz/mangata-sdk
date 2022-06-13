@@ -604,7 +604,7 @@ const signTx = async (api, tx, account, txOptions) => {
                 nonce,
                 signer: txOptions?.signer
             }, async (result) => {
-                console.log(`Tx ([${truncatedString(tx.hash.toString(), tx.hash.toString().length)}]): ${result.status.type} (${truncatedString(result.status.value.toString(), result.status.value.toString().length)})`);
+                console.info(`Tx ([${truncatedString(tx.hash.toString(), tx.hash.toString().length)}]): ${result.status.type} (${truncatedString(result.status.value.toString(), result.status.value.toString().length)})`);
                 txOptions?.statusCallback?.(result);
                 if (result.status.isFinalized) {
                     const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(async (lastHeader) => {
@@ -745,14 +745,14 @@ const getError = (api, method, eventData) => {
     return null;
 };
 class Tx {
-    static async sendKusamaTokenFromRelayToParachain(kusamaEndpointUrl, ksmAccount, destinationMangataAddress, amount, txOptions) {
+    static async sendKusamaTokenFromRelayToParachain(kusamaEndpointUrl, ksmAccount, destinationMangataAddress, amount, parachainId, txOptions) {
         const provider = new ws.WsProvider(kusamaEndpointUrl);
         const kusamaApi = await new api.ApiPromise({ provider }).isReady;
         const destination = {
             V1: {
                 interior: {
                     X1: {
-                        ParaChain: 2110
+                        ParaChain: parachainId
                     }
                 },
                 parents: 0
@@ -908,6 +908,75 @@ const fromBN = (value, exponent) => {
 };
 
 class Fee {
+    static async sendKusamaTokenFromRelayToParachainFee(kusamaEndpointUrl, ksmAccount, destinationMangataAddress, amount, parachainId) {
+        const provider = new ws.WsProvider(kusamaEndpointUrl);
+        const kusamaApi = await new api.ApiPromise({ provider }).isReady;
+        const destination = {
+            V1: {
+                interior: {
+                    X1: {
+                        ParaChain: parachainId
+                    }
+                },
+                parents: 0
+            }
+        };
+        const beneficiary = {
+            V1: {
+                interior: {
+                    X1: {
+                        AccountId32: {
+                            id: kusamaApi
+                                .createType("AccountId32", utilCrypto.encodeAddress(destinationMangataAddress, 42))
+                                .toHex(),
+                            network: "Any"
+                        }
+                    }
+                },
+                parents: 0
+            }
+        };
+        const assets = {
+            V1: [
+                {
+                    fun: {
+                        Fungible: amount
+                    },
+                    id: {
+                        Concrete: {
+                            interior: "Here",
+                            parents: 0
+                        }
+                    }
+                }
+            ]
+        };
+        const dispatchInfo = await kusamaApi.tx.xcmPallet
+            .reserveTransferAssets(destination, beneficiary, assets, 0)
+            .paymentInfo(ksmAccount);
+        return fromBN(new util.BN(dispatchInfo.partialFee.toString()), 12);
+    }
+    static async sendKusamaTokenFromParachainToRelayFee(api, mangataAccount, destinationKusamaAddress, amount) {
+        const destination = {
+            V1: {
+                parents: 1,
+                interior: {
+                    X1: {
+                        AccountId32: {
+                            network: "Any",
+                            id: api
+                                .createType("AccountId32", utilCrypto.encodeAddress(destinationKusamaAddress, 2))
+                                .toHex()
+                        }
+                    }
+                }
+            }
+        };
+        const dispatchInfo = await api.tx.xTokens
+            .transfer("4", amount, destination, new util.BN("6000000000"))
+            .paymentInfo(mangataAccount);
+        return fromBN(new util.BN(dispatchInfo.partialFee.toString()));
+    }
     static async activateLiquidity(api, account, liquditityTokenId, amount) {
         const dispatchInfo = await api.tx.xyk
             .activateLiquidity(liquditityTokenId, amount)
@@ -1039,11 +1108,13 @@ const calculateWorkPool = async (liquidityAssetsAmount, liquidityTokenId, curren
 const calculateFutureRewardsAmount = async (api, address, liquidityTokenId, futureTimeBlockNumber) => {
     const block = await api.rpc.chain.getBlock();
     const blockNumber = new util.BN(block.block.header.number.toString());
-    const currentTime = blockNumber.div(new util.BN(10000));
     const futureBlockNumber = blockNumber.add(new util.BN(futureTimeBlockNumber));
     const futureTime = futureBlockNumber.div(new util.BN(10000));
-    const liquidityAssetsAmountUser = await api.query.xyk.liquidityMiningActiveUser([address, liquidityTokenId]);
-    const liquidityAssetsAmountPool = await api.query.xyk.liquidityMiningActivePool([address, liquidityTokenId]);
+    const liquidityAssetsAmountUser = await api.query.xyk.liquidityMiningActiveUser([
+        address,
+        new util.BN(liquidityTokenId)
+    ]);
+    const liquidityAssetsAmountPool = await api.query.xyk.liquidityMiningActivePool(new util.BN(liquidityTokenId));
     const workUser = await calculateWorkUser(address, new util.BN(liquidityAssetsAmountUser.toString()), liquidityTokenId, futureTime, api);
     const workPool = await calculateWorkPool(new util.BN(liquidityAssetsAmountPool.toString()), liquidityTokenId, futureTime, api);
     const burnedNotClaimedRewards = await api.query.xyk.liquidityMiningUserToBeClaimed([
@@ -1057,7 +1128,9 @@ const calculateFutureRewardsAmount = async (api, address, liquidityTokenId, futu
     const currentAvailableRewardsForPool = await api.query.issuance.promotedPoolsRewards(liquidityTokenId);
     const currentAvailableRewardsForPoolBN = new util.BN(currentAvailableRewardsForPool.toString());
     const rewardsPerSession = new util.BN("136986000000000000000000");
-    const sessionsToPass = futureTime.sub(currentTime).div(new util.BN(1200));
+    const sessionsToPass = futureTimeBlockNumber
+        .sub(blockNumber)
+        .div(new util.BN(1200));
     const numberOfPromotedPools = await api.query.issuance.promotedPoolsRewards.entries();
     const futureAvailableRewardsForPool = currentAvailableRewardsForPoolBN.add(rewardsPerSession
         .mul(sessionsToPass)
@@ -1177,6 +1250,20 @@ class Mangata {
     async disconnect() {
         const api = await this.getApi();
         await api.disconnect();
+    }
+    async sendKusamaTokenFromRelayToParachain(kusamaEndpointUrl, ksmAccount, destinationMangataAddress, amount, parachainId = 2110, txOptions) {
+        return await Tx.sendKusamaTokenFromRelayToParachain(kusamaEndpointUrl, ksmAccount, destinationMangataAddress, amount, parachainId, txOptions);
+    }
+    async sendKusamaTokenFromRelayToParachainFee(kusamaEndpointUrl, ksmAccount, destinationMangataAddress, amount, parachainId = 2110) {
+        return await Fee.sendKusamaTokenFromRelayToParachainFee(kusamaEndpointUrl, ksmAccount, destinationMangataAddress, amount, parachainId);
+    }
+    async sendKusamaTokenFromParachainToRelay(mangataAccount, destinationKusamaAddress, amount, txOptions) {
+        const api = await this.getApi();
+        return await Tx.sendKusamaTokenFromParachainToRelay(api, mangataAccount, destinationKusamaAddress, amount, txOptions);
+    }
+    async sendKusamaTokenFromParachainToRelayFee(mangataAccount, destinationKusamaAddress, amount) {
+        const api = await this.getApi();
+        return await Fee.sendKusamaTokenFromParachainToRelayFee(api, mangataAccount, destinationKusamaAddress, amount);
     }
     async activateLiquidity(account, liquditityTokenId, amount, txOptions) {
         const api = await this.getApi();

@@ -36,7 +36,7 @@ export const signTx = async (
           signer: txOptions?.signer
         },
         async (result) => {
-          console.log(
+          console.info(
             `Tx ([${truncatedString(
               tx.hash.toString(),
               tx.hash.toString().length
@@ -283,6 +283,7 @@ export class Tx {
     ksmAccount: string | KeyringPair,
     destinationMangataAddress: string,
     amount: BN,
+    parachainId: number,
     txOptions?: XcmTxOptions
   ) {
     const provider = new WsProvider(kusamaEndpointUrl);
@@ -292,7 +293,7 @@ export class Tx {
       V1: {
         interior: {
           X1: {
-            ParaChain: 2110
+            ParaChain: parachainId
           }
         },
         parents: 0

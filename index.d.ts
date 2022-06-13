@@ -153,6 +153,10 @@ declare class Mangata {
      * Disconnect from the node
      */
     disconnect(): Promise<void>;
+    sendKusamaTokenFromRelayToParachain(kusamaEndpointUrl: string, ksmAccount: string | KeyringPair, destinationMangataAddress: string, amount: BN, parachainId?: number, txOptions?: XcmTxOptions): Promise<void>;
+    sendKusamaTokenFromRelayToParachainFee(kusamaEndpointUrl: string, ksmAccount: string | KeyringPair, destinationMangataAddress: string, amount: BN, parachainId?: number): Promise<string>;
+    sendKusamaTokenFromParachainToRelay(mangataAccount: string | KeyringPair, destinationKusamaAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
+    sendKusamaTokenFromParachainToRelayFee(mangataAccount: string | KeyringPair, destinationKusamaAddress: string, amount: BN): Promise<string>;
     activateLiquidity(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     deactivateLiquidity(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     calculateFutureRewardsAmount(address: string, liquidityTokenId: string, futureBlockNumber: BN): Promise<BN>;
