@@ -618,14 +618,20 @@ const signTx = async (api, tx, account, txOptions) => {
                 console.info(`Tx[${truncatedString(tx.hash.toString())}] => ${result.status.type}(${result.status.value.toString()})${serializeTx(api, tx)}`);
                 txOptions?.statusCallback?.(result);
                 if (result.status.isFinalized) {
+                    const inclusionBlockHash = result.status.asFinalized.toString();
+                    const inclusionBlockHeader = await api.rpc.chain.getHeader(inclusionBlockHash);
+                    const inclusionBlockNr = inclusionBlockHeader.number.toBn();
+                    const executionBlockNr = inclusionBlockNr.addn(1);
                     const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(async (lastHeader) => {
-                        if (lastHeader.parentHash.toString() ===
-                            result.status.asFinalized.toString()) {
+                        const lastBlockNumber = lastHeader.number.toBn();
+                        if (lastBlockNumber.gt(inclusionBlockNr)) {
+                            const executionBlockHash = await api.rpc.chain.getBlockHash(executionBlockNr);
+                            const executionBlockHeader = await api.rpc.chain.getHeader(executionBlockHash);
                             unsubscribeNewHeads();
-                            const currentBlock = await api.rpc.chain.getBlock(lastHeader.hash);
+                            const currentBlock = await api.rpc.chain.getBlock(executionBlockHeader.hash);
                             const currentBlockExtrinsics = currentBlock.block.extrinsics;
-                            const currentBlockEvents = await api.query.system.events.at(lastHeader.hash);
-                            const headerJsonResponse = JSON.parse(lastHeader.toString());
+                            const currentBlockEvents = await api.query.system.events.at(executionBlockHeader.hash);
+                            const headerJsonResponse = JSON.parse(executionBlockHeader.toString());
                             const buffer = Buffer.from(headerJsonResponse["seed"]["seed"].substring(2), "hex");
                             const countOfExtrinsicsFromThisBlock = headerJsonResponse["count"];
                             const currentBlockInherents = currentBlockExtrinsics
@@ -655,7 +661,7 @@ const signTx = async (api, tx, account, txOptions) => {
                                 executionOrder.forEach((e) => { console.info(`Tx ([${truncatedString(tx.hash.toString())}]) shuffled ${e.hash.toString()}`); });
                                 reject(`Tx ([${tx.hash.toString()}])
                       could not be find in a block
-                      $([${truncatedString(result.status.asFinalized.toString())}])`);
+                      $([${truncatedString(inclusionBlockHash)}])`);
                             }
                             const reqEvents = currentBlockEvents
                                 .filter((currentBlockEvent) => {
@@ -688,12 +694,12 @@ const signTx = async (api, tx, account, txOptions) => {
                             unsub();
                         }
                         else if (retries++ < 10) {
-                            console.info(`Retry [${retries}]: Tx: ([${truncatedString(tx.hash.toString())}]): ${result.status.type} (${truncatedString(result.status.value.toString())}): parentHash: ([${truncatedString(lastHeader.parentHash.toString())}]): finalized in: ([${truncatedString(result.status.asFinalized.toString())}]) `);
+                            console.info(`Retry [${retries}]: Tx: ([${truncatedString(tx.hash.toString())}]): ${result.status.type} (${truncatedString(result.status.value.toString())}): parentHash: ([${truncatedString(lastHeader.parentHash.toString())}]): finalized in: ([${truncatedString(inclusionBlockHash)}]) `);
                         }
                         else {
                             //Lets retry this for 10 times until we reject the promise.
                             unsubscribeNewHeads();
-                            reject(`Transaction was not finalized: Tx ([${truncatedString(tx.hash.toString())}]): parent hash: ([${truncatedString(lastHeader.parentHash.toString())}]): Status finalized: ([${truncatedString(result.status.asFinalized.toString())}])`);
+                            reject(`Transaction was not finalized: Tx ([${truncatedString(tx.hash.toString())}]): parent hash: ([${truncatedString(lastHeader.parentHash.toString())}]): Status finalized: ([${truncatedString(inclusionBlockHash)}])`);
                             const currentNonce = await Query.getNonce(api, extractedAccount);
                             instance.setNonce(extractedAccount, currentNonce);
                             unsub();

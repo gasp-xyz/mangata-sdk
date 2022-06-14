@@ -64,21 +64,29 @@ export const signTx = async (
 
           txOptions?.statusCallback?.(result);
           if (result.status.isFinalized) {
+            const inclusionBlockHash =  result.status.asFinalized.toString();
+            const inclusionBlockHeader = await api.rpc.chain.getHeader(inclusionBlockHash);
+            const inclusionBlockNr = inclusionBlockHeader.number.toBn();
+            const executionBlockNr = inclusionBlockNr.addn(1);
+
             const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
               async (lastHeader) => {
+                const lastBlockNumber = lastHeader.number.toBn();
+
                 if (
-                  lastHeader.parentHash.toString() ===
-                  result.status.asFinalized.toString()
+                  lastBlockNumber.gt(inclusionBlockNr)
                 ) {
+                  const executionBlockHash = await api.rpc.chain.getBlockHash(executionBlockNr);
+                  const executionBlockHeader = await api.rpc.chain.getHeader(executionBlockHash);
                   unsubscribeNewHeads();
                   const currentBlock = await api.rpc.chain.getBlock(
-                    lastHeader.hash
+                    executionBlockHeader.hash
                   );
                   const currentBlockExtrinsics = currentBlock.block.extrinsics;
                   const currentBlockEvents = await api.query.system.events.at(
-                    lastHeader.hash
+                    executionBlockHeader.hash
                   );
-                  const headerJsonResponse = JSON.parse(lastHeader.toString());
+                  const headerJsonResponse = JSON.parse(executionBlockHeader.toString());
 
                   const buffer: Buffer = Buffer.from(
                     headerJsonResponse["seed"]["seed"].substring(2),
@@ -134,7 +142,7 @@ export const signTx = async (
                     reject(
                       `Tx ([${tx.hash.toString()}])
                       could not be find in a block
-                      $([${truncatedString( result.status.asFinalized.toString())}])`
+                      $([${truncatedString( inclusionBlockHash )}])`
                     );
                   }
                   const reqEvents: MangataGenericEvent[] = currentBlockEvents
@@ -181,7 +189,7 @@ export const signTx = async (
                     )}): parentHash: ([${truncatedString(
                       lastHeader.parentHash.toString(),
                     )}]): finalized in: ([${truncatedString(
-                      result.status.asFinalized.toString(),
+                      inclusionBlockHash ,
                     )}]) `
                   );
                 } else {
@@ -193,7 +201,7 @@ export const signTx = async (
                     )}]): parent hash: ([${truncatedString(
                       lastHeader.parentHash.toString(),
                     )}]): Status finalized: ([${truncatedString(
-                      result.status.asFinalized.toString(),
+                      inclusionBlockHash ,
                     )}])`
                   );
                   const currentNonce: BN = await Query.getNonce(
