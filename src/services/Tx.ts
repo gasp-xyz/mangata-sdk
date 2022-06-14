@@ -507,7 +507,7 @@ export class Tx {
     firstTokenId: string,
     secondTokenId: string,
     firstTokenAmount: BN,
-    expectedSecondTokenAmount: BN = new BN(Number.MAX_SAFE_INTEGER),
+    expectedSecondTokenAmount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     return await signTx(

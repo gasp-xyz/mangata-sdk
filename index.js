@@ -861,7 +861,7 @@ class Tx {
     static async buyAsset(api, account, soldTokenId, boughtTokenId, amount, maxAmountIn, txOptions) {
         return await signTx(api, api.tx.xyk.buyAsset(soldTokenId, boughtTokenId, amount, maxAmountIn), account, txOptions);
     }
-    static async mintLiquidity(api, account, firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount = new util.BN(Number.MAX_SAFE_INTEGER), txOptions) {
+    static async mintLiquidity(api, account, firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount, txOptions) {
         return await signTx(api, api.tx.xyk.mintLiquidity(firstTokenId, secondTokenId, firstTokenAmount, expectedSecondTokenAmount), account, txOptions);
     }
     static async burnLiquidity(api, account, firstTokenId, secondTokenId, liquidityTokenAmount, txOptions) {
