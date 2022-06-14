@@ -61,8 +61,3 @@ export type TokenBalance = {
   reserved: TReservedBalance;
   frozen: TFreeBalance;
 };
-
-export type Reward = {
-  notYetClaimed: BN;
-  toBeClaimed: BN;
-};

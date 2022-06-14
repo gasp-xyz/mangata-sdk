@@ -588,20 +588,19 @@ const truncatedString = (str) => {
 
 /* eslint-disable no-console */
 function serializeTx(api, tx) {
-    if (!process.env.TX_VERBOSE) {
+    if (!process.env.TX_VERBOSE)
         return "";
-    }
-    const method_object = JSON.parse(tx.method.toString());
-    const args = JSON.stringify(method_object.args);
-    const call_decoded = api.registry.findMetaCall(tx.method.callIndex);
-    if (call_decoded.method == "sudo" && call_decoded.method == "sudo") {
-        const sudo_call_index = tx.method.args[0].callIndex;
-        const sudo_call_args = JSON.stringify(method_object.args.call.args);
-        const sudo_call_decoded = api.registry.findMetaCall(sudo_call_index);
-        return ` (sudo::${sudo_call_decoded.section}::${sudo_call_decoded.method}(${sudo_call_args})`;
+    const methodObject = JSON.parse(tx.method.toString());
+    const args = JSON.stringify(methodObject.args);
+    const callDecoded = api.registry.findMetaCall(tx.method.callIndex);
+    if (callDecoded.method == "sudo" && callDecoded.method == "sudo") {
+        const sudoCallIndex = tx.method.args[0].callIndex;
+        const sudoCallArgs = JSON.stringify(methodObject.args.call.args);
+        const sudoCallDecoded = api.registry.findMetaCall(sudoCallIndex);
+        return ` (sudo::${sudoCallDecoded.section}::${sudoCallDecoded.method}(${sudoCallArgs})`;
     }
     else {
-        return ` (${call_decoded.section}::${call_decoded.method}(${args}))`;
+        return ` (${callDecoded.section}::${callDecoded.method}(${args}))`;
     }
 }
 const signTx = async (api, tx, account, txOptions) => {
@@ -657,8 +656,12 @@ const signTx = async (api, tx, account, txOptions) => {
                                 return extrinsic.hash.toString() === tx.hash.toString();
                             });
                             if (index < 0) {
-                                bothBlocksExtrinsics.forEach((e) => { console.info(`Tx ([${truncatedString(tx.hash.toString())}]) origin ${e.hash.toString()}`); });
-                                executionOrder.forEach((e) => { console.info(`Tx ([${truncatedString(tx.hash.toString())}]) shuffled ${e.hash.toString()}`); });
+                                bothBlocksExtrinsics.forEach((e) => {
+                                    console.info(`Tx ([${truncatedString(tx.hash.toString())}]) origin ${e.hash.toString()}`);
+                                });
+                                executionOrder.forEach((e) => {
+                                    console.info(`Tx ([${truncatedString(tx.hash.toString())}]) shuffled ${e.hash.toString()}`);
+                                });
                                 reject(`Tx ([${tx.hash.toString()}])
                       could not be find in a block
                       $([${truncatedString(inclusionBlockHash)}])`);
@@ -1167,35 +1170,35 @@ const calculateFutureRewardsAmount = async (api, address, liquidityTokenId, futu
  */
 class Mangata {
     api;
-    uri;
+    urls;
     static instanceMap = new Map();
     /**
      * The Mangata's constructor is private to prevent direct
      * construction calls with the `new` operator.
      */
-    constructor(uri) {
+    constructor(urls) {
         this.api = null;
-        this.uri = uri;
+        this.urls = urls;
     }
     /**
      * Initialised via create method with proper types and rpc
      * for Mangata
      */
-    async connectToNode(uri) {
-        const provider = new WsProvider(uri);
+    async connectToNode(urls) {
+        const provider = new WsProvider(urls);
         const api = await new ApiPromise(options({ provider, throwOnConnect: true, throwOnUnknown: true })).isReady;
         return api;
     }
     /**
      * The static method that controls the access to the Mangata instance.
      */
-    static getInstance(uri) {
-        if (!Mangata.instanceMap.has(uri)) {
-            this.instanceMap.set(uri, new Mangata(uri));
-            return this.instanceMap.get(uri);
+    static getInstance(urls) {
+        if (!Mangata.instanceMap.has(urls)) {
+            this.instanceMap.set(urls, new Mangata(urls));
+            return this.instanceMap.get(urls);
         }
         else {
-            return this.instanceMap.get(uri);
+            return this.instanceMap.get(urls);
         }
     }
     /**
@@ -1205,15 +1208,15 @@ class Mangata {
         // Because we assign this.api synchronously, repeated calls to
         // method() are guaranteed to always reuse the same promise.
         if (!this.api) {
-            this.api = this.connectToNode(this.uri);
+            this.api = this.connectToNode(this.urls);
         }
         return this.api;
     }
     /**
      * Uri of the connected node
      */
-    getUri() {
-        return this.uri;
+    getUrls() {
+        return this.urls;
     }
     /**
      * Wait for the new block
@@ -1223,7 +1226,7 @@ class Mangata {
         const api = await this.getApi();
         const numberOfBlocks = blockCount || 1;
         return new Promise(async (resolve) => {
-            const unsubscribe = await api.rpc.chain.subscribeNewHeads(() => {
+            const unsubscribe = await api.rpc.chain.subscribeFinalizedHeads(() => {
                 if (++count === numberOfBlocks) {
                     unsubscribe();
                     resolve(true);

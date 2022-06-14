@@ -28,10 +28,10 @@ Mangata SDK is a first library, built in typescript that provides easy methods f
 
 ```sh
 // with npm
-npm i mangata-sdk
+npm i @mangata-finance/sdk
 
 // with yarn
-yarn add mangata-sdk
+yarn add @mangata-finance/sdk
 ```
 
 # Basic use case
@@ -39,11 +39,13 @@ yarn add mangata-sdk
 Here is a quick example to get you started, **all you need is Mangata instance**:
 
 ```js
-const { Mangata } = require('mangata-sdk');
+const { Mangata } = require("@mangata-finance/sdk");
 
-async function main () {
-  // Connect to the local node (also testnet, mainnet)
-  const mangata = Mangata.getInstance('ws://127.0.0.1:9944')
+async function main() {
+  // Connect to the mainet (also testnet, mainnet)
+  const mangata = Mangata.getInstance(
+    "wss://mangata-x.api.onfinality.io/public-ws"
+  );
 
   // Retrieve the chainName, nodeName & nodeVersion information
   const [chain, nodeName, nodeVersion] = await Promise.all([
@@ -52,43 +54,14 @@ async function main () {
     mangata.getNodeVersion()
   ]);
 
-  console.log(`You are connected to chain ${chain} using ${nodeName} v${nodeVersion}`);
-
-  // you can also only call one method
-  cont chain = await mangata.getChain()
-  console.log(`You are connected to chain ${chain}`)
+  console.log(
+    `You are connected to chain ${chain} using ${nodeName} v${nodeVersion}`
+  );
 }
 
-main().catch(console.error).finally(() => process.exit());
+main()
+  .catch(console.error)
+  .finally(() => process.exit());
 ```
 
-# Available Methods
-
-### TxOptions Type (Optional)
-
-| Input             | Type     |
-| ----------------- | -------- |
-| `nonce`           | BN       |
-| `signer`          | Signer   |
-| `statusCallback`  | function |
-| `extrinsicStatus` | function |
-
-## `getApi`
-
-If you need to retrieve underlying API
-
-```js
-const mangata = Mangata.getInstance("ws://127.0.0.1:9944");
-const api = await mangata.getApi();
-console.log("Connected: ", api.isConnected);
-```
-
-## `getChain`
-
-If you need to retrieve the chain name
-
-```js
-const mangata = Mangata.getInstance("ws://127.0.0.1:9944");
-const chain = await mangata.getChain();
-console.log("Chain: ", chain);
-```
+For available methods please visit [docs](https://docs.mangata.finance/sdk/)

@@ -16,20 +16,18 @@ import { MangataEventData } from "../types/MangataEventData";
 import { truncatedString } from "../utils/truncatedString";
 
 function serializeTx(api: ApiPromise, tx: SubmittableExtrinsic<"promise">) {
-  if (!process.env.TX_VERBOSE) {
-    return "";
-  }
+  if (!process.env.TX_VERBOSE) return "";
 
-  const method_object = JSON.parse(tx.method.toString());
-  const args = JSON.stringify(method_object.args);
-  const call_decoded = api.registry.findMetaCall(tx.method.callIndex);
-  if (call_decoded.method == "sudo" && call_decoded.method == "sudo") {
-    const sudo_call_index = (tx.method.args[0] as any).callIndex;
-    const sudo_call_args = JSON.stringify(method_object.args.call.args);
-    const sudo_call_decoded = api.registry.findMetaCall(sudo_call_index);
-    return ` (sudo::${sudo_call_decoded.section}::${sudo_call_decoded.method}(${sudo_call_args})`;
+  const methodObject = JSON.parse(tx.method.toString());
+  const args = JSON.stringify(methodObject.args);
+  const callDecoded = api.registry.findMetaCall(tx.method.callIndex);
+  if (callDecoded.method == "sudo" && callDecoded.method == "sudo") {
+    const sudoCallIndex = (tx.method.args[0] as any).callIndex;
+    const sudoCallArgs = JSON.stringify(methodObject.args.call.args);
+    const sudoCallDecoded = api.registry.findMetaCall(sudoCallIndex);
+    return ` (sudo::${sudoCallDecoded.section}::${sudoCallDecoded.method}(${sudoCallArgs})`;
   } else {
-    return ` (${call_decoded.section}::${call_decoded.method}(${args}))`;
+    return ` (${callDecoded.section}::${callDecoded.method}(${args}))`;
   }
 }
 
@@ -55,17 +53,17 @@ export const signTx = async (
         },
         async (result) => {
           console.info(
-            `Tx[${truncatedString(
-              tx.hash.toString()
-            )}] => ${
+            `Tx[${truncatedString(tx.hash.toString())}] => ${
               result.status.type
             }(${result.status.value.toString()})${serializeTx(api, tx)}`
           );
 
           txOptions?.statusCallback?.(result);
           if (result.status.isFinalized) {
-            const inclusionBlockHash =  result.status.asFinalized.toString();
-            const inclusionBlockHeader = await api.rpc.chain.getHeader(inclusionBlockHash);
+            const inclusionBlockHash = result.status.asFinalized.toString();
+            const inclusionBlockHeader = await api.rpc.chain.getHeader(
+              inclusionBlockHash
+            );
             const inclusionBlockNr = inclusionBlockHeader.number.toBn();
             const executionBlockNr = inclusionBlockNr.addn(1);
 
@@ -73,11 +71,13 @@ export const signTx = async (
               async (lastHeader) => {
                 const lastBlockNumber = lastHeader.number.toBn();
 
-                if (
-                  lastBlockNumber.gt(inclusionBlockNr)
-                ) {
-                  const executionBlockHash = await api.rpc.chain.getBlockHash(executionBlockNr);
-                  const executionBlockHeader = await api.rpc.chain.getHeader(executionBlockHash);
+                if (lastBlockNumber.gt(inclusionBlockNr)) {
+                  const executionBlockHash = await api.rpc.chain.getBlockHash(
+                    executionBlockNr
+                  );
+                  const executionBlockHeader = await api.rpc.chain.getHeader(
+                    executionBlockHash
+                  );
                   unsubscribeNewHeads();
                   const currentBlock = await api.rpc.chain.getBlock(
                     executionBlockHeader.hash
@@ -86,7 +86,9 @@ export const signTx = async (
                   const currentBlockEvents = await api.query.system.events.at(
                     executionBlockHeader.hash
                   );
-                  const headerJsonResponse = JSON.parse(executionBlockHeader.toString());
+                  const headerJsonResponse = JSON.parse(
+                    executionBlockHeader.toString()
+                  );
 
                   const buffer: Buffer = Buffer.from(
                     headerJsonResponse["seed"]["seed"].substring(2),
@@ -128,21 +130,29 @@ export const signTx = async (
                   const executionOrder =
                     unshuffledInherents.concat(shuffledExtrinscs);
 
-
-                  const index = executionOrder.findIndex(
-                    (extrinsic) => {
-                      return extrinsic.hash.toString() === tx.hash.toString();
-                    }
-                  );
-
+                  const index = executionOrder.findIndex((extrinsic) => {
+                    return extrinsic.hash.toString() === tx.hash.toString();
+                  });
 
                   if (index < 0) {
-                    bothBlocksExtrinsics.forEach((e) => {console.info(`Tx ([${truncatedString(tx.hash.toString())}]) origin ${e.hash.toString()}`)});
-                    executionOrder.forEach((e) => {console.info(`Tx ([${truncatedString(tx.hash.toString())}]) shuffled ${e.hash.toString()}`)});
+                    bothBlocksExtrinsics.forEach((e) => {
+                      console.info(
+                        `Tx ([${truncatedString(
+                          tx.hash.toString()
+                        )}]) origin ${e.hash.toString()}`
+                      );
+                    });
+                    executionOrder.forEach((e) => {
+                      console.info(
+                        `Tx ([${truncatedString(
+                          tx.hash.toString()
+                        )}]) shuffled ${e.hash.toString()}`
+                      );
+                    });
                     reject(
                       `Tx ([${tx.hash.toString()}])
                       could not be find in a block
-                      $([${truncatedString( inclusionBlockHash )}])`
+                      $([${truncatedString(inclusionBlockHash)}])`
                     );
                   }
                   const reqEvents: MangataGenericEvent[] = currentBlockEvents
@@ -183,13 +193,13 @@ export const signTx = async (
                 } else if (retries++ < 10) {
                   console.info(
                     `Retry [${retries}]: Tx: ([${truncatedString(
-                      tx.hash.toString(),
+                      tx.hash.toString()
                     )}]): ${result.status.type} (${truncatedString(
-                      result.status.value.toString(),
+                      result.status.value.toString()
                     )}): parentHash: ([${truncatedString(
-                      lastHeader.parentHash.toString(),
+                      lastHeader.parentHash.toString()
                     )}]): finalized in: ([${truncatedString(
-                      inclusionBlockHash ,
+                      inclusionBlockHash
                     )}]) `
                   );
                 } else {
@@ -197,11 +207,11 @@ export const signTx = async (
                   unsubscribeNewHeads();
                   reject(
                     `Transaction was not finalized: Tx ([${truncatedString(
-                      tx.hash.toString(),
+                      tx.hash.toString()
                     )}]): parent hash: ([${truncatedString(
-                      lastHeader.parentHash.toString(),
+                      lastHeader.parentHash.toString()
                     )}]): Status finalized: ([${truncatedString(
-                      inclusionBlockHash ,
+                      inclusionBlockHash
                     )}])`
                   );
                   const currentNonce: BN = await Query.getNonce(
@@ -215,9 +225,7 @@ export const signTx = async (
             );
           } else if (result.isError) {
             reject(
-              `Tx ([${truncatedString(
-                tx.hash.toString(),
-              )}]) Transaction error`
+              `Tx ([${truncatedString(tx.hash.toString())}]) Transaction error`
             );
             const currentNonce: BN = await Query.getNonce(
               api,

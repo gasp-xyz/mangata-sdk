@@ -16,8 +16,7 @@ import {
   TokenBalance,
   TTokenId,
   TPoolWithShare,
-  TPoolWithRatio,
-  Reward
+  TPoolWithRatio
 } from "./types/AssetInfo";
 import { MangataGenericEvent } from "./types/MangataGenericEvent";
 import { TxOptions, XcmTxOptions } from "./types/TxOptions";
@@ -30,24 +29,27 @@ import { calculateFutureRewardsAmount } from "./utils/calculateFutureRewardsAmou
  */
 export class Mangata {
   private api: Promise<ApiPromise> | null;
-  private uri: string;
-  private static instanceMap: Map<string, Mangata> = new Map<string, Mangata>();
+  private urls: string[];
+  private static instanceMap: Map<string[], Mangata> = new Map<
+    string[],
+    Mangata
+  >();
 
   /**
    * The Mangata's constructor is private to prevent direct
    * construction calls with the `new` operator.
    */
-  private constructor(uri: string) {
+  private constructor(urls: string[]) {
     this.api = null;
-    this.uri = uri;
+    this.urls = urls;
   }
 
   /**
    * Initialised via create method with proper types and rpc
    * for Mangata
    */
-  private async connectToNode(uri: string) {
-    const provider = new WsProvider(uri);
+  private async connectToNode(urls: string[]) {
+    const provider = new WsProvider(urls);
     const api = await new ApiPromise(
       options({ provider, throwOnConnect: true, throwOnUnknown: true })
     ).isReady;
@@ -57,12 +59,12 @@ export class Mangata {
   /**
    * The static method that controls the access to the Mangata instance.
    */
-  public static getInstance(uri: string): Mangata {
-    if (!Mangata.instanceMap.has(uri)) {
-      this.instanceMap.set(uri, new Mangata(uri));
-      return this.instanceMap.get(uri)!;
+  public static getInstance(urls: string[]): Mangata {
+    if (!Mangata.instanceMap.has(urls)) {
+      this.instanceMap.set(urls, new Mangata(urls));
+      return this.instanceMap.get(urls)!;
     } else {
-      return this.instanceMap.get(uri)!;
+      return this.instanceMap.get(urls)!;
     }
   }
 
@@ -73,7 +75,7 @@ export class Mangata {
     // Because we assign this.api synchronously, repeated calls to
     // method() are guaranteed to always reuse the same promise.
     if (!this.api) {
-      this.api = this.connectToNode(this.uri);
+      this.api = this.connectToNode(this.urls);
     }
 
     return this.api;
@@ -82,8 +84,8 @@ export class Mangata {
   /**
    * Uri of the connected node
    */
-  public getUri(): string {
-    return this.uri;
+  public getUrls(): string[] {
+    return this.urls;
   }
 
   /**
@@ -96,7 +98,7 @@ export class Mangata {
     const numberOfBlocks = blockCount || 1;
 
     return new Promise(async (resolve) => {
-      const unsubscribe = await api.rpc.chain.subscribeNewHeads(() => {
+      const unsubscribe = await api.rpc.chain.subscribeFinalizedHeads(() => {
         if (++count === numberOfBlocks) {
           unsubscribe();
           resolve(true);
