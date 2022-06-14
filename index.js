@@ -586,13 +586,31 @@ const recreateExtrinsicsOrder = (extrinsics, seedBytes) => {
     return result;
 };
 
-const truncatedString = (str, len) => {
+const truncatedString = (str) => {
     if (!str)
         return "";
+    const len = str.length;
     return str.substring(0, 7) + "..." + str.substring(len - 5, len);
 };
 
 /* eslint-disable no-console */
+function serializeTx(api, tx) {
+    if (!process.env.TX_VERBOSE) {
+        return "";
+    }
+    const method_object = JSON.parse(tx.method.toString());
+    const args = JSON.stringify(method_object.args);
+    const call_decoded = api.registry.findMetaCall(tx.method.callIndex);
+    if (call_decoded.method == "sudo" && call_decoded.method == "sudo") {
+        const sudo_call_index = tx.method.args[0].callIndex;
+        const sudo_call_args = JSON.stringify(method_object.args.call.args);
+        const sudo_call_decoded = api.registry.findMetaCall(sudo_call_index);
+        return ` (sudo::${sudo_call_decoded.section}::${sudo_call_decoded.method}(${sudo_call_args})`;
+    }
+    else {
+        return ` (${call_decoded.section}::${call_decoded.method}(${args}))`;
+    }
+}
 const signTx = async (api, tx, account, txOptions) => {
     return new Promise(async (resolve, reject) => {
         let output = [];
@@ -604,17 +622,23 @@ const signTx = async (api, tx, account, txOptions) => {
                 nonce,
                 signer: txOptions?.signer
             }, async (result) => {
-                console.info(`Tx ([${truncatedString(tx.hash.toString(), tx.hash.toString().length)}]): ${result.status.type} (${truncatedString(result.status.value.toString(), result.status.value.toString().length)})`);
+                console.info(`Tx[${truncatedString(tx.hash.toString())}] => ${result.status.type}(${result.status.value.toString()})${serializeTx(api, tx)}`);
                 txOptions?.statusCallback?.(result);
                 if (result.status.isFinalized) {
+                    const inclusionBlockHash = result.status.asFinalized.toString();
+                    const inclusionBlockHeader = await api.rpc.chain.getHeader(inclusionBlockHash);
+                    const inclusionBlockNr = inclusionBlockHeader.number.toBn();
+                    const executionBlockNr = inclusionBlockNr.addn(1);
                     const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(async (lastHeader) => {
-                        if (lastHeader.parentHash.toString() ===
-                            result.status.asFinalized.toString()) {
+                        const lastBlockNumber = lastHeader.number.toBn();
+                        if (lastBlockNumber.gt(inclusionBlockNr)) {
+                            const executionBlockHash = await api.rpc.chain.getBlockHash(executionBlockNr);
+                            const executionBlockHeader = await api.rpc.chain.getHeader(executionBlockHash);
                             unsubscribeNewHeads();
-                            const currentBlock = await api.rpc.chain.getBlock(lastHeader.hash);
+                            const currentBlock = await api.rpc.chain.getBlock(executionBlockHeader.hash);
                             const currentBlockExtrinsics = currentBlock.block.extrinsics;
-                            const currentBlockEvents = await api.query.system.events.at(lastHeader.hash);
-                            const headerJsonResponse = JSON.parse(lastHeader.toString());
+                            const currentBlockEvents = await api.query.system.events.at(executionBlockHeader.hash);
+                            const headerJsonResponse = JSON.parse(executionBlockHeader.toString());
                             const buffer = Buffer.from(headerJsonResponse["seed"]["seed"].substring(2), "hex");
                             const countOfExtrinsicsFromThisBlock = headerJsonResponse["count"];
                             const currentBlockInherents = currentBlockExtrinsics
@@ -636,14 +660,15 @@ const signTx = async (api, tx, account, txOptions) => {
                                 return [who, tx];
                             }), Uint8Array.from(buffer));
                             const executionOrder = unshuffledInherents.concat(shuffledExtrinscs);
-                            const index = executionOrder.findIndex((shuffledExtrinsic) => {
-                                return (shuffledExtrinsic?.isSigned &&
-                                    shuffledExtrinsic?.signer.toString() ===
-                                        extractedAccount &&
-                                    shuffledExtrinsic?.nonce.toString() === nonce.toString());
+                            const index = executionOrder.findIndex((extrinsic) => {
+                                return extrinsic.hash.toString() === tx.hash.toString();
                             });
                             if (index < 0) {
-                                return;
+                                bothBlocksExtrinsics.forEach((e) => { console.info(`Tx ([${truncatedString(tx.hash.toString())}]) origin ${e.hash.toString()}`); });
+                                executionOrder.forEach((e) => { console.info(`Tx ([${truncatedString(tx.hash.toString())}]) shuffled ${e.hash.toString()}`); });
+                                reject(`Tx ([${tx.hash.toString()}])
+                      could not be find in a block
+                      $([${truncatedString(inclusionBlockHash)}])`);
                             }
                             const reqEvents = currentBlockEvents
                                 .filter((currentBlockEvent) => {
@@ -670,21 +695,18 @@ const signTx = async (api, tx, account, txOptions) => {
                                     error: getError(api, event.method, eventData)
                                 };
                             });
-                            for (const event of reqEvents) {
-                                console.info(`${event.section}::${event.method}`);
-                            }
                             output = output.concat(reqEvents);
                             txOptions?.extrinsicStatus?.(output);
                             resolve(output);
                             unsub();
                         }
                         else if (retries++ < 10) {
-                            console.info(`Retry [${retries}]: Tx: ([${truncatedString(tx.hash.toString(), tx.hash.toString().length)}]): ${result.status.type} (${truncatedString(result.status.value.toString(), result.status.value.toString().length)}): parentHash: ([${truncatedString(lastHeader.parentHash.toString(), lastHeader.parentHash.toString().length)}]): finalized in: ([${truncatedString(result.status.asFinalized.toString(), result.status.asFinalized.toString().length)}]) `);
+                            console.info(`Retry [${retries}]: Tx: ([${truncatedString(tx.hash.toString())}]): ${result.status.type} (${truncatedString(result.status.value.toString())}): parentHash: ([${truncatedString(lastHeader.parentHash.toString())}]): finalized in: ([${truncatedString(inclusionBlockHash)}]) `);
                         }
                         else {
                             //Lets retry this for 10 times until we reject the promise.
                             unsubscribeNewHeads();
-                            reject(`Transaction was not finalized: Tx ([${truncatedString(tx.hash.toString(), tx.hash.toString().length)}]): parent hash: ([${truncatedString(lastHeader.parentHash.toString(), lastHeader.parentHash.toString().length)}]): Status finalized: ([${truncatedString(result.status.asFinalized.toString(), result.status.asFinalized.toString().length)}])`);
+                            reject(`Transaction was not finalized: Tx ([${truncatedString(tx.hash.toString())}]): parent hash: ([${truncatedString(lastHeader.parentHash.toString())}]): Status finalized: ([${truncatedString(inclusionBlockHash)}])`);
                             const currentNonce = await Query.getNonce(api, extractedAccount);
                             instance.setNonce(extractedAccount, currentNonce);
                             unsub();
@@ -692,7 +714,7 @@ const signTx = async (api, tx, account, txOptions) => {
                     });
                 }
                 else if (result.isError) {
-                    reject(`Tx ([${truncatedString(tx.hash.toString(), tx.hash.toString().length)}]) Transaction error`);
+                    reject(`Tx ([${truncatedString(tx.hash.toString())}]) Transaction error`);
                     const currentNonce = await Query.getNonce(api, extractedAccount);
                     instance.setNonce(extractedAccount, currentNonce);
                 }

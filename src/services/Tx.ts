@@ -15,6 +15,24 @@ import { MangataGenericEvent } from "../types/MangataGenericEvent";
 import { MangataEventData } from "../types/MangataEventData";
 import { truncatedString } from "../utils/truncatedString";
 
+function serializeTx(api: ApiPromise, tx: SubmittableExtrinsic<"promise">) {
+  if (!process.env.TX_VERBOSE) {
+    return "";
+  }
+
+  const method_object = JSON.parse(tx.method.toString());
+  const args = JSON.stringify(method_object.args);
+  const call_decoded = api.registry.findMetaCall(tx.method.callIndex);
+  if (call_decoded.method == "sudo" && call_decoded.method == "sudo") {
+    const sudo_call_index = (tx.method.args[0] as any).callIndex;
+    const sudo_call_args = JSON.stringify(method_object.args.call.args);
+    const sudo_call_decoded = api.registry.findMetaCall(sudo_call_index);
+    return ` (sudo::${sudo_call_decoded.section}::${sudo_call_decoded.method}(${sudo_call_args})`;
+  } else {
+    return ` (${call_decoded.section}::${call_decoded.method}(${args}))`;
+  }
+}
+
 export const signTx = async (
   api: ApiPromise,
   tx: SubmittableExtrinsic<"promise">,
@@ -37,32 +55,38 @@ export const signTx = async (
         },
         async (result) => {
           console.info(
-            `Tx ([${truncatedString(
-              tx.hash.toString(),
-              tx.hash.toString().length
-            )}]): ${result.status.type} (${truncatedString(
-              result.status.value.toString(),
-              result.status.value.toString().length
-            )})`
+            `Tx[${truncatedString(
+              tx.hash.toString()
+            )}] => ${
+              result.status.type
+            }(${result.status.value.toString()})${serializeTx(api, tx)}`
           );
 
           txOptions?.statusCallback?.(result);
           if (result.status.isFinalized) {
+            const inclusionBlockHash =  result.status.asFinalized.toString();
+            const inclusionBlockHeader = await api.rpc.chain.getHeader(inclusionBlockHash);
+            const inclusionBlockNr = inclusionBlockHeader.number.toBn();
+            const executionBlockNr = inclusionBlockNr.addn(1);
+
             const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
               async (lastHeader) => {
+                const lastBlockNumber = lastHeader.number.toBn();
+
                 if (
-                  lastHeader.parentHash.toString() ===
-                  result.status.asFinalized.toString()
+                  lastBlockNumber.gt(inclusionBlockNr)
                 ) {
+                  const executionBlockHash = await api.rpc.chain.getBlockHash(executionBlockNr);
+                  const executionBlockHeader = await api.rpc.chain.getHeader(executionBlockHash);
                   unsubscribeNewHeads();
                   const currentBlock = await api.rpc.chain.getBlock(
-                    lastHeader.hash
+                    executionBlockHeader.hash
                   );
                   const currentBlockExtrinsics = currentBlock.block.extrinsics;
                   const currentBlockEvents = await api.query.system.events.at(
-                    lastHeader.hash
+                    executionBlockHeader.hash
                   );
-                  const headerJsonResponse = JSON.parse(lastHeader.toString());
+                  const headerJsonResponse = JSON.parse(executionBlockHeader.toString());
 
                   const buffer: Buffer = Buffer.from(
                     headerJsonResponse["seed"]["seed"].substring(2),
@@ -104,18 +128,22 @@ export const signTx = async (
                   const executionOrder =
                     unshuffledInherents.concat(shuffledExtrinscs);
 
+
                   const index = executionOrder.findIndex(
-                    (shuffledExtrinsic) => {
-                      return (
-                        shuffledExtrinsic?.isSigned &&
-                        shuffledExtrinsic?.signer.toString() ===
-                          extractedAccount &&
-                        shuffledExtrinsic?.nonce.toString() === nonce.toString()
-                      );
+                    (extrinsic) => {
+                      return extrinsic.hash.toString() === tx.hash.toString();
                     }
                   );
+
+
                   if (index < 0) {
-                    return;
+                    bothBlocksExtrinsics.forEach((e) => {console.info(`Tx ([${truncatedString(tx.hash.toString())}]) origin ${e.hash.toString()}`)});
+                    executionOrder.forEach((e) => {console.info(`Tx ([${truncatedString(tx.hash.toString())}]) shuffled ${e.hash.toString()}`)});
+                    reject(
+                      `Tx ([${tx.hash.toString()}])
+                      could not be find in a block
+                      $([${truncatedString( inclusionBlockHash )}])`
+                    );
                   }
                   const reqEvents: MangataGenericEvent[] = currentBlockEvents
                     .filter((currentBlockEvent) => {
@@ -148,10 +176,6 @@ export const signTx = async (
                       } as MangataGenericEvent;
                     });
 
-                  for (const event of reqEvents) {
-                    console.info(`${event.section}::${event.method}`);
-                  }
-
                   output = output.concat(reqEvents);
                   txOptions?.extrinsicStatus?.(output);
                   resolve(output);
@@ -160,16 +184,12 @@ export const signTx = async (
                   console.info(
                     `Retry [${retries}]: Tx: ([${truncatedString(
                       tx.hash.toString(),
-                      tx.hash.toString().length
                     )}]): ${result.status.type} (${truncatedString(
                       result.status.value.toString(),
-                      result.status.value.toString().length
                     )}): parentHash: ([${truncatedString(
                       lastHeader.parentHash.toString(),
-                      lastHeader.parentHash.toString().length
                     )}]): finalized in: ([${truncatedString(
-                      result.status.asFinalized.toString(),
-                      result.status.asFinalized.toString().length
+                      inclusionBlockHash ,
                     )}]) `
                   );
                 } else {
@@ -178,13 +198,10 @@ export const signTx = async (
                   reject(
                     `Transaction was not finalized: Tx ([${truncatedString(
                       tx.hash.toString(),
-                      tx.hash.toString().length
                     )}]): parent hash: ([${truncatedString(
                       lastHeader.parentHash.toString(),
-                      lastHeader.parentHash.toString().length
                     )}]): Status finalized: ([${truncatedString(
-                      result.status.asFinalized.toString(),
-                      result.status.asFinalized.toString().length
+                      inclusionBlockHash ,
                     )}])`
                   );
                   const currentNonce: BN = await Query.getNonce(
@@ -200,7 +217,6 @@ export const signTx = async (
             reject(
               `Tx ([${truncatedString(
                 tx.hash.toString(),
-                tx.hash.toString().length
               )}]) Transaction error`
             );
             const currentNonce: BN = await Query.getNonce(
