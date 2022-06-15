@@ -621,7 +621,7 @@ const signTx = async (api, tx, account, txOptions) => {
                     const inclusionBlockHeader = await api.rpc.chain.getHeader(inclusionBlockHash);
                     const inclusionBlockNr = inclusionBlockHeader.number.toBn();
                     const executionBlockNr = inclusionBlockNr.addn(1);
-                    const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(async (lastHeader) => {
+                    const unsubscribeNewHeads = await api.rpc.chain.subscribeFinalizedHeads(async (lastHeader) => {
                         const lastBlockNumber = lastHeader.number.toBn();
                         if (lastBlockNumber.gt(inclusionBlockNr)) {
                             const executionBlockHash = await api.rpc.chain.getBlockHash(executionBlockNr);
@@ -697,7 +697,7 @@ const signTx = async (api, tx, account, txOptions) => {
                             unsub();
                         }
                         else if (retries++ < 10) {
-                            console.info(`Retry [${retries}]: Tx: ([${truncatedString(tx.hash.toString())}]): ${result.status.type} (${truncatedString(result.status.value.toString())}): parentHash: ([${truncatedString(lastHeader.parentHash.toString())}]): finalized in: ([${truncatedString(inclusionBlockHash)}]) `);
+                            console.info(`Retry [${retries}] Tx: [${truncatedString(tx.hash.toString())}] current: #${lastHeader.number} [${truncatedString(lastHeader.hash.toString())}] finalized in: #${inclusionBlockNr} [${truncatedString(inclusionBlockHash)}] `);
                         }
                         else {
                             //Lets retry this for 10 times until we reject the promise.
