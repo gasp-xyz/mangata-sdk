@@ -4,7 +4,6 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { WsProvider } from "@polkadot/rpc-provider/ws";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { BN } from "@polkadot/util";
-import { encodeAddress } from "@polkadot/util-crypto";
 
 import { instance } from "../utils/MemoryDatabase";
 import { getTxNonce } from "../utils/getTxNonce";
@@ -67,160 +66,165 @@ export const signTx = async (
             const inclusionBlockNr = inclusionBlockHeader.number.toBn();
             const executionBlockNr = inclusionBlockNr.addn(1);
 
-            const unsubscribeNewHeads = await api.rpc.chain.subscribeFinalizedHeads(
-              async (lastHeader) => {
-                const lastBlockNumber = lastHeader.number.toBn();
+            const unsubscribeNewHeads =
+              await api.rpc.chain.subscribeFinalizedHeads(
+                async (lastHeader) => {
+                  const lastBlockNumber = lastHeader.number.toBn();
 
-                if (lastBlockNumber.gt(inclusionBlockNr)) {
-                  const executionBlockHash = await api.rpc.chain.getBlockHash(
-                    executionBlockNr
-                  );
-                  const executionBlockHeader = await api.rpc.chain.getHeader(
-                    executionBlockHash
-                  );
-                  unsubscribeNewHeads();
-                  const currentBlock = await api.rpc.chain.getBlock(
-                    executionBlockHeader.hash
-                  );
-                  const currentBlockExtrinsics = currentBlock.block.extrinsics;
-                  const currentBlockEvents = await api.query.system.events.at(
-                    executionBlockHeader.hash
-                  );
-                  const headerJsonResponse = JSON.parse(
-                    executionBlockHeader.toString()
-                  );
+                  if (lastBlockNumber.gt(inclusionBlockNr)) {
+                    const executionBlockHash = await api.rpc.chain.getBlockHash(
+                      executionBlockNr
+                    );
+                    const executionBlockHeader = await api.rpc.chain.getHeader(
+                      executionBlockHash
+                    );
+                    unsubscribeNewHeads();
+                    const currentBlock = await api.rpc.chain.getBlock(
+                      executionBlockHeader.hash
+                    );
+                    const currentBlockExtrinsics =
+                      currentBlock.block.extrinsics;
+                    const currentBlockEvents = await api.query.system.events.at(
+                      executionBlockHeader.hash
+                    );
+                    const headerJsonResponse = JSON.parse(
+                      executionBlockHeader.toString()
+                    );
 
-                  const buffer: Buffer = Buffer.from(
-                    headerJsonResponse["seed"]["seed"].substring(2),
-                    "hex"
-                  );
-                  const countOfExtrinsicsFromThisBlock =
-                    headerJsonResponse["count"];
-                  const currentBlockInherents = currentBlockExtrinsics
-                    .slice(0, countOfExtrinsicsFromThisBlock)
-                    .filter((tx) => {
-                      return !tx.isSigned;
-                    });
-                  const previousBlockExtrinsics = currentBlockExtrinsics.slice(
-                    countOfExtrinsicsFromThisBlock,
-                    currentBlockExtrinsics.length
-                  );
-                  const bothBlocksExtrinsics = currentBlockInherents.concat(
-                    previousBlockExtrinsics
-                  );
-
-                  const unshuffledInherents = bothBlocksExtrinsics.filter(
-                    (tx) => {
-                      return !tx.isSigned;
-                    }
-                  );
-
-                  const shuffledExtrinscs = recreateExtrinsicsOrder(
-                    bothBlocksExtrinsics
+                    const buffer: Buffer = Buffer.from(
+                      headerJsonResponse["seed"]["seed"].substring(2),
+                      "hex"
+                    );
+                    const countOfExtrinsicsFromThisBlock =
+                      headerJsonResponse["count"];
+                    const currentBlockInherents = currentBlockExtrinsics
+                      .slice(0, countOfExtrinsicsFromThisBlock)
                       .filter((tx) => {
-                        return tx.isSigned;
-                      })
-                      .map((tx) => {
-                        const who = tx.isSigned ? tx.signer.toString() : "0000";
-                        return [who, tx];
-                      }),
-                    Uint8Array.from(buffer)
-                  );
-
-                  const executionOrder =
-                    unshuffledInherents.concat(shuffledExtrinscs);
-
-                  const index = executionOrder.findIndex((extrinsic) => {
-                    return extrinsic.hash.toString() === tx.hash.toString();
-                  });
-
-                  if (index < 0) {
-                    bothBlocksExtrinsics.forEach((e) => {
-                      console.info(
-                        `Tx ([${truncatedString(
-                          tx.hash.toString()
-                        )}]) origin ${e.hash.toString()}`
+                        return !tx.isSigned;
+                      });
+                    const previousBlockExtrinsics =
+                      currentBlockExtrinsics.slice(
+                        countOfExtrinsicsFromThisBlock,
+                        currentBlockExtrinsics.length
                       );
+                    const bothBlocksExtrinsics = currentBlockInherents.concat(
+                      previousBlockExtrinsics
+                    );
+
+                    const unshuffledInherents = bothBlocksExtrinsics.filter(
+                      (tx) => {
+                        return !tx.isSigned;
+                      }
+                    );
+
+                    const shuffledExtrinscs = recreateExtrinsicsOrder(
+                      bothBlocksExtrinsics
+                        .filter((tx) => {
+                          return tx.isSigned;
+                        })
+                        .map((tx) => {
+                          const who = tx.isSigned
+                            ? tx.signer.toString()
+                            : "0000";
+                          return [who, tx];
+                        }),
+                      Uint8Array.from(buffer)
+                    );
+
+                    const executionOrder =
+                      unshuffledInherents.concat(shuffledExtrinscs);
+
+                    const index = executionOrder.findIndex((extrinsic) => {
+                      return extrinsic.hash.toString() === tx.hash.toString();
                     });
-                    executionOrder.forEach((e) => {
-                      console.info(
-                        `Tx ([${truncatedString(
-                          tx.hash.toString()
-                        )}]) shuffled ${e.hash.toString()}`
-                      );
-                    });
-                    reject(
-                      `Tx ([${tx.hash.toString()}])
+
+                    if (index < 0) {
+                      bothBlocksExtrinsics.forEach((e) => {
+                        console.info(
+                          `Tx ([${truncatedString(
+                            tx.hash.toString()
+                          )}]) origin ${e.hash.toString()}`
+                        );
+                      });
+                      executionOrder.forEach((e) => {
+                        console.info(
+                          `Tx ([${truncatedString(
+                            tx.hash.toString()
+                          )}]) shuffled ${e.hash.toString()}`
+                        );
+                      });
+                      reject(
+                        `Tx ([${tx.hash.toString()}])
                       could not be find in a block
                       $([${truncatedString(inclusionBlockHash)}])`
+                      );
+                    }
+                    const reqEvents: MangataGenericEvent[] = currentBlockEvents
+                      .filter((currentBlockEvent) => {
+                        return (
+                          currentBlockEvent.phase.isApplyExtrinsic &&
+                          currentBlockEvent.phase.asApplyExtrinsic.toNumber() ===
+                            index
+                        );
+                      })
+                      .map((eventRecord) => {
+                        const { event, phase } = eventRecord;
+                        const types = event.typeDef;
+                        const eventData: MangataEventData[] = event.data.map(
+                          (d: any, i: any) => {
+                            return {
+                              lookupName: types[i].lookupName!,
+                              data: d
+                            };
+                          }
+                        );
+
+                        return {
+                          event,
+                          phase,
+                          section: event.section,
+                          method: event.method,
+                          metaDocumentation: event.meta.docs.toString(),
+                          eventData,
+                          error: getError(api, event.method, eventData)
+                        } as MangataGenericEvent;
+                      });
+
+                    output = output.concat(reqEvents);
+                    txOptions?.extrinsicStatus?.(output);
+                    resolve(output);
+                    unsub();
+                  } else if (retries++ < 10) {
+                    console.info(
+                      `Retry [${retries}] Tx: [${truncatedString(
+                        tx.hash.toString()
+                      )}] current: #${lastHeader.number} [${truncatedString(
+                        lastHeader.hash.toString()
+                      )}] finalized in: #${inclusionBlockNr} [${truncatedString(
+                        inclusionBlockHash
+                      )}] `
                     );
+                  } else {
+                    //Lets retry this for 10 times until we reject the promise.
+                    unsubscribeNewHeads();
+                    reject(
+                      `Transaction was not finalized: Tx ([${truncatedString(
+                        tx.hash.toString()
+                      )}]): parent hash: ([${truncatedString(
+                        lastHeader.parentHash.toString()
+                      )}]): Status finalized: ([${truncatedString(
+                        inclusionBlockHash
+                      )}])`
+                    );
+                    const currentNonce: BN = await Query.getNonce(
+                      api,
+                      extractedAccount
+                    );
+                    instance.setNonce(extractedAccount, currentNonce);
+                    unsub();
                   }
-                  const reqEvents: MangataGenericEvent[] = currentBlockEvents
-                    .filter((currentBlockEvent) => {
-                      return (
-                        currentBlockEvent.phase.isApplyExtrinsic &&
-                        currentBlockEvent.phase.asApplyExtrinsic.toNumber() ===
-                          index
-                      );
-                    })
-                    .map((eventRecord) => {
-                      const { event, phase } = eventRecord;
-                      const types = event.typeDef;
-                      const eventData: MangataEventData[] = event.data.map(
-                        (d: any, i: any) => {
-                          return {
-                            lookupName: types[i].lookupName!,
-                            data: d
-                          };
-                        }
-                      );
-
-                      return {
-                        event,
-                        phase,
-                        section: event.section,
-                        method: event.method,
-                        metaDocumentation: event.meta.docs.toString(),
-                        eventData,
-                        error: getError(api, event.method, eventData)
-                      } as MangataGenericEvent;
-                    });
-
-                  output = output.concat(reqEvents);
-                  txOptions?.extrinsicStatus?.(output);
-                  resolve(output);
-                  unsub();
-                } else if (retries++ < 10) {
-                  console.info(
-                    `Retry [${retries}] Tx: [${truncatedString(
-                      tx.hash.toString()
-                    )}] current: #${lastHeader.number} [${truncatedString(
-                      lastHeader.hash.toString()
-                    )}] finalized in: #${inclusionBlockNr} [${truncatedString(
-                      inclusionBlockHash
-                    )}] `
-                  );
-                } else {
-                  //Lets retry this for 10 times until we reject the promise.
-                  unsubscribeNewHeads();
-                  reject(
-                    `Transaction was not finalized: Tx ([${truncatedString(
-                      tx.hash.toString()
-                    )}]): parent hash: ([${truncatedString(
-                      lastHeader.parentHash.toString()
-                    )}]): Status finalized: ([${truncatedString(
-                      inclusionBlockHash
-                    )}])`
-                  );
-                  const currentNonce: BN = await Query.getNonce(
-                    api,
-                    extractedAccount
-                  );
-                  instance.setNonce(extractedAccount, currentNonce);
-                  unsub();
                 }
-              }
-            );
+              );
           } else if (result.isError) {
             reject(
               `Tx ([${truncatedString(tx.hash.toString())}]) Transaction error`
@@ -328,10 +332,7 @@ export class Tx {
           X1: {
             AccountId32: {
               id: kusamaApi
-                .createType(
-                  "AccountId32",
-                  encodeAddress(destinationMangataAddress, 42)
-                )
+                .createType("AccountId32", destinationMangataAddress)
                 .toHex(),
               network: "Any"
             }
@@ -379,10 +380,7 @@ export class Tx {
             AccountId32: {
               network: "Any",
               id: api
-                .createType(
-                  "AccountId32",
-                  encodeAddress(destinationKusamaAddress, 2)
-                )
+                .createType("AccountId32", destinationKusamaAddress)
                 .toHex()
             }
           }

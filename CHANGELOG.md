@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.0.3](https://github.com/mangata-finance/mangata-SDK/compare/v1.0.2...v1.0.3) (2022-06-16)
 
+- FIX: remove encodeAddress method from XCM functions
+
 ### [1.0.2](https://github.com/mangata-finance/mangata-SDK/compare/v1.0.1...v1.0.2) (2022-06-15)
 
 - FIX: subscribe for finalized blocks only

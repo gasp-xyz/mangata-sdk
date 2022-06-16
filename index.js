@@ -6,8 +6,8 @@ var util = require('@polkadot/util');
 var api = require('@polkadot/api');
 var ws = require('@polkadot/rpc-provider/ws');
 var types = require('@mangata-finance/types');
-var utilCrypto = require('@polkadot/util-crypto');
 var mangataPrngXoshiro = require('mangata-prng-xoshiro');
+var utilCrypto = require('@polkadot/util-crypto');
 var Big = require('big.js');
 var uuid = require('uuid');
 
@@ -655,7 +655,9 @@ const signTx = async (api, tx, account, txOptions) => {
                                 return tx.isSigned;
                             })
                                 .map((tx) => {
-                                const who = tx.isSigned ? tx.signer.toString() : "0000";
+                                const who = tx.isSigned
+                                    ? tx.signer.toString()
+                                    : "0000";
                                 return [who, tx];
                             }), Uint8Array.from(buffer));
                             const executionOrder = unshuffledInherents.concat(shuffledExtrinscs);
@@ -789,7 +791,7 @@ class Tx {
                     X1: {
                         AccountId32: {
                             id: kusamaApi
-                                .createType("AccountId32", utilCrypto.encodeAddress(destinationMangataAddress, 42))
+                                .createType("AccountId32", destinationMangataAddress)
                                 .toHex(),
                             network: "Any"
                         }
@@ -829,7 +831,7 @@ class Tx {
                         AccountId32: {
                             network: "Any",
                             id: api
-                                .createType("AccountId32", utilCrypto.encodeAddress(destinationKusamaAddress, 2))
+                                .createType("AccountId32", destinationKusamaAddress)
                                 .toHex()
                         }
                     }

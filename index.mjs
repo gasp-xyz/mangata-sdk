@@ -3,8 +3,8 @@ export { BN } from '@polkadot/util';
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { WsProvider } from '@polkadot/rpc-provider/ws';
 import { options } from '@mangata-finance/types';
-import { encodeAddress } from '@polkadot/util-crypto';
 import { XoShiRo256Plus } from 'mangata-prng-xoshiro';
+import { encodeAddress } from '@polkadot/util-crypto';
 import Big from 'big.js';
 import { v4 } from 'uuid';
 
@@ -648,7 +648,9 @@ const signTx = async (api, tx, account, txOptions) => {
                                 return tx.isSigned;
                             })
                                 .map((tx) => {
-                                const who = tx.isSigned ? tx.signer.toString() : "0000";
+                                const who = tx.isSigned
+                                    ? tx.signer.toString()
+                                    : "0000";
                                 return [who, tx];
                             }), Uint8Array.from(buffer));
                             const executionOrder = unshuffledInherents.concat(shuffledExtrinscs);
@@ -782,7 +784,7 @@ class Tx {
                     X1: {
                         AccountId32: {
                             id: kusamaApi
-                                .createType("AccountId32", encodeAddress(destinationMangataAddress, 42))
+                                .createType("AccountId32", destinationMangataAddress)
                                 .toHex(),
                             network: "Any"
                         }
@@ -822,7 +824,7 @@ class Tx {
                         AccountId32: {
                             network: "Any",
                             id: api
-                                .createType("AccountId32", encodeAddress(destinationKusamaAddress, 2))
+                                .createType("AccountId32", destinationKusamaAddress)
                                 .toHex()
                         }
                     }
