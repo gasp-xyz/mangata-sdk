@@ -1194,7 +1194,7 @@ class Mangata {
      * for Mangata
      */
     async connectToNode(urls) {
-        const provider = new ws.WsProvider(urls);
+        const provider = new ws.WsProvider(urls, 5000);
         const api$1 = await new api.ApiPromise(types.options({ provider, throwOnConnect: true, throwOnUnknown: true })).isReady;
         return api$1;
     }

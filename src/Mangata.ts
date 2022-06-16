@@ -49,7 +49,7 @@ export class Mangata {
    * for Mangata
    */
   private async connectToNode(urls: string[]) {
-    const provider = new WsProvider(urls);
+    const provider = new WsProvider(urls, 5000);
     const api = await new ApiPromise(
       options({ provider, throwOnConnect: true, throwOnUnknown: true })
     ).isReady;
