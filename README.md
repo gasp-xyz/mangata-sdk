@@ -18,8 +18,6 @@
 ![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fmangata-finance%2Fmangata-sdk%2Fbadge%3Fref%3Ddevelop&style=flat)
 ![npm type definitions](https://img.shields.io/npm/types/%40mangata-finance%2Fsdk)
 
-# DO NOT USE. UNDER DEVELOPMENT
-
 # Getting Started
 
 Mangata SDK is a first library, built in typescript that provides easy methods for buying and selling assets on Mangata DEX. The main purpose is to save time for builders of client applications, primarily for algorithmic traders and frontend interface builders.
