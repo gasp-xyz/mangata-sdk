@@ -155,7 +155,9 @@ it("should sell asset", async () => {
     secondTokenId.toString(),
     new BN(25000)
   );
+
   await instance.waitForNewBlock(2);
+
   await instance.sellAsset(
     testUser,
     firstTokenId.toString(),
@@ -183,7 +185,9 @@ it("should mint liquidity", async () => {
     secondTokenId.toString(),
     new BN(25000)
   );
+
   await instance.waitForNewBlock(2);
+
   await instance.mintLiquidity(
     testUser,
     firstTokenId.toString(),
@@ -200,6 +204,8 @@ it("should mint liquidity", async () => {
 });
 
 it("should burn liquidity", async () => {
+  const beforePools = await instance.getPools();
+
   await instance.createPool(
     testUser,
     firstTokenId.toString(),
@@ -207,12 +213,34 @@ it("should burn liquidity", async () => {
     secondTokenId.toString(),
     new BN(25000)
   );
+
   await instance.waitForNewBlock(2);
+
+  const liquidityTokenId = await instance.getLiquidityTokenId(
+    firstTokenId.toString(),
+    secondTokenId.toString()
+  );
+
+  await instance.waitForNewBlock(2);
+
+  const investedPools = await instance.getInvestedPools(testUser.address);
+
+  const investedPool = investedPools.find(
+    (investedPool) =>
+      investedPool.liquidityTokenId === liquidityTokenId.toString()
+  );
+
+  await instance.waitForNewBlock(2);
+
+  const amountToBurn = investedPool.nonActivatedLPTokens.add(
+    investedPool.activatedLPTokens
+  );
+
   await instance.burnLiquidity(
     testUser,
     firstTokenId.toString(),
     secondTokenId.toString(),
-    new BN(10000),
+    amountToBurn,
     {
       extrinsicStatus: (result) => {
         const eventResult = getEventResultFromTxWait(result);
@@ -220,6 +248,11 @@ it("should burn liquidity", async () => {
       }
     }
   );
+  await instance.waitForNewBlock(2);
+
+  const afterPools = await instance.getPools();
+
+  expect(beforePools.length).toEqual(afterPools.length);
 });
 
 afterAll(async () => {

@@ -127,6 +127,9 @@ declare class Mangata {
     getUrls(): string[];
     /**
      * Wait for the new block
+     * (by default 2) - Do not use blockCount = 1 it gives an error
+     * when executing transactions
+     * @param {number} blockCount - The block number to wait for
      */
     waitForNewBlock(blockCount?: number): Promise<boolean>;
     /**

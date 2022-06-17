@@ -17,7 +17,7 @@ export const createTokenForUser = async (
   amount: BN
 ): Promise<BN> => {
   const api = await instance.getApi();
-  await instance.waitForNewBlock();
+  await instance.waitForNewBlock(2);
   const nonce = await instance.getNonce(sudo.address);
   let tokenId: BN;
   await signTx(
@@ -100,7 +100,7 @@ export const createMGXToken = async (
 ): Promise<void> => {
   const api = await instance.getApi();
   const nonce = await instance.getNonce(sudoUser.address);
-  await instance.waitForNewBlock();
+  await instance.waitForNewBlock(2);
   await signTx(
     api,
     api.tx.sudo.sudo(api.tx.tokens.mint("0", user.address, new BN(amount))),

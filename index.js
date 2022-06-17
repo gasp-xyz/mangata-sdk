@@ -1195,7 +1195,7 @@ class Mangata {
      */
     async connectToNode(urls) {
         const provider = new ws.WsProvider(urls, 5000);
-        const api$1 = await new api.ApiPromise(types.options({ provider, throwOnConnect: true, throwOnUnknown: true })).isReady;
+        const api$1 = await api.ApiPromise.create(types.options({ provider, throwOnConnect: true, throwOnUnknown: true }));
         return api$1;
     }
     /**
@@ -1229,6 +1229,9 @@ class Mangata {
     }
     /**
      * Wait for the new block
+     * (by default 2) - Do not use blockCount = 1 it gives an error
+     * when executing transactions
+     * @param {number} blockCount - The block number to wait for
      */
     async waitForNewBlock(blockCount) {
         let count = 0;

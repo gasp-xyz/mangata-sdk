@@ -50,9 +50,9 @@ export class Mangata {
    */
   private async connectToNode(urls: string[]) {
     const provider = new WsProvider(urls, 5000);
-    const api = await new ApiPromise(
+    const api = await ApiPromise.create(
       options({ provider, throwOnConnect: true, throwOnUnknown: true })
-    ).isReady;
+    );
     return api;
   }
 
@@ -90,6 +90,9 @@ export class Mangata {
 
   /**
    * Wait for the new block
+   * (by default 2) - Do not use blockCount = 1 it gives an error
+   * when executing transactions
+   * @param {number} blockCount - The block number to wait for
    */
   public async waitForNewBlock(blockCount?: number): Promise<boolean> {
     let count = 0;
