@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.0.5](https://github.com/mangata-finance/mangata-SDK/compare/v1.0.4...v1.0.5) (2022-06-17)
 
+- create api using ApiPromise.create() instead of new ApiPromise()
+
 ### [1.0.4](https://github.com/mangata-finance/mangata-SDK/compare/v1.0.3...v1.0.4) (2022-06-16)
 
 - add reconnection 5 seconds
