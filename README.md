@@ -43,9 +43,7 @@ const { Mangata } = require("@mangata-finance/sdk");
 
 async function main() {
   // Connect to the mainet (also testnet, mainnet)
-  const mangata = Mangata.getInstance(
-    "wss://mangata-x.api.onfinality.io/public-ws"
-  );
+  const mangata = Mangata.getInstance(["wss://mangata-x.api.onfinality.io/public-ws"]);
 
   // Retrieve the chainName, nodeName & nodeVersion information
   const [chain, nodeName, nodeVersion] = await Promise.all([
