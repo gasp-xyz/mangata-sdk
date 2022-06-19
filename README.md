@@ -11,14 +11,12 @@
 
 ![Artwork](https://mangata.finance/images/home/assets-artwork.webp)
 
-![npm](https://img.shields.io/npm/v/mangata-sdk)
+![npm](https://img.shields.io/npm/v/%40mangata-finance%2Fsdk)
 ![Issues](https://img.shields.io/github/issues/mangata-finance/mangata-sdk)
 ![Pull Request](https://img.shields.io/github/issues-pr/mangata-finance/mangata-sdk)
 ![GitHub last commit](https://img.shields.io/github/last-commit/mangata-finance/mangata-sdk)
 ![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fmangata-finance%2Fmangata-sdk%2Fbadge%3Fref%3Ddevelop&style=flat)
-![npm type definitions](https://img.shields.io/npm/types/mangata-sdk)
-
-# DO NOT USE. UNDER DEVELOPMENT
+![npm type definitions](https://img.shields.io/npm/types/%40mangata-finance%2Fsdk)
 
 # Getting Started
 
@@ -43,9 +41,7 @@ const { Mangata } = require("@mangata-finance/sdk");
 
 async function main() {
   // Connect to the mainet (also testnet, mainnet)
-  const mangata = Mangata.getInstance(
-    "wss://mangata-x.api.onfinality.io/public-ws"
-  );
+  const mangata = Mangata.getInstance(["wss://mangata-x.api.onfinality.io/public-ws"]);
 
   // Retrieve the chainName, nodeName & nodeVersion information
   const [chain, nodeName, nodeVersion] = await Promise.all([
