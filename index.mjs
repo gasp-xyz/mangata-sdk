@@ -118,7 +118,9 @@ const getAssetsInfoMap = async (api) => {
     // TKN0x000003CD-TKN0x00000000
     // therefore we need to parse this to tokens ids
     // TKN0x000003CD-TKN0x00000000 -> 13-4 -> 'm12-MGA / mDOT'
-    return Object.values(result).reduce((obj, item) => {
+    return Object.values(result)
+        .filter((item) => item.symbol !== "ETH")
+        .reduce((obj, item) => {
         const asset = {
             ...item,
             symbol: item.symbol.includes("TKN")
@@ -1179,8 +1181,11 @@ class Mangata {
      * construction calls with the `new` operator.
      */
     constructor(urls) {
-        this.api = null;
         this.urls = urls;
+        this.api = (async () => {
+            const api = await this.connectToNode(urls);
+            return api;
+        })();
     }
     /**
      * Initialised via create method with proper types and rpc
@@ -1229,7 +1234,7 @@ class Mangata {
     async waitForNewBlock(blockCount) {
         let count = 0;
         const api = await this.getApi();
-        const numberOfBlocks = blockCount || 1;
+        const numberOfBlocks = blockCount || 2;
         return new Promise(async (resolve) => {
             const unsubscribe = await api.rpc.chain.subscribeFinalizedHeads(() => {
                 if (++count === numberOfBlocks) {

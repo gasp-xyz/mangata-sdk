@@ -35,20 +35,22 @@ export const getAssetsInfoMap = async (api: ApiPromise) => {
   // TKN0x000003CD-TKN0x00000000
   // therefore we need to parse this to tokens ids
   // TKN0x000003CD-TKN0x00000000 -> 13-4 -> 'm12-MGA / mDOT'
-  return Object.values(result).reduce((obj, item) => {
-    const asset = {
-      ...item,
-      symbol: item.symbol.includes("TKN")
-        ? getCorrectSymbol(item.symbol, result)
-        : item.symbol,
-      address:
-        item.symbol === "MGA"
-          ? MGAaddress
-          : item.symbol === "ETH"
-          ? ETHaddress
-          : item.address
-    };
-    obj[item.id] = asset;
-    return obj;
-  }, {} as { [id: TTokenId]: TTokenInfo });
+  return Object.values(result)
+    .filter((item) => item.symbol !== "ETH")
+    .reduce((obj, item) => {
+      const asset = {
+        ...item,
+        symbol: item.symbol.includes("TKN")
+          ? getCorrectSymbol(item.symbol, result)
+          : item.symbol,
+        address:
+          item.symbol === "MGA"
+            ? MGAaddress
+            : item.symbol === "ETH"
+            ? ETHaddress
+            : item.address
+      };
+      obj[item.id] = asset;
+      return obj;
+    }, {} as { [id: TTokenId]: TTokenInfo });
 };

@@ -28,7 +28,7 @@ import { calculateFutureRewardsAmount } from "./utils/calculateFutureRewardsAmou
  * The Mangata class defines the `getInstance` method that lets clients access the unique singleton instance.
  */
 export class Mangata {
-  private api: Promise<ApiPromise> | null;
+  private api: Promise<ApiPromise>;
   private urls: string[];
   private static instanceMap: Map<string[], Mangata> = new Map<
     string[],
@@ -40,8 +40,11 @@ export class Mangata {
    * construction calls with the `new` operator.
    */
   private constructor(urls: string[]) {
-    this.api = null;
     this.urls = urls;
+    this.api = (async () => {
+      const api = await this.connectToNode(urls);
+      return api;
+    })();
   }
 
   /**
@@ -77,7 +80,6 @@ export class Mangata {
     if (!this.api) {
       this.api = this.connectToNode(this.urls);
     }
-
     return this.api;
   }
 
@@ -98,7 +100,7 @@ export class Mangata {
     let count = 0;
     const api = await this.getApi();
 
-    const numberOfBlocks = blockCount || 1;
+    const numberOfBlocks = blockCount || 2;
 
     return new Promise(async (resolve) => {
       const unsubscribe = await api.rpc.chain.subscribeFinalizedHeads(() => {
