@@ -25,6 +25,7 @@ beforeEach(async () => {
   sudoUser = MangataHelpers.createKeyPairFromName(keyring, SUDO_USER_NAME);
 
   await instance.waitForNewBlock(2);
+
   firstTokenId = await createTokenForUser(
     testUser,
     sudoUser,
@@ -122,9 +123,9 @@ it("should sell asset 4 times", async () => {
     secondTokenId.toString(),
     new BN(100000)
   );
-  const userNonce = [];
+  const userNonce: BN[] = [];
   userNonce.push(await instance.getNonce(testUser.address));
-  const promises = [];
+  const promises: any = [];
   const maxFutureNonce = userNonce[0].toNumber() + 3;
   for (let index = maxFutureNonce; index >= userNonce[0].toNumber(); index--) {
     promises.push(
@@ -232,15 +233,15 @@ it("should burn liquidity", async () => {
 
   await instance.waitForNewBlock(2);
 
-  const amountToBurn = investedPool.nonActivatedLPTokens.add(
-    investedPool.activatedLPTokens
-  );
+  const amountToBurn =
+    investedPool &&
+    investedPool.nonActivatedLPTokens.add(investedPool.activatedLPTokens);
 
   await instance.burnLiquidity(
     testUser,
     firstTokenId.toString(),
     secondTokenId.toString(),
-    amountToBurn,
+    amountToBurn!,
     {
       extrinsicStatus: (result) => {
         const eventResult = getEventResultFromTxWait(result);

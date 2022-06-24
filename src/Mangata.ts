@@ -103,7 +103,7 @@ export class Mangata {
     const numberOfBlocks = blockCount || 2;
 
     return new Promise(async (resolve) => {
-      const unsubscribe = await api.rpc.chain.subscribeFinalizedHeads(() => {
+      const unsubscribe = await api.rpc.chain.subscribeNewHeads(() => {
         if (++count === numberOfBlocks) {
           unsubscribe();
           resolve(true);

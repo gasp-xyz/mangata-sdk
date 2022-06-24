@@ -82,21 +82,21 @@ export class Query {
     address: TTokenAddress,
     tokenId: TTokenId
   ): Promise<TokenBalance> {
-    const balanceResponse = await api.query.tokens.accounts(address, tokenId);
-    const balance = JSON.parse(JSON.stringify(balanceResponse)) as {
-      free: string;
-      reserved: string;
-      frozen: string;
-    };
+    const { free, reserved, frozen } = await api.query.tokens.accounts(
+      address,
+      tokenId
+    );
 
     return {
-      free: isHex(balance.free) ? hexToBn(balance.free) : new BN(balance.free),
-      reserved: isHex(balance.reserved)
-        ? hexToBn(balance.reserved)
-        : new BN(balance.reserved),
-      frozen: isHex(balance.frozen)
-        ? hexToBn(balance.frozen)
-        : new BN(balance.frozen)
+      free: isHex(free.toString())
+        ? hexToBn(free.toString())
+        : new BN(free.toString()),
+      reserved: isHex(reserved.toString())
+        ? hexToBn(reserved.toString())
+        : new BN(reserved.toString()),
+      frozen: isHex(frozen.toString())
+        ? hexToBn(frozen.toString())
+        : new BN(frozen.toString())
     };
   }
 

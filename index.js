@@ -320,16 +320,17 @@ class Query {
         return new util.BN(tokenSupply);
     }
     static async getTokenBalance(api, address, tokenId) {
-        const balanceResponse = await api.query.tokens.accounts(address, tokenId);
-        const balance = JSON.parse(JSON.stringify(balanceResponse));
+        const { free, reserved, frozen } = await api.query.tokens.accounts(address, tokenId);
         return {
-            free: util.isHex(balance.free) ? util.hexToBn(balance.free) : new util.BN(balance.free),
-            reserved: util.isHex(balance.reserved)
-                ? util.hexToBn(balance.reserved)
-                : new util.BN(balance.reserved),
-            frozen: util.isHex(balance.frozen)
-                ? util.hexToBn(balance.frozen)
-                : new util.BN(balance.frozen)
+            free: util.isHex(free.toString())
+                ? util.hexToBn(free.toString())
+                : new util.BN(free.toString()),
+            reserved: util.isHex(reserved.toString())
+                ? util.hexToBn(reserved.toString())
+                : new util.BN(reserved.toString()),
+            frozen: util.isHex(frozen.toString())
+                ? util.hexToBn(frozen.toString())
+                : new util.BN(frozen.toString())
         };
     }
     static async getNextTokenId(api) {
@@ -1243,7 +1244,7 @@ class Mangata {
         const api = await this.getApi();
         const numberOfBlocks = blockCount || 2;
         return new Promise(async (resolve) => {
-            const unsubscribe = await api.rpc.chain.subscribeFinalizedHeads(() => {
+            const unsubscribe = await api.rpc.chain.subscribeNewHeads(() => {
                 if (++count === numberOfBlocks) {
                     unsubscribe();
                     resolve(true);
