@@ -1,6 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 
-export const liquidityPromotedTokenMap = async (api: ApiPromise) => {
+export const getLiquidityPromotedPools = async (api: ApiPromise) => {
   try {
     const liquidityAssetsResponse =
       await api.query.issuance.promotedPoolsRewards.entries();

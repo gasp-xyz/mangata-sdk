@@ -1,4 +1,5 @@
 import dts from "rollup-plugin-dts";
+import { terser } from "rollup-plugin-terser";
 
 export default [
   {
@@ -6,11 +7,13 @@ export default [
     output: [
       {
         file: "index.js",
-        format: "cjs"
+        format: "cjs",
+        plugins: [terser()]
       },
       {
         file: "index.mjs",
-        format: "es"
+        format: "es",
+        plugins: [terser()]
       }
     ]
   },

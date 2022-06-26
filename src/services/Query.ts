@@ -13,16 +13,14 @@ import {
   TPoolWithRatio,
   TPoolWithShare
 } from "../types/AssetInfo";
-import { getAssetsInfoMap } from "../utils/getAssetsInfoMap";
-import { liquidityAssetsMap } from "../utils/liquidityAssetsMap";
-import { poolsBalanceMap } from "../utils/poolsBalanceMap";
-import { balancesMap } from "../utils/balancesMap";
-import { accountEntriesMap } from "../utils/accountEntriesMap";
-import { getCorrectSymbol } from "../utils/getCorrectSymbol";
-import { getAssetsInfoMapWithIds } from "../utils/getAssetsInfoMapWithIds";
+import { getCompleteAssetsInfo } from "../utils/getCompleteAssetsInfo";
+import { getLiquidityAssets } from "../utils/getLiquidityAssets";
+import { getPoolsBalance } from "../utils/getPoolsBalance";
+import { getAccountBalances } from "../utils/getAccountBalances";
+import { getAssetsInfoWithIds } from "../utils/getAssetsInfoWithIds";
 import { calculateLiquidityShare } from "../utils/calculateLiquidityShare";
 import { getRatio } from "../utils/getRatio";
-import { liquidityPromotedTokenMap } from "../utils/liquidityPromotedTokenMap";
+import { getLiquidityPromotedPools } from "../utils/getLiquidityPromotedPools";
 
 export class Query {
   static async getNonce(api: ApiPromise, address: TTokenAddress): Promise<BN> {
@@ -109,16 +107,8 @@ export class Query {
     api: ApiPromise,
     tokenId: TTokenId
   ): Promise<TTokenInfo> {
-    const assetsInfo = await getAssetsInfoMap(api);
-
-    const asset = assetsInfo[tokenId];
-    return asset.name.includes("LiquidityPoolToken")
-      ? {
-          ...asset,
-          name: "Liquidity Pool Token",
-          symbol: getCorrectSymbol(asset.symbol, assetsInfo)
-        }
-      : asset;
+    const assetsInfo = await this.getAssetsInfo(api);
+    return assetsInfo[tokenId];
   }
 
   static async getLiquidityTokenIds(api: ApiPromise): Promise<TTokenId[]> {
@@ -129,22 +119,43 @@ export class Query {
   }
 
   static async getLiquidityTokens(api: ApiPromise): Promise<TMainTokens> {
-    const assetsInfo = await getAssetsInfoMap(api);
+    const assetsInfo = await this.getAssetsInfo(api);
 
-    return Object.values(assetsInfo)
-      .reduce(
-        (acc, asset) =>
-          asset.name.includes("Liquidity Pool Token") ? acc.concat(asset) : acc,
-        [] as TTokenInfo[]
-      )
-      .reduce((acc, assetInfo) => {
-        acc[assetInfo.id] = assetInfo;
-        return acc;
-      }, {} as { [id: TTokenId]: TTokenInfo });
+    return Object.values(assetsInfo).reduce((acc, curr) => {
+      if (curr.name.includes("Liquidity Pool Token")) {
+        acc[curr.id] = curr;
+      }
+      return acc;
+    }, {} as { [id: TTokenId]: TTokenInfo });
   }
 
   static async getAssetsInfo(api: ApiPromise): Promise<TMainTokens> {
-    return await getAssetsInfoMap(api);
+    const completeAssetsInfo = await getCompleteAssetsInfo(api);
+    // we need to filter out ETH and Dummy liquidity token
+    // then we need to display symbol for liquidity token
+    return Object.values(completeAssetsInfo)
+      .filter((assetsInfo) => assetsInfo.id !== "1" && assetsInfo.id !== "3")
+      .reduce((obj, item) => {
+        const asset = {
+          ...item,
+          symbol: item.symbol.includes("TKN")
+            ? item.symbol
+                .split("-")
+                .reduce((acc, curr) => {
+                  const currentValue = curr.replace("TKN", "");
+                  const tokenId = currentValue.startsWith("0x")
+                    ? hexToBn(currentValue).toString()
+                    : currentValue;
+                  const symbol = completeAssetsInfo[tokenId].symbol;
+                  acc.push(symbol);
+                  return acc;
+                }, [] as string[])
+                .join("-")
+            : item.symbol
+        };
+        obj[asset.id] = asset;
+        return obj;
+      }, {} as { [id: TTokenId]: TTokenInfo });
   }
 
   static async getBlockNumber(api: ApiPromise): Promise<string> {
@@ -156,53 +167,57 @@ export class Query {
     api: ApiPromise,
     address: string
   ): Promise<{ [id: TTokenId]: TToken } | null> {
-    if (!address) {
-      return null;
-    }
+    if (!address) return null;
 
-    const [assetsInfo, accountEntries] = await Promise.all([
-      getAssetsInfoMap(api),
-      accountEntriesMap(api, address)
+    const [assetsInfo, accountBalances] = await Promise.all([
+      this.getAssetsInfo(api),
+      getAccountBalances(api, address)
     ]);
 
-    return Object.values(assetsInfo)
-      .filter((assetInfo) => accountEntries[assetInfo.id])
-      .reduce((acc, assetInfo) => {
-        const asset = {
+    return Object.values(assetsInfo).reduce((acc, assetInfo) => {
+      if (Object.keys(accountBalances).includes(assetInfo.id)) {
+        acc[assetInfo.id] = {
           ...assetInfo,
-          balance: accountEntries[assetInfo.id]
+          balance: accountBalances[assetInfo.id]
         };
-
-        acc[asset.id] = asset;
-        return acc;
-      }, {} as { [id: TTokenId]: TToken });
+      }
+      return acc;
+    }, {} as { [id: TTokenId]: TToken });
   }
 
+  // In the next major release rename this to
+  // getTotalIssuanceOfTokens
   static async getBalances(api: ApiPromise): Promise<TBalances> {
-    return await balancesMap(api);
+    const balancesResponse = await api.query.tokens.totalIssuance.entries();
+
+    return balancesResponse.reduce((acc, [key, value]) => {
+      const id = (key.toHuman() as string[])[0].replace(/[, ]/g, "");
+      const balance = new BN(value.toString());
+      acc[id] = balance;
+      return acc;
+    }, {} as { [id: string]: BN });
   }
 
-  static async getInvestedPools(
-    api: ApiPromise,
-    address: TTokenAddress
-  ): Promise<Promise<TPoolWithShare>[]> {
-    const [assetsInfo, accountEntries, liquidityTokensPromoted] =
+  static async getInvestedPools(api: ApiPromise, address: TTokenAddress) {
+    const [assetsInfo, accountBalances, liquidityTokensPromoted] =
       await Promise.all([
-        getAssetsInfoMapWithIds(api),
-        accountEntriesMap(api, address),
-        liquidityPromotedTokenMap(api)
+        getAssetsInfoWithIds(api),
+        getAccountBalances(api, address),
+        getLiquidityPromotedPools(api)
       ]);
 
-    return Object.values(assetsInfo)
-      .reduce(
-        (acc, asset) => (accountEntries[asset.id] ? acc.concat(asset) : acc),
-        [] as TTokenInfo[]
-      )
-      .filter((asset: TTokenInfo) =>
-        asset.name.includes("Liquidity Pool Token")
-      )
+    const poolsInfo = Object.values(assetsInfo)
+      .reduce((acc, asset) => {
+        if (
+          Object.keys(accountBalances).includes(asset.id) &&
+          asset.name.includes("Liquidity Pool Token")
+        ) {
+          acc.push(asset);
+        }
+        return acc;
+      }, [] as TTokenInfo[])
       .map(async (asset: TTokenInfo) => {
-        const userLiquidityBalance = accountEntries[asset.id];
+        const userLiquidityBalance = accountBalances[asset.id];
         const firstTokenId = asset.symbol.split("-")[0];
         const secondTokenId = asset.symbol.split("-")[1];
         const [firstTokenAmount, secondTokenAmount] =
@@ -237,16 +252,16 @@ export class Query {
 
         return poolInfo;
       });
+
+    return Promise.all(poolsInfo);
   }
 
   static async getPool(api: ApiPromise, liquidityTokenId: TTokenId) {
-    const liquidityPool = await api.query.xyk.liquidityPools(liquidityTokenId);
-    const liquidityPoolId = JSON.parse(JSON.stringify(liquidityPool)) as [
-      TTokenId,
-      TTokenId
-    ];
-    const liquidityTokensPromoted = await liquidityPromotedTokenMap(api);
-    const [firstTokenId, secondTokenId] = liquidityPoolId;
+    const [liquidityPoolTokens, isPoolPromoted] = await Promise.all([
+      this.getLiquidityPool(api, liquidityTokenId),
+      api.query.issuance.promotedPoolsRewards(liquidityTokenId)
+    ]);
+    const [firstTokenId, secondTokenId] = liquidityPoolTokens;
     const [firstTokenAmount, secondTokenAmount] =
       await this.getAmountOfTokenIdInPool(
         api,
@@ -254,12 +269,12 @@ export class Query {
         secondTokenId.toString()
       );
     return {
-      firstTokenId,
-      secondTokenId,
+      firstTokenId: firstTokenId.toString(),
+      secondTokenId: secondTokenId.toString(),
       firstTokenAmount,
       secondTokenAmount,
       liquidityTokenId,
-      isPromoted: liquidityTokensPromoted.includes(liquidityTokenId),
+      isPromoted: isPoolPromoted.gtn(0),
       firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
       secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount)
     } as TPoolWithRatio;
@@ -267,11 +282,11 @@ export class Query {
 
   static async getPools(api: ApiPromise): Promise<TPoolWithRatio[]> {
     const [assetsInfo, liquidityAssets] = await Promise.all([
-      getAssetsInfoMapWithIds(api),
-      liquidityAssetsMap(api)
+      getAssetsInfoWithIds(api),
+      getLiquidityAssets(api)
     ]);
-    const poolBalances = await poolsBalanceMap(api, liquidityAssets);
-    const liquidityTokensPromoted = await liquidityPromotedTokenMap(api);
+    const poolBalances = await getPoolsBalance(api, liquidityAssets);
+    const liquidityTokensPromoted = await getLiquidityPromotedPools(api);
 
     return Object.values(assetsInfo)
       .reduce(

@@ -1,7 +1,7 @@
 import { KeyringPair } from "@polkadot/keyring/types";
 import { BN } from "@polkadot/util";
 
-import { Mangata, signTx } from "../index";
+import { signTx } from "../index";
 import { instance } from "./instanceCreation";
 import { MangataGenericEvent } from "../src/types/MangataGenericEvent";
 
@@ -19,24 +19,21 @@ export const createTokenForUser = async (
   const api = await instance.getApi();
   await instance.waitForNewBlock(2);
   const nonce = await instance.getNonce(sudo.address);
-  let tokenId: BN;
-  await signTx(
+  const result = await signTx(
     api,
     api.tx.sudo.sudo(api.tx.tokens.create(user.address, amount)),
     sudo,
     {
-      nonce,
-      extrinsicStatus: (result) => {
-        const eventResult = getEventResultFromTxWait(result, [
-          "tokens",
-          "Issued",
-          user.address
-        ]);
-
-        tokenId = new BN(eventResult.data[0]["data"]);
-      }
+      nonce
     }
   );
+  const eventResult = getEventResultFromTxWait(result, [
+    "tokens",
+    "Issued",
+    user.address
+  ]);
+
+  const tokenId = new BN(eventResult.data[0]["data"]);
 
   return tokenId;
 };

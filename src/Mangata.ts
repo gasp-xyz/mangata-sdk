@@ -875,15 +875,7 @@ export class Mangata {
 
   public async getInvestedPools(address: string): Promise<TPoolWithShare[]> {
     const api = await this.getApi();
-    const investedPools = await Query.getInvestedPools(api, address);
-
-    const investedPoolsFormatted = [];
-    for (const pool of investedPools) {
-      const awaitedPool = await pool;
-      investedPoolsFormatted.push(awaitedPool);
-    }
-
-    return investedPoolsFormatted as TPoolWithShare[];
+    return await Query.getInvestedPools(api, address);
   }
 
   public async getPools(): Promise<TPoolWithRatio[]> {

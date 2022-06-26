@@ -4,9 +4,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.0.8](https://github.com/mangata-finance/mangata-SDK/compare/v1.0.7...v1.0.8) (2022-06-26)
 
-### [1.0.9](https://github.com/mangata-finance/mangata-SDK/compare/v1.0.7...v1.0.9) (2022-06-26)
-
-### [1.0.8](https://github.com/mangata-finance/mangata-SDK/compare/v1.0.7...v1.0.8) (2022-06-26)
+- Internal refactoring for better performance
 
 ### [1.0.7](https://github.com/mangata-finance/mangata-SDK/compare/v1.0.6...v1.0.7) (2022-06-24)
 
