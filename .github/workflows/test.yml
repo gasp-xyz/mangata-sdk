@@ -12,14 +12,12 @@ jobs:
 
     steps:
       - name: set registry
-        run: yarn config set registry https://registry.npmjs.org
+        run: npm config set registry https://registry.npmjs.org
 
       - uses: actions/checkout@v2
-      - name: install
-        run: yarn --network-timeout 100000
 
       - name: Lint
-        run: yarn eslint
+        run: npm eslint
 
       - name: Start mangata-node node
         run: docker-compose -f devops/parachain/docker-compose.yml up -d
@@ -31,7 +29,7 @@ jobs:
         run: docker ps
         
       - name: Build the library
-        run: yarn build
+        run: npm build
 
       - name: Test
-        run: yarn test
+        run: npm test
