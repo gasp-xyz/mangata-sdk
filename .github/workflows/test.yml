@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Lint
-        run: npm eslint
+        run: npm run eslint
 
       - name: Start mangata-node node
         run: docker-compose -f devops/parachain/docker-compose.yml up -d
@@ -29,7 +29,7 @@ jobs:
         run: docker ps
         
       - name: Build the library
-        run: npm build
+        run: npm run build
 
       - name: Test
-        run: npm test
+        run: npm run test
