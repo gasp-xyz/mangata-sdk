@@ -1,34 +1,93 @@
 name: CI
-on: [push]
+
+on:
+  - push
+  - pull_request
+
+env:
+  API_URL: "ws://127.0.0.1:8844"
+  TEST_PALLET_ADDRESS: ${{ secrets.TEST_PALLET_ADDRESS }}
+  TEST_SUDO_NAME: ${{ secrets.TEST_SUDO_NAME }}
+
 jobs:
-  build:
-    name: Test code quality and run tests
+  complete-setup:
     runs-on: ubuntu-latest
-
-    env:
-      API_URL: 'ws://10.0.0.6:9944'
-      TEST_PALLET_ADDRESS: ${{ secrets.TEST_PALLET_ADDRESS }}
-      TEST_SUDO_NAME: ${{ secrets.TEST_SUDO_NAME }}
-
     steps:
+      - name: Clone mangata node repository
+        uses: actions/checkout@v2
+        with:
+          repository: mangata-finance/mangata-node
+          path: mangata-repo
+          ref: develop
+
+      - name: Checked cloned mangata repo
+        run: |
+          cd $GITHUB_WORKSPACE/mangata-repo
+          ls -a
+
+      - name: Stop previous parachain if running
+        run: make -C $GITHUB_WORKSPACE/mangata-repo/devops/parachain stop
+
+      - name: Start mangata-node parachain
+        env:
+          ENV: rococo
+        run: make -C $GITHUB_WORKSPACE/mangata-repo/devops/parachain start
+
+      - name: Docker ps - chceck mangata node image
+        run: docker ps
+
+      - name: Sleep for 3 minutes
+        run: sleep 180s
+
+      - uses: actions/checkout@v2
+
       - name: set registry
         run: yarn config set registry https://registry.npmjs.org
 
-      - uses: actions/checkout@v2
-      - name: install
+      - name: Set network timeout
         run: yarn --network-timeout 100000
 
       - name: Lint
         run: yarn eslint
 
-      - name: Start mangata-node node
-        run: docker-compose -f devops/parachain/docker-compose.yml up -d
+      - name: Build the SDK
+        run: yarn build
 
-      - name: Sleep for 2 minutes
-        run: sleep 120s
+      - name: Run calculate price test
+        run: yarn test calculate-price.test.ts
 
-      - name: Docker ps
-        run: docker ps
+      - name: Run shuffling test
+        run: yarn test shuffling.test.ts
 
-      - name: Test
-        run: yarn test
+      - name: Run chain test
+        run: yarn test chain.test.ts
+
+      - name: Run node name test
+        run: yarn test node-name.test.ts
+
+      - name: Run node version test
+        run: yarn test node-version.test.ts
+
+      - name: Run transfer token test
+        run: yarn test transfer-token.test.ts
+
+      - name: Run pool balance test
+        run: yarn test pool-balance.test.ts
+
+      - name: Run create pool test
+        run: yarn test create-pool.test.ts
+
+      - name: Run burn liquidity test
+        run: yarn test burn-liquidity.test.ts
+
+      - name: Run buy asset test
+        run: yarn test buy-asset.test.ts
+
+      - name: Run mint liquidity test
+        run: yarn test mint-liquidity.test.ts
+
+      - name: Run sell asset test
+        run: yarn test sell-asset.test.ts
+
+      - name: Run sell asset four times test
+        run: yarn test sell-asset-four-times.test.ts
