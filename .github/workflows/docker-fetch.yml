@@ -1,0 +1,17 @@
+name: Fetch Docker Mangata node
+
+on:
+  - push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone mangata node repository
+        uses: actions/checkout@v2
+        with:
+          repository: mangata-finance/mangata-node
+          path: mangata-repo
+          ref: develop
+      - name: Check cloned repo
+        run: cat $HOME/mangata-repo
