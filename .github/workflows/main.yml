@@ -31,7 +31,7 @@ jobs:
       - name: Start mangata-node parachain
         env:
           ENV: rococo
-        run: make -C $GITHUB_WORKSPACE/mangata-repo/devops/parachain stop start
+        run: make -C $GITHUB_WORKSPACE/mangata-repo/devops/parachain start
 
       - name: Docker ps - chceck mangata node image
         run: docker ps

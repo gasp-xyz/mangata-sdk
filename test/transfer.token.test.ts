@@ -3,7 +3,7 @@ import { it, expect, afterAll, beforeEach } from "vitest";
 import { KeyringPair } from "@polkadot/keyring/types";
 
 import { instance, SUDO_USER_NAME } from "./instanceCreation";
-import { MangataHelpers } from "../index.mjs";
+import { MangataHelpers } from "../index.js";
 import {
   createMGXToken,
   getEventResultFromTxWait,
