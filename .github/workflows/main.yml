@@ -53,5 +53,41 @@ jobs:
       - name: Build the SDK
         run: yarn build
 
-      - name: Run all tests
-        run: yarn test
+      - name: Run calculate price test
+        run: yarn test calculate-price.test.ts
+
+      - name: Run shuffling test
+        run: yarn test shuffling.test.ts
+
+      - name: Run chain test
+        run: yarn test chain.test.ts
+
+      - name: Run node name test
+        run: yarn test node-name.test.ts
+
+      - name: Run node version test
+        run: yarn test node-version.test.ts
+
+      - name: Run transfer token test
+        run: yarn test transfer-token.test.ts
+
+      - name: Run pool balance test
+        run: yarn test pool-balance.test.ts
+
+      - name: Run create pool test
+        run: yarn test create-pool.test.ts
+
+      - name: Run burn liquidity test
+        run: yarn test burn-liquidity.test.ts
+
+      - name: Run buy asset test
+        run: yarn test buy-asset.test.ts
+
+      - name: Run mint liquidity test
+        run: yarn test mint-liquidity.test.ts
+
+      - name: Run sell asset test
+        run: yarn test sell-asset.test.ts
+
+      - name: Run sell asset four times test
+        run: yarn test sell-asset-four-times.test.ts
