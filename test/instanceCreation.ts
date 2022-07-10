@@ -1,4 +1,4 @@
-import { Mangata } from "../index";
+import { Mangata } from "../index.mjs";
 
 const uri = process.env.API_URL ? process.env.API_URL : "ws://127.0.0.1:8844";
 

@@ -3,14 +3,13 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { it, expect, afterAll, beforeEach } from "vitest";
 
 import { instance, SUDO_USER_NAME } from "./instanceCreation";
-import { MangataHelpers } from "../index";
+import { MangataHelpers } from "../index.mjs";
 import {
   createMGXToken,
   getEventResultFromTxWait,
   ExtrinsicResult,
   createTokenForUser
 } from "./utility";
-import { MangataGenericEvent } from "../src/types/MangataGenericEvent";
 
 let testUser: KeyringPair;
 let sudoUser: KeyringPair;
@@ -51,7 +50,7 @@ it("should create pool", async () => {
     secondTokenId.toString(),
     new BN(50000),
     {
-      extrinsicStatus: (result: MangataGenericEvent[]) => {
+      extrinsicStatus: (result) => {
         const eventResult = getEventResultFromTxWait(result, [
           "xyk",
           "PoolCreated",
