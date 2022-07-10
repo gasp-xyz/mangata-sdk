@@ -15,4 +15,4 @@ jobs:
           ref: develop
       - name: Check cloned repo
         run:
-          - cd ${GITHUB_WORKSPACE}/mangata-repo
+          - cd ${{ github.workspace/mangata-repo }}
