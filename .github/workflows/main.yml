@@ -1,34 +1,62 @@
 name: CI
-on: [push]
+
+on:
+  - push
+  - pull_request
+
+env:
+  API_URL: "ws://127.0.0.1:8844"
+  TEST_PALLET_ADDRESS: ${{ secrets.TEST_PALLET_ADDRESS }}
+  TEST_SUDO_NAME: ${{ secrets.TEST_SUDO_NAME }}
+
 jobs:
-  build:
-    name: Test code quality and run tests
+  mangata-node-init:
     runs-on: ubuntu-latest
-
-    env:
-      API_URL: 'ws://10.0.0.6:9944'
-      TEST_PALLET_ADDRESS: ${{ secrets.TEST_PALLET_ADDRESS }}
-      TEST_SUDO_NAME: ${{ secrets.TEST_SUDO_NAME }}
-
     steps:
+      - name: Clone mangata node repository
+        uses: actions/checkout@v2
+        with:
+          repository: mangata-finance/mangata-node
+          path: mangata-repo
+          ref: develop
+
+      - name: Checked cloned mangata repo
+        run: |
+          cd $GITHUB_WORKSPACE/mangata-repo
+          ls -a
+
+      - name: Stop previous parachain if running
+        run: make -C $GITHUB_WORKSPACE/mangata-repo/devops/parachain stop
+
+      - name: Start mangata-node parachain
+        env:
+          ENV: rococo
+        run: make -C $GITHUB_WORKSPACE/mangata-repo/devops/parachain stop start
+
+      - name: Docker ps - chceck mangata node image
+        run: docker ps
+
+      - name: Sleep for 2 minutes
+        run: sleep 120s
+
+  setup-dev-config:
+    runs-on: ubuntu-latest
+    needs: ["mangata-node-init"]
+    steps:
+      - uses: actions/checkout@v2
+
       - name: set registry
         run: yarn config set registry https://registry.npmjs.org
 
-      - uses: actions/checkout@v2
-      - name: install
+      - name: Set network timeout
         run: yarn --network-timeout 100000
 
       - name: Lint
         run: yarn eslint
 
-      - name: Start mangata-node node
-        run: docker-compose -f devops/parachain/docker-compose.yml up -d
-
-      - name: Sleep for 2 minutes
-        run: sleep 120s
-
-      - name: Docker ps
-        run: docker ps
-
-      - name: Test
+  run-tests:
+    runs-on: ubuntu-latest
+    needs: ["mangata-node-init", "setup-dev-config"]
+    steps:
+      - name: Run all tests
         run: yarn test
