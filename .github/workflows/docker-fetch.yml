@@ -14,4 +14,6 @@ jobs:
           path: mangata-repo
           ref: develop
       - name: Check cloned repo
-        run: cat $HOME/mangata-repo
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
