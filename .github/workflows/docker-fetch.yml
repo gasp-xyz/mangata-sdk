@@ -16,4 +16,4 @@ jobs:
       - name: Check cloned repo
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
+        run: pwd
