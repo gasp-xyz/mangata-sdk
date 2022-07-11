@@ -41,11 +41,23 @@ jobs:
 
       - uses: actions/checkout@v2
 
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
       - name: set registry
         run: yarn config set registry https://registry.npmjs.org
 
       - name: Set network timeout
-        run: yarn --network-timeout 100000
+        run: yarn --network-timeout 100000 --frozen-lockfile
 
       - name: Lint
         run: yarn eslint
