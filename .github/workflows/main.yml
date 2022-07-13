@@ -1,7 +1,6 @@
 name: CI
 
 on:
-  - push
   - pull_request
 
 env:
@@ -14,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone mangata node repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: mangata-finance/mangata-node
           path: mangata-repo
@@ -39,67 +38,61 @@ jobs:
       - name: Sleep for 3 minutes
         run: sleep 180s
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - uses: actions/cache@v3
-        id: yarn-cache
+      - name: Setup Node version and cache dependencies
+        uses: actions/setup-node@v3
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          node-version: "14"
+          cache: "npm"
 
       - name: set registry
-        run: yarn config set registry https://registry.npmjs.org
+        run: npm config set registry https://registry.npmjs.org
 
       - name: Set network timeout
-        run: yarn --network-timeout 100000 --frozen-lockfile
+        run: npm ci
 
       - name: Lint
-        run: yarn eslint
+        run: npm run eslint
 
       - name: Build the SDK
-        run: yarn build
+        run: npm run build
 
       - name: Run calculate price test
-        run: yarn test calculate-price.test.ts
+        run: npm run test calculate-price.test.ts
 
       - name: Run shuffling test
-        run: yarn test shuffling.test.ts
+        run: npm run test shuffling.test.ts
 
       - name: Run chain test
-        run: yarn test chain.test.ts
+        run: npm run test chain.test.ts
 
       - name: Run node name test
-        run: yarn test node-name.test.ts
+        run: npm run test node-name.test.ts
 
       - name: Run node version test
-        run: yarn test node-version.test.ts
+        run: npm run test node-version.test.ts
 
       - name: Run transfer token test
-        run: yarn test transfer-token.test.ts
+        run: npm run test transfer-token.test.ts
 
       - name: Run pool balance test
-        run: yarn test pool-balance.test.ts
+        run: npm run test pool-balance.test.ts
 
       - name: Run create pool test
-        run: yarn test create-pool.test.ts
+        run: npm run test create-pool.test.ts
 
       - name: Run burn liquidity test
-        run: yarn test burn-liquidity.test.ts
+        run: npm run test burn-liquidity.test.ts
 
       - name: Run buy asset test
-        run: yarn test buy-asset.test.ts
+        run: npm run test buy-asset.test.ts
 
       - name: Run mint liquidity test
-        run: yarn test mint-liquidity.test.ts
+        run: npm run test mint-liquidity.test.ts
 
       - name: Run sell asset test
-        run: yarn test sell-asset.test.ts
+        run: npm run test sell-asset.test.ts
 
       - name: Run sell asset four times test
-        run: yarn test sell-asset-four-times.test.ts
+        run: npm run test sell-asset-four-times.test.ts
