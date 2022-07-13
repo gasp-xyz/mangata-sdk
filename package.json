@@ -13,6 +13,8 @@
     }
   },
   "scripts": {
+    "preinstall": "yarn config set enableTelemetry 0;",
+    "prepare": "husky install",
     "build": "rm -fr build/* && tsc -p tsconfig.json && rollup -c",
     "test": "vitest --config ./vitest.config.ts --run",
     "start": "npm run build && node ./index.js",
