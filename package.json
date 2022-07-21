@@ -14,15 +14,12 @@
   },
   "scripts": {
     "preinstall": "yarn config set enableTelemetry 0;",
-    "prepare": "husky install",
+    "prepare": "if [ -z \"$SKIP_HUSKY\" ]; then husky install ; fi",
     "build": "rm -fr build/* && tsc -p tsconfig.json && rollup -c",
     "test": "vitest --config ./vitest.config.ts --run",
     "start": "npm run build && node ./index.js",
     "eslint": "node_modules/.bin/eslint --max-warnings 0 . --ext .ts",
-    "eslint-fix": "npm run eslint --fix",
-    "bump:major": "standard-version --release-as major",
-    "bump:minor": "standard-version --release-as minor",
-    "bump:patch": "standard-version --release-as patch"
+    "eslint-fix": "npm run eslint --fix"
   },
   "files": [
     "index.js",
@@ -67,7 +64,6 @@
     "rollup-plugin-dts": "^4.2.1",
     "rollup-plugin-terser": "^7.0.2",
     "semantic-release": "^19.0.3",
-    "standard-version": "^9.3.1",
     "ts-node": "^10.5.0",
     "typescript": "^4.5.2",
     "vitest": "^0.18.0"
