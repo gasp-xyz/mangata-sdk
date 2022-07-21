@@ -1,3 +1,10 @@
+## [1.0.9](https://github.com/mangata-finance/mangata-sdk/compare/v1.0.8...v1.0.9) (2022-07-21)
+
+
+### Bug Fixes
+
+* better error handling for extrinsic ([eb12451](https://github.com/mangata-finance/mangata-sdk/commit/eb12451b1fc15047b9ee23f133009f017fa3c39b))
+
 # Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
