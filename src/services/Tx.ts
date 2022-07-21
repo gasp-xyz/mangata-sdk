@@ -279,7 +279,7 @@ const getError = (
     if (errorIdx && moduleIdx) {
       try {
         const decode = api.registry.findMetaError({
-          error: new BN(errorIdx),
+          error: Uint8Array.of(Number(errorIdx)),
           index: new BN(moduleIdx)
         });
         return {
