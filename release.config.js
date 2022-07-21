@@ -1,5 +1,5 @@
 module.exports = {
-  branches: ["main"],
+  branches: ["release/*"],
   repositoryUrl: "https://github.com/mangata-finance/mangata-sdk",
   plugins: [
     "@semantic-release/commit-analyzer",
