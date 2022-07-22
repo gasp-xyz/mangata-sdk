@@ -3,7 +3,7 @@ import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { WsProvider } from "@polkadot/rpc-provider/ws";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { BN } from "@polkadot/util";
+import { BN, isHex, hexToU8a } from "@polkadot/util";
 
 import { instance } from "../utils/MemoryDatabase";
 import { getTxNonce } from "../utils/getTxNonce";
@@ -279,7 +279,7 @@ const getError = (
     if (errorIdx && moduleIdx) {
       try {
         const decode = api.registry.findMetaError({
-          error: Uint8Array.of(Number(errorIdx)),
+          error: isHex(errorIdx) ? hexToU8a(errorIdx) : new BN(errorIdx),
           index: new BN(moduleIdx)
         });
         return {
