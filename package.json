@@ -25,6 +25,10 @@
     "index.mjs",
     "index.d.ts"
   ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "tag": "latest"
+  },
   "engines": {
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
   },

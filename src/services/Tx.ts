@@ -226,7 +226,10 @@ export const signTx = async (
                 }
               );
           } else if (result.isError) {
-            console.info("Tx Error Result", JSON.stringify(result, null, 2));
+            console.info(
+              "Transaction Error Result",
+              JSON.stringify(result, null, 2)
+            );
             reject(
               `Tx ([${truncatedString(tx.hash.toString())}]) Transaction error`
             );
