@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.3.0...v1.3.1) (2022-07-25)
+
+
+### Bug Fixes
+
+* better wording ([fca8ede](https://github.com/mangata-finance/mangata-sdk/commit/fca8edef0580b05d4262ca38d55302f8907384c1))
+
 ## [1.0.11](https://github.com/mangata-finance/mangata-sdk/compare/v1.0.10...v1.0.11) (2022-07-22)
 
 
