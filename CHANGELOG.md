@@ -6,6 +6,14 @@
 * add better message ([47b7cf4](https://github.com/mangata-finance/mangata-sdk/commit/47b7cf421bd0cb6c6128f8ac0cbcf850c55b6299))
 * add log for failing transaction ([3880e02](https://github.com/mangata-finance/mangata-sdk/commit/3880e0229d9af4f07dd4dfd9c021599ed8f1a404))
 
+# [1.1.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.0.11...v1.1.0) (2022-07-25)
+
+
+### Features
+
+* add better message ([47b7cf4](https://github.com/mangata-finance/mangata-sdk/commit/47b7cf421bd0cb6c6128f8ac0cbcf850c55b6299))
+* add log for failing transaction ([3880e02](https://github.com/mangata-finance/mangata-sdk/commit/3880e0229d9af4f07dd4dfd9c021599ed8f1a404))
+
 ## [1.0.11](https://github.com/mangata-finance/mangata-sdk/compare/v1.0.10...v1.0.11) (2022-07-22)
 
 
