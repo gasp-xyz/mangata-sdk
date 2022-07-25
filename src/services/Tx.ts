@@ -155,7 +155,7 @@ export const signTx = async (
                       });
                       reject(
                         `Tx ([${tx.hash.toString()}])
-                      could not be find in a block
+                      could not be find in the block
                       $([${truncatedString(inclusionBlockHash)}])`
                       );
                     }
