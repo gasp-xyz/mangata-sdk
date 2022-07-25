@@ -1,8 +1,6 @@
 /// <reference types="bn.js" />
-import * as _polkadot_api_types from '@polkadot/api/types';
 import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 export { SubmittableExtrinsic } from '@polkadot/api/types';
-import * as _polkadot_types_types from '@polkadot/types/types';
 import { Codec, ISubmittableResult } from '@polkadot/types/types';
 export { ISubmittableResult } from '@polkadot/types/types';
 import { BN } from '@polkadot/util';
@@ -402,8 +400,8 @@ declare class MangataHelpers {
     }, firstTokenAmount: string, secondTokenAmount: string): string | undefined;
 }
 
-declare const toBN: (value: string, exponent?: number | undefined) => BN;
-declare const fromBN: (value: BN, exponent?: number | undefined) => string;
+declare const toBN: (value: string, exponent?: number) => BN;
+declare const fromBN: (value: BN, exponent?: number) => string;
 
 declare const BIG_ZERO: Big;
 declare const BIG_ONE: Big;
@@ -439,11 +437,6 @@ declare const BN_DIV_NUMERATOR_MULTIPLIER: BN;
 
 declare const toFixed: (value: string, decimals: number) => string;
 
-declare const signTx: (api: ApiPromise, tx: SubmittableExtrinsic<"promise">, account: string | KeyringPair, txOptions?: Partial<{
-    nonce: BN;
-    signer: _polkadot_api_types.Signer;
-    statusCallback: (result: _polkadot_types_types.ISubmittableResult) => void;
-    extrinsicStatus: (events: MangataGenericEvent[]) => void;
-}> | undefined) => Promise<MangataGenericEvent[]>;
+declare const signTx: (api: ApiPromise, tx: SubmittableExtrinsic<"promise">, account: string | KeyringPair, txOptions?: TxOptions) => Promise<MangataGenericEvent[]>;
 
 export { AssetInfo, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Mangata, MangataEventData, MangataGenericEvent, MangataHelpers, TBalances, TFreeBalance, TFrozenBalance, TMainTokens, TPool, TPoolWithRatio, TPoolWithShare, TReservedBalance, TToken, TTokenAddress, TTokenId, TTokenInfo, TTokenMainInfo, TTokenName, TTokenSymbol, TTokens, TokenBalance, TxOptions, XcmTxOptions, fromBN, signTx, toBN, toFixed };

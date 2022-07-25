@@ -3,3 +3,6 @@ build/
 yarn-error.log
 .vscode/
 .DS_Store
+index.d.ts
+index.js
+index.mjs
