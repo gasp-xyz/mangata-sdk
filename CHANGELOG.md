@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.3.1...v1.4.0) (2022-08-14)
+
+
+### Features
+
+* setup xcm for tur token ([17d05bc](https://github.com/mangata-finance/mangata-sdk/commit/17d05bc34b6e5e60cc91187226e9ff328e894414))
+
 ## [1.3.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.3.0...v1.3.1) (2022-07-25)
 
 
