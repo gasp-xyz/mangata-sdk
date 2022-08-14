@@ -216,6 +216,70 @@ export class Mangata {
     );
   }
 
+  public async sendTurTokenFromTuringToMangata(
+    turingUrl: string,
+    account: string | KeyringPair,
+    mangataAddress: string,
+    amount: BN,
+    txOptions?: XcmTxOptions
+  ) {
+    const api = await this.getApi();
+    return await Tx.sendTurTokenFromTuringToMangata(
+      api,
+      turingUrl,
+      account,
+      mangataAddress,
+      amount,
+      txOptions
+    );
+  }
+
+  public async sendTurTokenFromMangataToTuring(
+    mangataAccount: string | KeyringPair,
+    destinationAddress: string,
+    amount: BN,
+    txOptions?: XcmTxOptions
+  ) {
+    const api = await this.getApi();
+    return await Tx.sendTurTokenFromMangataToTuring(
+      api,
+      mangataAccount,
+      destinationAddress,
+      amount,
+      txOptions
+    );
+  }
+
+  public async sendTurTokenFromTuringToMangataFee(
+    turingUrl: string,
+    account: string | KeyringPair,
+    mangataAddress: string,
+    amount: BN
+  ) {
+    const api = await this.getApi();
+    return await Fee.sendTurTokenFromTuringToMangataFee(
+      api,
+      turingUrl,
+      account,
+      mangataAddress,
+      amount
+    );
+  }
+
+  public async sendTurTokenFromMangataToTuringFee(
+    mangataAccount: string | KeyringPair,
+    destinationAddress: string,
+    amount: BN
+  ) {
+    const api = await this.getApi();
+    return await Fee.sendTurTokenFromMangataToTuringFee(
+      api,
+      mangataAccount,
+      destinationAddress,
+      amount
+    );
+  }
+
   public async activateLiquidity(
     account: string | KeyringPair,
     liquditityTokenId: string,

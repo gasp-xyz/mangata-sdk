@@ -7,6 +7,93 @@ import { encodeAddress } from "@polkadot/util-crypto";
 import { fromBN } from "../utils/BNutility";
 
 export class Fee {
+  static async sendTurTokenFromTuringToMangataFee(
+    api: ApiPromise,
+    turingUrl: string,
+    account: string | KeyringPair,
+    mangataAddress: string,
+    amount: BN
+  ) {
+    const provider = new WsProvider(turingUrl);
+    const turingApi = await new ApiPromise({ provider }).isReady;
+    const correctAddress = encodeAddress(mangataAddress, 42);
+
+    const asset = {
+      V1: {
+        id: {
+          Concrete: {
+            parents: 1,
+            interior: {
+              X1: {
+                Parachain: 2114
+              }
+            }
+          }
+        },
+        fun: {
+          Fungible: amount
+        }
+      }
+    };
+
+    const destination = {
+      V1: {
+        parents: 1,
+        interior: {
+          X2: [
+            {
+              Parachain: 2110
+            },
+            {
+              AccountId32: {
+                network: "Any",
+                id: api.createType("AccountId32", correctAddress).toHex()
+              }
+            }
+          ]
+        }
+      }
+    };
+    const dispatchInfo = await turingApi.tx.xTokens
+      .transferMultiasset(asset, destination, new BN("4000000000"))
+      .paymentInfo(account);
+
+    return fromBN(new BN(dispatchInfo.partialFee.toString()), 10);
+  }
+
+  static async sendTurTokenFromMangataToTuringFee(
+    api: ApiPromise,
+    mangataAccount: string | KeyringPair,
+    destinationAddress: string,
+    amount: BN
+  ): Promise<string> {
+    const correctAddress = encodeAddress(destinationAddress, 42);
+    const destination = {
+      V1: {
+        parents: 1,
+        interior: {
+          X2: [
+            {
+              Parachain: 2114
+            },
+            {
+              AccountId32: {
+                network: "Any",
+                id: api.createType("AccountId32", correctAddress).toHex()
+              }
+            }
+          ]
+        }
+      }
+    };
+
+    const dispatchInfo = await api.tx.xTokens
+      .transfer("7", amount, destination, new BN("6000000000"))
+      .paymentInfo(mangataAccount);
+
+    return fromBN(new BN(dispatchInfo.partialFee.toString()));
+  }
+
   static async sendKusamaTokenFromRelayToParachainFee(
     kusamaEndpointUrl: string,
     ksmAccount: string | KeyringPair,
@@ -106,7 +193,7 @@ export class Fee {
     amount: BN
   ): Promise<string> {
     const dispatchInfo = await api.tx.xyk
-      .activateLiquidity(liquditityTokenId, amount)
+      .activateLiquidity(liquditityTokenId, amount, null)
       .paymentInfo(account);
     return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }

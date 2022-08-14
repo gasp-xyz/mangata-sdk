@@ -154,6 +154,10 @@ declare class Mangata {
     sendKusamaTokenFromRelayToParachainFee(kusamaEndpointUrl: string, ksmAccount: string | KeyringPair, destinationMangataAddress: string, amount: BN, parachainId?: number): Promise<string>;
     sendKusamaTokenFromParachainToRelay(mangataAccount: string | KeyringPair, destinationKusamaAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
     sendKusamaTokenFromParachainToRelayFee(mangataAccount: string | KeyringPair, destinationKusamaAddress: string, amount: BN): Promise<string>;
+    sendTurTokenFromTuringToMangata(turingUrl: string, account: string | KeyringPair, mangataAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
+    sendTurTokenFromMangataToTuring(mangataAccount: string | KeyringPair, destinationAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
+    sendTurTokenFromTuringToMangataFee(turingUrl: string, account: string | KeyringPair, mangataAddress: string, amount: BN): Promise<string>;
+    sendTurTokenFromMangataToTuringFee(mangataAccount: string | KeyringPair, destinationAddress: string, amount: BN): Promise<string>;
     activateLiquidity(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     deactivateLiquidity(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     calculateFutureRewardsAmount(address: string, liquidityTokenId: string, futureBlockNumber: BN): Promise<BN>;

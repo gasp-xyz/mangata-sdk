@@ -4,6 +4,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { WsProvider } from "@polkadot/rpc-provider/ws";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { BN, isHex, hexToU8a } from "@polkadot/util";
+import { encodeAddress } from "@polkadot/util-crypto";
 
 import { instance } from "../utils/MemoryDatabase";
 import { getTxNonce } from "../utils/getTxNonce";
@@ -400,6 +401,98 @@ export class Tx {
       });
   }
 
+  static async sendTurTokenFromTuringToMangata(
+    api: ApiPromise,
+    turingUrl: string,
+    account: string | KeyringPair,
+    mangataAddress: string,
+    amount: BN,
+    txOptions?: XcmTxOptions
+  ) {
+    const provider = new WsProvider(turingUrl);
+    const turingApi = await new ApiPromise({ provider }).isReady;
+    const correctAddress = encodeAddress(mangataAddress, 42);
+
+    const asset = {
+      V1: {
+        id: {
+          Concrete: {
+            parents: 1,
+            interior: {
+              X1: {
+                Parachain: 2114
+              }
+            }
+          }
+        },
+        fun: {
+          Fungible: amount
+        }
+      }
+    };
+
+    const destination = {
+      V1: {
+        parents: 1,
+        interior: {
+          X2: [
+            {
+              Parachain: 2110
+            },
+            {
+              AccountId32: {
+                network: "Any",
+                id: api.createType("AccountId32", correctAddress).toHex()
+              }
+            }
+          ]
+        }
+      }
+    };
+
+    await turingApi.tx.xTokens
+      .transferMultiasset(asset, destination, new BN("4000000000"))
+      .signAndSend(account, {
+        signer: txOptions?.signer,
+        nonce: txOptions?.nonce
+      });
+  }
+
+  static async sendTurTokenFromMangataToTuring(
+    api: ApiPromise,
+    mangataAccount: string | KeyringPair,
+    destinationAddress: string,
+    amount: BN,
+    txOptions?: XcmTxOptions
+  ) {
+    const correctAddress = encodeAddress(destinationAddress, 42);
+    const destination = {
+      V1: {
+        parents: 1,
+        interior: {
+          X2: [
+            {
+              Parachain: 2114
+            },
+            {
+              AccountId32: {
+                network: "Any",
+                id: api.createType("AccountId32", correctAddress).toHex()
+              }
+            }
+          ]
+        }
+      }
+    };
+
+    await signTx(
+      api,
+      api.tx.xTokens.transfer("7", amount, destination, new BN("6000000000")),
+      mangataAccount,
+      txOptions
+    );
+  }
+
   static async activateLiquidity(
     api: ApiPromise,
     account: string | KeyringPair,
@@ -409,7 +502,7 @@ export class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      api.tx.xyk.activateLiquidity(liquditityTokenId, amount),
+      api.tx.xyk.activateLiquidity(liquditityTokenId, amount, null),
       account,
       txOptions
     );
