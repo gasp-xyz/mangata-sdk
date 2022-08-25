@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.4.0...v1.5.0) (2022-08-25)
+
+
+### Features
+
+* add memo api promise ([6f95ce6](https://github.com/mangata-finance/mangata-sdk/commit/6f95ce692f940cafa8c992de05a8f5dee863e337))
+
 # [1.4.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.3.1...v1.4.0) (2022-08-14)
 
 
