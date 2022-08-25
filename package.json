@@ -68,8 +68,8 @@
     "rollup-plugin-terser": "^7.0.2",
     "semantic-release": "^19.0.3",
     "ts-node": "^10.5.0",
-    "typescript": "^4.5.2",
-    "vitest": "^0.18.0"
+    "typescript": "^4.7.4",
+    "vitest": "^0.22.1"
   },
   "dependencies": {
     "@mangata-finance/types": "^0.7.0",
