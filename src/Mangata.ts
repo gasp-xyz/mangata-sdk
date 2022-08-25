@@ -30,10 +30,7 @@ import { calculateFutureRewardsAmount } from "./utils/calculateFutureRewardsAmou
 export class Mangata {
   private api: Promise<ApiPromise>;
   private urls: string[];
-  private static instanceMap: Map<string[], Mangata> = new Map<
-    string[],
-    Mangata
-  >();
+  private static instanceMap: Map<string, Mangata> = new Map<string, Mangata>();
 
   /**
    * The Mangata's constructor is private to prevent direct
@@ -63,11 +60,11 @@ export class Mangata {
    * The static method that controls the access to the Mangata instance.
    */
   public static getInstance(urls: string[]): Mangata {
-    if (!Mangata.instanceMap.has(urls)) {
-      this.instanceMap.set(urls, new Mangata(urls));
-      return this.instanceMap.get(urls)!;
+    if (!Mangata.instanceMap.has(JSON.stringify(urls))) {
+      Mangata.instanceMap.set(JSON.stringify(urls), new Mangata(urls));
+      return Mangata.instanceMap.get(JSON.stringify(urls))!;
     } else {
-      return this.instanceMap.get(urls)!;
+      return Mangata.instanceMap.get(JSON.stringify(urls))!;
     }
   }
 
