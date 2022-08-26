@@ -53,8 +53,7 @@ export const signTx = async (
         },
         async (result) => {
           console.info(
-            `Tx[${truncatedString(tx.hash.toString())}] => ${
-              result.status.type
+            `Tx[${truncatedString(tx.hash.toString())}] => ${result.status.type
             }(${result.status.value.toString()})${serializeTx(api, tx)}`
           );
 
@@ -88,72 +87,13 @@ export const signTx = async (
                     const currentBlockEvents = await api.query.system.events.at(
                       executionBlockHeader.hash
                     );
-                    const headerJsonResponse = JSON.parse(
-                      executionBlockHeader.toString()
-                    );
 
-                    const buffer: Buffer = Buffer.from(
-                      headerJsonResponse["seed"]["seed"].substring(2),
-                      "hex"
-                    );
-                    const countOfExtrinsicsFromThisBlock =
-                      headerJsonResponse["count"];
-                    const currentBlockInherents = currentBlockExtrinsics
-                      .slice(0, countOfExtrinsicsFromThisBlock)
-                      .filter((tx) => {
-                        return !tx.isSigned;
-                      });
-                    const previousBlockExtrinsics =
-                      currentBlockExtrinsics.slice(
-                        countOfExtrinsicsFromThisBlock,
-                        currentBlockExtrinsics.length
-                      );
-                    const bothBlocksExtrinsics = currentBlockInherents.concat(
-                      previousBlockExtrinsics
-                    );
 
-                    const unshuffledInherents = bothBlocksExtrinsics.filter(
-                      (tx) => {
-                        return !tx.isSigned;
-                      }
-                    );
-
-                    const shuffledExtrinscs = recreateExtrinsicsOrder(
-                      bothBlocksExtrinsics
-                        .filter((tx) => {
-                          return tx.isSigned;
-                        })
-                        .map((tx) => {
-                          const who = tx.isSigned
-                            ? tx.signer.toString()
-                            : "0000";
-                          return [who, tx];
-                        }),
-                      Uint8Array.from(buffer)
-                    );
-
-                    const executionOrder =
-                      unshuffledInherents.concat(shuffledExtrinscs);
-
-                    const index = executionOrder.findIndex((extrinsic) => {
+                    const index = currentBlockExtrinsics.findIndex((extrinsic) => {
                       return extrinsic.hash.toString() === tx.hash.toString();
                     });
 
                     if (index < 0) {
-                      bothBlocksExtrinsics.forEach((e) => {
-                        console.info(
-                          `Tx ([${truncatedString(
-                            tx.hash.toString()
-                          )}]) origin ${e.hash.toString()}`
-                        );
-                      });
-                      executionOrder.forEach((e) => {
-                        console.info(
-                          `Tx ([${truncatedString(
-                            tx.hash.toString()
-                          )}]) shuffled ${e.hash.toString()}`
-                        );
-                      });
                       reject(
                         `Tx ([${tx.hash.toString()}])
                       could not be find in the block
@@ -165,7 +105,7 @@ export const signTx = async (
                         return (
                           currentBlockEvent.phase.isApplyExtrinsic &&
                           currentBlockEvent.phase.asApplyExtrinsic.toNumber() ===
-                            index
+                          index
                         );
                       })
                       .map((eventRecord) => {
