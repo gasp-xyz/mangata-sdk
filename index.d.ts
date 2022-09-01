@@ -162,6 +162,7 @@ declare class Mangata {
     deactivateLiquidity(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     calculateFutureRewardsAmount(address: string, liquidityTokenId: string, futureBlockNumber: BN): Promise<BN>;
     calculateRewardsAmount(address: string, liquidityTokenId: string): Promise<BN>;
+    calculateRewardsAmountV2(address: string, liquidityTokenId: string): Promise<BN>;
     claimRewardsFee(account: string | KeyringPair, liquditityTokenId: string, amount: BN): Promise<string>;
     claimRewards(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     createPoolFee(account: string | KeyringPair, firstTokenId: string, firstTokenAmount: BN, secondTokenId: string, secondTokenAmount: BN): Promise<string>;

@@ -32,6 +32,22 @@ export class Rpc {
 
     return price;
   }
+  static async calculateRewardsAmountV2(
+    api: ApiPromise,
+    address: string,
+    liquidityTokenId: string
+  ): Promise<BN> {
+    const rewards = await (api.rpc as any).xyk.calculate_rewards_amount_v2(
+      address,
+      liquidityTokenId
+    );
+
+    const price = isHex(rewards.price.toString())
+      ? hexToBn(rewards.price.toString())
+      : new BN(rewards.price);
+
+    return price;
+  }
 
   static async calculateBuyPrice(
     api: ApiPromise,

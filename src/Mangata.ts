@@ -330,6 +330,13 @@ export class Mangata {
     const api = await this.getApi();
     return await Rpc.calculateRewardsAmount(api, address, liquidityTokenId);
   }
+  public async calculateRewardsAmountV2(
+    address: string,
+    liquidityTokenId: string
+  ): Promise<BN> {
+    const api = await this.getApi();
+    return await Rpc.calculateRewardsAmountV2(api, address, liquidityTokenId);
+  }
 
   public async claimRewardsFee(
     account: string | KeyringPair,
