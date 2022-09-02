@@ -206,9 +206,7 @@ export const calculateFutureRewardsAmount = async (
     currentAvailableRewardsForPool.toString()
   );
   const rewardsPerSession = new BN("136986000000000000000000");
-  const sessionsToPass = futureTimeBlockNumber
-    .sub(blockNumber)
-    .div(new BN(1200));
+  const sessionsToPass = new BN(futureTimeBlockNumber).div(new BN(1200));
   const numberOfPromotedPools =
     await api.query.issuance.promotedPoolsRewards.entries();
 
