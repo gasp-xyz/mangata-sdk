@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.5.0...v1.6.0) (2022-09-06)
+
+
+### Features
+
+* implement future rewards for minting ([460c281](https://github.com/mangata-finance/mangata-sdk/commit/460c281e079696f324879e99aff89329466bb2ac))
+
 # [1.5.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.4.0...v1.5.0) (2022-08-25)
 
 
