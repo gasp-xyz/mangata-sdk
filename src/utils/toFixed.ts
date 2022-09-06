@@ -11,7 +11,7 @@ export const toFixed = (value: string, decimals: number) => {
   // This expression matches:
   // 1. Everything except trailing zeroes
   // Source: https://www.reddit.com/r/regex/comments/dl2nug/comment/f4m8o9w/?utm_source=share&utm_medium=web2x&context=3
-  const trailingZeroesRegex = /^0*(\d+(?:\.(?:(?!0+$)\d)+)?)/gm;
+  const trailingZeroesRegex = /^-?0*(\d+(?:\.(?:(?!0+$)\d)+)?)/gm;
   const withoutTrailingZeroes = (withDesiredDecimalPlaces?.[0] || value).match(
     trailingZeroesRegex
   );
