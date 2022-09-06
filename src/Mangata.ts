@@ -20,7 +20,10 @@ import {
 } from "./types/AssetInfo";
 import { MangataGenericEvent } from "./types/MangataGenericEvent";
 import { TxOptions, XcmTxOptions } from "./types/TxOptions";
-import { calculateFutureRewardsAmount } from "./utils/calculateFutureRewardsAmount";
+import {
+  calculateFutureRewardsAmount,
+  calculateFutureRewardsAmountForMinting
+} from "./utils/calculateFutureRewardsAmount";
 
 /**
  * @class Mangata
@@ -319,6 +322,20 @@ export class Mangata {
       api,
       address,
       liquidityTokenId,
+      futureBlockNumber
+    );
+  }
+
+  public async calculateFutureRewardsAmountForMinting(
+    liquidityTokenId: string,
+    mintingAmount: BN,
+    futureBlockNumber: BN
+  ) {
+    const api = await this.getApi();
+    return await calculateFutureRewardsAmountForMinting(
+      api,
+      liquidityTokenId,
+      mintingAmount,
       futureBlockNumber
     );
   }
