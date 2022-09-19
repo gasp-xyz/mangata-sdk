@@ -1178,10 +1178,10 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@mangata-finance/types@^0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@mangata-finance/types/-/types-0.7.0.tgz#5284745304574cd0409874ec0cbd6b30386bd96d"
-  integrity sha512-jt13+gTmFov3jLEZglra8m9vxekPgR8a4x0hjY80DVMkbxmmFbRkHGzGeRSV9ckWmDjEOkMiZxYBALIJ9cMscg==
+"@mangata-finance/types@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@mangata-finance/types/-/types-0.8.0.tgz#6eb1995c53758441f5fecfb3f0b95cc8ae1d9816"
+  integrity sha512-mHcLUHRjxZtsfznNTBzIX2DAKMh5DdXarbsitaGil5vxHzC/oiQEEJivkTOfhgWdOd8yYqZcmjbnvJv7rVjixw==
 
 "@noble/hashes@1.1.2":
   version "1.1.2"
