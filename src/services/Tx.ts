@@ -123,7 +123,7 @@ export const signTx = async (
                     } else {
                       unsubscribeNewHeads();
                       console.info(
-                        `Tx[${truncatedString(tx.hash.toString())}] => Executed (${blockHash.toString()})`
+                        `Tx[${truncatedString(tx.hash.toString())}] => Executed(${blockHash.toString()})`
                       );
                     }
 
