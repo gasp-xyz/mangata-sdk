@@ -68,8 +68,7 @@ export const signTx = async (
         },
         async (result) => {
           console.info(
-            `Tx[${truncatedString(tx.hash.toString())}] => ${result.status.type
-            }(${result.status.value.toString()})${serializeTx(api, tx)}`
+            `Tx[${tx.hash.toString()}] who:${extractedAccount} nonce:${nonce.toString()} => ${result.status.type}(${result.status.value.toString()})${serializeTx(api, tx)}`
           );
 
           txOptions?.statusCallback?.(result);
@@ -91,7 +90,7 @@ export const signTx = async (
                   if (executionBlockNr.gt(executionBlockStopNr)) {
                     unsubscribeNewHeads();
                     reject(
-                      `Tx ([${truncatedString(tx.hash.toString())}])
+                      `Tx ([${tx.hash.toString()}])
                       was not executed in blocks : ${executionBlockStartNr.toString()} .. ${executionBlockStopNr.toString()}`);
                     const currentNonce: BN = await Query.getNonce(
                       api,
@@ -170,7 +169,7 @@ export const signTx = async (
               JSON.stringify(result, null, 2)
             );
             reject(
-              `Tx([${truncatedString(tx.hash.toString())
+              `Tx([${tx.hash.toString()
               }]) Transaction error`
             );
             const currentNonce: BN = await Query.getNonce(
