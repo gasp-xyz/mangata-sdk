@@ -19,6 +19,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "14"
+          registry-url: "https://registry.npmjs.org"
           cache: "npm"
 
       - name: Install dependencies
@@ -27,8 +28,27 @@ jobs:
       - name: Build the SDK
         run: npm run build
 
+      - name: Deploy to NPM
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node for GPR
+        uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@mangata-finance"
+
+      - name: Change registry
+        run: echo "registry=https://npm.pkg.github.com/@mangata-finance" >> .npmrc
+
+      - name: Deploy to GPR
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: create release
         run: npx semantic-release
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.FE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
