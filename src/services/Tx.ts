@@ -122,8 +122,7 @@ export const signTx = async (
                     } else {
                       unsubscribeNewHeads();
                       console.info(
-                        `Tx[${truncatedString(tx.hash.toString())}] => Executed(${blockHash.toString()})`
-                      );
+                        `Tx[${tx.hash.toString()}] who:${extractedAccount} nonce:${nonce.toString()} => Executed(${blockHash.toString()})`);
                     }
 
                     const eventsTriggeredByTx: MangataGenericEvent[] = events
