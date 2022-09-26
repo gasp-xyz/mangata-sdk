@@ -13,15 +13,19 @@ export const getTxNonce = async (
   let nonce: BN;
   if (txOptions && txOptions.nonce) {
     nonce = txOptions.nonce;
+    console.info(`who:${address} nonce:${nonce.toString()} is set`);
   } else {
     const onChainNonce = await Query.getNonce(api, address);
     if (instance.hasAddressNonce(address)) {
       nonce = instance.getNonce(address);
+      console.info(`who:${address} nonce:${nonce.toString()} read from db`);
     } else {
       nonce = onChainNonce;
+      console.info(`who:${address} nonce:${nonce.toString()} read from rpc call`);
     }
 
     if (onChainNonce && onChainNonce.gt(nonce)) {
+      console.info(`who:${address} nonce:${nonce.toString()} aligned with rpc nonce`);
       nonce = onChainNonce;
     }
 

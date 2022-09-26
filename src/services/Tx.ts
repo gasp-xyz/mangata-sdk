@@ -59,6 +59,7 @@ export const signTx = async (
 
     const nonce = await getTxNonce(api, extractedAccount, txOptions);
     let retries = 0;
+    console.info(`signTx Tx[${tx.hash.toString()}] who:${extractedAccount} nonce:${nonce.toString()} `);
     try {
       const unsub = await tx.signAndSend(
         account,
