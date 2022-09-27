@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.6.1...v1.7.0) (2022-09-27)
+
+
+### Features
+
+* update sdk to use asset registry ([e4ba7fa](https://github.com/mangata-finance/mangata-sdk/commit/e4ba7fafed743922f65591366ae4e745fd8ebd8c))
+
 ## [1.6.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.6.0...v1.6.1) (2022-09-06)
 
 
