@@ -26,7 +26,10 @@ jobs:
 
       - name: Build the node
         run: |
-          cd $GITHUB_WORKSPACE/mangata-repo/launch
+          cd $GITHUB_WORKSPACE/mangata-repo
+          chmod +x ./docker-cargo.sh
+          export SKIP_BUILD=1 ./docker-cargo.sh build --release --features=mangata-rococo scripts/build-image.sh
+          cd launch
           yarn install
           yarn gen
           yarn up
