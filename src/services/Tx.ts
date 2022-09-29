@@ -310,6 +310,7 @@ const getError = (
 
 export class Tx {
   static async sendKusamaTokenFromRelayToParachain(
+    api: ApiPromise,
     kusamaEndpointUrl: string,
     ksmAccount: string | KeyringPair,
     destinationMangataAddress: string,
@@ -336,7 +337,7 @@ export class Tx {
         interior: {
           X1: {
             AccountId32: {
-              id: kusamaApi
+              id: api
                 .createType("AccountId32", destinationMangataAddress)
                 .toHex(),
               network: "Any"

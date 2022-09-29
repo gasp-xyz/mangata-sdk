@@ -160,7 +160,9 @@ export class Mangata {
     parachainId: number = 2110,
     txOptions?: XcmTxOptions
   ) {
+    const api = await this.getApi();
     return await Tx.sendKusamaTokenFromRelayToParachain(
+      api,
       kusamaEndpointUrl,
       ksmAccount,
       destinationMangataAddress,
