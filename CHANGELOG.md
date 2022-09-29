@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.7.0...v1.7.1) (2022-09-29)
+
+
+### Bug Fixes
+
+* issue with create type in kusama - replace with mangata create type ([5949439](https://github.com/mangata-finance/mangata-sdk/commit/5949439f33bc5b927a9526a1bf9befc2a9561920))
+
 # [1.7.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.6.1...v1.7.0) (2022-09-27)
 
 
