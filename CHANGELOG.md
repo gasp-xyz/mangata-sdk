@@ -1,3 +1,10 @@
+## [1.7.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.7.1...v1.7.2) (2022-09-29)
+
+
+### Bug Fixes
+
+* correct api for kusama fee ([44ce8f7](https://github.com/mangata-finance/mangata-sdk/commit/44ce8f7613bfab147a5f93af290968c0bbf99b8f))
+
 ## [1.7.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.7.0...v1.7.1) (2022-09-29)
 
 
