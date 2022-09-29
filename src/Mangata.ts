@@ -179,7 +179,9 @@ export class Mangata {
     amount: BN,
     parachainId: number = 2110
   ) {
+    const api = await this.getApi();
     return await Fee.sendKusamaTokenFromRelayToParachainFee(
+      api,
       kusamaEndpointUrl,
       ksmAccount,
       destinationMangataAddress,
