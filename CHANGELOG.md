@@ -1,3 +1,10 @@
+## [1.7.3](https://github.com/mangata-finance/mangata-sdk/compare/v1.7.2...v1.7.3) (2022-09-30)
+
+
+### Bug Fixes
+
+* update polkadot api to latest version and fix kusama api error ([eca87b5](https://github.com/mangata-finance/mangata-sdk/commit/eca87b560a171056339dd0a34b2cc27acfa669f0))
+
 ## [1.7.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.7.1...v1.7.2) (2022-09-29)
 
 
