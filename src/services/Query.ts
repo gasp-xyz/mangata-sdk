@@ -122,11 +122,8 @@ export class Query {
     const assetsInfo = await this.getAssetsInfo(api);
 
     return Object.values(assetsInfo).reduce((acc, curr) => {
-      if (curr.name.includes("LiquidityPoolToken")) {
-        acc[curr.id] = {
-          ...curr,
-          name: curr.name.replace(/0x\w+/, "").replace(/[A-Z]/g, " $&").trim()
-        };
+      if (curr.name.includes("Liquidity Pool Token")) {
+        acc[curr.id] = curr;
       }
       return acc;
     }, {} as { [id: TTokenId]: TTokenInfo });
