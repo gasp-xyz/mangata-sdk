@@ -1,3 +1,10 @@
+## [1.7.4](https://github.com/mangata-finance/mangata-sdk/compare/v1.7.3...v1.7.4) (2022-09-30)
+
+
+### Bug Fixes
+
+* remove KAR token from asset info for now ([df60e9d](https://github.com/mangata-finance/mangata-sdk/commit/df60e9d5ec2f4e5c71f2a8b4d1ffb2da0345d186))
+
 ## [1.7.3](https://github.com/mangata-finance/mangata-sdk/compare/v1.7.2...v1.7.3) (2022-09-30)
 
 
