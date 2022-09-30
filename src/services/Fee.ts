@@ -95,7 +95,6 @@ export class Fee {
   }
 
   static async sendKusamaTokenFromRelayToParachainFee(
-    api: ApiPromise,
     kusamaEndpointUrl: string,
     ksmAccount: string | KeyringPair,
     destinationMangataAddress: string,
@@ -121,7 +120,7 @@ export class Fee {
         interior: {
           X1: {
             AccountId32: {
-              id: api
+              id: kusamaApi
                 .createType(
                   "AccountId32",
                   encodeAddress(destinationMangataAddress, 42)
