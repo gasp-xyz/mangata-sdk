@@ -1,3 +1,10 @@
+## [1.7.5](https://github.com/mangata-finance/mangata-sdk/compare/v1.7.4...v1.7.5) (2022-09-30)
+
+
+### Bug Fixes
+
+* correctly update get liqudity tokens method ([5075a92](https://github.com/mangata-finance/mangata-sdk/commit/5075a9289bccd61943c6374e60b667a2f8bbe3f4))
+
 ## [1.7.4](https://github.com/mangata-finance/mangata-sdk/compare/v1.7.3...v1.7.4) (2022-09-30)
 
 
