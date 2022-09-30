@@ -137,7 +137,7 @@ export class Query {
     // we need to filter out ETH and Dummy liquidity token
     // then we need to display symbol for liquidity token
     return Object.values(completeAssetsInfo)
-      .filter((assetsInfo) => assetsInfo.id !== "1" && assetsInfo.id !== "3")
+      .filter((assetsInfo) => !["1", "3", "6"].includes(assetsInfo.id))
       .reduce((obj, item) => {
         const asset = {
           ...item,
