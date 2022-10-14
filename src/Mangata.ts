@@ -152,6 +152,90 @@ export class Mangata {
     await api.disconnect();
   }
 
+  public async sendTokenFromParachainToMangata(
+    url: string,
+    tokenSymbol: string,
+    destWeight: string,
+    account: string | KeyringPair,
+    mangataAddress: string,
+    amount: BN,
+    txOptions?: XcmTxOptions
+  ) {
+    const api = await this.getApi();
+    return await Tx.sendTokenFromParachainToMangata(
+      api,
+      url,
+      tokenSymbol,
+      destWeight,
+      account,
+      mangataAddress,
+      amount,
+      txOptions
+    );
+  }
+
+  public async sendTokenFromMangataToParachain(
+    tokenSymbol: string,
+    withWeight: string,
+    parachainId: number,
+    account: string | KeyringPair,
+    destinationAddress: string,
+    amount: BN,
+    txOptions?: XcmTxOptions
+  ) {
+    const api = await this.getApi();
+    return await Tx.sendTokenFromMangataToParachain(
+      api,
+      tokenSymbol,
+      withWeight,
+      parachainId,
+      account,
+      destinationAddress,
+      amount,
+      txOptions
+    );
+  }
+
+  public async sendTokenFromParachainToMangataFee(
+    url: string,
+    tokenSymbol: string,
+    destWeight: string,
+    account: string | KeyringPair,
+    mangataAddress: string,
+    amount: BN
+  ) {
+    const api = await this.getApi();
+    return await Fee.sendTokenFromParachainToMangataFee(
+      api,
+      url,
+      tokenSymbol,
+      destWeight,
+      account,
+      mangataAddress,
+      amount
+    );
+  }
+
+  public async sendTokenFromMangataToParachainFee(
+    tokenSymbol: string,
+    withWeight: string,
+    parachainId: number,
+    account: string | KeyringPair,
+    destinationAddress: string,
+    amount: BN
+  ) {
+    const api = await this.getApi();
+    return await Fee.sendTokenFromMangataToParachainFee(
+      api,
+      tokenSymbol,
+      withWeight,
+      parachainId,
+      account,
+      destinationAddress,
+      amount
+    );
+  }
+
   public async sendKusamaTokenFromRelayToParachain(
     kusamaEndpointUrl: string,
     ksmAccount: string | KeyringPair,
