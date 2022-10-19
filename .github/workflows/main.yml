@@ -4,7 +4,7 @@ on:
   - pull_request
 
 env:
-  API_URL: "ws://127.0.0.1:8844"
+  API_URL: "ws://127.0.0.1:9947"
   TEST_PALLET_ADDRESS: ${{ secrets.TEST_PALLET_ADDRESS }}
   TEST_SUDO_NAME: ${{ secrets.TEST_SUDO_NAME }}
 
@@ -24,13 +24,19 @@ jobs:
           cd $GITHUB_WORKSPACE/mangata-repo
           ls -a
 
-      - name: Stop previous parachain if running
-        run: make -C $GITHUB_WORKSPACE/mangata-repo/devops/parachain stop
+      - name: Build the node
+        run: |
+          cd $GITHUB_WORKSPACE/mangata-repo
+          chmod +x ./docker-cargo.sh
+          export SKIP_BUILD=1 ./docker-cargo.sh build --release --features=mangata-rococo $GITHUB_WORKSPACE/mangata-repo/scripts/build-image.sh
+        shell: bash
 
-      - name: Start mangata-node parachain
-        env:
-          ENV: rococo
-        run: make -C $GITHUB_WORKSPACE/mangata-repo/devops/parachain start
+      - name: Run the Node
+        run: |
+          cd $GITHUB_WORKSPACE/mangata-repo/launch
+          yarn install
+          yarn gen
+          yarn up
 
       - name: Docker ps - chceck mangata node image
         run: docker ps
@@ -96,3 +102,8 @@ jobs:
 
       - name: Run sell asset four times test
         run: npm run test sell-asset-four-times.test.ts
+
+      - name: Stop node
+        run: |
+          cd $GITHUB_WORKSPACE/mangata-repo/launch
+          yarn down

@@ -5,8 +5,137 @@ import { WsProvider } from "@polkadot/rpc-provider/ws";
 import { encodeAddress } from "@polkadot/util-crypto";
 
 import { fromBN } from "../utils/BNutility";
+import { DepositXcmTuple, WithdrawXcmTuple } from "../types/AssetInfo";
+import { BN_ZERO } from "../utils/bnConstants";
 
 export class Fee {
+  static async sendTokenFromParachainToMangataFee(...args: DepositXcmTuple) {
+    const [
+      mangataApi,
+      url,
+      tokenSymbol,
+      destWeight,
+      account,
+      mangataAddress,
+      amount
+    ] = args;
+    const provider = new WsProvider(url);
+    const api = await new ApiPromise({ provider }).isReady;
+    const correctMangataAddress = encodeAddress(mangataAddress, 42);
+
+    const assetRegistryMetadata =
+      await mangataApi.query.assetRegistry.metadata.entries();
+
+    const assetMetadata = assetRegistryMetadata.find((metadata) => {
+      const symbol = metadata[1].value.symbol.toPrimitive();
+      return symbol === tokenSymbol;
+    });
+
+    if (assetMetadata && assetMetadata[1].value.location) {
+      const { location, decimals } = assetMetadata[1].unwrap();
+      const decodedLocation = JSON.parse(location.toString());
+      const decodedDecimals = JSON.parse(decimals.toString());
+
+      const asset = {
+        V1: {
+          id: {
+            Concrete: {
+              parents: "1",
+              interior: decodedLocation.v1.interior
+            }
+          },
+          fun: {
+            Fungible: amount
+          }
+        }
+      };
+
+      const destination = {
+        V1: {
+          parents: 1,
+          interior: {
+            X2: [
+              {
+                Parachain: 2110
+              },
+              {
+                AccountId32: {
+                  network: "Any",
+                  id: api
+                    .createType("AccountId32", correctMangataAddress)
+                    .toHex()
+                }
+              }
+            ]
+          }
+        }
+      };
+
+      const dispatchInfo = await api.tx.xTokens
+        .transferMultiasset(asset, destination, new BN(destWeight))
+        .paymentInfo(account);
+      return fromBN(
+        new BN(dispatchInfo.partialFee.toString()),
+        Number(decodedDecimals)
+      );
+    } else {
+      return BN_ZERO;
+    }
+  }
+
+  static async sendTokenFromMangataToParachainFee(...args: WithdrawXcmTuple) {
+    const [
+      api,
+      tokenSymbol,
+      withWeight,
+      parachainId,
+      account,
+      destinationAddress,
+      amount
+    ] = args;
+    const correctAddress = encodeAddress(destinationAddress, 42);
+
+    const assetRegistryMetadata =
+      await api.query.assetRegistry.metadata.entries();
+
+    const assetMetadata = assetRegistryMetadata.find((metadata) => {
+      const symbol = metadata[1].value.symbol.toPrimitive();
+      return symbol === tokenSymbol;
+    });
+
+    if (assetMetadata && assetMetadata[1].value.location) {
+      const tokenId = (assetMetadata[0].toHuman() as string[])[0].replace(
+        /[, ]/g,
+        ""
+      );
+
+      const destination = {
+        V1: {
+          parents: 1,
+          interior: {
+            X2: [
+              {
+                Parachain: parachainId
+              },
+              {
+                AccountId32: {
+                  network: "Any",
+                  id: api.createType("AccountId32", correctAddress).toHex()
+                }
+              }
+            ]
+          }
+        }
+      };
+
+      const dispatchInfo = await api.tx.xTokens
+        .transfer(tokenId, amount, destination, new BN(withWeight))
+        .paymentInfo(account);
+
+      return fromBN(new BN(dispatchInfo.partialFee.toString()));
+    }
+  }
+
   static async sendTurTokenFromTuringToMangataFee(
     api: ApiPromise,
     turingUrl: string,

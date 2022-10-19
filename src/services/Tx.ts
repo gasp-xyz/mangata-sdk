@@ -15,7 +15,6 @@ import { TxOptions, XcmTxOptions } from "../types/TxOptions";
 import { MangataGenericEvent } from "../types/MangataGenericEvent";
 import { MangataEventData } from "../types/MangataEventData";
 import { truncatedString } from "../utils/truncatedString";
-import { GenericEvent } from '@polkadot/types';
 
 function serializeTx(api: ApiPromise, tx: SubmittableExtrinsic<"promise">) {
   if (!process.env.TX_VERBOSE) return "";
@@ -337,6 +336,137 @@ export class Tx {
         signer: txOptions?.signer,
         nonce: txOptions?.nonce
       });
+  }
+
+  static async sendTokenFromParachainToMangata(...args: DepositXcmTuple) {
+    const [
+      mangataApi,
+      url,
+      tokenSymbol,
+      destWeight,
+      account,
+      mangataAddress,
+      amount,
+      txOptions
+    ] = args;
+    const provider = new WsProvider(url);
+    const api = await new ApiPromise({ provider }).isReady;
+    const correctMangataAddress = encodeAddress(mangataAddress, 42);
+
+    const assetRegistryMetadata =
+      await mangataApi.query.assetRegistry.metadata.entries();
+
+    const assetMetadata = assetRegistryMetadata.find((metadata) => {
+      const symbol = metadata[1].value.symbol.toPrimitive();
+      return symbol === tokenSymbol;
+    });
+
+    if (assetMetadata && assetMetadata[1].value.location) {
+      const { location } = assetMetadata[1].unwrap();
+      const decodedLocation = JSON.parse(location.toString());
+
+      const asset = {
+        V1: {
+          id: {
+            Concrete: {
+              parents: "1",
+              interior: decodedLocation.v1.interior
+            }
+          },
+          fun: {
+            Fungible: amount
+          }
+        }
+      };
+
+      const destination = {
+        V1: {
+          parents: 1,
+          interior: {
+            X2: [
+              {
+                Parachain: 2110
+              },
+              {
+                AccountId32: {
+                  network: "Any",
+                  id: api
+                    .createType("AccountId32", correctMangataAddress)
+                    .toHex()
+                }
+              }
+            ]
+          }
+        }
+      };
+
+      await api.tx.xTokens
+        .transferMultiasset(asset, destination, new BN(destWeight))
+        .signAndSend(account, {
+          signer: txOptions?.signer,
+          nonce: txOptions?.nonce
+        });
+    }
+  }
+
+  static async sendTokenFromMangataToParachain(...args: WithdrawXcmTuple) {
+    const [
+      api,
+      tokenSymbol,
+      withWeight,
+      parachainId,
+      account,
+      destinationAddress,
+      amount,
+      txOptions
+    ] = args;
+    const correctAddress = encodeAddress(destinationAddress, 42);
+
+    const assetRegistryMetadata =
+      await api.query.assetRegistry.metadata.entries();
+
+    const assetMetadata = assetRegistryMetadata.find((metadata) => {
+      const symbol = metadata[1].value.symbol.toPrimitive();
+      return symbol === tokenSymbol;
+    });
+
+    if (assetMetadata && assetMetadata[1].value.location) {
+      const tokenId = (assetMetadata[0].toHuman() as string[])[0].replace(
+        /[, ]/g,
+        ""
+      );
+
+      const destination = {
+        V1: {
+          parents: 1,
+          interior: {
+            X2: [
+              {
+                Parachain: parachainId
+              },
+              {
+                AccountId32: {
+                  network: "Any",
+                  id: api.createType("AccountId32", correctAddress).toHex()
+                }
+              }
+            ]
+          }
+        }
+      };
+
+      await signTx(
+        api,
+        api.tx.xTokens.transfer(
+          tokenId,
+          amount,
+          destination,
+          new BN(withWeight)
+        ),
+        account,
+        txOptions
+      );
+    }
   }
 
   static async sendTurTokenFromTuringToMangata(

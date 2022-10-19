@@ -1,4 +1,7 @@
 import { BN } from "@polkadot/util";
+import { ApiPromise } from "@polkadot/api";
+import { KeyringPair } from "@polkadot/keyring/types";
+import { XcmTxOptions } from "./TxOptions";
 
 export type AssetInfo = {
   id: string;
@@ -61,3 +64,25 @@ export type TokenBalance = {
   reserved: TReservedBalance;
   frozen: TFreeBalance;
 };
+
+export type DepositXcmTuple = [
+  mangataApi: ApiPromise,
+  url: string,
+  tokenSymbol: string,
+  destWeight: string,
+  account: string | KeyringPair,
+  mangataAddress: string,
+  amount: BN,
+  txOptions?: XcmTxOptions
+];
+
+export type WithdrawXcmTuple = [
+  api: ApiPromise,
+  tokenSymbol: string,
+  withWeight: string,
+  parachainId: number,
+  account: string | KeyringPair,
+  destinationAddress: string,
+  amount: BN,
+  txOptions?: XcmTxOptions
+];

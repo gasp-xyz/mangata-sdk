@@ -1,3 +1,45 @@
+## [1.7.5](https://github.com/mangata-finance/mangata-sdk/compare/v1.7.4...v1.7.5) (2022-09-30)
+
+
+### Bug Fixes
+
+* correctly update get liqudity tokens method ([5075a92](https://github.com/mangata-finance/mangata-sdk/commit/5075a9289bccd61943c6374e60b667a2f8bbe3f4))
+
+## [1.7.4](https://github.com/mangata-finance/mangata-sdk/compare/v1.7.3...v1.7.4) (2022-09-30)
+
+
+### Bug Fixes
+
+* remove KAR token from asset info for now ([df60e9d](https://github.com/mangata-finance/mangata-sdk/commit/df60e9d5ec2f4e5c71f2a8b4d1ffb2da0345d186))
+
+## [1.7.3](https://github.com/mangata-finance/mangata-sdk/compare/v1.7.2...v1.7.3) (2022-09-30)
+
+
+### Bug Fixes
+
+* update polkadot api to latest version and fix kusama api error ([eca87b5](https://github.com/mangata-finance/mangata-sdk/commit/eca87b560a171056339dd0a34b2cc27acfa669f0))
+
+## [1.7.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.7.1...v1.7.2) (2022-09-29)
+
+
+### Bug Fixes
+
+* correct api for kusama fee ([44ce8f7](https://github.com/mangata-finance/mangata-sdk/commit/44ce8f7613bfab147a5f93af290968c0bbf99b8f))
+
+## [1.7.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.7.0...v1.7.1) (2022-09-29)
+
+
+### Bug Fixes
+
+* issue with create type in kusama - replace with mangata create type ([5949439](https://github.com/mangata-finance/mangata-sdk/commit/5949439f33bc5b927a9526a1bf9befc2a9561920))
+
+# [1.7.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.6.1...v1.7.0) (2022-09-27)
+
+
+### Features
+
+* update sdk to use asset registry ([e4ba7fa](https://github.com/mangata-finance/mangata-sdk/commit/e4ba7fafed743922f65591366ae4e745fd8ebd8c))
+
 ## [1.6.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.6.0...v1.6.1) (2022-09-06)
 
 
