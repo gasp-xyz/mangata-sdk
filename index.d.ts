@@ -419,7 +419,6 @@ declare class Mangata {
 declare class MangataHelpers {
     static createKeyring(type: KeypairType): Keyring;
     static createKeyPairFromName(keyring: Keyring, name?: string): KeyringPair;
-    static getXoshiro(seed: Uint8Array): any;
     static getPriceImpact(poolBalance: {
         firstTokenBalance: BN;
         secondTokenBalance: BN;
