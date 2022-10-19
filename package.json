@@ -75,7 +75,6 @@
     "@mangata-finance/types": "^0.9.0",
     "@polkadot/api": "^9.4.2",
     "big.js": "^6.1.1",
-    "mangata-prng-xoshiro": "^3.0.0",
     "uuid": "^8.3.2"
   }
 }

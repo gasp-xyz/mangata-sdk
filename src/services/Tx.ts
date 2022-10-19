@@ -3,7 +3,7 @@ import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { WsProvider } from "@polkadot/rpc-provider/ws";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { GenericExtrinsic } from "@polkadot/types";
+import { GenericExtrinsic, GenericEvent } from "@polkadot/types";
 import { AnyTuple } from '@polkadot/types-codec/types';
 import { BN, isHex, hexToU8a } from "@polkadot/util";
 import { encodeAddress } from "@polkadot/util-crypto";
@@ -15,6 +15,7 @@ import { TxOptions, XcmTxOptions } from "../types/TxOptions";
 import { MangataGenericEvent } from "../types/MangataGenericEvent";
 import { MangataEventData } from "../types/MangataEventData";
 import { truncatedString } from "../utils/truncatedString";
+import { DepositXcmTuple, WithdrawXcmTuple } from "../types/AssetInfo";
 
 function serializeTx(api: ApiPromise, tx: SubmittableExtrinsic<"promise">) {
   if (!process.env.TX_VERBOSE) return "";
