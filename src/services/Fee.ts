@@ -79,7 +79,7 @@ export class Fee {
         Number(decodedDecimals)
       );
     } else {
-      return BN_ZERO;
+      return "0";
     }
   }
 
@@ -133,6 +133,8 @@ export class Fee {
         .paymentInfo(account);
 
       return fromBN(new BN(dispatchInfo.partialFee.toString()));
+    } else {
+      return "0";
     }
   }
 
