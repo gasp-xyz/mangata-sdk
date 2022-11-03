@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.8.1...v1.9.0) (2022-11-03)
+
+
+### Features
+
+* update polkadot api to latest version ([91f2775](https://github.com/mangata-finance/mangata-sdk/commit/91f27751dfb1034512ee31af7c5a75be23726f05))
+
 ## [1.8.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.8.0...v1.8.1) (2022-10-20)
 
 
