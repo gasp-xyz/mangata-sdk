@@ -1,3 +1,17 @@
+## [1.8.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.8.0...v1.8.1) (2022-10-20)
+
+
+### Bug Fixes
+
+* update fee method correctly ([30ff132](https://github.com/mangata-finance/mangata-sdk/commit/30ff13258ef4cd5fee36f37835f6665f044c7271))
+
+# [1.8.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.7.5...v1.8.0) (2022-10-14)
+
+
+### Features
+
+* xcm methods ([aeb5d16](https://github.com/mangata-finance/mangata-sdk/commit/aeb5d16ef582031e0ef92f7fa34dcf461712d593))
+
 ## [1.7.5](https://github.com/mangata-finance/mangata-sdk/compare/v1.7.4...v1.7.5) (2022-09-30)
 
 

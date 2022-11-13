@@ -172,8 +172,8 @@ declare class Mangata {
     disconnect(): Promise<void>;
     sendTokenFromParachainToMangata(url: string, tokenSymbol: string, destWeight: string, account: string | KeyringPair, mangataAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
     sendTokenFromMangataToParachain(tokenSymbol: string, withWeight: string, parachainId: number, account: string | KeyringPair, destinationAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
-    sendTokenFromParachainToMangataFee(url: string, tokenSymbol: string, destWeight: string, account: string | KeyringPair, mangataAddress: string, amount: BN): Promise<string | BN>;
-    sendTokenFromMangataToParachainFee(tokenSymbol: string, withWeight: string, parachainId: number, account: string | KeyringPair, destinationAddress: string, amount: BN): Promise<string | undefined>;
+    sendTokenFromParachainToMangataFee(url: string, tokenSymbol: string, destWeight: string, account: string | KeyringPair, mangataAddress: string, amount: BN): Promise<string>;
+    sendTokenFromMangataToParachainFee(tokenSymbol: string, withWeight: string, parachainId: number, account: string | KeyringPair, destinationAddress: string, amount: BN): Promise<string>;
     sendKusamaTokenFromRelayToParachain(kusamaEndpointUrl: string, ksmAccount: string | KeyringPair, destinationMangataAddress: string, amount: BN, parachainId?: number, txOptions?: XcmTxOptions): Promise<void>;
     sendKusamaTokenFromRelayToParachainFee(kusamaEndpointUrl: string, ksmAccount: string | KeyringPair, destinationMangataAddress: string, amount: BN, parachainId?: number): Promise<string>;
     sendKusamaTokenFromParachainToRelay(mangataAccount: string | KeyringPair, destinationKusamaAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
