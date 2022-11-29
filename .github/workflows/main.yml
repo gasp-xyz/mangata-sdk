@@ -19,8 +19,11 @@ jobs:
           path: mangata-repo
           ref: develop
 
-      - name: Install latest nightly
-        uses: dtolnay/rust-toolchain@nightly
+      - name: Install WASM toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          target: wasm32-unknown-unknown
 
       - name: Build the node
         working-directory: mangata-repo
