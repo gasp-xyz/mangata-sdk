@@ -22,6 +22,7 @@ jobs:
           ref: develop
 
       - name: Build the node
+        working-directory: mangata-repo
         run: cargo build --release --features=mangata-rococo
 
       - name: Run the Node
