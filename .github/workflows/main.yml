@@ -25,6 +25,9 @@ jobs:
         working-directory: mangata-repo
         run: cargo build --release --features=mangata-rococo
 
+      - name: Setup yarn
+        run: npm install -g yarn
+
       - name: Run the Node
         working-directory: mangata-repo/launch
         run: |
@@ -98,6 +101,6 @@ jobs:
         run: npm run test sell-asset-four-times.test.ts
 
       - name: Stop node
-        working-directory: launch
+        working-directory: mangata-repo/launch
         run: |
           yarn down
