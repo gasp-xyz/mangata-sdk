@@ -11,6 +11,8 @@ env:
 jobs:
   complete-setup:
     runs-on: ubuntu-latest
+    container:
+      image: mangatasolutions/node-builder:multi-nightly-2022-11-21
     steps:
       - name: Clone mangata node repository
         uses: actions/checkout@v3
@@ -21,10 +23,7 @@ jobs:
 
       - name: Build the node
         working-directory: launch
-        run: |
-          chmod +x ./docker-cargo.sh
-          export SKIP_BUILD=1 ./docker-cargo.sh build --release --features=mangata-rococo /scripts/build-image.sh
-        shell: bash
+        run: cargo build --release --features=mangata-rococo
 
       - name: Run the Node
         working-directory: launch
