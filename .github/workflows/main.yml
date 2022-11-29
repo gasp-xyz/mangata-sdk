@@ -19,21 +19,16 @@ jobs:
           path: mangata-repo
           ref: develop
 
-      - name: Checked cloned mangata repo
-        run: |
-          cd $GITHUB_WORKSPACE/mangata-repo
-          ls -a
-
       - name: Build the node
+        working-directory: launch
         run: |
-          cd $GITHUB_WORKSPACE/mangata-repo
           chmod +x ./docker-cargo.sh
-          export SKIP_BUILD=1 ./docker-cargo.sh build --release --features=mangata-rococo $GITHUB_WORKSPACE/mangata-repo/scripts/build-image.sh
+          export SKIP_BUILD=1 ./docker-cargo.sh build --release --features=mangata-rococo /scripts/build-image.sh
         shell: bash
 
       - name: Run the Node
+        working-directory: launch
         run: |
-          cd $GITHUB_WORKSPACE/mangata-repo/launch
           yarn install
           yarn gen
           yarn up
@@ -104,6 +99,6 @@ jobs:
         run: npm run test sell-asset-four-times.test.ts
 
       - name: Stop node
+        working-directory: launch
         run: |
-          cd $GITHUB_WORKSPACE/mangata-repo/launch
           yarn down
