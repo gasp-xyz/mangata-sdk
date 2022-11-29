@@ -19,6 +19,9 @@ jobs:
           path: mangata-repo
           ref: develop
 
+      - name: Install latest nightly
+        uses: dtolnay/rust-toolchain@nightly-2022-11-21
+
       - name: Build the node
         working-directory: mangata-repo
         run: cargo build --release --features=mangata-rococo
