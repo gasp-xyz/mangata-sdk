@@ -20,7 +20,7 @@ jobs:
           ref: develop
 
       - name: Install latest nightly
-        uses: dtolnay/rust-toolchain@nightly-2022-11-21
+        uses: dtolnay/rust-toolchain@nightly
 
       - name: Build the node
         working-directory: mangata-repo
