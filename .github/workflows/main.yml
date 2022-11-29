@@ -11,8 +11,6 @@ env:
 jobs:
   complete-setup:
     runs-on: ubuntu-latest
-    container:
-      image: mangatasolutions/node-builder:multi-nightly-2022-11-21
     steps:
       - name: Clone mangata node repository
         uses: actions/checkout@v3
@@ -24,6 +22,10 @@ jobs:
       - name: Build the node
         working-directory: mangata-repo
         run: cargo build --release --features=mangata-rococo
+
+      - name: Replace parachain docker image reference in config
+        working-directory: mangata-repo/launch
+        run: sed -i 's+mangatasolutions/mangata-node:dev+mangatasolutions/mangata-node:develop+g' config.yml
 
       - name: Setup yarn
         run: npm install -g yarn
