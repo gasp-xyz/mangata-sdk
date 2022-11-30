@@ -30,15 +30,15 @@ beforeEach(async () => {
   firstTokenId = await createTokenForUser(
     testUser,
     sudoUser,
-    new BN("10000000000000000000000")
+    new BN("100000000000000000000000")
   );
   secondTokenId = await createTokenForUser(
     testUser,
     sudoUser,
-    new BN("10000000000000000000000")
+    new BN("100000000000000000000000")
   );
 
-  await createMGXToken(sudoUser, testUser, new BN("1000000000000000000000"));
+  await createMGXToken(sudoUser, testUser, new BN("100000000000000000000000"));
 
   await instance.waitForNewBlock(2);
 });
@@ -48,7 +48,7 @@ it("should transfer tokens from testUser1 to testUser2", async () => {
     testUser,
     secondTokenId.toString(),
     testUser1.address,
-    new BN(100),
+    new BN("100"),
     {
       extrinsicStatus: (result) => {
         const eventTransfer = getEventResultFromTxWait(result, [
@@ -80,13 +80,13 @@ it("should transfer tokens from testUser1 to testUser2", async () => {
   );
 
   const issuance = await instance.getTotalIssuance(firstTokenId.toString());
-  expect(issuance.toString()).toEqual("10000000000000000000000");
+  expect(issuance.toString()).toEqual("100000000000000000000000");
 
   const tokenBalance = await instance.getTokenBalance(
     firstTokenId.toString(),
     testUser1.address
   );
-  expect(tokenBalance.free.toString()).toEqual("10000000000000000000000");
+  expect(tokenBalance.free.toString()).toEqual("100000000000000000000000");
 });
 
 afterAll(async () => {
