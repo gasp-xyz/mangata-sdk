@@ -108,8 +108,3 @@ jobs:
 
       - name: Run sell asset four times test
         run: npm run test sell-asset-four-times.test.ts
-
-      - name: Stop node
-        working-directory: mangata-repo/launch
-        run: |
-          yarn down
