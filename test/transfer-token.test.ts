@@ -61,32 +61,32 @@ it("should transfer tokens from testUser1 to testUser2", async () => {
     }
   );
 
-  // await instance.transferTokenAll(
-  //   testUser,
-  //   firstTokenId.toString(),
-  //   testUser1.address,
-  //   {
-  //     extrinsicStatus: (resultTransferAll) => {
-  //       const eventTransferAll = getEventResultFromTxWait(resultTransferAll, [
-  //         "tokens",
-  //         "Transfer",
-  //         testUser.address
-  //       ]);
-  //       expect(eventTransferAll.state).toEqual(
-  //         ExtrinsicResult.ExtrinsicSuccess
-  //       );
-  //     }
-  //   }
-  // );
+  await instance.transferTokenAll(
+    testUser,
+    firstTokenId.toString(),
+    testUser1.address,
+    {
+      extrinsicStatus: (resultTransferAll) => {
+        const eventTransferAll = getEventResultFromTxWait(resultTransferAll, [
+          "tokens",
+          "Transfer",
+          testUser.address
+        ]);
+        expect(eventTransferAll.state).toEqual(
+          ExtrinsicResult.ExtrinsicSuccess
+        );
+      }
+    }
+  );
 
-  // const issuance = await instance.getTotalIssuance(firstTokenId.toString());
-  // expect(issuance.toString()).toEqual("100000000000000000000000");
+  const issuance = await instance.getTotalIssuance(firstTokenId.toString());
+  expect(issuance.toString()).toEqual("100000000000000000000000");
 
-  // const tokenBalance = await instance.getTokenBalance(
-  //   firstTokenId.toString(),
-  //   testUser1.address
-  // );
-  // expect(tokenBalance.free.toString()).toEqual("100000000000000000000000");
+  const tokenBalance = await instance.getTokenBalance(
+    firstTokenId.toString(),
+    testUser1.address
+  );
+  expect(tokenBalance.free.toString()).toEqual("100000000000000000000000");
 });
 
 afterAll(async () => {
