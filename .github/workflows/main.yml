@@ -7,6 +7,7 @@ env:
   API_URL: "ws://127.0.0.1:9947"
   TEST_PALLET_ADDRESS: ${{ secrets.TEST_PALLET_ADDRESS }}
   TEST_SUDO_NAME: ${{ secrets.TEST_SUDO_NAME }}
+  TX_VERBOSE: true
 
 jobs:
   complete-setup:
@@ -19,21 +20,26 @@ jobs:
           path: mangata-repo
           ref: develop
 
-      - name: Checked cloned mangata repo
-        run: |
-          cd $GITHUB_WORKSPACE/mangata-repo
-          ls -a
+      - name: Install WASM toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          target: wasm32-unknown-unknown
 
       - name: Build the node
-        run: |
-          cd $GITHUB_WORKSPACE/mangata-repo
-          chmod +x ./docker-cargo.sh
-          export SKIP_BUILD=1 ./docker-cargo.sh build --release --features=mangata-rococo $GITHUB_WORKSPACE/mangata-repo/scripts/build-image.sh
-        shell: bash
+        working-directory: mangata-repo
+        run: cargo build --release --features=mangata-rococo
+
+      - name: Replace parachain docker image reference in config
+        working-directory: mangata-repo/launch
+        run: sed -i 's+mangatasolutions/mangata-node:dev+mangatasolutions/mangata-node:develop+g' config.yml
+
+      - name: Setup yarn
+        run: npm install -g yarn
 
       - name: Run the Node
+        working-directory: mangata-repo/launch
         run: |
-          cd $GITHUB_WORKSPACE/mangata-repo/launch
           yarn install
           yarn gen
           yarn up
@@ -102,8 +108,3 @@ jobs:
 
       - name: Run sell asset four times test
         run: npm run test sell-asset-four-times.test.ts
-
-      - name: Stop node
-        run: |
-          cd $GITHUB_WORKSPACE/mangata-repo/launch
-          yarn down
