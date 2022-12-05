@@ -251,51 +251,47 @@ export const calculateFutureRewardsAmountForMinting = async (
   api: ApiPromise,
   liquidityTokenId: string,
   mintingAmount: BN,
-  futureTimeBlockNumber: BN
+  blocksToPass: BN
 ) => {
-  const block = await api.rpc.chain.getBlock();
-  const blockNumber = new BN(block.block.header.number.toString());
-  const futureBlockNumber = blockNumber.add(new BN(futureTimeBlockNumber));
-  const futureTime = futureBlockNumber.div(new BN(10000));
-  const currentTime = blockNumber.div(new BN(10000));
-
-  const liquidityAssetsAmountPool =
-    await api.query.xyk.liquidityMiningActivePool(new BN(liquidityTokenId));
-
-  const workUser = await calculateWorkUserForMinting(
-    mintingAmount,
-    currentTime,
-    futureTime,
-    api
-  );
-
-  const workPool = await calculateWorkPool(
-    new BN(liquidityAssetsAmountPool.toString()).add(mintingAmount),
-    liquidityTokenId,
-    futureTime,
-    api
-  );
-
-  const currentAvailableRewardsForPool =
-    await api.query.issuance.promotedPoolsRewards(liquidityTokenId);
-
-  const currentAvailableRewardsForPoolBN = new BN(
-    currentAvailableRewardsForPool.toString()
-  );
-
   const rewardsPerSession = new BN("136986000000000000000000");
-  const sessionsToPass = futureTimeBlockNumber.div(new BN(1200));
-  const numberOfPromotedPools =
-    await api.query.issuance.promotedPoolsRewards.entries();
 
-  const futureAvailableRewardsForPool = rewardsPerSession
-    .mul(sessionsToPass)
-    .div(new BN(numberOfPromotedPools.length))
-    .add(currentAvailableRewardsForPoolBN);
-  let futureRewards = new BN(0);
-  if (workUser.gt(new BN(0)) && workPool.gt(new BN(0))) {
-    futureRewards = futureAvailableRewardsForPool.mul(workUser).div(workPool);
-  }
+  const sessionsToPass = blocksToPass.div(new BN("1200"));
+  const totalRewardsMinted = sessionsToPass.mul(rewardsPerSession);
+
+  const promotedPoolRewardsV2 =
+    await api.query.issuance.promotedPoolsRewardsV2();
+  const promotedPoolInfos = promotedPoolRewardsV2.toHuman() as {
+    [key: string]: {
+      weight: string;
+      rewards: string;
+    };
+  };
+
+  const totalWeight = Object.values(promotedPoolInfos).reduce(
+    (
+      acc: BN,
+      curr: {
+        weight: string;
+        rewards: string;
+      }
+    ) => acc.add(new BN(curr.weight)),
+    new BN(0)
+  );
+
+  const poolWeight = new BN(
+    promotedPoolInfos[liquidityTokenId].weight.toString()
+  );
+
+  const rewardsMintedForPool = totalRewardsMinted
+    .mul(poolWeight)
+    .div(totalWeight);
+
+  const totalActivatedLiquidityInPool =
+    await api.query.xyk.liquidityMiningActivePoolV2(liquidityTokenId);
+
+  const futureRewards = rewardsMintedForPool
+    .mul(mintingAmount)
+    .div(new BN(totalActivatedLiquidityInPool.toString()).add(mintingAmount));
 
   return futureRewards;
 };
