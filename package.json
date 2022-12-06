@@ -73,9 +73,9 @@
   },
   "dependencies": {
     "@mangata-finance/types": "^0.13.0",
-    "@polkadot/api": "^9.6.2",
-    "big.js": "^6.1.1",
+    "@polkadot/api": "^9.10.1",
+    "big.js": "^6.2.1",
     "mangata-prng-xoshiro": "^3.0.0",
-    "uuid": "^8.3.2"
+    "uuid": "^9.0.0"
   }
 }
