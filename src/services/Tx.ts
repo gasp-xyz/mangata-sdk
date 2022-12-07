@@ -53,12 +53,12 @@ export const signTx = async (
   txOptions?: TxOptions
 ): Promise<MangataGenericEvent[]> => {
   return new Promise<MangataGenericEvent[]>(async (resolve, reject) => {
-    let output: MangataGenericEvent[] = [];
+    const output: MangataGenericEvent[] = [];
     const extractedAccount =
       typeof account === "string" ? account : account.address;
 
     const nonce = await getTxNonce(api, extractedAccount, txOptions);
-    let retries = 0;
+    const retries = 0;
     console.info(`signTx Tx[${tx.hash.toString()}] who:${extractedAccount} nonce:${nonce.toString()} `);
     try {
       const unsub = await tx.signAndSend(
