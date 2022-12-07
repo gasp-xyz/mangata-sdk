@@ -21,7 +21,7 @@ export class Rpc {
     address: string,
     liquidityTokenId: string
   ): Promise<BN> {
-    const rewards = await (api.rpc as any).xyk.calculate_rewards_amount_v2(
+    const rewards = await (api.rpc as any).xyk.calculate_rewards_amount(
       address,
       liquidityTokenId
     );
