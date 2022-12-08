@@ -634,7 +634,7 @@ export class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      api.tx.xyk.activateLiquidity(liquditityTokenId, amount, null),
+      api.tx.xyk.activateLiquidityV2(liquditityTokenId, amount, null),
       account,
       txOptions
     );
@@ -649,7 +649,7 @@ export class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      api.tx.xyk.deactivateLiquidity(liquditityTokenId, amount),
+      api.tx.xyk.deactivateLiquidityV2(liquditityTokenId, amount),
       account,
       txOptions
     );
@@ -664,7 +664,7 @@ export class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      api.tx.xyk.claimRewards(liquidityTokenId, amount),
+      api.tx.xyk.claimRewardsV2(liquidityTokenId, amount),
       account,
       txOptions
     );
