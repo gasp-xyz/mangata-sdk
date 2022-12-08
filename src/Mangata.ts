@@ -2,7 +2,7 @@ import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { WsProvider } from "@polkadot/rpc-provider/ws";
 import { options } from "@mangata-finance/types";
-import { BN, hexToString } from "@polkadot/util";
+import { BN } from "@polkadot/util";
 
 import { Rpc } from "./services/Rpc";
 import { Tx } from "./services/Tx";
