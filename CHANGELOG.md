@@ -1,3 +1,19 @@
+# [1.10.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.9.0...v1.10.0) (2022-12-08)
+
+
+### Bug Fixes
+
+* remove postfix v2 for calculate rewards amount ([120ce44](https://github.com/mangata-finance/mangata-sdk/commit/120ce444fb17940d497fc20a0e0bd0fe504e3c5e))
+* remove unnecessary util method ([7e84da8](https://github.com/mangata-finance/mangata-sdk/commit/7e84da8601981669ba2cf75c1593fb16fbf2e8d0))
+
+
+### Features
+
+* new rewards api ([cf8d3d1](https://github.com/mangata-finance/mangata-sdk/commit/cf8d3d180479e56a6669b8485b993644f006aff0))
+* update method for rewards ([279fdc7](https://github.com/mangata-finance/mangata-sdk/commit/279fdc7c9a41178446ea5a4f2241b2a0aefbc835))
+* update packages to correct versions ([34687db](https://github.com/mangata-finance/mangata-sdk/commit/34687dbf7912725cea0bbec995c0de70d06b1df3))
+* update packages to latest versions ([79a3c15](https://github.com/mangata-finance/mangata-sdk/commit/79a3c155ccc098200afd89f67f6d439a72cd6ada))
+
 # [1.9.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.8.1...v1.9.0) (2022-11-03)
 
 
