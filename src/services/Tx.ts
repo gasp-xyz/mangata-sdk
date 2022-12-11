@@ -58,16 +58,11 @@ export const signTx = async (
       typeof account === "string" ? account : account.address;
 
     const nonce = await getTxNonce(api, extractedAccount, txOptions);
-    const retries = 0;
-    console.info(`signTx Tx[${tx.hash.toString()}] who:${extractedAccount} nonce:${nonce.toString()} `);
+    await tx.signAsync(account, { nonce, signer: txOptions?.signer });
+    console.info(`submitting Tx[${tx.hash.toString()}] who:${extractedAccount} nonce:${nonce.toString()} `);
     try {
-      const unsub = await tx.signAndSend(
-        account,
-        {
-          nonce,
-          signer: txOptions?.signer
-        },
-        async (result) => {
+      const unsub = await tx.send(
+        async (result: any) => {
           console.info(
             `Tx[${tx.hash.toString()}] who:${extractedAccount} nonce:${nonce.toString()} => ${result.status.type}(${result.status.value.toString()})${serializeTx(api, tx)}`
           );
@@ -571,7 +566,7 @@ export class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      api.tx.xyk.activateLiquidity(liquditityTokenId, amount, null),
+      api.tx.xyk.activateLiquidityV2(liquditityTokenId, amount, null),
       account,
       txOptions
     );
@@ -586,7 +581,7 @@ export class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      api.tx.xyk.deactivateLiquidity(liquditityTokenId, amount),
+      api.tx.xyk.deactivateLiquidityV2(liquditityTokenId, amount),
       account,
       txOptions
     );
@@ -601,7 +596,7 @@ export class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      api.tx.xyk.claimRewards(liquidityTokenId, amount),
+      api.tx.xyk.claimRewardsV2(liquidityTokenId, amount),
       account,
       txOptions
     );

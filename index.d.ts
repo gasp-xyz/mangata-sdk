@@ -184,8 +184,7 @@ declare class Mangata {
     sendTurTokenFromMangataToTuringFee(mangataAccount: string | KeyringPair, destinationAddress: string, amount: BN): Promise<string>;
     activateLiquidity(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     deactivateLiquidity(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
-    calculateFutureRewardsAmount(address: string, liquidityTokenId: string, futureBlockNumber: BN): Promise<BN>;
-    calculateFutureRewardsAmountForMinting(liquidityTokenId: string, mintingAmount: BN, futureBlockNumber: BN): Promise<BN>;
+    calculateFutureRewardsAmountForMinting(liquidityTokenId: string, mintingAmount: BN, blocksToPass: BN): Promise<BN>;
     calculateRewardsAmount(address: string, liquidityTokenId: string): Promise<BN>;
     claimRewardsFee(account: string | KeyringPair, liquditityTokenId: string, amount: BN): Promise<string>;
     claimRewards(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;

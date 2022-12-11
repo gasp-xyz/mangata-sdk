@@ -2,6 +2,7 @@
   "name": "@mangata-finance/sdk",
   "version": "1.9.0",
   "description": "SDK for communication with Mangata node",
+  "type": "module",
   "main": "./index.js",
   "module": "./index.mjs",
   "types": "./index.d.ts",
@@ -42,6 +43,70 @@
     "parachain",
     "sdk"
   ],
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ],
+      "@babel/preset-react"
+    ]
+  },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "rules": {
+      "no-var": "warn",
+      "prefer-const": "warn",
+      "no-console": "warn",
+      "arrow-body-style": "off",
+      "prefer-arrow-callback": "off",
+      "semi": 0
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "release": {
+    "branches": [
+      "release/*"
+    ],
+    "repositoryUrl": "https://github.com/mangata-finance/mangata-sdk",
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/changelog",
+        {
+          "changelogFile": "CHANGELOG.md"
+        }
+      ],
+      "@semantic-release/npm",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "CHANGELOG.md",
+            "package.json"
+          ],
+          "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+        }
+      ],
+      "@semantic-release/github"
+    ]
+  },
   "author": "Mangata Finance",
   "license": "GPL-3.0",
   "bugs": {
@@ -69,12 +134,12 @@
     "semantic-release": "^19.0.3",
     "ts-node": "^10.5.0",
     "typescript": "^4.7.4",
-    "vitest": "^0.22.1"
+    "vitest": "^0.25.6"
   },
   "dependencies": {
-    "@mangata-finance/types": "^0.9.0",
-    "@polkadot/api": "^9.6.2",
-    "big.js": "^6.1.1",
-    "uuid": "^8.3.2"
+    "@mangata-finance/types": "^0.15.0",
+    "@polkadot/api": "^9.10.1",
+    "big.js": "^6.2.1",
+    "uuid": "^9.0.0"
   }
 }

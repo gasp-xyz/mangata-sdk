@@ -3,7 +3,7 @@ import { Keyring } from "@polkadot/api";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { BN } from "@polkadot/util";
-import { v4 as uuid } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import Big from "big.js";
 
 import { toBN } from "./utils/BNutility";
@@ -25,7 +25,7 @@ export class MangataHelpers {
     keyring: Keyring,
     name = ""
   ): KeyringPair {
-    const userName: string = name ? name : "//testUser_" + uuid();
+    const userName: string = name ? name : "//testUser_" + uuidv4();
     const account = keyring.createFromUri(userName);
     keyring.addPair(account);
     return account;
