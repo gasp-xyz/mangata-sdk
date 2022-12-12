@@ -7,6 +7,7 @@ import { GenericExtrinsic, GenericEvent } from "@polkadot/types";
 import { AnyTuple } from '@polkadot/types-codec/types';
 import { BN, isHex, hexToU8a } from "@polkadot/util";
 import { encodeAddress } from "@polkadot/util-crypto";
+import { ISubmittableResult } from "@polkadot/types/types";
 
 import { instance } from "../utils/MemoryDatabase";
 import { getTxNonce } from "../utils/getTxNonce";
@@ -27,23 +28,10 @@ function serializeTx(api: ApiPromise, tx: SubmittableExtrinsic<"promise">) {
     const sudoCallIndex = (tx.method.args[0] as any).callIndex;
     const sudoCallArgs = JSON.stringify(methodObject.args.call.args);
     const sudoCallDecoded = api.registry.findMetaCall(sudoCallIndex);
-    return ` (sudo::${sudoCallDecoded.section}::${sudoCallDecoded.method}(${sudoCallArgs})`;
+    return ` (sudo:: ${sudoCallDecoded.section}:: ${sudoCallDecoded.method}(${sudoCallArgs})`;
   } else {
-    return ` (${callDecoded.section}::${callDecoded.method}(${args}))`;
+    return ` (${callDecoded.section}:: ${callDecoded.method}(${args}))`;
   }
-}
-
-const getBlockExtrinisics = async (api: ApiPromise, blockNr: BN): Promise<GenericExtrinsic<AnyTuple>[]> => {
-  const blockHash = await api.rpc.chain.getBlockHash(blockNr);
-  const blockHeader = await api.rpc.chain.getHeader(blockHash);
-  const currentBlock = await api.rpc.chain.getBlock(blockHeader.hash);
-  return currentBlock.block.extrinsics;
-}
-
-const getBlockEvents = async (api: ApiPromise, blockNr: BN): Promise<GenericEvent[]> => {
-  const blockHash = await api.rpc.chain.getBlockHash(blockNr);
-  const blockHeader = await api.rpc.chain.getHeader(blockHash);
-  return await api.query.system.events.at(blockHeader.hash);
 }
 
 export const signTx = async (
@@ -53,18 +41,17 @@ export const signTx = async (
   txOptions?: TxOptions
 ): Promise<MangataGenericEvent[]> => {
   return new Promise<MangataGenericEvent[]>(async (resolve, reject) => {
-    const output: MangataGenericEvent[] = [];
     const extractedAccount =
       typeof account === "string" ? account : account.address;
 
     const nonce = await getTxNonce(api, extractedAccount, txOptions);
     await tx.signAsync(account, { nonce, signer: txOptions?.signer });
-    console.info(`submitting Tx[${tx.hash.toString()}] who:${extractedAccount} nonce:${nonce.toString()} `);
+    console.info(`submitting Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} `);
     try {
       const unsub = await tx.send(
-        async (result: any) => {
+        async (result: ISubmittableResult) => {
           console.info(
-            `Tx[${tx.hash.toString()}] who:${extractedAccount} nonce:${nonce.toString()} => ${result.status.type}(${result.status.value.toString()})${serializeTx(api, tx)}`
+            `Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} => ${result.status.type}(${result.status.value.toString()})${serializeTx(api, tx)}`
           );
 
           txOptions?.statusCallback?.(result);
@@ -86,8 +73,8 @@ export const signTx = async (
                   if (executionBlockNr.gt(executionBlockStopNr)) {
                     unsubscribeNewHeads();
                     reject(
-                      `Tx ([${tx.hash.toString()}])
-                      was not executed in blocks : ${executionBlockStartNr.toString()} .. ${executionBlockStopNr.toString()}`);
+                      `Tx([${tx.hash.toString()}])
+                      was not executed in blocks : ${executionBlockStartNr.toString()}..${executionBlockStopNr.toString()}`);
                     const currentNonce: BN = await Query.getNonce(
                       api,
                       extractedAccount
@@ -118,7 +105,7 @@ export const signTx = async (
                     } else {
                       unsubscribeNewHeads();
                       console.info(
-                        `Tx[${tx.hash.toString()}] who:${extractedAccount} nonce:${nonce.toString()} => Executed(${blockHash.toString()})`);
+                        `Tx[${tx.hash.toString()}]who:${extractedAccount} nonce:${nonce.toString()} => Executed(${blockHash.toString()})`);
                     }
 
                     const eventsTriggeredByTx: MangataGenericEvent[] = events
