@@ -136,7 +136,7 @@
     "vitest": "^0.25.6"
   },
   "dependencies": {
-    "@mangata-finance/types": "^0.15.0",
+    "@mangata-finance/types": "^0.16.0",
     "@polkadot/api": "^9.10.1",
     "big.js": "^6.2.1",
     "mangata-prng-xoshiro": "^3.0.0",
