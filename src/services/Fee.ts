@@ -324,7 +324,7 @@ export class Fee {
     amount: BN
   ): Promise<string> {
     const dispatchInfo = await api.tx.xyk
-      .activateLiquidity(liquditityTokenId, amount, null)
+      .activateLiquidityV2(liquditityTokenId, amount, null)
       .paymentInfo(account);
     return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
@@ -336,7 +336,7 @@ export class Fee {
     amount: BN
   ): Promise<string> {
     const dispatchInfo = await api.tx.xyk
-      .deactivateLiquidity(liquditityTokenId, amount)
+      .deactivateLiquidityV2(liquditityTokenId, amount)
       .paymentInfo(account);
     return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
@@ -348,7 +348,7 @@ export class Fee {
     amount: BN
   ): Promise<string> {
     const dispatchInfo = await api.tx.xyk
-      .claimRewards(liquidityTokenId, amount)
+      .claimRewardsV2(liquidityTokenId, amount)
       .paymentInfo(account);
     return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
