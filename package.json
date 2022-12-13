@@ -1,6 +1,6 @@
 {
   "name": "@mangata-finance/sdk",
-  "version": "1.10.0",
+  "version": "1.10.3",
   "description": "SDK for communication with Mangata node",
   "main": "./index.js",
   "module": "./index.mjs",
@@ -72,7 +72,7 @@
     "vitest": "^0.25.6"
   },
   "dependencies": {
-    "@mangata-finance/types": "^0.15.0",
+    "@mangata-finance/types": "^0.16.0",
     "@polkadot/api": "^9.10.1",
     "big.js": "^6.2.1",
     "uuid": "^9.0.0"
