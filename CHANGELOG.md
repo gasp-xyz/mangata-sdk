@@ -1,3 +1,11 @@
+## [1.10.4](https://github.com/mangata-finance/mangata-sdk/compare/v1.10.3...v1.10.4) (2022-12-13)
+
+
+### Bug Fixes
+
+* rewrite to postfix v2 ([0ebe7b0](https://github.com/mangata-finance/mangata-sdk/commit/0ebe7b0949c401fe5640220ccf832bdcee46036e))
+* update version ([dd7a034](https://github.com/mangata-finance/mangata-sdk/commit/dd7a034e40ce3497c8b3edb39ea78fac692926df))
+
 # [1.10.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.9.0...v1.10.0) (2022-12-08)
 
 
