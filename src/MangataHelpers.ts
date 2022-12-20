@@ -9,7 +9,6 @@ import Big from "big.js";
 import { toBN } from "./utils/BNutility";
 import { toFixed } from "./utils/toFixed";
 import { isInputValid } from "./utils/isInputValid";
-import { getXoshiro } from "./utils/getXorshiroStates";
 import { BIG_HUNDRED } from "./utils/bigConstants";
 import { BN_TEN_THOUSAND } from "./utils/bnConstants";
 
@@ -30,10 +29,6 @@ export class MangataHelpers {
     const account = keyring.createFromUri(userName);
     keyring.addPair(account);
     return account;
-  }
-
-  public static getXoshiro(seed: Uint8Array) {
-    return getXoshiro(seed);
   }
 
   public static getPriceImpact(

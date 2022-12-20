@@ -3,12 +3,14 @@ import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { WsProvider } from "@polkadot/rpc-provider/ws";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
+import { GenericExtrinsic, GenericEvent } from "@polkadot/types";
+import { AnyTuple } from '@polkadot/types-codec/types';
 import { BN, isHex, hexToU8a } from "@polkadot/util";
 import { encodeAddress } from "@polkadot/util-crypto";
+import { ISubmittableResult } from "@polkadot/types/types";
 
 import { instance } from "../utils/MemoryDatabase";
 import { getTxNonce } from "../utils/getTxNonce";
-import { recreateExtrinsicsOrder } from "../utils/recreateExtrinsicsOrder";
 import { Query } from "../services/Query";
 import { TxOptions, XcmTxOptions } from "../types/TxOptions";
 import { MangataGenericEvent } from "../types/MangataGenericEvent";
@@ -26,9 +28,9 @@ function serializeTx(api: ApiPromise, tx: SubmittableExtrinsic<"promise">) {
     const sudoCallIndex = (tx.method.args[0] as any).callIndex;
     const sudoCallArgs = JSON.stringify(methodObject.args.call.args);
     const sudoCallDecoded = api.registry.findMetaCall(sudoCallIndex);
-    return ` (sudo::${sudoCallDecoded.section}::${sudoCallDecoded.method}(${sudoCallArgs})`;
+    return ` (sudo:: ${sudoCallDecoded.section}:: ${sudoCallDecoded.method}(${sudoCallArgs})`;
   } else {
-    return ` (${callDecoded.section}::${callDecoded.method}(${args}))`;
+    return ` (${callDecoded.section}:: ${callDecoded.method}(${args}))`;
   }
 }
 
@@ -39,24 +41,17 @@ export const signTx = async (
   txOptions?: TxOptions
 ): Promise<MangataGenericEvent[]> => {
   return new Promise<MangataGenericEvent[]>(async (resolve, reject) => {
-    let output: MangataGenericEvent[] = [];
     const extractedAccount =
       typeof account === "string" ? account : account.address;
 
     const nonce = await getTxNonce(api, extractedAccount, txOptions);
-    let retries = 0;
+    await tx.signAsync(account, { nonce, signer: txOptions?.signer });
+    console.info(`submitting Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} `);
     try {
-      const unsub = await tx.signAndSend(
-        account,
-        {
-          nonce,
-          signer: txOptions?.signer
-        },
-        async (result) => {
+      const unsub = await tx.send(
+        async (result: ISubmittableResult) => {
           console.info(
-            `Tx[${truncatedString(tx.hash.toString())}] => ${
-              result.status.type
-            }(${result.status.value.toString()})${serializeTx(api, tx)}`
+            `Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} => ${result.status.type}(${result.status.value.toString()})${serializeTx(api, tx)}`
           );
 
           txOptions?.statusCallback?.(result);
@@ -66,107 +61,59 @@ export const signTx = async (
               inclusionBlockHash
             );
             const inclusionBlockNr = inclusionBlockHeader.number.toBn();
-            const executionBlockNr = inclusionBlockNr.addn(1);
+            const executionBlockStartNr = inclusionBlockNr.addn(1);
+            const executionBlockStopNr = inclusionBlockNr.addn(10);
+            const executionBlockNr = executionBlockStartNr;
 
             const unsubscribeNewHeads =
               await api.rpc.chain.subscribeFinalizedHeads(
                 async (lastHeader) => {
                   const lastBlockNumber = lastHeader.number.toBn();
 
-                  if (lastBlockNumber.gt(inclusionBlockNr)) {
-                    const executionBlockHash = await api.rpc.chain.getBlockHash(
-                      executionBlockNr
-                    );
-                    const executionBlockHeader = await api.rpc.chain.getHeader(
-                      executionBlockHash
-                    );
+                  if (executionBlockNr.gt(executionBlockStopNr)) {
                     unsubscribeNewHeads();
-                    const currentBlock = await api.rpc.chain.getBlock(
-                      executionBlockHeader.hash
+                    reject(
+                      `Tx([${tx.hash.toString()}])
+                      was not executed in blocks : ${executionBlockStartNr.toString()}..${executionBlockStopNr.toString()}`);
+                    const currentNonce: BN = await Query.getNonce(
+                      api,
+                      extractedAccount
                     );
-                    const currentBlockExtrinsics =
-                      currentBlock.block.extrinsics;
-                    const currentBlockEvents = await api.query.system.events.at(
-                      executionBlockHeader.hash
-                    );
-                    const headerJsonResponse = JSON.parse(
-                      executionBlockHeader.toString()
-                    );
+                    instance.setNonce(extractedAccount, currentNonce);
+                    unsub();
+                    return;
+                  }
 
-                    const buffer: Buffer = Buffer.from(
-                      headerJsonResponse["seed"]["seed"].substring(2),
-                      "hex"
-                    );
-                    const countOfExtrinsicsFromThisBlock =
-                      headerJsonResponse["count"];
-                    const currentBlockInherents = currentBlockExtrinsics
-                      .slice(0, countOfExtrinsicsFromThisBlock)
-                      .filter((tx) => {
-                        return !tx.isSigned;
-                      });
-                    const previousBlockExtrinsics =
-                      currentBlockExtrinsics.slice(
-                        countOfExtrinsicsFromThisBlock,
-                        currentBlockExtrinsics.length
-                      );
-                    const bothBlocksExtrinsics = currentBlockInherents.concat(
-                      previousBlockExtrinsics
-                    );
+                  if (lastBlockNumber.gte(executionBlockNr)) {
+                    const blockHash = await api.rpc.chain.getBlockHash(executionBlockNr);
+                    const blockHeader = await api.rpc.chain.getHeader(blockHash);
+                    const extinsics: GenericExtrinsic<AnyTuple>[] = (await api.rpc.chain.getBlock(blockHeader.hash)).block.extrinsics;
+                    const events = (await api.query.system.events.at(blockHeader.hash));
 
-                    const unshuffledInherents = bothBlocksExtrinsics.filter(
-                      (tx) => {
-                        return !tx.isSigned;
-                      }
-                    );
+                    //increment
+                    executionBlockNr.iaddn(1);
 
-                    const shuffledExtrinscs = recreateExtrinsicsOrder(
-                      bothBlocksExtrinsics
-                        .filter((tx) => {
-                          return tx.isSigned;
-                        })
-                        .map((tx) => {
-                          const who = tx.isSigned
-                            ? tx.signer.toString()
-                            : "0000";
-                          return [who, tx];
-                        }),
-                      Uint8Array.from(buffer)
-                    );
-
-                    const executionOrder =
-                      unshuffledInherents.concat(shuffledExtrinscs);
-
-                    const index = executionOrder.findIndex((extrinsic) => {
+                    const index = extinsics.findIndex((extrinsic) => {
                       return extrinsic.hash.toString() === tx.hash.toString();
                     });
 
                     if (index < 0) {
-                      bothBlocksExtrinsics.forEach((e) => {
-                        console.info(
-                          `Tx ([${truncatedString(
-                            tx.hash.toString()
-                          )}]) origin ${e.hash.toString()}`
-                        );
-                      });
-                      executionOrder.forEach((e) => {
-                        console.info(
-                          `Tx ([${truncatedString(
-                            tx.hash.toString()
-                          )}]) shuffled ${e.hash.toString()}`
-                        );
-                      });
-                      reject(
-                        `Tx ([${tx.hash.toString()}])
-                      could not be find in the block
-                      $([${truncatedString(inclusionBlockHash)}])`
+                      console.info(
+                        `Tx([${tx.hash.toString()}]) not found in block ${executionBlockNr} $([${truncatedString(blockHash.toString())}])`
                       );
+                      return;
+                    } else {
+                      unsubscribeNewHeads();
+                      console.info(
+                        `Tx[${tx.hash.toString()}]who:${extractedAccount} nonce:${nonce.toString()} => Executed(${blockHash.toString()})`);
                     }
-                    const reqEvents: MangataGenericEvent[] = currentBlockEvents
+
+                    const eventsTriggeredByTx: MangataGenericEvent[] = events
                       .filter((currentBlockEvent) => {
                         return (
                           currentBlockEvent.phase.isApplyExtrinsic &&
                           currentBlockEvent.phase.asApplyExtrinsic.toNumber() ===
-                            index
+                          index
                         );
                       })
                       .map((eventRecord) => {
@@ -192,37 +139,8 @@ export const signTx = async (
                         } as MangataGenericEvent;
                       });
 
-                    output = output.concat(reqEvents);
-                    txOptions?.extrinsicStatus?.(output);
-                    resolve(output);
-                    unsub();
-                  } else if (retries++ < 10) {
-                    console.info(
-                      `Retry [${retries}] Tx: [${truncatedString(
-                        tx.hash.toString()
-                      )}] current: #${lastHeader.number} [${truncatedString(
-                        lastHeader.hash.toString()
-                      )}] finalized in: #${inclusionBlockNr} [${truncatedString(
-                        inclusionBlockHash
-                      )}] `
-                    );
-                  } else {
-                    //Lets retry this for 10 times until we reject the promise.
-                    unsubscribeNewHeads();
-                    reject(
-                      `Transaction was not finalized: Tx ([${truncatedString(
-                        tx.hash.toString()
-                      )}]): parent hash: ([${truncatedString(
-                        lastHeader.parentHash.toString()
-                      )}]): Status finalized: ([${truncatedString(
-                        inclusionBlockHash
-                      )}])`
-                    );
-                    const currentNonce: BN = await Query.getNonce(
-                      api,
-                      extractedAccount
-                    );
-                    instance.setNonce(extractedAccount, currentNonce);
+                    txOptions?.extrinsicStatus?.(eventsTriggeredByTx);
+                    resolve(eventsTriggeredByTx);
                     unsub();
                   }
                 }
@@ -233,7 +151,8 @@ export const signTx = async (
               JSON.stringify(result, null, 2)
             );
             reject(
-              `Tx ([${truncatedString(tx.hash.toString())}]) Transaction error`
+              `Tx([${tx.hash.toString()
+              }]) Transaction error`
             );
             const currentNonce: BN = await Query.getNonce(
               api,
