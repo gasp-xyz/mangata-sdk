@@ -55,8 +55,8 @@ export const signTx = async (
           );
 
           txOptions?.statusCallback?.(result);
-          if (result.status.isFinalized) {
-            const inclusionBlockHash = result.status.asFinalized.toString();
+          if (result.status.isInBlock) {
+            const inclusionBlockHash = result.status.asInBlock.toString();
             const inclusionBlockHeader = await api.rpc.chain.getHeader(
               inclusionBlockHash
             );
@@ -66,7 +66,7 @@ export const signTx = async (
             const executionBlockNr = executionBlockStartNr;
 
             const unsubscribeNewHeads =
-              await api.rpc.chain.subscribeFinalizedHeads(
+              await api.rpc.chain.subscribeNewHeads(
                 async (lastHeader) => {
                   const lastBlockNumber = lastHeader.number.toBn();
 
