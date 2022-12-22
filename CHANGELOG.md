@@ -1,3 +1,10 @@
+## [1.10.5](https://github.com/mangata-finance/mangata-sdk/compare/v1.10.4...v1.10.5) (2022-12-22)
+
+
+### Bug Fixes
+
+* pool promotion rewards v2 ([29d380a](https://github.com/mangata-finance/mangata-sdk/commit/29d380a1b0624ca980c860fbd43bfe8cfd4036bd))
+
 ## [1.10.4](https://github.com/mangata-finance/mangata-sdk/compare/v1.10.3...v1.10.4) (2022-12-13)
 
 
