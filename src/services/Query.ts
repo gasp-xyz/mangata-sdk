@@ -258,10 +258,20 @@ export class Query {
   }
 
   static async getPool(api: ApiPromise, liquidityTokenId: TTokenId) {
-    const [liquidityPoolTokens, isPoolPromoted] = await Promise.all([
-      this.getLiquidityPool(api, liquidityTokenId),
-      api.query.issuance.promotedPoolsRewards(liquidityTokenId)
-    ]);
+    const liquidityPoolTokens = await this.getLiquidityPool(
+      api,
+      liquidityTokenId
+    );
+    const promotedPoolRewardsV2 =
+      await api.query.issuance.promotedPoolsRewardsV2();
+    const promotedPoolInfos = promotedPoolRewardsV2.toHuman() as {
+      [key: string]: {
+        weight: string;
+        rewards: string;
+      };
+    };
+    const isPoolPromoted = promotedPoolInfos[liquidityTokenId];
+
     const [firstTokenId, secondTokenId] = liquidityPoolTokens;
     const [firstTokenAmount, secondTokenAmount] =
       await this.getAmountOfTokenIdInPool(
@@ -275,7 +285,10 @@ export class Query {
       firstTokenAmount,
       secondTokenAmount,
       liquidityTokenId,
-      isPromoted: isPoolPromoted.gtn(0),
+      isPromoted:
+        isPoolPromoted === undefined
+          ? false
+          : new BN(isPoolPromoted.rewards.replace(/[, ]/g, "")).gt(BN_ZERO),
       firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
       secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount)
     } as TPoolWithRatio;
