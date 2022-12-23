@@ -2,12 +2,17 @@ import { ApiPromise } from "@polkadot/api";
 
 export const getLiquidityPromotedPools = async (api: ApiPromise) => {
   try {
-    const liquidityAssetsResponse =
-      await api.query.issuance.promotedPoolsRewards.entries();
+    const promotedPoolRewardsV2 =
+      await api.query.issuance.promotedPoolsRewardsV2();
 
-    return liquidityAssetsResponse.map(
-      ([key]) => key.args.map((k) => k.toHuman())[0] as string
-    );
+    const promotedPoolInfos = promotedPoolRewardsV2.toHuman() as {
+      [key: string]: {
+        weight: string;
+        rewards: string;
+      };
+    };
+
+    return Object.keys(promotedPoolInfos);
   } catch (error) {
     return [];
   }
