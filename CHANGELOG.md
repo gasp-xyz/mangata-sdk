@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.10.5...v1.11.0) (2023-01-05)
+
+
+### Features
+
+* update types ([7220fdd](https://github.com/mangata-finance/mangata-sdk/commit/7220fdd5a2ef75266bdcd3851028838c5873c56d))
+
 ## [1.10.5](https://github.com/mangata-finance/mangata-sdk/compare/v1.10.4...v1.10.5) (2022-12-22)
 
 
