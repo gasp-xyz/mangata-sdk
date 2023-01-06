@@ -6,7 +6,6 @@ import { encodeAddress } from "@polkadot/util-crypto";
 
 import { fromBN } from "../utils/BNutility";
 import { DepositXcmTuple, WithdrawXcmTuple } from "../types/AssetInfo";
-import { BN_ZERO } from "../utils/bnConstants";
 
 export class Fee {
   static async sendTokenFromParachainToMangataFee(...args: DepositXcmTuple) {
@@ -71,8 +70,10 @@ export class Fee {
         }
       };
 
+      const destWeightCorrect =
+        tokenSymbol === "BNC" ? "Unlimited" : new BN(destWeight);
       const dispatchInfo = await api.tx.xTokens
-        .transferMultiasset(asset, destination, new BN(destWeight))
+        .transferMultiasset(asset, destination, destWeightCorrect)
         .paymentInfo(account);
       return fromBN(
         new BN(dispatchInfo.partialFee.toString()),
