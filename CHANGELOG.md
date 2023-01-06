@@ -1,3 +1,10 @@
+## [1.11.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.0...v1.11.1) (2023-01-06)
+
+
+### Bug Fixes
+
+* bifrost BNC change ([3ad9414](https://github.com/mangata-finance/mangata-sdk/commit/3ad9414198b73ee65532f29205cda95620e44e62))
+
 # [1.11.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.10.5...v1.11.0) (2023-01-05)
 
 
