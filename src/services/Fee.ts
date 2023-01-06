@@ -70,10 +70,15 @@ export class Fee {
         }
       };
 
-      const destWeightCorrect =
-        tokenSymbol === "BNC" ? "Unlimited" : new BN(destWeight);
+      const destWeightLimit =
+        tokenSymbol === "BNC"
+          ? {
+              Limited: new BN(destWeight)
+            }
+          : new BN(destWeight);
+
       const dispatchInfo = await api.tx.xTokens
-        .transferMultiasset(asset, destination, destWeightCorrect)
+        .transferMultiasset(asset, destination, destWeightLimit)
         .paymentInfo(account);
       return fromBN(
         new BN(dispatchInfo.partialFee.toString()),

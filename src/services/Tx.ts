@@ -464,11 +464,15 @@ export class Tx {
         }
       };
 
-      const destWeightCorrect =
-        tokenSymbol === "BNC" ? "Unlimited" : new BN(destWeight);
+      const destWeightLimit =
+        tokenSymbol === "BNC"
+          ? {
+              Limited: new BN(destWeight)
+            }
+          : new BN(destWeight);
 
       await api.tx.xTokens
-        .transferMultiasset(asset, destination, destWeightCorrect)
+        .transferMultiasset(asset, destination, destWeightLimit)
         .signAndSend(account, {
           signer: txOptions?.signer,
           nonce: txOptions?.nonce
