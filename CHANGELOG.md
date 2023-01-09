@@ -1,3 +1,10 @@
+## [1.11.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.1...v1.11.2) (2023-01-06)
+
+
+### Bug Fixes
+
+* update BNC chain to newest version ([372a95f](https://github.com/mangata-finance/mangata-sdk/commit/372a95ffd72974a6780e18b9057dea4fdbf9db46))
+
 ## [1.11.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.0...v1.11.1) (2023-01-06)
 
 
