@@ -1,3 +1,10 @@
+## [1.11.3](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.2...v1.11.3) (2023-01-09)
+
+
+### Bug Fixes
+
+* weight limit argument for xTokens ([fd2d620](https://github.com/mangata-finance/mangata-sdk/commit/fd2d620a53261938cb56059966210d2fc71dfc6d))
+
 ## [1.11.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.1...v1.11.2) (2023-01-06)
 
 
