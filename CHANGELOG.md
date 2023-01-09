@@ -1,3 +1,31 @@
+## [1.11.3](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.2...v1.11.3) (2023-01-09)
+
+
+### Bug Fixes
+
+* weight limit argument for xTokens ([fd2d620](https://github.com/mangata-finance/mangata-sdk/commit/fd2d620a53261938cb56059966210d2fc71dfc6d))
+
+## [1.11.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.1...v1.11.2) (2023-01-06)
+
+
+### Bug Fixes
+
+* update BNC chain to newest version ([372a95f](https://github.com/mangata-finance/mangata-sdk/commit/372a95ffd72974a6780e18b9057dea4fdbf9db46))
+
+## [1.11.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.0...v1.11.1) (2023-01-06)
+
+
+### Bug Fixes
+
+* bifrost BNC change ([3ad9414](https://github.com/mangata-finance/mangata-sdk/commit/3ad9414198b73ee65532f29205cda95620e44e62))
+
+# [1.11.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.10.5...v1.11.0) (2023-01-05)
+
+
+### Features
+
+* update types ([7220fdd](https://github.com/mangata-finance/mangata-sdk/commit/7220fdd5a2ef75266bdcd3851028838c5873c56d))
+
 ## [1.10.5](https://github.com/mangata-finance/mangata-sdk/compare/v1.10.4...v1.10.5) (2022-12-22)
 
 
