@@ -6,6 +6,7 @@ import { encodeAddress } from "@polkadot/util-crypto";
 
 import { fromBN } from "../utils/BNutility";
 import { DepositXcmTuple, WithdrawXcmTuple } from "../types/AssetInfo";
+import { getWeightXTokens } from "../utils/getWeightXTokens";
 
 export class Fee {
   static async sendTokenFromParachainToMangataFee(...args: DepositXcmTuple) {
@@ -70,12 +71,12 @@ export class Fee {
         }
       };
 
-      const destWeightLimit =
-        tokenSymbol === "BNC"
-          ? {
-              Limited: new BN(destWeight)
-            }
-          : new BN(destWeight);
+      const destWeightLimit = getWeightXTokens(
+        new BN(destWeight),
+        api.tx.xTokens.transferMultiasset
+      );
+
+      console.log("destWeight", destWeightLimit);
 
       const dispatchInfo = await api.tx.xTokens
         .transferMultiasset(asset, destination, destWeightLimit)
@@ -191,8 +192,14 @@ export class Fee {
         }
       }
     };
+
+    const destWeightLimit = getWeightXTokens(
+      new BN("4000000000"),
+      api.tx.xTokens.transferMultiasset
+    );
+
     const dispatchInfo = await turingApi.tx.xTokens
-      .transferMultiasset(asset, destination, new BN("4000000000"))
+      .transferMultiasset(asset, destination, destWeightLimit)
       .paymentInfo(account);
 
     return fromBN(new BN(dispatchInfo.partialFee.toString()), 10);

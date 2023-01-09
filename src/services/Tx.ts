@@ -15,6 +15,7 @@ import { MangataGenericEvent } from "../types/MangataGenericEvent";
 import { MangataEventData } from "../types/MangataEventData";
 import { truncatedString } from "../utils/truncatedString";
 import { DepositXcmTuple, WithdrawXcmTuple } from "../types/AssetInfo";
+import { getWeightXTokens } from "../utils/getWeightXTokens";
 
 function serializeTx(api: ApiPromise, tx: SubmittableExtrinsic<"promise">) {
   if (!process.env.TX_VERBOSE) return "";
@@ -464,12 +465,10 @@ export class Tx {
         }
       };
 
-      const destWeightLimit =
-        tokenSymbol === "BNC"
-          ? {
-              Limited: new BN(destWeight)
-            }
-          : new BN(destWeight);
+      const destWeightLimit = getWeightXTokens(
+        new BN(destWeight),
+        api.tx.xTokens.transferMultiasset
+      );
 
       await api.tx.xTokens
         .transferMultiasset(asset, destination, destWeightLimit)
@@ -589,8 +588,13 @@ export class Tx {
       }
     };
 
+    const destWeightLimit = getWeightXTokens(
+      new BN("4000000000"),
+      api.tx.xTokens.transferMultiasset
+    );
+
     await turingApi.tx.xTokens
-      .transferMultiasset(asset, destination, new BN("4000000000"))
+      .transferMultiasset(asset, destination, destWeightLimit)
       .signAndSend(account, {
         signer: txOptions?.signer,
         nonce: txOptions?.nonce
