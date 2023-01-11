@@ -18,6 +18,7 @@ import { MangataEventData } from "../types/MangataEventData";
 import { truncatedString } from "../utils/truncatedString";
 import { DepositXcmTuple, WithdrawXcmTuple } from "../types/AssetInfo";
 import { getWeightXTokens } from "../utils/getWeightXTokens";
+import { getCorrectLocationForBNC } from "../utils/getCorrectLocationForBNC";
 
 function serializeTx(api: ApiPromise, tx: SubmittableExtrinsic<"promise">) {
   if (!process.env.TX_VERBOSE) return "";
@@ -352,10 +353,13 @@ export class Tx {
       const asset = {
         V1: {
           id: {
-            Concrete: {
-              parents: "1",
-              interior: decodedLocation.v1.interior
-            }
+            Concrete:
+              tokenSymbol === "BNC"
+                ? getCorrectLocationForBNC()
+                : {
+                    parents: "1",
+                    interior: decodedLocation.v1.interior
+                  }
           },
           fun: {
             Fungible: amount

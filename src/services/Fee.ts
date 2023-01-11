@@ -76,8 +76,6 @@ export class Fee {
         api.tx.xTokens.transferMultiasset
       );
 
-      console.log("destWeight", destWeightLimit);
-
       const dispatchInfo = await api.tx.xTokens
         .transferMultiasset(asset, destination, destWeightLimit)
         .paymentInfo(account);

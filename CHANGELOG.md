@@ -1,3 +1,17 @@
+## [1.11.5](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.4...v1.11.5) (2023-01-11)
+
+
+### Bug Fixes
+
+* bnc deposit ([8cfa3c6](https://github.com/mangata-finance/mangata-sdk/commit/8cfa3c67ad034f54655903ddfe237216541484b2))
+
+## [1.11.4](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.3...v1.11.4) (2023-01-10)
+
+
+### Bug Fixes
+
+* remove unnecessary console ([9f7f681](https://github.com/mangata-finance/mangata-sdk/commit/9f7f6818cabc58e2098637f34c30218f40e072d9))
+
 ## [1.11.3](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.2...v1.11.3) (2023-01-09)
 
 

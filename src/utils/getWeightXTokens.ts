@@ -7,10 +7,6 @@ export const getWeightXTokens = (
   weight: BN,
   extrinsicCall?: SubmittableExtrinsicFunction<"promise">
 ): BN | { Limited: BN } => {
-  console.log(
-    "HUHUHU",
-    extrinsicCall?.meta.args.at(-1)?.type.eq("XcmV2WeightLimit")
-  );
   return extrinsicCall?.meta.args.at(-1)?.type.eq("XcmV2WeightLimit")
     ? {
         Limited: weight
