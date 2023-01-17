@@ -1,3 +1,10 @@
+## [1.11.6](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.5...v1.11.6) (2023-01-17)
+
+
+### Bug Fixes
+
+* update transfer method to use destWeightLimit ([7915f97](https://github.com/mangata-finance/mangata-sdk/commit/7915f97851ca038ac7da9dffa79afa23fc2bab67))
+
 ## [1.11.5](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.4...v1.11.5) (2023-01-11)
 
 
