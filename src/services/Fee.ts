@@ -133,8 +133,13 @@ export class Fee {
         }
       };
 
+      const destWeightLimit = getWeightXTokens(
+        new BN(withWeight),
+        api.tx.xTokens.transfer
+      );
+
       const dispatchInfo = await api.tx.xTokens
-        .transfer(tokenId, amount, destination, new BN(withWeight))
+        .transfer(tokenId, amount, destination, destWeightLimit)
         .paymentInfo(account);
 
       return fromBN(new BN(dispatchInfo.partialFee.toString()));

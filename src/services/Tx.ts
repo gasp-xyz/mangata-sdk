@@ -448,14 +448,14 @@ export class Tx {
         }
       };
 
+      const destWeightLimit = getWeightXTokens(
+        new BN(withWeight),
+        api.tx.xTokens.transfer
+      );
+
       await signTx(
         api,
-        api.tx.xTokens.transfer(
-          tokenId,
-          amount,
-          destination,
-          new BN(withWeight)
-        ),
+        api.tx.xTokens.transfer(tokenId, amount, destination, destWeightLimit),
         account,
         txOptions
       );

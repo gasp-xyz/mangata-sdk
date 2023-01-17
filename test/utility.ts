@@ -1,7 +1,7 @@
 import { KeyringPair } from "@polkadot/keyring/types";
 import { BN } from "@polkadot/util";
 
-import { signTx } from "../index";
+import { signTx } from "../index.js";
 import { instance } from "./instanceCreation";
 import { MangataGenericEvent } from "../src/types/MangataGenericEvent";
 
