@@ -1,3 +1,10 @@
+## [1.11.7](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.6...v1.11.7) (2023-01-18)
+
+
+### Bug Fixes
+
+* update location for vsKSM ([e881541](https://github.com/mangata-finance/mangata-sdk/commit/e8815413f9b31ffa84c63908e7115e0885ae7df3))
+
 ## [1.11.6](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.5...v1.11.6) (2023-01-17)
 
 
