@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.7...v1.12.0) (2023-01-20)
+
+
+### Features
+
+* add vKSM location ([7ff764e](https://github.com/mangata-finance/mangata-sdk/commit/7ff764eb9f1d403a5c609a000f7b5a8c77e3dcda))
+
 ## [1.11.7](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.6...v1.11.7) (2023-01-18)
 
 
