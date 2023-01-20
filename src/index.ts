@@ -8,6 +8,8 @@ export * from "./utils/BNutility";
 export * from "./utils/bigConstants";
 export * from "./utils/bnConstants";
 export * from "./utils/toFixed";
+export * from "./utils/isSellAssetTransactionSuccessful";
+export * from "./utils/isBuyAssetTransactionSuccessful";
 
 export * from "./types/AssetInfo";
 export * from "./types/MangataEventData";
