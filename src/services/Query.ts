@@ -227,6 +227,12 @@ export class Query {
             firstTokenId.toString(),
             secondTokenId.toString()
           );
+        const share = await calculateLiquidityShare(
+          api,
+          asset.id,
+          userLiquidityBalance.free.add(userLiquidityBalance.reserved)
+        );
+
         const poolInfo = {
           firstTokenId,
           secondTokenId,
@@ -234,13 +240,13 @@ export class Query {
           secondTokenAmount,
           liquidityTokenId: asset.id,
           isPromoted: liquidityTokensPromoted.includes(asset.id),
-          share: await calculateLiquidityShare(
-            api,
-            asset.id,
-            userLiquidityBalance.free.add(userLiquidityBalance.reserved)
-          ),
-          firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
-          secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount),
+          share,
+          firstTokenRatio: share.eq(BN_ZERO)
+            ? BN_ZERO
+            : getRatio(firstTokenAmount, secondTokenAmount),
+          secondTokenRatio: share.eq(BN_ZERO)
+            ? BN_ZERO
+            : getRatio(secondTokenAmount, firstTokenAmount),
           activatedLPTokens: userLiquidityBalance.reserved,
           nonActivatedLPTokens: userLiquidityBalance.free
         } as TPool & {
@@ -254,7 +260,11 @@ export class Query {
         return poolInfo;
       });
 
-    return Promise.all(poolsInfo);
+    const onlyVisiblePools = (await Promise.all(poolsInfo)).filter((poolInfo) =>
+      poolInfo.share.gt(BN_ZERO)
+    );
+
+    return onlyVisiblePools;
   }
 
   static async getPool(api: ApiPromise, liquidityTokenId: TTokenId) {

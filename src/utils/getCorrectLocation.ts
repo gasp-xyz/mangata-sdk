@@ -13,6 +13,13 @@ export const getCorrectLocation = (tokenSymbol: string, location: any) => {
         x1: { generalKey: "0x0404" }
       }
     };
+  } else if (tokenSymbol === "vKSM") {
+    return {
+      parents: "0",
+      interior: {
+        x1: { generalKey: "0x0104" }
+      }
+    };
   } else {
     return {
       parents: "1",
