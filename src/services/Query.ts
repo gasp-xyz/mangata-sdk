@@ -260,11 +260,7 @@ export class Query {
         return poolInfo;
       });
 
-    const onlyVisiblePools = (await Promise.all(poolsInfo)).filter((poolInfo) =>
-      poolInfo.share.gt(BN_ZERO)
-    );
-
-    return onlyVisiblePools;
+    return Promise.all(poolsInfo);
   }
 
   static async getPool(api: ApiPromise, liquidityTokenId: TTokenId) {
