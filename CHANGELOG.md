@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.12.0...v1.13.0) (2023-01-25)
+
+
+### Features
+
+* filter pool when share is zero ([259155f](https://github.com/mangata-finance/mangata-sdk/commit/259155f1813f08803d08faf1ba711c1daa33b445))
+
 # [1.12.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.11.7...v1.12.0) (2023-01-20)
 
 
