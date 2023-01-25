@@ -1,3 +1,10 @@
+## [1.13.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.13.0...v1.13.1) (2023-01-25)
+
+
+### Bug Fixes
+
+* leave all invested pools ([6ddd18f](https://github.com/mangata-finance/mangata-sdk/commit/6ddd18f6c7a2eed6c539df757c9ae49acd5284b9))
+
 # [1.13.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.12.0...v1.13.0) (2023-01-25)
 
 
