@@ -9,7 +9,7 @@
     Mangata Software Development Kit (SDK) is a toolset for convenient communication with Mangata Substrate node.
 </p>
 
-![Artwork](https://mangata.finance/images/home/assets-artwork.webp)
+![Artwork](https://blog.mangata.finance/assets/posts/themis-cover.png)
 
 ![npm](https://img.shields.io/npm/v/%40mangata-finance%2Fsdk)
 ![Issues](https://img.shields.io/github/issues/mangata-finance/mangata-sdk)
