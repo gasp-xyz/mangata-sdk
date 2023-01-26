@@ -1,3 +1,18 @@
+# [1.14.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.13.1...v1.14.0) (2023-01-26)
+
+
+### Bug Fixes
+
+* remove type module ([f1eac41](https://github.com/mangata-finance/mangata-sdk/commit/f1eac4187c94accb6b600dfb89cda97573f443b1))
+* solve linter issues ([04e7527](https://github.com/mangata-finance/mangata-sdk/commit/04e7527d94a5d23956ead26c78d86eebabe8c7c7))
+
+
+### Features
+
+* add config files ([ae0b000](https://github.com/mangata-finance/mangata-sdk/commit/ae0b00051e484c2df70ae38128ba17538245f229))
+* add helper method for buy and sell asset ([9a425c5](https://github.com/mangata-finance/mangata-sdk/commit/9a425c57140e84a74496984b2107fa05feff8689))
+* wait fot tx to be included not finalized ([99a3330](https://github.com/mangata-finance/mangata-sdk/commit/99a333089edeb9d1166d2b437856d4bdbcccc0ad))
+
 ## [1.13.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.13.0...v1.13.1) (2023-01-25)
 
 
