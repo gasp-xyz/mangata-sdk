@@ -1,3 +1,10 @@
+## [1.14.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.14.0...v1.14.1) (2023-01-27)
+
+
+### Bug Fixes
+
+* kusama weight limit ([211090e](https://github.com/mangata-finance/mangata-sdk/commit/211090eaf5c27e6c17bc4bc219f77eb1eda1d50b))
+
 # [1.14.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.13.1...v1.14.0) (2023-01-26)
 
 
