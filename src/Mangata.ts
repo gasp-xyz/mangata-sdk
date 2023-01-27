@@ -297,6 +297,9 @@ export class Mangata {
     );
   }
 
+  /**
+   * @deprecated Please use sendTokenFromParachainToMangata
+   */
   public async sendTurTokenFromTuringToMangata(
     turingUrl: string,
     account: string | KeyringPair,
@@ -315,6 +318,9 @@ export class Mangata {
     );
   }
 
+  /**
+   * @deprecated Please use sendTokenFromMangataToParachain
+   */
   public async sendTurTokenFromMangataToTuring(
     mangataAccount: string | KeyringPair,
     destinationAddress: string,
@@ -331,6 +337,9 @@ export class Mangata {
     );
   }
 
+  /**
+   * @deprecated Please use sendTokenFromParachainToMangataFee
+   */
   public async sendTurTokenFromTuringToMangataFee(
     turingUrl: string,
     account: string | KeyringPair,
@@ -347,6 +356,9 @@ export class Mangata {
     );
   }
 
+  /**
+   * @deprecated Please use sendTokenFromMangataToParachainFee
+   */
   public async sendTurTokenFromMangataToTuringFee(
     mangataAccount: string | KeyringPair,
     destinationAddress: string,

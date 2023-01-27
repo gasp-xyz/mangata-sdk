@@ -4,7 +4,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { WsProvider } from "@polkadot/rpc-provider/ws";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { GenericExtrinsic, GenericEvent } from "@polkadot/types";
-import { AnyTuple } from '@polkadot/types-codec/types';
+import { AnyTuple } from "@polkadot/types-codec/types";
 import { BN, isHex, hexToU8a } from "@polkadot/util";
 import { encodeAddress } from "@polkadot/util-crypto";
 import { ISubmittableResult } from "@polkadot/types/types";
@@ -48,122 +48,127 @@ export const signTx = async (
 
     const nonce = await getTxNonce(api, extractedAccount, txOptions);
     await tx.signAsync(account, { nonce, signer: txOptions?.signer });
-    console.info(`submitting Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} `);
+    console.info(
+      `submitting Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} `
+    );
     try {
-      const unsub = await tx.send(
-        async (result: ISubmittableResult) => {
-          console.info(
-            `Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} => ${result.status.type}(${result.status.value.toString()})${serializeTx(api, tx)}`
+      const unsub = await tx.send(async (result: ISubmittableResult) => {
+        console.info(
+          `Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} => ${
+            result.status.type
+          }(${result.status.value.toString()})${serializeTx(api, tx)}`
+        );
+
+        txOptions?.statusCallback?.(result);
+        if (result.status.isInBlock) {
+          const inclusionBlockHash = result.status.asInBlock.toString();
+          const inclusionBlockHeader = await api.rpc.chain.getHeader(
+            inclusionBlockHash
           );
+          const inclusionBlockNr = inclusionBlockHeader.number.toBn();
+          const executionBlockStartNr = inclusionBlockNr.addn(1);
+          const executionBlockStopNr = inclusionBlockNr.addn(10);
+          const executionBlockNr = executionBlockStartNr;
 
-          txOptions?.statusCallback?.(result);
-          if (result.status.isInBlock) {
-            const inclusionBlockHash = result.status.asInBlock.toString();
-            const inclusionBlockHeader = await api.rpc.chain.getHeader(
-              inclusionBlockHash
-            );
-            const inclusionBlockNr = inclusionBlockHeader.number.toBn();
-            const executionBlockStartNr = inclusionBlockNr.addn(1);
-            const executionBlockStopNr = inclusionBlockNr.addn(10);
-            const executionBlockNr = executionBlockStartNr;
+          const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
+            async (lastHeader) => {
+              const lastBlockNumber = lastHeader.number.toBn();
 
-            const unsubscribeNewHeads =
-              await api.rpc.chain.subscribeNewHeads(
-                async (lastHeader) => {
-                  const lastBlockNumber = lastHeader.number.toBn();
+              if (executionBlockNr.gt(executionBlockStopNr)) {
+                unsubscribeNewHeads();
+                reject(
+                  `Tx([${tx.hash.toString()}])
+                      was not executed in blocks : ${executionBlockStartNr.toString()}..${executionBlockStopNr.toString()}`
+                );
+                const currentNonce: BN = await Query.getNonce(
+                  api,
+                  extractedAccount
+                );
+                instance.setNonce(extractedAccount, currentNonce);
+                unsub();
+                return;
+              }
 
-                  if (executionBlockNr.gt(executionBlockStopNr)) {
-                    unsubscribeNewHeads();
-                    reject(
-                      `Tx([${tx.hash.toString()}])
-                      was not executed in blocks : ${executionBlockStartNr.toString()}..${executionBlockStopNr.toString()}`);
-                    const currentNonce: BN = await Query.getNonce(
-                      api,
-                      extractedAccount
-                    );
-                    instance.setNonce(extractedAccount, currentNonce);
-                    unsub();
-                    return;
-                  }
+              if (lastBlockNumber.gte(executionBlockNr)) {
+                const blockHash = await api.rpc.chain.getBlockHash(
+                  executionBlockNr
+                );
+                const blockHeader = await api.rpc.chain.getHeader(blockHash);
+                const extinsics: GenericExtrinsic<AnyTuple>[] = (
+                  await api.rpc.chain.getBlock(blockHeader.hash)
+                ).block.extrinsics;
+                const events = await api.query.system.events.at(
+                  blockHeader.hash
+                );
 
-                  if (lastBlockNumber.gte(executionBlockNr)) {
-                    const blockHash = await api.rpc.chain.getBlockHash(executionBlockNr);
-                    const blockHeader = await api.rpc.chain.getHeader(blockHash);
-                    const extinsics: GenericExtrinsic<AnyTuple>[] = (await api.rpc.chain.getBlock(blockHeader.hash)).block.extrinsics;
-                    const events = (await api.query.system.events.at(blockHeader.hash));
+                //increment
+                executionBlockNr.iaddn(1);
 
-                    //increment
-                    executionBlockNr.iaddn(1);
+                const index = extinsics.findIndex((extrinsic) => {
+                  return extrinsic.hash.toString() === tx.hash.toString();
+                });
 
-                    const index = extinsics.findIndex((extrinsic) => {
-                      return extrinsic.hash.toString() === tx.hash.toString();
-                    });
-
-                    if (index < 0) {
-                      console.info(
-                        `Tx([${tx.hash.toString()}]) not found in block ${executionBlockNr} $([${truncatedString(blockHash.toString())}])`
-                      );
-                      return;
-                    } else {
-                      unsubscribeNewHeads();
-                      console.info(
-                        `Tx[${tx.hash.toString()}]who:${extractedAccount} nonce:${nonce.toString()} => Executed(${blockHash.toString()})`);
-                    }
-
-                    const eventsTriggeredByTx: MangataGenericEvent[] = events
-                      .filter((currentBlockEvent) => {
-                        return (
-                          currentBlockEvent.phase.isApplyExtrinsic &&
-                          currentBlockEvent.phase.asApplyExtrinsic.toNumber() ===
-                          index
-                        );
-                      })
-                      .map((eventRecord) => {
-                        const { event, phase } = eventRecord;
-                        const types = event.typeDef;
-                        const eventData: MangataEventData[] = event.data.map(
-                          (d: any, i: any) => {
-                            return {
-                              lookupName: types[i].lookupName!,
-                              data: d
-                            };
-                          }
-                        );
-
-                        return {
-                          event,
-                          phase,
-                          section: event.section,
-                          method: event.method,
-                          metaDocumentation: event.meta.docs.toString(),
-                          eventData,
-                          error: getError(api, event.method, eventData)
-                        } as MangataGenericEvent;
-                      });
-
-                    txOptions?.extrinsicStatus?.(eventsTriggeredByTx);
-                    resolve(eventsTriggeredByTx);
-                    unsub();
-                  }
+                if (index < 0) {
+                  console.info(
+                    `Tx([${tx.hash.toString()}]) not found in block ${executionBlockNr} $([${truncatedString(
+                      blockHash.toString()
+                    )}])`
+                  );
+                  return;
+                } else {
+                  unsubscribeNewHeads();
+                  console.info(
+                    `Tx[${tx.hash.toString()}]who:${extractedAccount} nonce:${nonce.toString()} => Executed(${blockHash.toString()})`
+                  );
                 }
-              );
-          } else if (result.isError) {
-            console.info(
-              "Transaction Error Result",
-              JSON.stringify(result, null, 2)
-            );
-            reject(
-              `Tx([${tx.hash.toString()
-              }]) Transaction error`
-            );
-            const currentNonce: BN = await Query.getNonce(
-              api,
-              extractedAccount
-            );
-            instance.setNonce(extractedAccount, currentNonce);
-          }
+
+                const eventsTriggeredByTx: MangataGenericEvent[] = events
+                  .filter((currentBlockEvent) => {
+                    return (
+                      currentBlockEvent.phase.isApplyExtrinsic &&
+                      currentBlockEvent.phase.asApplyExtrinsic.toNumber() ===
+                        index
+                    );
+                  })
+                  .map((eventRecord) => {
+                    const { event, phase } = eventRecord;
+                    const types = event.typeDef;
+                    const eventData: MangataEventData[] = event.data.map(
+                      (d: any, i: any) => {
+                        return {
+                          lookupName: types[i].lookupName!,
+                          data: d
+                        };
+                      }
+                    );
+
+                    return {
+                      event,
+                      phase,
+                      section: event.section,
+                      method: event.method,
+                      metaDocumentation: event.meta.docs.toString(),
+                      eventData,
+                      error: getError(api, event.method, eventData)
+                    } as MangataGenericEvent;
+                  });
+
+                txOptions?.extrinsicStatus?.(eventsTriggeredByTx);
+                resolve(eventsTriggeredByTx);
+                unsub();
+              }
+            }
+          );
+        } else if (result.isError) {
+          console.info(
+            "Transaction Error Result",
+            JSON.stringify(result, null, 2)
+          );
+          reject(`Tx([${tx.hash.toString()}]) Transaction error`);
+          const currentNonce: BN = await Query.getNonce(api, extractedAccount);
+          instance.setNonce(extractedAccount, currentNonce);
         }
-      );
+      });
     } catch (error: any) {
       const currentNonce: BN = await Query.getNonce(api, extractedAccount);
       instance.setNonce(extractedAccount, currentNonce);
@@ -315,8 +320,13 @@ export class Tx {
       }
     };
 
+    const destWeightLimit = getWeightXTokens(
+      new BN("6000000000"),
+      api.tx.xTokens.transfer
+    );
+
     await api.tx.xTokens
-      .transfer("4", amount, destination, new BN("6000000000"))
+      .transfer("4", amount, destination, destWeightLimit)
       .signAndSend(mangataAccount, {
         signer: txOptions?.signer,
         nonce: txOptions?.nonce

@@ -327,8 +327,13 @@ export class Fee {
       }
     };
 
+    const destWeightLimit = getWeightXTokens(
+      new BN("6000000000"),
+      api.tx.xTokens.transferMultiasset
+    );
+
     const dispatchInfo = await api.tx.xTokens
-      .transfer("4", amount, destination, new BN("6000000000"))
+      .transfer("4", amount, destination, destWeightLimit)
       .paymentInfo(mangataAccount);
 
     return fromBN(new BN(dispatchInfo.partialFee.toString()));
