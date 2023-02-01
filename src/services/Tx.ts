@@ -47,11 +47,12 @@ export const signTx = async (
       typeof account === "string" ? account : account.address;
 
     const nonce = await getTxNonce(api, extractedAccount, txOptions);
-    await tx
-      .signAsync(account, { nonce, signer: txOptions?.signer })
-      .catch((reason) => {
-        console.log("REAAASON", reason);
-      });
+    try {
+      await tx.signAsync(account, { nonce, signer: txOptions?.signer });
+    } catch (error: any) {
+      reject(error);
+    }
+
     console.info(
       `submitting Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} `
     );
