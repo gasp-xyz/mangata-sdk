@@ -178,9 +178,21 @@ declare class Mangata {
     sendKusamaTokenFromRelayToParachainFee(kusamaEndpointUrl: string, ksmAccount: string | KeyringPair, destinationMangataAddress: string, amount: BN, parachainId?: number): Promise<string>;
     sendKusamaTokenFromParachainToRelay(mangataAccount: string | KeyringPair, destinationKusamaAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
     sendKusamaTokenFromParachainToRelayFee(mangataAccount: string | KeyringPair, destinationKusamaAddress: string, amount: BN): Promise<string>;
+    /**
+     * @deprecated Please use sendTokenFromParachainToMangata
+     */
     sendTurTokenFromTuringToMangata(turingUrl: string, account: string | KeyringPair, mangataAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
+    /**
+     * @deprecated Please use sendTokenFromMangataToParachain
+     */
     sendTurTokenFromMangataToTuring(mangataAccount: string | KeyringPair, destinationAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
+    /**
+     * @deprecated Please use sendTokenFromParachainToMangataFee
+     */
     sendTurTokenFromTuringToMangataFee(turingUrl: string, account: string | KeyringPair, mangataAddress: string, amount: BN): Promise<string>;
+    /**
+     * @deprecated Please use sendTokenFromMangataToParachainFee
+     */
     sendTurTokenFromMangataToTuringFee(mangataAccount: string | KeyringPair, destinationAddress: string, amount: BN): Promise<string>;
     activateLiquidity(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     deactivateLiquidity(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
@@ -466,6 +478,8 @@ declare const toFixed: (value: string, decimals: number) => string;
 
 declare const isSellAssetTransactionSuccessful: (results: MangataGenericEvent[]) => boolean;
 
+declare const isBuyAssetTransactionSuccessful: (results: MangataGenericEvent[]) => boolean;
+
 declare const signTx: (api: ApiPromise, tx: SubmittableExtrinsic<"promise">, account: string | KeyringPair, txOptions?: TxOptions) => Promise<MangataGenericEvent[]>;
 
-export { AssetInfo, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, DepositXcmTuple, Mangata, MangataEventData, MangataGenericEvent, MangataHelpers, TBalances, TFreeBalance, TFrozenBalance, TMainTokens, TPool, TPoolWithRatio, TPoolWithShare, TReservedBalance, TToken, TTokenAddress, TTokenId, TTokenInfo, TTokenMainInfo, TTokenName, TTokenSymbol, TTokens, TokenBalance, TxOptions, WithdrawXcmTuple, XcmTxOptions, fromBN, isSellAssetTransactionSuccessful, signTx, toBN, toFixed };
+export { AssetInfo, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, DepositXcmTuple, Mangata, MangataEventData, MangataGenericEvent, MangataHelpers, TBalances, TFreeBalance, TFrozenBalance, TMainTokens, TPool, TPoolWithRatio, TPoolWithShare, TReservedBalance, TToken, TTokenAddress, TTokenId, TTokenInfo, TTokenMainInfo, TTokenName, TTokenSymbol, TTokens, TokenBalance, TxOptions, WithdrawXcmTuple, XcmTxOptions, fromBN, isBuyAssetTransactionSuccessful, isSellAssetTransactionSuccessful, signTx, toBN, toFixed };
