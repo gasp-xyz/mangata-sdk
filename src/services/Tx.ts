@@ -50,6 +50,7 @@ export const signTx = async (
     try {
       await tx.signAsync(account, { nonce, signer: txOptions?.signer });
     } catch (error: any) {
+      console.log(JSON.stringify(error));
       reject(error);
     }
 
