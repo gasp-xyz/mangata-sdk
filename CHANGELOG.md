@@ -1,3 +1,10 @@
+## [1.14.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.14.1...v1.14.2) (2023-02-01)
+
+
+### Bug Fixes
+
+* update sign async function when error occurs ([d7e68e9](https://github.com/mangata-finance/mangata-sdk/commit/d7e68e9d731db3c1b960ce3a2282328d714f7a4b))
+
 ## [1.14.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.14.0...v1.14.1) (2023-01-27)
 
 
