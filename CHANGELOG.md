@@ -1,3 +1,10 @@
+## [1.15.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.15.0...v1.15.1) (2023-02-07)
+
+
+### Bug Fixes
+
+* update metadata types to latest version ([fb2ce06](https://github.com/mangata-finance/mangata-sdk/commit/fb2ce066c3156817708b44c7a21f8c45881dc54d))
+
 # [1.15.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.14.2...v1.15.0) (2023-02-07)
 
 
