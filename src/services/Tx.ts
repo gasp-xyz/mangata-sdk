@@ -250,7 +250,8 @@ export class Tx {
     txOptions?: XcmTxOptions
   ) {
     const provider = new WsProvider(kusamaEndpointUrl);
-    const kusamaApi = await new ApiPromise({ provider }).isReady;
+    const kusamaApi = await new ApiPromise({ provider, noInitWarn: true })
+      .isReady;
 
     const destination = {
       V1: {
@@ -350,7 +351,7 @@ export class Tx {
       txOptions
     ] = args;
     const provider = new WsProvider(url);
-    const api = await new ApiPromise({ provider }).isReady;
+    const api = await new ApiPromise({ provider, noInitWarn: true }).isReady;
     const correctMangataAddress = encodeAddress(mangataAddress, 42);
 
     const assetRegistryMetadata =

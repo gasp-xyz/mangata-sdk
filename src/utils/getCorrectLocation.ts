@@ -6,6 +6,13 @@ export const getCorrectLocation = (tokenSymbol: string, location: any) => {
         x1: { generalKey: "0x0001" }
       }
     };
+  } else if (tokenSymbol === "vBNC") {
+    return {
+      parents: "0",
+      interior: {
+        x1: { generalKey: "0x0101" }
+      }
+    };
   } else if (tokenSymbol === "vsKSM") {
     return {
       parents: "0",
