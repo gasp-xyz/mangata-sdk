@@ -1,3 +1,15 @@
+# [1.15.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.14.2...v1.15.0) (2023-02-07)
+
+
+### Bug Fixes
+
+* remove console ([192dd01](https://github.com/mangata-finance/mangata-sdk/commit/192dd01d23a647b29a4aed10064eafac43f6aaa3))
+
+
+### Features
+
+* add vBNC token ([da3d032](https://github.com/mangata-finance/mangata-sdk/commit/da3d03210df08e29296ae76cc098061693de8288))
+
 ## [1.14.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.14.1...v1.14.2) (2023-02-01)
 
 
