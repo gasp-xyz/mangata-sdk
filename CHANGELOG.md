@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.15.1...v1.16.0) (2023-02-10)
+
+
+### Features
+
+* add ZLK token ([b253ea6](https://github.com/mangata-finance/mangata-sdk/commit/b253ea691d57413832ae4ce2c124cec94e57d710))
+
 ## [1.15.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.15.0...v1.15.1) (2023-02-07)
 
 
