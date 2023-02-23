@@ -1,3 +1,10 @@
+## [1.16.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.16.0...v1.16.1) (2023-02-23)
+
+
+### Bug Fixes
+
+* update path ([c6de8d9](https://github.com/mangata-finance/mangata-sdk/commit/c6de8d9feec168cafdf3d482b14954dcc7b11af1))
+
 # [1.16.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.15.1...v1.16.0) (2023-02-10)
 
 
