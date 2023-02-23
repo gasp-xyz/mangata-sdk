@@ -1,7 +1,7 @@
 import { KeyringPair } from "@polkadot/keyring/types";
 import { BN } from "@polkadot/util";
 
-import { signTx } from "../index.js";
+import { signTx } from "../src/services/Tx";
 import { instance } from "./instanceCreation";
 import { MangataGenericEvent } from "../src/types/MangataGenericEvent";
 
@@ -17,7 +17,6 @@ export const createTokenForUser = async (
   amount: BN
 ): Promise<BN> => {
   const api = await instance.getApi();
-  await instance.waitForNewBlock(2);
   const nonce = await instance.getNonce(sudo.address);
   const result = await signTx(
     api,
