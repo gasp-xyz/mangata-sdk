@@ -17,6 +17,7 @@
     "rootDir": "src",
     "skipLibCheck": true,
     "strict": true,
+    "noEmit": true,
     "traceResolution": false,
     "types": ["node"],
     "module": "esnext",
