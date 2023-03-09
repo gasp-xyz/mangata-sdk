@@ -1,1 +1,0 @@
-{"version":3,"file":"getTotalIssuance.d.ts","sourceRoot":"","sources":["../../../src/methods/query/getTotalIssuance.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,UAAU,EAAE,MAAM,eAAe,CAAC;AAC3C,OAAO,EAAE,OAAO,EAAE,MAAM,oBAAoB,CAAC;AAC7C,OAAO,EAAE,EAAE,EAAE,MAAM,gBAAgB,CAAC;AAEpC,eAAO,MAAM,gBAAgB,oBACV,QAAQ,UAAU,CAAC,WAC3B,OAAO,KACf,QAAQ,EAAE,CAIZ,CAAC"}
