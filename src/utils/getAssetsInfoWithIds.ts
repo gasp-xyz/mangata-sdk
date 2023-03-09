@@ -1,7 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { hexToBn } from "@polkadot/util";
+import { TTokenInfo } from "../types/query";
 
-import { TTokenInfo } from "../types/AssetInfo";
 import { getCompleteAssetsInfo } from "./getCompleteAssetsInfo";
 
 export const getAssetsInfoWithIds = async (api: ApiPromise) => {

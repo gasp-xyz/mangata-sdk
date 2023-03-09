@@ -1,0 +1,1 @@
+{"version":3,"file":"getTokenBalance.d.ts","sourceRoot":"","sources":["../../../src/methods/query/getTokenBalance.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,UAAU,EAAE,MAAM,eAAe,CAAC;AAC3C,OAAO,EAAE,OAAO,EAAE,OAAO,EAAE,MAAM,oBAAoB,CAAC;AACtD,OAAO,EAAE,YAAY,EAAE,MAAM,mBAAmB,CAAC;AAGjD,eAAO,MAAM,eAAe,oBACT,QAAQ,UAAU,CAAC,WAC3B,OAAO,WACP,OAAO,KACf,QAAQ,YAAY,CAkBtB,CAAC"}

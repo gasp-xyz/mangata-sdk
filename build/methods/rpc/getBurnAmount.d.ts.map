@@ -1,0 +1,1 @@
+{"version":3,"file":"getBurnAmount.d.ts","sourceRoot":"","sources":["../../../src/methods/rpc/getBurnAmount.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,UAAU,EAAE,MAAM,eAAe,CAAC;AAE3C,OAAO,EAAE,KAAK,EAAE,MAAM,iBAAiB,CAAC;AAExC,eAAO,MAAM,aAAa,oBACP,QAAQ,UAAU,CAAC,QAC9B,KAAK,iBAWZ,CAAC"}

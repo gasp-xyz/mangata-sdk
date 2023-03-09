@@ -1,10 +1,8 @@
 import { ApiPromise } from "@polkadot/api";
 
-import { TTokenInfo, TTokenId } from "../types/AssetInfo";
 import { hexToString } from "@polkadot/util";
-
-const ETHaddress = "0x0000000000000000000000000000000000000000";
-const MGAaddress = "0xc7e3bda797d2ceb740308ec40142ae235e08144a";
+import { TokenId } from "../types/common";
+import { TTokenInfo } from "../types/query";
 
 export const getCompleteAssetsInfo = async (api: ApiPromise) => {
   const assetsInfoResponse = await api.query.assetRegistry.metadata.entries();
@@ -14,19 +12,12 @@ export const getCompleteAssetsInfo = async (api: ApiPromise) => {
     const { name, decimals, symbol } = value.unwrap();
     const assetInfo = {
       id: tokenId,
-      chainId: 0,
       decimals: Number(decimals.toString()),
       name: hexToString(name.toString()),
-      symbol: hexToString(symbol.toString()),
-      address:
-        hexToString(symbol.toString()) === "MGA"
-          ? MGAaddress
-          : hexToString(symbol.toString()) === "ETH"
-          ? ETHaddress
-          : ""
+      symbol: hexToString(symbol.toString())
     };
 
     obj[tokenId] = assetInfo;
     return obj;
-  }, {} as { [id: TTokenId]: TTokenInfo });
+  }, {} as { [id: TokenId]: TTokenInfo });
 };

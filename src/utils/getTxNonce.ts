@@ -1,32 +1,34 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
+import { getNonce } from "../methods/query/getNonce";
+import { TxOptions } from "../types/common";
 
-import { Query } from "../services/Query";
-import { instance } from "../utils/MemoryDatabase";
-import { TxOptions } from "../types/TxOptions";
+getNonce;
+import { dbInstance } from "./inMemoryDatabase";
 
 export const getTxNonce = async (
   api: ApiPromise,
   address: string,
-  txOptions?: TxOptions
+  txOptions?: Partial<TxOptions>
 ): Promise<BN> => {
   let nonce: BN;
   if (txOptions && txOptions.nonce) {
     nonce = txOptions.nonce;
   } else {
-    const onChainNonce = await Query.getNonce(api, address);
-    if (instance.hasAddressNonce(address)) {
-      nonce = instance.getNonce(address);
+    const onChainNonce = await api.rpc.system.accountNextIndex(address);
+
+    if (dbInstance.hasAddressNonce(address)) {
+      nonce = dbInstance.getNonce(address);
     } else {
-      nonce = onChainNonce;
+      nonce = onChainNonce.toBn();
     }
 
-    if (onChainNonce && onChainNonce.gt(nonce)) {
-      nonce = onChainNonce;
+    if (onChainNonce.toBn() && onChainNonce.toBn().gt(nonce)) {
+      nonce = onChainNonce.toBn();
     }
 
     const nextNonce: BN = nonce.addn(1);
-    instance.setNonce(address, nextNonce);
+    dbInstance.setNonce(address, nextNonce);
   }
 
   return nonce;

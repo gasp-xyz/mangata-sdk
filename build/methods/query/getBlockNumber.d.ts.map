@@ -1,0 +1,1 @@
+{"version":3,"file":"getBlockNumber.d.ts","sourceRoot":"","sources":["../../../src/methods/query/getBlockNumber.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,UAAU,EAAE,MAAM,eAAe,CAAC;AAE3C,eAAO,MAAM,cAAc,oBACR,QAAQ,UAAU,CAAC,KACnC,QAAQ,MAAM,CAIhB,CAAC"}
