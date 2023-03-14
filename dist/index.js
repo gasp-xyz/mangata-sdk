@@ -7922,102 +7922,95 @@ var forWithdraw = async (instancePromise, args) => {
 };
 
 // src/index.ts
-var Mangata;
-((Mangata2) => {
+var Mangata = function() {
   const instanceMap = /* @__PURE__ */ new Map();
-  Mangata2.getInstance = (urls) => {
-    const key = JSON.stringify(urls.sort());
-    if (!instanceMap.has(key)) {
-      const provider = new WsProvider3(urls);
-      const instance2 = ApiPromise3.create(
-        options({
-          provider,
-          throwOnConnect: true,
-          throwOnUnknown: true,
-          noInitWarn: true
-        })
-      );
-      instanceMap.set(key, instance2);
-    }
-    const instance = instanceMap.get(key);
-    return {
-      fee: {
-        withdraw: (args) => forWithdraw(instance, args),
-        activateLiquidity: (args) => forActivateLiquidity(instance, args),
-        deactivateLiquidity: (args) => forDeactivateLiquidity(instance, args),
-        claimRewards: (args) => forClaimRewards(instance, args),
-        createPool: (args) => forCreatePool(instance, args),
-        sellAsset: (args) => forSellAsset(instance, args),
-        buyAsset: (args) => forBuyAsset(instance, args),
-        mintLiquidity: (args) => forMintLiquidity(instance, args),
-        burnLiquidity: (args) => forBurnLiquidity(instance, args),
-        transferAllToken: (args) => forTransferAllToken(instance, args),
-        transferToken: (args) => forTransferToken(instance, args)
-      },
-      query: {
-        getNonce: (address) => getNonce(instance, address),
-        getLiquidityTokenId: (firstTokenId, secondTokenId) => getLiquidityTokenId(instance, firstTokenId, secondTokenId),
-        getTotalIssuance: (tokenId) => getTotalIssuance(instance, tokenId),
-        getTokenBalance: (address, tokenId) => getTokenBalance(instance, address, tokenId),
-        getTokenInfo: (tokenId) => getTokenInfo(instance, tokenId),
-        getLiquidityTokenIds: () => getLiquidityTokenIds(instance),
-        getLiquidityTokens: () => getLiquidityTokens(instance),
-        getBlockNumber: () => getBlockNumber(instance),
-        getOwnedTokens: (address) => getOwnedTokens(instance, address),
-        getAssetsInfo: () => getAssetsInfo(instance),
-        getInvestedPools: (address) => getInvestedPools(instance, address),
-        getAmountOfTokenIdInPool: (firstTokenId, secondTokenId) => getAmountOfTokenIdInPool(instance, firstTokenId, secondTokenId),
-        getLiquidityPool: (liquidityTokenId) => getLiquidityPool(instance, liquidityTokenId),
-        getPool: (liquidityTokenId) => getPool(instance, liquidityTokenId),
-        getPools: () => getPools(instance),
-        getTotalIssuanceOfTokens: () => getTotalIssuanceOfTokens(instance)
-      },
-      rpc: {
-        calculateBuyPriceId: (args) => calculateBuyPriceId(instance, args),
-        calculateSellPriceId: (args) => calculateSellPriceId(instance, args),
-        getBurnAmount: (args) => getBurnAmount(instance, args),
-        calculateSellPrice: (args) => calculateSellPrice(instance, args),
-        calculateBuyPrice: (args) => calculateBuyPrice(instance, args),
-        calculateRewardsAmount: (args) => calculateRewardsAmount(instance, args),
-        getNodeVersion: () => getNodeVersion(instance),
-        getNodeName: () => getNodeName(instance),
-        getChain: () => getChain(instance)
-      },
-      xyk: {
-        deactivateLiquidity: (args) => deactivateLiquidity(instance, args),
-        activateLiquidity: (args) => activateLiquidity(instance, args),
-        burnLiquidity: (args) => burnLiquidity(instance, args),
-        mintLiquidity: (args) => mintLiquidity(instance, args),
-        buyAsset: (args) => buyAsset(instance, args),
-        sellAsset: (args) => sellAsset(instance, args),
-        createPool: (args) => createPool(instance, args),
-        claimRewards: (args) => claimRewards(instance, args)
-      },
-      tokens: {
-        transferAllTokens: (args) => transferAllTokens(instance, args),
-        transferTokens: (args) => transferTokens(instance, args)
-      },
-      xTokens: {
-        deposit: (args) => deposit(args),
-        depositKsm: (args) => depositKsm(args),
-        withdraw: (args) => withdraw(instance, args),
-        withdrawKsm: (args) => withdrawKsm(instance, args)
+  return {
+    instance: (urls) => {
+      const key = JSON.stringify(urls.sort());
+      if (!instanceMap.has(key)) {
+        const provider = new WsProvider3(urls);
+        const instance2 = ApiPromise3.create(
+          options({
+            provider,
+            throwOnConnect: true,
+            throwOnUnknown: true,
+            noInitWarn: true
+          })
+        );
+        instanceMap.set(key, instance2);
       }
-    };
+      const instance = instanceMap.get(key);
+      return {
+        apiPromise: instance,
+        fee: {
+          withdraw: (args) => forWithdraw(instance, args),
+          activateLiquidity: (args) => forActivateLiquidity(instance, args),
+          deactivateLiquidity: (args) => forDeactivateLiquidity(instance, args),
+          claimRewards: (args) => forClaimRewards(instance, args),
+          createPool: (args) => forCreatePool(instance, args),
+          sellAsset: (args) => forSellAsset(instance, args),
+          buyAsset: (args) => forBuyAsset(instance, args),
+          mintLiquidity: (args) => forMintLiquidity(instance, args),
+          burnLiquidity: (args) => forBurnLiquidity(instance, args),
+          transferAllToken: (args) => forTransferAllToken(instance, args),
+          transferToken: (args) => forTransferToken(instance, args)
+        },
+        query: {
+          getNonce: (address) => getNonce(instance, address),
+          getLiquidityTokenId: (firstTokenId, secondTokenId) => getLiquidityTokenId(instance, firstTokenId, secondTokenId),
+          getTotalIssuance: (tokenId) => getTotalIssuance(instance, tokenId),
+          getTokenBalance: (address, tokenId) => getTokenBalance(instance, address, tokenId),
+          getTokenInfo: (tokenId) => getTokenInfo(instance, tokenId),
+          getLiquidityTokenIds: () => getLiquidityTokenIds(instance),
+          getLiquidityTokens: () => getLiquidityTokens(instance),
+          getBlockNumber: () => getBlockNumber(instance),
+          getOwnedTokens: (address) => getOwnedTokens(instance, address),
+          getAssetsInfo: () => getAssetsInfo(instance),
+          getInvestedPools: (address) => getInvestedPools(instance, address),
+          getAmountOfTokenIdInPool: (firstTokenId, secondTokenId) => getAmountOfTokenIdInPool(instance, firstTokenId, secondTokenId),
+          getLiquidityPool: (liquidityTokenId) => getLiquidityPool(instance, liquidityTokenId),
+          getPool: (liquidityTokenId) => getPool(instance, liquidityTokenId),
+          getPools: () => getPools(instance),
+          getTotalIssuanceOfTokens: () => getTotalIssuanceOfTokens(instance)
+        },
+        rpc: {
+          calculateBuyPriceId: (args) => calculateBuyPriceId(instance, args),
+          calculateSellPriceId: (args) => calculateSellPriceId(instance, args),
+          getBurnAmount: (args) => getBurnAmount(instance, args),
+          calculateSellPrice: (args) => calculateSellPrice(instance, args),
+          calculateBuyPrice: (args) => calculateBuyPrice(instance, args),
+          calculateRewardsAmount: (args) => calculateRewardsAmount(instance, args),
+          getNodeVersion: () => getNodeVersion(instance),
+          getNodeName: () => getNodeName(instance),
+          getChain: () => getChain(instance)
+        },
+        xyk: {
+          deactivateLiquidity: (args) => deactivateLiquidity(instance, args),
+          activateLiquidity: (args) => activateLiquidity(instance, args),
+          burnLiquidity: (args) => burnLiquidity(instance, args),
+          mintLiquidity: (args) => mintLiquidity(instance, args),
+          buyAsset: (args) => buyAsset(instance, args),
+          sellAsset: (args) => sellAsset(instance, args),
+          createPool: (args) => createPool(instance, args),
+          claimRewards: (args) => claimRewards(instance, args)
+        },
+        tokens: {
+          transferAllTokens: (args) => transferAllTokens(instance, args),
+          transferTokens: (args) => transferTokens(instance, args)
+        },
+        xTokens: {
+          deposit: (args) => deposit(args),
+          depositKsm: (args) => depositKsm(args),
+          withdraw: (args) => withdraw(instance, args),
+          withdrawKsm: (args) => withdrawKsm(instance, args)
+        }
+      };
+    }
   };
-})(Mangata || (Mangata = {}));
-async function testSingleton() {
-  const urls = [
-    "wss://mangata-x.api.onfinality.io/public-ws",
-    "wss://prod-kusama-collator-01.mangatafinance.cloud"
-  ];
-  const instance = Mangata.getInstance(urls);
-  const pool = await instance.query.getInvestedPools(
-    "5GBrzxeB3N4VwQFGMpgh518Jp7QzfgbNog8YBe96dDwx3c1x"
-  );
-  console.log(pool);
-}
-testSingleton();
+}();
+export {
+  Mangata
+};
 /*! Bundled license information:
 
 @noble/hashes/esm/utils.js:

@@ -3,19 +3,20 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs",
+      "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     }
   },
+  "engines": {
+    "node": ">=14.16"
+  },
   "scripts": {
     "start": "NODE_OPTIONS='--experimental-specifier-resolution=node' node dist/index.js",
-    "build": "tsup src/index.ts --format cjs,esm --dts"
+    "build": "tsup"
   },
   "keywords": [],
   "author": "Michal",
@@ -23,12 +24,12 @@
   "dependencies": {
     "@mangata-finance/types": "^0.17.0",
     "@polkadot/api": "^9.9.4",
-    "big.js": "^6.2.1",
-    "ts-toolbelt": "^9.6.0"
+    "big.js": "^6.2.1"
   },
   "devDependencies": {
     "@types/big.js": "^6.1.6",
     "tsup": "^6.6.3",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "ts-toolbelt": "^9.6.0"
   }
 }

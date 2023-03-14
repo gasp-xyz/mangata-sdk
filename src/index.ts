@@ -92,146 +92,140 @@ import {
   forActivateLiquidity
 } from "./methods/fee/forActivateLiquidity";
 import { forWithdraw, WithdrawFee } from "./methods/fee/forWithdraw";
+import { Batch, batch } from "./methods/utility/batch";
 
-namespace Mangata {
+export { ExtrinsicCommon } from "./types/common";
+
+export const Mangata = (function () {
   const instanceMap: Map<string, Promise<ApiPromise>> = new Map<
     string,
     Promise<ApiPromise>
   >();
 
-  // The getInstance function returns the instance for a given array of node URLs.
-  export const getInstance = (urls: string[]) => {
-    /**
-     * Generate a unique key for the given array of URLs.
-     * Sort the URLs alphabetically before creating the key.
-     * We want to ensure that the getInstance function only creates one instance
-     * for any given array of URLs, regardless of the order of the URLs in the array
-     */
-    const key = JSON.stringify(urls.sort());
+  return {
+    instance: (urls: string[]) => {
+      /**
+       * Generate a unique key for the given array of URLs.
+       * Sort the URLs alphabetically before creating the key.
+       * We want to ensure that the getInstance function only creates one instance
+       * for any given array of URLs, regardless of the order of the URLs in the array
+       */
+      const key = JSON.stringify(urls.sort());
 
-    // Check if an instance already exists for the given URLs.
-    if (!instanceMap.has(key)) {
-      // Create a new instance using the given URLs.
-      const provider = new WsProvider(urls);
-      const instance = ApiPromise.create(
-        options({
-          provider,
-          throwOnConnect: true,
-          throwOnUnknown: true,
-          noInitWarn: true
-        })
-      );
+      // Check if an instance already exists for the given URLs.
+      if (!instanceMap.has(key)) {
+        // Create a new instance using the given URLs.
+        const provider = new WsProvider(urls);
+        const instance = ApiPromise.create(
+          options({
+            provider,
+            throwOnConnect: true,
+            throwOnUnknown: true,
+            noInitWarn: true
+          })
+        );
 
-      // Store the instance in the instanceMap.
-      instanceMap.set(key, instance);
-    }
-
-    // Return the instance in a Promise.
-    const instance = instanceMap.get(key)!;
-
-    return {
-      fee: {
-        withdraw: (args: WithdrawFee) => forWithdraw(instance, args),
-        activateLiquidity: (args: ActivateLiquidityFee) =>
-          forActivateLiquidity(instance, args),
-        deactivateLiquidity: (args: DeactivateLiquidityFee) =>
-          forDeactivateLiquidity(instance, args),
-        claimRewards: (args: ClaimRewardsFee) =>
-          forClaimRewards(instance, args),
-        createPool: (args: CreatePoolFee) => forCreatePool(instance, args),
-        sellAsset: (args: SellAssetFee) => forSellAsset(instance, args),
-        buyAsset: (args: BuyAssetFee) => forBuyAsset(instance, args),
-        mintLiquidity: (args: MintLiquidityFee) =>
-          forMintLiquidity(instance, args),
-        burnLiquidity: (args: BurnLiquidityFee) =>
-          forBurnLiquidity(instance, args),
-        transferAllToken: (args: TransferAllFee) =>
-          forTransferAllToken(instance, args),
-        transferToken: (args: TransferTokenFee) =>
-          forTransferToken(instance, args)
-      },
-      query: {
-        getNonce: (address: Address) => getNonce(instance, address),
-        getLiquidityTokenId: (firstTokenId: TokenId, secondTokenId: TokenId) =>
-          getLiquidityTokenId(instance, firstTokenId, secondTokenId),
-        getTotalIssuance: (tokenId: TokenId) =>
-          getTotalIssuance(instance, tokenId),
-        getTokenBalance: (address: Address, tokenId: TokenId) =>
-          getTokenBalance(instance, address, tokenId),
-        getTokenInfo: (tokenId: TokenId) => getTokenInfo(instance, tokenId),
-        getLiquidityTokenIds: () => getLiquidityTokenIds(instance),
-        getLiquidityTokens: () => getLiquidityTokens(instance),
-        getBlockNumber: () => getBlockNumber(instance),
-        getOwnedTokens: (address: Address) => getOwnedTokens(instance, address),
-        getAssetsInfo: () => getAssetsInfo(instance),
-        getInvestedPools: (address: Address) =>
-          getInvestedPools(instance, address),
-        getAmountOfTokenIdInPool: (
-          firstTokenId: TokenId,
-          secondTokenId: TokenId
-        ) => getAmountOfTokenIdInPool(instance, firstTokenId, secondTokenId),
-        getLiquidityPool: (liquidityTokenId: TokenId) =>
-          getLiquidityPool(instance, liquidityTokenId),
-        getPool: (liquidityTokenId: TokenId) =>
-          getPool(instance, liquidityTokenId),
-        getPools: () => getPools(instance),
-        getTotalIssuanceOfTokens: () => getTotalIssuanceOfTokens(instance)
-      },
-      rpc: {
-        calculateBuyPriceId: (args: Price) =>
-          calculateBuyPriceId(instance, args),
-        calculateSellPriceId: (args: Price) =>
-          calculateSellPriceId(instance, args),
-        getBurnAmount: (args: Price) => getBurnAmount(instance, args),
-        calculateSellPrice: (args: Reserve) =>
-          calculateSellPrice(instance, args),
-        calculateBuyPrice: (args: Reserve) => calculateBuyPrice(instance, args),
-        calculateRewardsAmount: (args: Rewards) =>
-          calculateRewardsAmount(instance, args),
-        getNodeVersion: () => getNodeVersion(instance),
-        getNodeName: () => getNodeName(instance),
-        getChain: () => getChain(instance)
-      },
-      xyk: {
-        deactivateLiquidity: (args: Liquidity) =>
-          deactivateLiquidity(instance, args),
-        activateLiquidity: (args: Liquidity) =>
-          activateLiquidity(instance, args),
-        burnLiquidity: (args: BurnLiquidity) => burnLiquidity(instance, args),
-        mintLiquidity: (args: MintLiquidity) => mintLiquidity(instance, args),
-        buyAsset: (args: BuyAsset) => buyAsset(instance, args),
-        sellAsset: (args: SellAsset) => sellAsset(instance, args),
-        createPool: (args: CreatePool) => createPool(instance, args),
-        claimRewards: (args: Liquidity) => claimRewards(instance, args)
-      },
-      tokens: {
-        transferAllTokens: (args: Transfer) =>
-          transferAllTokens(instance, args),
-        transferTokens: (args: Transfer & { amount: Amount }) =>
-          transferTokens(instance, args)
-      },
-      xTokens: {
-        deposit: (args: Deposit) => deposit(args),
-        depositKsm: (args: RelayDeposit) => depositKsm(args),
-        withdraw: (args: Withdraw) => withdraw(instance, args),
-        withdrawKsm: (args: RelayWithdraw) => withdrawKsm(instance, args)
+        // Store the instance in the instanceMap.
+        instanceMap.set(key, instance);
       }
-    };
+
+      // Return the instance in a Promise.
+      const instance = instanceMap.get(key)!;
+
+      return {
+        apiPromise: instance,
+        batch: (args: Batch) => batch(instance, args),
+        fee: {
+          withdraw: (args: WithdrawFee) => forWithdraw(instance, args),
+          activateLiquidity: (args: ActivateLiquidityFee) =>
+            forActivateLiquidity(instance, args),
+          deactivateLiquidity: (args: DeactivateLiquidityFee) =>
+            forDeactivateLiquidity(instance, args),
+          claimRewards: (args: ClaimRewardsFee) =>
+            forClaimRewards(instance, args),
+          createPool: (args: CreatePoolFee) => forCreatePool(instance, args),
+          sellAsset: (args: SellAssetFee) => forSellAsset(instance, args),
+          buyAsset: (args: BuyAssetFee) => forBuyAsset(instance, args),
+          mintLiquidity: (args: MintLiquidityFee) =>
+            forMintLiquidity(instance, args),
+          burnLiquidity: (args: BurnLiquidityFee) =>
+            forBurnLiquidity(instance, args),
+          transferAllToken: (args: TransferAllFee) =>
+            forTransferAllToken(instance, args),
+          transferToken: (args: TransferTokenFee) =>
+            forTransferToken(instance, args)
+        },
+        query: {
+          getNonce: (address: Address) => getNonce(instance, address),
+          getLiquidityTokenId: (
+            firstTokenId: TokenId,
+            secondTokenId: TokenId
+          ) => getLiquidityTokenId(instance, firstTokenId, secondTokenId),
+          getTotalIssuance: (tokenId: TokenId) =>
+            getTotalIssuance(instance, tokenId),
+          getTokenBalance: (address: Address, tokenId: TokenId) =>
+            getTokenBalance(instance, address, tokenId),
+          getTokenInfo: (tokenId: TokenId) => getTokenInfo(instance, tokenId),
+          getLiquidityTokenIds: () => getLiquidityTokenIds(instance),
+          getLiquidityTokens: () => getLiquidityTokens(instance),
+          getBlockNumber: () => getBlockNumber(instance),
+          getOwnedTokens: (address: Address) =>
+            getOwnedTokens(instance, address),
+          getAssetsInfo: () => getAssetsInfo(instance),
+          getInvestedPools: (address: Address) =>
+            getInvestedPools(instance, address),
+          getAmountOfTokenIdInPool: (
+            firstTokenId: TokenId,
+            secondTokenId: TokenId
+          ) => getAmountOfTokenIdInPool(instance, firstTokenId, secondTokenId),
+          getLiquidityPool: (liquidityTokenId: TokenId) =>
+            getLiquidityPool(instance, liquidityTokenId),
+          getPool: (liquidityTokenId: TokenId) =>
+            getPool(instance, liquidityTokenId),
+          getPools: () => getPools(instance),
+          getTotalIssuanceOfTokens: () => getTotalIssuanceOfTokens(instance)
+        },
+        rpc: {
+          calculateBuyPriceId: (args: Price) =>
+            calculateBuyPriceId(instance, args),
+          calculateSellPriceId: (args: Price) =>
+            calculateSellPriceId(instance, args),
+          getBurnAmount: (args: Price) => getBurnAmount(instance, args),
+          calculateSellPrice: (args: Reserve) =>
+            calculateSellPrice(instance, args),
+          calculateBuyPrice: (args: Reserve) =>
+            calculateBuyPrice(instance, args),
+          calculateRewardsAmount: (args: Rewards) =>
+            calculateRewardsAmount(instance, args),
+          getNodeVersion: () => getNodeVersion(instance),
+          getNodeName: () => getNodeName(instance),
+          getChain: () => getChain(instance)
+        },
+        xyk: {
+          deactivateLiquidity: (args: Liquidity) =>
+            deactivateLiquidity(instance, args),
+          activateLiquidity: (args: Liquidity) =>
+            activateLiquidity(instance, args),
+          burnLiquidity: (args: BurnLiquidity) => burnLiquidity(instance, args),
+          mintLiquidity: (args: MintLiquidity) => mintLiquidity(instance, args),
+          buyAsset: (args: BuyAsset) => buyAsset(instance, args),
+          sellAsset: (args: SellAsset) => sellAsset(instance, args),
+          createPool: (args: CreatePool) => createPool(instance, args),
+          claimRewards: (args: Liquidity) => claimRewards(instance, args)
+        },
+        tokens: {
+          transferAllTokens: (args: Transfer) =>
+            transferAllTokens(instance, args),
+          transferTokens: (args: Transfer & { amount: Amount }) =>
+            transferTokens(instance, args)
+        },
+        xTokens: {
+          deposit: (args: Deposit) => deposit(args),
+          depositKsm: (args: RelayDeposit) => depositKsm(args),
+          withdraw: (args: Withdraw) => withdraw(instance, args),
+          withdrawKsm: (args: RelayWithdraw) => withdrawKsm(instance, args)
+        }
+      };
+    }
   };
-}
-
-async function testSingleton() {
-  const urls = [
-    "wss://mangata-x.api.onfinality.io/public-ws",
-    "wss://prod-kusama-collator-01.mangatafinance.cloud"
-  ];
-
-  const instance = Mangata.getInstance(urls);
-  const pool = await instance.query.getInvestedPools(
-    "5GBrzxeB3N4VwQFGMpgh518Jp7QzfgbNog8YBe96dDwx3c1x"
-  );
-
-  console.log(pool);
-}
-
-testSingleton();
+})();
