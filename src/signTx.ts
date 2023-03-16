@@ -13,7 +13,6 @@ import {
 } from "./types/common";
 import { serializeTx } from "./utils/serialize";
 import { getTxNonce } from "./utils/getTxNonce";
-import { getNonce } from "./methods/query/getNonce";
 import { dbInstance } from "./utils/inMemoryDatabase";
 import { truncatedString } from "./utils/truncatedString";
 import { getError } from "./utils/getTxError";

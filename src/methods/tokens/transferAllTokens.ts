@@ -1,13 +1,31 @@
 import { ApiPromise } from "@polkadot/api";
+import { SubmittableExtrinsic } from "@polkadot/api/types";
+import { ISubmittableResult } from "@polkadot/types/types";
+import { MangataGenericEvent } from "../../types/common";
 import { Transfer } from "../../types/tokens";
 import { signTx } from "../../signTx";
 
-export const transferAllTokens = async (
+async function transferAllTokens(
   instancePromise: Promise<ApiPromise>,
-  args: Transfer
-) => {
+  args: Transfer,
+  isForBatch: false
+): Promise<MangataGenericEvent[]>;
+
+async function transferAllTokens(
+  instancePromise: Promise<ApiPromise>,
+  args: Transfer,
+  isForBatch: true
+): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
+
+async function transferAllTokens(
+  instancePromise: Promise<ApiPromise>,
+  args: Transfer,
+  isForBatch: boolean
+) {
   const api = await instancePromise;
   const { account, tokenId, address, txOptions } = args;
   const tx = api.tx.tokens.transferAll(address, tokenId, true);
-  return await signTx(api, tx, account, txOptions);
-};
+  return isForBatch ? tx : await signTx(api, tx, account, txOptions);
+}
+
+export { transferAllTokens };

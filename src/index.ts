@@ -95,6 +95,7 @@ import { forWithdraw, WithdrawFee } from "./methods/fee/forWithdraw";
 import { Batch, batch } from "./methods/utility/batch";
 
 export { ExtrinsicCommon } from "./types/common";
+export { Batch } from "./methods/utility/batch";
 
 export const Mangata = (function () {
   const instanceMap: Map<string, Promise<ApiPromise>> = new Map<
@@ -203,21 +204,41 @@ export const Mangata = (function () {
         },
         xyk: {
           deactivateLiquidity: (args: Liquidity) =>
-            deactivateLiquidity(instance, args),
+            deactivateLiquidity(instance, args, false),
           activateLiquidity: (args: Liquidity) =>
-            activateLiquidity(instance, args),
-          burnLiquidity: (args: BurnLiquidity) => burnLiquidity(instance, args),
-          mintLiquidity: (args: MintLiquidity) => mintLiquidity(instance, args),
-          buyAsset: (args: BuyAsset) => buyAsset(instance, args),
-          sellAsset: (args: SellAsset) => sellAsset(instance, args),
-          createPool: (args: CreatePool) => createPool(instance, args),
-          claimRewards: (args: Liquidity) => claimRewards(instance, args)
+            activateLiquidity(instance, args, false),
+          burnLiquidity: (args: BurnLiquidity) =>
+            burnLiquidity(instance, args, false),
+          mintLiquidity: (args: MintLiquidity) =>
+            mintLiquidity(instance, args, false),
+          buyAsset: (args: BuyAsset) => buyAsset(instance, args, false),
+          sellAsset: (args: SellAsset) => sellAsset(instance, args, false),
+          createPool: (args: CreatePool) => createPool(instance, args, false),
+          claimRewards: (args: Liquidity) => claimRewards(instance, args, false)
+        },
+        submitableExtrinsic: {
+          createPool: (args: CreatePool) => createPool(instance, args, true),
+          claimRewards: (args: Liquidity) => claimRewards(instance, args, true),
+          sellAsset: (args: SellAsset) => sellAsset(instance, args, true),
+          buyAsset: (args: BuyAsset) => buyAsset(instance, args, true),
+          mintLiquidity: (args: MintLiquidity) =>
+            mintLiquidity(instance, args, true),
+          burnLiquidity: (args: BurnLiquidity) =>
+            burnLiquidity(instance, args, true),
+          activateLiquidity: (args: Liquidity) =>
+            activateLiquidity(instance, args, true),
+          deactivateLiquidity: (args: Liquidity) =>
+            deactivateLiquidity(instance, args, true),
+          transferAllTokens: (args: Transfer) =>
+            transferAllTokens(instance, args, true),
+          transferTokens: (args: Transfer & { amount: Amount }) =>
+            transferTokens(instance, args, true)
         },
         tokens: {
           transferAllTokens: (args: Transfer) =>
-            transferAllTokens(instance, args),
+            transferAllTokens(instance, args, false),
           transferTokens: (args: Transfer & { amount: Amount }) =>
-            transferTokens(instance, args)
+            transferTokens(instance, args, false)
         },
         xTokens: {
           deposit: (args: Deposit) => deposit(args),

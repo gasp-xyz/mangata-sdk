@@ -1,11 +1,27 @@
 import { ApiPromise } from "@polkadot/api";
+import { SubmittableExtrinsic } from "@polkadot/api/types";
+import { ISubmittableResult } from "@polkadot/types/types";
+import { MangataGenericEvent } from "../../types/common";
 import { signTx } from "../../signTx";
 import { BuyAsset } from "../../types/xyk";
 
-export const buyAsset = async (
+async function buyAsset(
   instancePromise: Promise<ApiPromise>,
-  args: BuyAsset
-) => {
+  args: BuyAsset,
+  isForBatch: false
+): Promise<MangataGenericEvent[]>;
+
+async function buyAsset(
+  instancePromise: Promise<ApiPromise>,
+  args: BuyAsset,
+  isForBatch: true
+): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
+
+async function buyAsset(
+  instancePromise: Promise<ApiPromise>,
+  args: BuyAsset,
+  isForBatch: boolean
+) {
   const api = await instancePromise;
   const {
     account,
@@ -21,5 +37,7 @@ export const buyAsset = async (
     amount,
     maxAmountIn
   );
-  return await signTx(api, tx, account, txOptions);
-};
+  return isForBatch ? tx : await signTx(api, tx, account, txOptions);
+}
+
+export { buyAsset };

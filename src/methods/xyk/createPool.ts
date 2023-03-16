@@ -1,11 +1,26 @@
 import { ApiPromise } from "@polkadot/api";
+import { MangataGenericEvent } from "../../types/common";
 import { signTx } from "../../signTx";
 import { CreatePool } from "../../types/xyk";
+import { SubmittableExtrinsic } from "@polkadot/api/types";
+import { ISubmittableResult } from "@polkadot/types/types";
 
-export const createPool = async (
+async function createPool(
   instancePromise: Promise<ApiPromise>,
-  args: CreatePool
-) => {
+  args: CreatePool,
+  isForBatch: false
+): Promise<MangataGenericEvent[]>;
+async function createPool(
+  instancePromise: Promise<ApiPromise>,
+  args: CreatePool,
+  isForBatch: true
+): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
+
+async function createPool(
+  instancePromise: Promise<ApiPromise>,
+  args: CreatePool,
+  isForBatch: boolean
+) {
   const api = await instancePromise;
   const {
     account,
@@ -21,5 +36,8 @@ export const createPool = async (
     secondTokenId,
     secondTokenAmount
   );
-  return await signTx(api, tx, account, txOptions);
-};
+
+  return isForBatch ? tx : await signTx(api, tx, account, txOptions);
+}
+
+export { createPool };

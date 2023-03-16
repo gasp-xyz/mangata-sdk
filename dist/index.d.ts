@@ -1,7 +1,9 @@
+import * as _polkadot_api_base_types from '@polkadot/api-base/types';
+import * as _polkadot_types_types from '@polkadot/types/types';
+import { ISubmittableResult, Codec } from '@polkadot/types/types';
 import { BN } from '@polkadot/util';
 import { KeyringPair } from '@polkadot/keyring/types';
-import { Signer } from '@polkadot/api/types';
-import { ISubmittableResult, Codec } from '@polkadot/types/types';
+import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 import { Event, Phase, MultiLocation } from '@polkadot/types/interfaces';
 import * as bn_js from 'bn.js';
 import { ApiPromise } from '@polkadot/api';
@@ -184,9 +186,14 @@ type ActivateLiquidityFee = Object$1.Omit<Liquidity, "txOptions">;
 
 type WithdrawFee = Object$1.Omit<Withdraw, "txOptions">;
 
+type Batch = Object$1.Merge<ExtrinsicCommon, {
+    calls: SubmittableExtrinsic<"promise", ISubmittableResult>[];
+}>;
+
 declare const Mangata: {
     instance: (urls: string[]) => {
         apiPromise: Promise<ApiPromise>;
+        batch: (args: Batch) => Promise<MangataGenericEvent[]>;
         fee: {
             withdraw: (args: WithdrawFee) => Promise<string>;
             activateLiquidity: (args: ActivateLiquidityFee) => Promise<string>;
@@ -272,6 +279,9 @@ declare const Mangata: {
             createPool: (args: CreatePool) => Promise<MangataGenericEvent[]>;
             claimRewards: (args: Liquidity) => Promise<MangataGenericEvent[]>;
         };
+        submitableExtrinsic: {
+            createPool: (args: CreatePool) => Promise<_polkadot_api_base_types.SubmittableExtrinsic<"promise", _polkadot_types_types.ISubmittableResult>>;
+        };
         tokens: {
             transferAllTokens: (args: Transfer) => Promise<MangataGenericEvent[]>;
             transferTokens: (args: Transfer & {
@@ -287,4 +297,4 @@ declare const Mangata: {
     };
 };
 
-export { ExtrinsicCommon, Mangata };
+export { Batch, ExtrinsicCommon, Mangata };

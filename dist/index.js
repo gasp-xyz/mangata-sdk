@@ -3556,7 +3556,7 @@ var sellAsset = async (instancePromise, args) => {
 };
 
 // src/methods/xyk/createPool.ts
-var createPool = async (instancePromise, args) => {
+async function createPool(instancePromise, args, isForBatch) {
   const api = await instancePromise;
   const {
     account,
@@ -3572,8 +3572,8 @@ var createPool = async (instancePromise, args) => {
     secondTokenId,
     secondTokenAmount
   );
-  return await signTx(api, tx, account, txOptions);
-};
+  return isForBatch ? tx : await signTx(api, tx, account, txOptions);
+}
 
 // src/methods/xyk/claimRewards.ts
 var claimRewards = async (instancePromise, args) => {
@@ -7921,6 +7921,14 @@ var forWithdraw = async (instancePromise, args) => {
   }
 };
 
+// src/methods/utility/batch.ts
+var batch = async (instancePromise, args) => {
+  const api = await instancePromise;
+  const { account, txOptions, calls } = args;
+  const tx = api.tx.utility.batch(calls);
+  return await signTx(api, tx, account, txOptions);
+};
+
 // src/index.ts
 var Mangata = function() {
   const instanceMap = /* @__PURE__ */ new Map();
@@ -7942,6 +7950,7 @@ var Mangata = function() {
       const instance = instanceMap.get(key);
       return {
         apiPromise: instance,
+        batch: (args) => batch(instance, args),
         fee: {
           withdraw: (args) => forWithdraw(instance, args),
           activateLiquidity: (args) => forActivateLiquidity(instance, args),
@@ -7991,8 +8000,11 @@ var Mangata = function() {
           mintLiquidity: (args) => mintLiquidity(instance, args),
           buyAsset: (args) => buyAsset(instance, args),
           sellAsset: (args) => sellAsset(instance, args),
-          createPool: (args) => createPool(instance, args),
+          createPool: (args) => createPool(instance, args, false),
           claimRewards: (args) => claimRewards(instance, args)
+        },
+        submitableExtrinsic: {
+          createPool: (args) => createPool(instance, args, true)
         },
         tokens: {
           transferAllTokens: (args) => transferAllTokens(instance, args),

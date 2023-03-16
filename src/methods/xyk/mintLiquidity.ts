@@ -1,11 +1,27 @@
 import { ApiPromise } from "@polkadot/api";
+import { SubmittableExtrinsic } from "@polkadot/api/types";
+import { ISubmittableResult } from "@polkadot/types/types";
+import { MangataGenericEvent } from "../../types/common";
 import { signTx } from "../../signTx";
 import { MintLiquidity } from "../../types/xyk";
 
-export const mintLiquidity = async (
+async function mintLiquidity(
   instancePromise: Promise<ApiPromise>,
-  args: MintLiquidity
-) => {
+  args: MintLiquidity,
+  isForBatch: false
+): Promise<MangataGenericEvent[]>;
+
+async function mintLiquidity(
+  instancePromise: Promise<ApiPromise>,
+  args: MintLiquidity,
+  isForBatch: true
+): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
+
+async function mintLiquidity(
+  instancePromise: Promise<ApiPromise>,
+  args: MintLiquidity,
+  isForBatch: boolean
+) {
   const api = await instancePromise;
   const {
     account,
@@ -21,5 +37,7 @@ export const mintLiquidity = async (
     firstTokenAmount,
     expectedSecondTokenAmount
   );
-  return await signTx(api, tx, account, txOptions);
-};
+  return isForBatch ? tx : await signTx(api, tx, account, txOptions);
+}
+
+export { mintLiquidity };
