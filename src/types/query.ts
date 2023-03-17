@@ -1,6 +1,6 @@
 import { TokenId } from "./common";
 import { BN } from "@polkadot/util";
-import { Object } from "ts-toolbelt";
+import { Merge } from "type-fest";
 import { Pool } from "./xyk";
 
 export type TToken = {
@@ -19,12 +19,12 @@ export type TokenBalance = {
   reserved: BN;
   frozen: BN;
 };
-export type TPool = Object.Merge<
+export type TPool = Merge<
   Pool,
   { liquidityTokenId: TokenId; isPromoted: boolean }
 >;
 
-export type TPoolWithRatio = Object.Merge<
+export type TPoolWithRatio = Merge<
   TPool,
   {
     firstTokenRatio: BN;

@@ -1,7 +1,7 @@
 import { BN } from "@polkadot/util";
 import { Address, Amount, ExtrinsicCommon, TokenId, TxOptions } from "./common";
 import { MultiLocation } from "@polkadot/types/interfaces";
-import { Object } from "ts-toolbelt";
+import { Merge } from "type-fest";
 
 export type XcmWeightLimit = BN | { Limited: BN };
 
@@ -45,7 +45,7 @@ export type XcmDestination = {
   };
 };
 
-export type Deposit = Object.Merge<
+export type Deposit = Merge<
   ExtrinsicCommon,
   {
     url: string;
@@ -55,7 +55,7 @@ export type Deposit = Object.Merge<
   }
 >;
 
-export type Withdraw = Object.Merge<
+export type Withdraw = Merge<
   ExtrinsicCommon,
   {
     tokenSymbol: string;
@@ -66,7 +66,7 @@ export type Withdraw = Object.Merge<
   }
 >;
 
-export type RelayDeposit = Object.Merge<
+export type RelayDeposit = Merge<
   ExtrinsicCommon,
   {
     url: string;
@@ -76,7 +76,7 @@ export type RelayDeposit = Object.Merge<
   }
 >;
 
-export type RelayWithdraw = Object.Merge<
+export type RelayWithdraw = Merge<
   ExtrinsicCommon,
   {
     kusamaAddress: Address;

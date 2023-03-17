@@ -1,12 +1,12 @@
 import { Withdraw } from "../../types/xTokens";
 import { encodeAddress } from "@polkadot/util-crypto";
 import { BN } from "@polkadot/util";
-import { Object } from "ts-toolbelt";
+import { Except } from "type-fest";
 import { ApiPromise } from "@polkadot/api";
 import { getWeightXTokens } from "../../utils/getWeightXTokens";
 import { fromBN } from "../../utils/bnUtility";
 
-export type WithdrawFee = Object.Omit<Withdraw, "txOptions">;
+export type WithdrawFee = Except<Withdraw, "txOptions">;
 
 export const forWithdraw = async (
   instancePromise: Promise<ApiPromise>,

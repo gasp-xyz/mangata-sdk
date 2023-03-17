@@ -3,10 +3,10 @@ import { BN } from "@polkadot/util";
 import { Amount } from "../../types/common";
 import { Transfer } from "../../types/tokens";
 import { fromBN } from "../../utils/bnUtility";
-import { Object } from "ts-toolbelt";
+import { Merge, Except } from "type-fest";
 
-export type TransferTokenFee = Object.Merge<
-  Object.Omit<Transfer, "txOptions">,
+export type TransferTokenFee = Merge<
+  Except<Transfer, "txOptions">,
   { amount: Amount }
 >;
 

@@ -1,5 +1,5 @@
 import { Amount, ExtrinsicCommon, TokenId, Address } from "./common";
-import { Object } from "ts-toolbelt";
+import { Merge, Except } from "type-fest";
 
 export type Rewards = {
   address: Address;
@@ -18,7 +18,7 @@ export type Price = {
   amount: Amount;
 };
 
-export type Liquidity = Object.Merge<
+export type Liquidity = Merge<
   ExtrinsicCommon,
   {
     liquidityTokenId: TokenId;
@@ -26,12 +26,9 @@ export type Liquidity = Object.Merge<
   }
 >;
 
-export type BurnLiquidity = Object.Merge<
-  Object.Omit<Liquidity, "liquidityTokenId">,
-  Price
->;
+export type BurnLiquidity = Merge<Except<Liquidity, "liquidityTokenId">, Price>;
 
-export type MintLiquidity = Object.Merge<
+export type MintLiquidity = Merge<
   Omit<BurnLiquidity, "amount">,
   {
     firstTokenAmount: Amount;
@@ -45,11 +42,11 @@ export type Asset = {
   amount: Amount;
 };
 
-export type MaxAmountIn = Object.Merge<Asset, { maxAmountIn: Amount }>;
-export type MinAmountOut = Object.Merge<Asset, { minAmountOut: Amount }>;
+export type MaxAmountIn = Merge<Asset, { maxAmountIn: Amount }>;
+export type MinAmountOut = Merge<Asset, { minAmountOut: Amount }>;
 
-export type BuyAsset = Object.Merge<ExtrinsicCommon, MaxAmountIn>;
-export type SellAsset = Object.Merge<ExtrinsicCommon, MinAmountOut>;
+export type BuyAsset = Merge<ExtrinsicCommon, MaxAmountIn>;
+export type SellAsset = Merge<ExtrinsicCommon, MinAmountOut>;
 
 export type Pool = {
   firstTokenId: TokenId;
@@ -58,4 +55,4 @@ export type Pool = {
   secondTokenAmount: Amount;
 };
 
-export type CreatePool = Object.Merge<ExtrinsicCommon, Pool>;
+export type CreatePool = Merge<ExtrinsicCommon, Pool>;

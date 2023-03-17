@@ -2,9 +2,9 @@ import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
 import { Liquidity } from "../../types/xyk";
 import { fromBN } from "../../utils/bnUtility";
-import { Object } from "ts-toolbelt";
+import { Except } from "type-fest";
 
-export type DeactivateLiquidityFee = Object.Omit<Liquidity, "txOptions">;
+export type DeactivateLiquidityFee = Except<Liquidity, "txOptions">;
 
 export const forDeactivateLiquidity = async (
   instancePromise: Promise<ApiPromise>,

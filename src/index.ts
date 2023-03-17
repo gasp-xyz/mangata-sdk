@@ -97,6 +97,11 @@ import { Batch, batch } from "./methods/utility/batch";
 export { ExtrinsicCommon } from "./types/common";
 export { Batch } from "./methods/utility/batch";
 
+/**
+ * @author Mangata finance
+ *
+ * @returns object of all available methods for interaction with Mangata node
+ */
 export const Mangata = (function () {
   const instanceMap: Map<string, Promise<ApiPromise>> = new Map<
     string,
