@@ -1,4 +1,4 @@
-import { Amount, ExtrinsicCommon, TokenId, Address } from "./common";
+import { TokenAmount, ExtrinsicCommon, TokenId, Address } from "./common";
 import { Merge, Except } from "type-fest";
 
 export type Rewards = {
@@ -7,22 +7,22 @@ export type Rewards = {
 };
 
 export type Reserve = {
-  inputReserve: Amount;
-  outputReserve: Amount;
-  amount: Amount;
+  inputReserve: TokenAmount;
+  outputReserve: TokenAmount;
+  amount: TokenAmount;
 };
 
 export type Price = {
   firstTokenId: TokenId;
   secondTokenId: TokenId;
-  amount: Amount;
+  amount: TokenAmount;
 };
 
 export type Liquidity = Merge<
   ExtrinsicCommon,
   {
     liquidityTokenId: TokenId;
-    amount: Amount;
+    amount: TokenAmount;
   }
 >;
 
@@ -31,28 +31,28 @@ export type BurnLiquidity = Merge<Except<Liquidity, "liquidityTokenId">, Price>;
 export type MintLiquidity = Merge<
   Omit<BurnLiquidity, "amount">,
   {
-    firstTokenAmount: Amount;
-    expectedSecondTokenAmount: Amount;
+    firstTokenAmount: TokenAmount;
+    expectedSecondTokenAmount: TokenAmount;
   }
 >;
 
 export type Asset = {
   soldTokenId: TokenId;
   boughtTokenId: TokenId;
-  amount: Amount;
+  amount: TokenAmount;
 };
 
-export type MaxAmountIn = Merge<Asset, { maxAmountIn: Amount }>;
-export type MinAmountOut = Merge<Asset, { minAmountOut: Amount }>;
+export type MaxAmountIn = Merge<Asset, { maxAmountIn: TokenAmount }>;
+export type MinAmountOut = Merge<Asset, { minAmountOut: TokenAmount }>;
 
 export type BuyAsset = Merge<ExtrinsicCommon, MaxAmountIn>;
 export type SellAsset = Merge<ExtrinsicCommon, MinAmountOut>;
 
 export type Pool = {
   firstTokenId: TokenId;
-  firstTokenAmount: Amount;
+  firstTokenAmount: TokenAmount;
   secondTokenId: TokenId;
-  secondTokenAmount: Amount;
+  secondTokenAmount: TokenAmount;
 };
 
 export type CreatePool = Merge<ExtrinsicCommon, Pool>;

@@ -1,6 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN, isHex, hexToU8a } from "@polkadot/util";
-import { MangataEventData, TErrorData } from "../types/common";
+import { MangataEventData, ErrorData } from "../types/common";
 
 export const getError = (
   api: ApiPromise,
@@ -16,7 +16,7 @@ export const getError = (
     const error = eventData.find((item) =>
       item.lookupName.includes("DispatchError")
     );
-    const errorData = error?.data?.toHuman?.() as TErrorData | undefined;
+    const errorData = error?.data?.toHuman?.() as ErrorData | undefined;
     const errorIdx = errorData?.Module?.error;
     const moduleIdx = errorData?.Module?.index;
 

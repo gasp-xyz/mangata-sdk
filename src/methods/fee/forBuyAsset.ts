@@ -4,7 +4,7 @@ import { BuyAsset } from "../../types/xyk";
 import { fromBN } from "../../utils/bnUtility";
 import { Except } from "type-fest";
 
-export type BuyAssetFee = v<BuyAsset, "txOptions">;
+export type BuyAssetFee = Except<BuyAsset, "txOptions">;
 
 export const forBuyAsset = async (
   instancePromise: Promise<ApiPromise>,

@@ -1,6 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { Amount } from "../../types/common";
+import { TokenAmount } from "../../types/common";
 import { TBalances } from "../../types/query";
 
 export const getTotalIssuanceOfTokens = async (
@@ -14,5 +14,5 @@ export const getTotalIssuanceOfTokens = async (
     const balance = new BN(value.toString());
     acc[id] = balance;
     return acc;
-  }, {} as { [id: string]: Amount });
+  }, {} as { [id: string]: TokenAmount });
 };

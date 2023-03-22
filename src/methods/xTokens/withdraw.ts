@@ -3,7 +3,7 @@ import { encodeAddress } from "@polkadot/util-crypto";
 import { BN } from "@polkadot/util";
 import { ApiPromise } from "@polkadot/api";
 import { getWeightXTokens } from "../../utils/getWeightXTokens";
-import { signTx } from "../../signTx";
+import { signTx } from "../../utils/signTx";
 
 export const withdraw = async (
   instancePromise: Promise<ApiPromise>,

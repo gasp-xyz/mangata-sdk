@@ -10,12 +10,12 @@ import {
   MangataEventData,
   MangataGenericEvent,
   TxOptions
-} from "./types/common";
-import { serializeTx } from "./utils/serialize";
-import { getTxNonce } from "./utils/getTxNonce";
-import { dbInstance } from "./utils/inMemoryDatabase";
-import { truncatedString } from "./utils/truncatedString";
-import { getError } from "./utils/getTxError";
+} from "../types/common";
+import { serializeTx } from "./serialize";
+import { getTxNonce } from "./getTxNonce";
+import { dbInstance } from "./inMemoryDatabase";
+import { truncatedString } from "./truncatedString";
+import { getError } from "./getTxError";
 
 export const signTx = async (
   api: ApiPromise,

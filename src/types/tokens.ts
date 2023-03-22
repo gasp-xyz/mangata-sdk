@@ -1,4 +1,4 @@
-import { Account, Address, Amount, TokenId, TxOptions } from "./common";
+import { Account, Address, TokenId, TxOptions } from "./common";
 
 export type Transfer = {
   account: Account;

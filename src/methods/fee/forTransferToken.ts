@@ -1,13 +1,13 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { Amount } from "../../types/common";
+import { TokenAmount } from "../../types/common";
 import { Transfer } from "../../types/tokens";
 import { fromBN } from "../../utils/bnUtility";
 import { Merge, Except } from "type-fest";
 
 export type TransferTokenFee = Merge<
   Except<Transfer, "txOptions">,
-  { amount: Amount }
+  { amount: TokenAmount }
 >;
 
 export const forTransferToken = async (

@@ -1,13 +1,10 @@
-import * as _polkadot_api_base_types from '@polkadot/api-base/types';
-import * as _polkadot_types_types from '@polkadot/types/types';
-import { ISubmittableResult, Codec } from '@polkadot/types/types';
 import { BN } from '@polkadot/util';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
+import { ISubmittableResult, Codec } from '@polkadot/types/types';
 import { Event, Phase, MultiLocation } from '@polkadot/types/interfaces';
-import * as bn_js from 'bn.js';
+import { Merge, Except } from 'type-fest';
 import { ApiPromise } from '@polkadot/api';
-import { Object as Object$1 } from 'ts-toolbelt';
 
 type ExtrinsicCommon = {
     account: Account;
@@ -15,7 +12,7 @@ type ExtrinsicCommon = {
 };
 type Account = string | KeyringPair;
 type TokenId = string;
-type Amount = BN;
+type TokenAmount = BN;
 type Address = string;
 type MangataEventData = {
     lookupName: string;
@@ -40,65 +37,53 @@ type TxOptions = {
     extrinsicStatus: (events: MangataGenericEvent[]) => void;
 };
 
+type Batch = Merge<ExtrinsicCommon, {
+    calls: SubmittableExtrinsic<"promise", ISubmittableResult>[];
+}>;
+
 type Rewards = {
     address: Address;
     liquidityTokenId: TokenId;
 };
 type Reserve = {
-    inputReserve: Amount;
-    outputReserve: Amount;
-    amount: Amount;
+    inputReserve: TokenAmount;
+    outputReserve: TokenAmount;
+    amount: TokenAmount;
 };
 type Price = {
     firstTokenId: TokenId;
     secondTokenId: TokenId;
-    amount: Amount;
+    amount: TokenAmount;
 };
-type Liquidity = Object$1.Merge<ExtrinsicCommon, {
+type Liquidity = Merge<ExtrinsicCommon, {
     liquidityTokenId: TokenId;
-    amount: Amount;
+    amount: TokenAmount;
 }>;
-type BurnLiquidity = Object$1.Merge<Object$1.Omit<Liquidity, "liquidityTokenId">, Price>;
-type MintLiquidity = Object$1.Merge<Omit<BurnLiquidity, "amount">, {
-    firstTokenAmount: Amount;
-    expectedSecondTokenAmount: Amount;
+type BurnLiquidity = Merge<Except<Liquidity, "liquidityTokenId">, Price>;
+type MintLiquidity = Merge<Omit<BurnLiquidity, "amount">, {
+    firstTokenAmount: TokenAmount;
+    expectedSecondTokenAmount: TokenAmount;
 }>;
 type Asset = {
     soldTokenId: TokenId;
     boughtTokenId: TokenId;
-    amount: Amount;
+    amount: TokenAmount;
 };
-type MaxAmountIn = Object$1.Merge<Asset, {
-    maxAmountIn: Amount;
+type MaxAmountIn = Merge<Asset, {
+    maxAmountIn: TokenAmount;
 }>;
-type MinAmountOut = Object$1.Merge<Asset, {
-    minAmountOut: Amount;
+type MinAmountOut = Merge<Asset, {
+    minAmountOut: TokenAmount;
 }>;
-type BuyAsset = Object$1.Merge<ExtrinsicCommon, MaxAmountIn>;
-type SellAsset = Object$1.Merge<ExtrinsicCommon, MinAmountOut>;
+type BuyAsset = Merge<ExtrinsicCommon, MaxAmountIn>;
+type SellAsset = Merge<ExtrinsicCommon, MinAmountOut>;
 type Pool = {
     firstTokenId: TokenId;
-    firstTokenAmount: Amount;
+    firstTokenAmount: TokenAmount;
     secondTokenId: TokenId;
-    secondTokenAmount: Amount;
+    secondTokenAmount: TokenAmount;
 };
-type CreatePool = Object$1.Merge<ExtrinsicCommon, Pool>;
-
-type TToken = {
-    id: TokenId;
-    name: string;
-    symbol: string;
-    decimals: number;
-    balance: TokenBalance;
-};
-type TTokenInfo = Omit<TToken, "balance">;
-type TBalances = Record<TokenId, BN>;
-type TMainTokens = Record<TokenId, TTokenInfo>;
-type TokenBalance = {
-    free: BN;
-    reserved: BN;
-    frozen: BN;
-};
+type CreatePool = Merge<ExtrinsicCommon, Pool>;
 
 type Transfer = {
     account: Account;
@@ -111,7 +96,7 @@ type XcmAssetId = {
     Concrete: MultiLocation;
 };
 type XcmAssetFungibility = {
-    Fungible: Amount;
+    Fungible: TokenAmount;
 };
 type XcmAsset = {
     V1: {
@@ -138,163 +123,174 @@ type XcmDestination = {
         interior: XcmInterior;
     };
 };
-type Deposit = Object$1.Merge<ExtrinsicCommon, {
+type Deposit = Merge<ExtrinsicCommon, {
     url: string;
     asset: XcmAsset;
     destination: XcmDestination;
     weight: string;
 }>;
-type Withdraw = Object$1.Merge<ExtrinsicCommon, {
+type Withdraw = Merge<ExtrinsicCommon, {
     tokenSymbol: string;
     withWeight: string;
     parachainId: number;
     destinationAddress: Address;
-    amount: Amount;
+    amount: TokenAmount;
 }>;
-type RelayDeposit = Object$1.Merge<ExtrinsicCommon, {
+type RelayDeposit = Merge<ExtrinsicCommon, {
     url: string;
     address: Address;
-    amount: Amount;
+    amount: TokenAmount;
     parachainId: number;
 }>;
-type RelayWithdraw = Object$1.Merge<ExtrinsicCommon, {
+type RelayWithdraw = Merge<ExtrinsicCommon, {
     kusamaAddress: Address;
-    amount: Amount;
+    amount: TokenAmount;
 }>;
 
-type TransferAllFee = Object$1.Omit<Transfer, "txOptions">;
+type TransferAllFee = Except<Transfer, "txOptions">;
 
-type TransferTokenFee = Object$1.Merge<Object$1.Omit<Transfer, "txOptions">, {
-    amount: Amount;
+type TransferTokenFee = Merge<Except<Transfer, "txOptions">, {
+    amount: TokenAmount;
 }>;
 
-type BurnLiquidityFee = Object$1.Omit<BurnLiquidity, "txOptions">;
+type BurnLiquidityFee = Except<BurnLiquidity, "txOptions">;
 
-type MintLiquidityFee = Object$1.Omit<MintLiquidity, "txOptions">;
+type MintLiquidityFee = Except<MintLiquidity, "txOptions">;
 
-type BuyAssetFee = Object$1.Omit<BuyAsset, "txOptions">;
+type BuyAssetFee = Except<BuyAsset, "txOptions">;
 
-type SellAssetFee = Object$1.Omit<SellAsset, "txOptions">;
+type SellAssetFee = Except<SellAsset, "txOptions">;
 
-type CreatePoolFee = Object$1.Omit<CreatePool, "txOptions">;
+type CreatePoolFee = Except<CreatePool, "txOptions">;
 
-type ClaimRewardsFee = Object$1.Omit<Liquidity, "txOptions">;
+type ClaimRewardsFee = Except<Liquidity, "txOptions">;
 
-type DeactivateLiquidityFee = Object$1.Omit<Liquidity, "txOptions">;
+type DeactivateLiquidityFee = Except<Liquidity, "txOptions">;
 
-type ActivateLiquidityFee = Object$1.Omit<Liquidity, "txOptions">;
+type ActivateLiquidityFee = Except<Liquidity, "txOptions">;
 
-type WithdrawFee = Object$1.Omit<Withdraw, "txOptions">;
+type WithdrawFee = Except<Withdraw, "txOptions">;
 
-type Batch = Object$1.Merge<ExtrinsicCommon, {
-    calls: SubmittableExtrinsic<"promise", ISubmittableResult>[];
+type TToken = {
+    id: TokenId;
+    name: string;
+    symbol: string;
+    decimals: number;
+    balance: TokenBalance;
+};
+type TTokenInfo = Omit<TToken, "balance">;
+type TBalances = Record<TokenId, BN>;
+type TMainTokens = Record<TokenId, TTokenInfo>;
+type TokenBalance = {
+    free: BN;
+    reserved: BN;
+    frozen: BN;
+};
+type TPool = Merge<Pool, {
+    liquidityTokenId: TokenId;
+    isPromoted: boolean;
+}>;
+type TPoolWithRatio = Merge<TPool, {
+    firstTokenRatio: BN;
+    secondTokenRatio: BN;
 }>;
 
-declare const Mangata: {
-    instance: (urls: string[]) => {
-        apiPromise: Promise<ApiPromise>;
-        batch: (args: Batch) => Promise<MangataGenericEvent[]>;
-        fee: {
-            withdraw: (args: WithdrawFee) => Promise<string>;
-            activateLiquidity: (args: ActivateLiquidityFee) => Promise<string>;
-            deactivateLiquidity: (args: DeactivateLiquidityFee) => Promise<string>;
-            claimRewards: (args: ClaimRewardsFee) => Promise<string>;
-            createPool: (args: CreatePoolFee) => Promise<string>;
-            sellAsset: (args: SellAssetFee) => Promise<string>;
-            buyAsset: (args: BuyAssetFee) => Promise<string>;
-            mintLiquidity: (args: MintLiquidityFee) => Promise<string>;
-            burnLiquidity: (args: BurnLiquidityFee) => Promise<string>;
-            transferAllToken: (args: TransferAllFee) => Promise<string>;
-            transferToken: (args: TransferTokenFee) => Promise<string>;
-        };
-        query: {
-            getNonce: (address: Address) => Promise<bn_js>;
-            getLiquidityTokenId: (firstTokenId: TokenId, secondTokenId: TokenId) => Promise<bn_js>;
-            getTotalIssuance: (tokenId: TokenId) => Promise<bn_js>;
-            getTokenBalance: (address: Address, tokenId: TokenId) => Promise<TokenBalance>;
-            getTokenInfo: (tokenId: TokenId) => Promise<TTokenInfo>;
-            getLiquidityTokenIds: () => Promise<string[]>;
-            getLiquidityTokens: () => Promise<TMainTokens>;
-            getBlockNumber: () => Promise<string>;
-            getOwnedTokens: (address: Address) => Promise<{
-                [id: string]: TToken;
-            } | null>;
-            getAssetsInfo: () => Promise<TMainTokens>;
-            getInvestedPools: (address: Address) => Promise<({
-                firstTokenId: string;
-                firstTokenAmount: bn_js;
-                secondTokenId: string;
-                secondTokenAmount: bn_js;
-                liquidityTokenId: string;
-                isPromoted: boolean;
-            } & {
-                share: bn_js;
-                firstTokenRatio: bn_js;
-                secondTokenRatio: bn_js;
-                activatedLPTokens: bn_js;
-                nonActivatedLPTokens: bn_js;
-            })[]>;
-            getAmountOfTokenIdInPool: (firstTokenId: TokenId, secondTokenId: TokenId) => Promise<bn_js[]>;
-            getLiquidityPool: (liquidityTokenId: TokenId) => Promise<bn_js[]>;
-            getPool: (liquidityTokenId: TokenId) => Promise<{
-                firstTokenId: string;
-                firstTokenAmount: bn_js;
-                secondTokenId: string;
-                secondTokenAmount: bn_js;
-                liquidityTokenId: string;
-                isPromoted: boolean;
-                firstTokenRatio: bn_js;
-                secondTokenRatio: bn_js;
-            }>;
-            getPools: () => Promise<{
-                firstTokenId: string;
-                firstTokenAmount: bn_js;
-                secondTokenId: string;
-                secondTokenAmount: bn_js;
-                liquidityTokenId: string;
-                isPromoted: boolean;
-                firstTokenRatio: bn_js;
-                secondTokenRatio: bn_js;
-            }[]>;
-            getTotalIssuanceOfTokens: () => Promise<TBalances>;
-        };
-        rpc: {
-            calculateBuyPriceId: (args: Price) => Promise<bn_js>;
-            calculateSellPriceId: (args: Price) => Promise<bn_js>;
-            getBurnAmount: (args: Price) => Promise<any>;
-            calculateSellPrice: (args: Reserve) => Promise<bn_js>;
-            calculateBuyPrice: (args: Reserve) => Promise<bn_js>;
-            calculateRewardsAmount: (args: Rewards) => Promise<bn_js>;
-            getNodeVersion: () => Promise<string>;
-            getNodeName: () => Promise<string>;
-            getChain: () => Promise<string>;
-        };
-        xyk: {
-            deactivateLiquidity: (args: Liquidity) => Promise<MangataGenericEvent[]>;
-            activateLiquidity: (args: Liquidity) => Promise<MangataGenericEvent[]>;
-            burnLiquidity: (args: BurnLiquidity) => Promise<MangataGenericEvent[]>;
-            mintLiquidity: (args: MintLiquidity) => Promise<MangataGenericEvent[]>;
-            buyAsset: (args: BuyAsset) => Promise<MangataGenericEvent[]>;
-            sellAsset: (args: SellAsset) => Promise<MangataGenericEvent[]>;
-            createPool: (args: CreatePool) => Promise<MangataGenericEvent[]>;
-            claimRewards: (args: Liquidity) => Promise<MangataGenericEvent[]>;
-        };
-        submitableExtrinsic: {
-            createPool: (args: CreatePool) => Promise<_polkadot_api_base_types.SubmittableExtrinsic<"promise", _polkadot_types_types.ISubmittableResult>>;
-        };
-        tokens: {
-            transferAllTokens: (args: Transfer) => Promise<MangataGenericEvent[]>;
-            transferTokens: (args: Transfer & {
-                amount: Amount;
-            }) => Promise<MangataGenericEvent[]>;
-        };
-        xTokens: {
-            deposit: (args: Deposit) => Promise<void>;
-            depositKsm: (args: RelayDeposit) => Promise<void>;
-            withdraw: (args: Withdraw) => Promise<void>;
-            withdrawKsm: (args: RelayWithdraw) => Promise<void>;
-        };
+type MangataSubmittableExtrinsic = SubmittableExtrinsic<"promise", ISubmittableResult>;
+interface MangataInstance {
+    xTokens: {
+        deposit: (args: Deposit) => Promise<void>;
+        depositKsm: (args: RelayDeposit) => Promise<void>;
+        withdraw: (args: Withdraw) => Promise<void>;
+        withdrawKsm: (args: RelayWithdraw) => Promise<void>;
     };
+    xyk: {
+        deactivateLiquidity: (args: Liquidity) => Promise<MangataGenericEvent[]>;
+        activateLiquidity: (args: Liquidity) => Promise<MangataGenericEvent[]>;
+        burnLiquidity: (args: BurnLiquidity) => Promise<MangataGenericEvent[]>;
+        mintLiquidity: (args: MintLiquidity) => Promise<MangataGenericEvent[]>;
+        buyAsset: (args: BuyAsset) => Promise<MangataGenericEvent[]>;
+        sellAsset: (args: SellAsset) => Promise<MangataGenericEvent[]>;
+        createPool: (args: CreatePool) => Promise<MangataGenericEvent[]>;
+        claimRewards: (args: Liquidity) => Promise<MangataGenericEvent[]>;
+    };
+    rpc: {
+        calculateBuyPriceId: (args: Price) => Promise<BN>;
+        calculateSellPriceId: (args: Price) => Promise<BN>;
+        getBurnAmount: (args: Price) => Promise<any>;
+        calculateSellPrice: (args: Reserve) => Promise<BN>;
+        calculateBuyPrice: (args: Reserve) => Promise<BN>;
+        calculateRewardsAmount: (args: Rewards) => Promise<BN>;
+        getNodeVersion: () => Promise<string>;
+        getNodeName: () => Promise<string>;
+        getChain: () => Promise<string>;
+    };
+    tokens: {
+        transferAllTokens: (args: Transfer) => Promise<MangataGenericEvent[]>;
+        transferTokens: (args: Transfer & {
+            amount: TokenAmount;
+        }) => Promise<MangataGenericEvent[]>;
+    };
+    submitableExtrinsic: {
+        createPool: (args: CreatePool) => Promise<MangataSubmittableExtrinsic>;
+        claimRewards: (args: Liquidity) => Promise<MangataSubmittableExtrinsic>;
+        sellAsset: (args: SellAsset) => Promise<MangataSubmittableExtrinsic>;
+        buyAsset: (args: BuyAsset) => Promise<MangataSubmittableExtrinsic>;
+        mintLiquidity: (args: MintLiquidity) => Promise<MangataSubmittableExtrinsic>;
+        burnLiquidity: (args: BurnLiquidity) => Promise<MangataSubmittableExtrinsic>;
+        activateLiquidity: (args: Liquidity) => Promise<MangataSubmittableExtrinsic>;
+        deactivateLiquidity: (args: Liquidity) => Promise<MangataSubmittableExtrinsic>;
+        transferAllTokens: (args: Transfer) => Promise<MangataSubmittableExtrinsic>;
+        transferTokens: (args: Transfer & {
+            amount: TokenAmount;
+        }) => Promise<MangataSubmittableExtrinsic>;
+    };
+    query: {
+        getNonce: (address: Address) => Promise<BN>;
+        getLiquidityTokenId: (firstTokenId: TokenId, secondTokenId: TokenId) => Promise<BN>;
+        getTotalIssuance: (tokenId: TokenId) => Promise<BN>;
+        getTokenBalance: (address: Address, tokenId: TokenId) => Promise<TokenBalance>;
+        getTokenInfo: (tokenId: TokenId) => Promise<TTokenInfo>;
+        getLiquidityTokenIds: () => Promise<string[]>;
+        getLiquidityTokens: () => Promise<TMainTokens>;
+        getBlockNumber: () => Promise<string>;
+        getOwnedTokens: (address: Address) => Promise<{
+            [id: TokenId]: TToken;
+        } | null>;
+        getAssetsInfo: () => Promise<TMainTokens>;
+        getInvestedPools: (address: Address) => Promise<(TPool & {
+            share: BN;
+            firstTokenRatio: BN;
+            secondTokenRatio: BN;
+            activatedLPTokens: BN;
+            nonActivatedLPTokens: BN;
+        })[]>;
+        getAmountOfTokenIdInPool: (firstTokenId: TokenId, secondTokenId: TokenId) => Promise<BN[]>;
+        getLiquidityPool: (liquidityTokenId: TokenId) => Promise<BN[]>;
+        getPool: (liquidityTokenId: TokenId) => Promise<TPoolWithRatio>;
+        getPools: () => Promise<TPoolWithRatio[]>;
+        getTotalIssuanceOfTokens: () => Promise<TBalances>;
+    };
+    fee: {
+        withdraw: (args: WithdrawFee) => Promise<string>;
+        activateLiquidity: (args: ActivateLiquidityFee) => Promise<string>;
+        deactivateLiquidity: (args: DeactivateLiquidityFee) => Promise<string>;
+        claimRewards: (args: ClaimRewardsFee) => Promise<string>;
+        createPool: (args: CreatePoolFee) => Promise<string>;
+        sellAsset: (args: SellAssetFee) => Promise<string>;
+        buyAsset: (args: BuyAssetFee) => Promise<string>;
+        mintLiquidity: (args: MintLiquidityFee) => Promise<string>;
+        burnLiquidity: (args: BurnLiquidityFee) => Promise<string>;
+        transferAllToken: (args: TransferAllFee) => Promise<string>;
+        transferToken: (args: TransferTokenFee) => Promise<string>;
+    };
+    apiPromise: Promise<ApiPromise>;
+    batch: (args: Batch) => Promise<MangataGenericEvent[]>;
+    batchAll: (args: Batch) => Promise<MangataGenericEvent[]>;
+    forceBatch: (args: Batch) => Promise<MangataGenericEvent[]>;
+}
+declare function createMangataInstance(urls: string[]): MangataInstance;
+declare const Mangata: {
+    instance: typeof createMangataInstance;
 };
 
 export { Batch, ExtrinsicCommon, Mangata };

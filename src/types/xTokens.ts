@@ -1,5 +1,11 @@
 import { BN } from "@polkadot/util";
-import { Address, Amount, ExtrinsicCommon, TokenId, TxOptions } from "./common";
+import {
+  Address,
+  TokenAmount,
+  ExtrinsicCommon,
+  TokenId,
+  TxOptions
+} from "./common";
 import { MultiLocation } from "@polkadot/types/interfaces";
 import { Merge } from "type-fest";
 
@@ -14,7 +20,7 @@ export type XcmAssetId = {
 };
 
 export type XcmAssetFungibility = {
-  Fungible: Amount;
+  Fungible: TokenAmount;
 };
 
 export type XcmAsset = {
@@ -62,7 +68,7 @@ export type Withdraw = Merge<
     withWeight: string;
     parachainId: number;
     destinationAddress: Address;
-    amount: Amount;
+    amount: TokenAmount;
   }
 >;
 
@@ -71,7 +77,7 @@ export type RelayDeposit = Merge<
   {
     url: string;
     address: Address;
-    amount: Amount;
+    amount: TokenAmount;
     parachainId: number;
   }
 >;
@@ -80,6 +86,6 @@ export type RelayWithdraw = Merge<
   ExtrinsicCommon,
   {
     kusamaAddress: Address;
-    amount: Amount;
+    amount: TokenAmount;
   }
 >;

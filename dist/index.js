@@ -2982,10 +2982,6 @@ var require_bytes = __commonJS({
   }
 });
 
-// src/index.ts
-import { ApiPromise as ApiPromise3, WsProvider as WsProvider3 } from "@polkadot/api";
-import { options } from "@mangata-finance/types";
-
 // src/utils/serialize.ts
 var serializeTx = (api, tx) => {
   if (!process.env.TX_VERBOSE)
@@ -3300,7 +3296,7 @@ var getError = (api, method, eventData) => {
   return null;
 };
 
-// src/signTx.ts
+// src/utils/signTx.ts
 var signTx = async (api, tx, account, txOptions) => {
   return new Promise(async (resolve, reject) => {
     const extractedAccount = typeof account === "string" ? account : account.address;
@@ -3422,51 +3418,63 @@ var signTx = async (api, tx, account, txOptions) => {
   });
 };
 
+// src/methods/utility/batch.ts
+var batch = async (instancePromise, args) => {
+  const api = await instancePromise;
+  const { account, txOptions, calls } = args;
+  const tx = api.tx.utility.batch(calls);
+  return await signTx(api, tx, account, txOptions);
+};
+
+// src/mangata.ts
+import { ApiPromise as ApiPromise3, WsProvider as WsProvider3 } from "@polkadot/api";
+import { options } from "@mangata-finance/types";
+
 // src/methods/xyk/deactivateLiquidity.ts
-var deactivateLiquidity = async (instancePromise, args) => {
+async function deactivateLiquidity(instancePromise, args, isForBatch) {
   const api = await instancePromise;
   const { account, liquidityTokenId, amount, txOptions } = args;
   const tx = api.tx.xyk.deactivateLiquidityV2(liquidityTokenId, amount);
-  return await signTx(api, tx, account, txOptions);
-};
+  return isForBatch ? tx : await signTx(api, tx, account, txOptions);
+}
 
 // src/methods/xyk/activateLiquidity.ts
-var activateLiquidity = async (instancePromise, args) => {
+async function activateLiquidity(instancePromise, args, isForBatch) {
   const api = await instancePromise;
   const { account, liquidityTokenId, amount, txOptions } = args;
   const tx = api.tx.xyk.activateLiquidityV2(liquidityTokenId, amount, null);
-  return await signTx(api, tx, account, txOptions);
-};
+  return isForBatch ? tx : await signTx(api, tx, account, txOptions);
+}
 
 // src/methods/xyk/burnLiquidity.ts
-var burnLiquidity = async (instancePromise, args) => {
+async function burnLiquidity(instancePromise, args, isForBatch) {
   const api = await instancePromise;
   const { account, firstTokenId, secondTokenId, amount, txOptions } = args;
   const tx = api.tx.xyk.burnLiquidity(firstTokenId, secondTokenId, amount);
-  return await signTx(api, tx, account, txOptions);
-};
+  return isForBatch ? tx : await signTx(api, tx, account, txOptions);
+}
 
 // src/methods/tokens/transferAllTokens.ts
-var transferAllTokens = async (instancePromise, args) => {
+async function transferAllTokens(instancePromise, args, isForBatch) {
   const api = await instancePromise;
   const { account, tokenId, address, txOptions } = args;
   const tx = api.tx.tokens.transferAll(address, tokenId, true);
-  return await signTx(api, tx, account, txOptions);
-};
+  return isForBatch ? tx : await signTx(api, tx, account, txOptions);
+}
 
 // src/methods/tokens/transferTokens.ts
-var transferTokens = async (instancePromise, args) => {
+async function transferTokens(instancePromise, args, isForBatch) {
   const api = await instancePromise;
   const { account, tokenId, address, txOptions, amount } = args;
   const tx = api.tx.tokens.transfer(address, tokenId, amount);
-  return await signTx(api, tx, account, txOptions);
-};
+  return isForBatch ? tx : await signTx(api, tx, account, txOptions);
+}
 
-// src/index.ts
+// src/mangata.ts
 import "@mangata-finance/types";
 
 // src/methods/xyk/mintLiquidity.ts
-var mintLiquidity = async (instancePromise, args) => {
+async function mintLiquidity(instancePromise, args, isForBatch) {
   const api = await instancePromise;
   const {
     account,
@@ -3482,8 +3490,8 @@ var mintLiquidity = async (instancePromise, args) => {
     firstTokenAmount,
     expectedSecondTokenAmount
   );
-  return await signTx(api, tx, account, txOptions);
-};
+  return isForBatch ? tx : await signTx(api, tx, account, txOptions);
+}
 
 // src/methods/xTokens/deposit.ts
 import { ApiPromise, WsProvider } from "@polkadot/api";
@@ -3516,7 +3524,7 @@ var deposit = async (args) => {
 };
 
 // src/methods/xyk/buyAsset.ts
-var buyAsset = async (instancePromise, args) => {
+async function buyAsset(instancePromise, args, isForBatch) {
   const api = await instancePromise;
   const {
     account,
@@ -3532,11 +3540,11 @@ var buyAsset = async (instancePromise, args) => {
     amount,
     maxAmountIn
   );
-  return await signTx(api, tx, account, txOptions);
-};
+  return isForBatch ? tx : await signTx(api, tx, account, txOptions);
+}
 
 // src/methods/xyk/sellAsset.ts
-var sellAsset = async (instancePromise, args) => {
+async function sellAsset(instancePromise, args, isForBatch) {
   const api = await instancePromise;
   const {
     account,
@@ -3552,8 +3560,8 @@ var sellAsset = async (instancePromise, args) => {
     amount,
     minAmountOut
   );
-  return await signTx(api, tx, account, txOptions);
-};
+  return isForBatch ? tx : await signTx(api, tx, account, txOptions);
+}
 
 // src/methods/xyk/createPool.ts
 async function createPool(instancePromise, args, isForBatch) {
@@ -3576,12 +3584,12 @@ async function createPool(instancePromise, args, isForBatch) {
 }
 
 // src/methods/xyk/claimRewards.ts
-var claimRewards = async (instancePromise, args) => {
+async function claimRewards(instancePromise, args, isForBatch) {
   const api = await instancePromise;
   const { account, txOptions, liquidityTokenId, amount } = args;
   const tx = api.tx.xyk.claimRewardsV2(liquidityTokenId, amount);
-  return await signTx(api, tx, account, txOptions);
-};
+  return isForBatch ? tx : await signTx(api, tx, account, txOptions);
+}
 
 // src/methods/rpc/calculateBuyPriceId.ts
 var calculateBuyPriceId = async (instancePromise, args) => {
@@ -7921,105 +7929,129 @@ var forWithdraw = async (instancePromise, args) => {
   }
 };
 
-// src/methods/utility/batch.ts
-var batch = async (instancePromise, args) => {
+// src/methods/utility/batchAll.ts
+var batchAll = async (instancePromise, args) => {
   const api = await instancePromise;
   const { account, txOptions, calls } = args;
-  const tx = api.tx.utility.batch(calls);
+  const tx = api.tx.utility.batchAll(calls);
   return await signTx(api, tx, account, txOptions);
 };
 
-// src/index.ts
-var Mangata = function() {
-  const instanceMap = /* @__PURE__ */ new Map();
+// src/methods/utility/forceBatch.ts
+var forceBatch = async (instancePromise, args) => {
+  const api = await instancePromise;
+  const { account, txOptions, calls } = args;
+  const tx = api.tx.utility.forceBatch(calls);
+  return await signTx(api, tx, account, txOptions);
+};
+
+// src/mangata.ts
+var instanceMap = {};
+function getOrCreateInstance(urls) {
+  const key = JSON.stringify(urls.sort());
+  if (!instanceMap[key]) {
+    const provider = new WsProvider3(urls);
+    instanceMap[key] = ApiPromise3.create(
+      options({
+        provider,
+        throwOnConnect: true,
+        throwOnUnknown: true,
+        noInitWarn: true
+      })
+    );
+  }
+  return instanceMap[key];
+}
+function createMangataInstance(urls) {
+  const instancePromise = getOrCreateInstance(urls);
   return {
-    instance: (urls) => {
-      const key = JSON.stringify(urls.sort());
-      if (!instanceMap.has(key)) {
-        const provider = new WsProvider3(urls);
-        const instance2 = ApiPromise3.create(
-          options({
-            provider,
-            throwOnConnect: true,
-            throwOnUnknown: true,
-            noInitWarn: true
-          })
-        );
-        instanceMap.set(key, instance2);
-      }
-      const instance = instanceMap.get(key);
-      return {
-        apiPromise: instance,
-        batch: (args) => batch(instance, args),
-        fee: {
-          withdraw: (args) => forWithdraw(instance, args),
-          activateLiquidity: (args) => forActivateLiquidity(instance, args),
-          deactivateLiquidity: (args) => forDeactivateLiquidity(instance, args),
-          claimRewards: (args) => forClaimRewards(instance, args),
-          createPool: (args) => forCreatePool(instance, args),
-          sellAsset: (args) => forSellAsset(instance, args),
-          buyAsset: (args) => forBuyAsset(instance, args),
-          mintLiquidity: (args) => forMintLiquidity(instance, args),
-          burnLiquidity: (args) => forBurnLiquidity(instance, args),
-          transferAllToken: (args) => forTransferAllToken(instance, args),
-          transferToken: (args) => forTransferToken(instance, args)
-        },
-        query: {
-          getNonce: (address) => getNonce(instance, address),
-          getLiquidityTokenId: (firstTokenId, secondTokenId) => getLiquidityTokenId(instance, firstTokenId, secondTokenId),
-          getTotalIssuance: (tokenId) => getTotalIssuance(instance, tokenId),
-          getTokenBalance: (address, tokenId) => getTokenBalance(instance, address, tokenId),
-          getTokenInfo: (tokenId) => getTokenInfo(instance, tokenId),
-          getLiquidityTokenIds: () => getLiquidityTokenIds(instance),
-          getLiquidityTokens: () => getLiquidityTokens(instance),
-          getBlockNumber: () => getBlockNumber(instance),
-          getOwnedTokens: (address) => getOwnedTokens(instance, address),
-          getAssetsInfo: () => getAssetsInfo(instance),
-          getInvestedPools: (address) => getInvestedPools(instance, address),
-          getAmountOfTokenIdInPool: (firstTokenId, secondTokenId) => getAmountOfTokenIdInPool(instance, firstTokenId, secondTokenId),
-          getLiquidityPool: (liquidityTokenId) => getLiquidityPool(instance, liquidityTokenId),
-          getPool: (liquidityTokenId) => getPool(instance, liquidityTokenId),
-          getPools: () => getPools(instance),
-          getTotalIssuanceOfTokens: () => getTotalIssuanceOfTokens(instance)
-        },
-        rpc: {
-          calculateBuyPriceId: (args) => calculateBuyPriceId(instance, args),
-          calculateSellPriceId: (args) => calculateSellPriceId(instance, args),
-          getBurnAmount: (args) => getBurnAmount(instance, args),
-          calculateSellPrice: (args) => calculateSellPrice(instance, args),
-          calculateBuyPrice: (args) => calculateBuyPrice(instance, args),
-          calculateRewardsAmount: (args) => calculateRewardsAmount(instance, args),
-          getNodeVersion: () => getNodeVersion(instance),
-          getNodeName: () => getNodeName(instance),
-          getChain: () => getChain(instance)
-        },
-        xyk: {
-          deactivateLiquidity: (args) => deactivateLiquidity(instance, args),
-          activateLiquidity: (args) => activateLiquidity(instance, args),
-          burnLiquidity: (args) => burnLiquidity(instance, args),
-          mintLiquidity: (args) => mintLiquidity(instance, args),
-          buyAsset: (args) => buyAsset(instance, args),
-          sellAsset: (args) => sellAsset(instance, args),
-          createPool: (args) => createPool(instance, args, false),
-          claimRewards: (args) => claimRewards(instance, args)
-        },
-        submitableExtrinsic: {
-          createPool: (args) => createPool(instance, args, true)
-        },
-        tokens: {
-          transferAllTokens: (args) => transferAllTokens(instance, args),
-          transferTokens: (args) => transferTokens(instance, args)
-        },
-        xTokens: {
-          deposit: (args) => deposit(args),
-          depositKsm: (args) => depositKsm(args),
-          withdraw: (args) => withdraw(instance, args),
-          withdrawKsm: (args) => withdrawKsm(instance, args)
-        }
-      };
+    apiPromise: instancePromise,
+    batch: async (args) => await batch(instancePromise, args),
+    batchAll: async (args) => await batchAll(instancePromise, args),
+    forceBatch: async (args) => await forceBatch(instancePromise, args),
+    xTokens: {
+      deposit: async (args) => await deposit(args),
+      depositKsm: async (args) => await depositKsm(args),
+      withdraw: async (args) => await withdraw(instancePromise, args),
+      withdrawKsm: async (args) => await withdrawKsm(instancePromise, args)
+    },
+    xyk: {
+      deactivateLiquidity: async (args) => await deactivateLiquidity(instancePromise, args, false),
+      activateLiquidity: async (args) => await activateLiquidity(instancePromise, args, false),
+      burnLiquidity: async (args) => await burnLiquidity(instancePromise, args, false),
+      mintLiquidity: async (args) => await mintLiquidity(instancePromise, args, false),
+      buyAsset: async (args) => await buyAsset(instancePromise, args, false),
+      sellAsset: async (args) => await sellAsset(instancePromise, args, false),
+      createPool: async (args) => await createPool(instancePromise, args, false),
+      claimRewards: async (args) => await claimRewards(instancePromise, args, false)
+    },
+    rpc: {
+      calculateBuyPriceId: async (args) => await calculateBuyPriceId(instancePromise, args),
+      calculateSellPriceId: async (args) => await calculateSellPriceId(instancePromise, args),
+      getBurnAmount: async (args) => await getBurnAmount(instancePromise, args),
+      calculateSellPrice: async (args) => await calculateSellPrice(instancePromise, args),
+      calculateBuyPrice: async (args) => await calculateBuyPrice(instancePromise, args),
+      calculateRewardsAmount: async (args) => await calculateRewardsAmount(instancePromise, args),
+      getNodeVersion: async () => await getNodeVersion(instancePromise),
+      getNodeName: async () => await getNodeName(instancePromise),
+      getChain: async () => await getChain(instancePromise)
+    },
+    tokens: {
+      transferAllTokens: async (args) => await transferAllTokens(instancePromise, args, false),
+      transferTokens: async (args) => await transferTokens(instancePromise, args, false)
+    },
+    submitableExtrinsic: {
+      createPool: async (args) => await createPool(instancePromise, args, true),
+      claimRewards: async (args) => await claimRewards(instancePromise, args, true),
+      sellAsset: async (args) => await sellAsset(instancePromise, args, true),
+      buyAsset: async (args) => await buyAsset(instancePromise, args, true),
+      mintLiquidity: async (args) => await mintLiquidity(instancePromise, args, true),
+      burnLiquidity: async (args) => await burnLiquidity(instancePromise, args, true),
+      activateLiquidity: async (args) => await activateLiquidity(instancePromise, args, true),
+      deactivateLiquidity: async (args) => await deactivateLiquidity(instancePromise, args, true),
+      transferAllTokens: async (args) => await transferAllTokens(instancePromise, args, true),
+      transferTokens: async (args) => await transferTokens(instancePromise, args, true)
+    },
+    query: {
+      getNonce: async (address) => await getNonce(instancePromise, address),
+      getLiquidityTokenId: async (firstTokenId, secondTokenId) => await getLiquidityTokenId(instancePromise, firstTokenId, secondTokenId),
+      getTotalIssuance: async (tokenId) => await getTotalIssuance(instancePromise, tokenId),
+      getTokenBalance: async (address, tokenId) => await getTokenBalance(instancePromise, address, tokenId),
+      getTokenInfo: async (tokenId) => await getTokenInfo(instancePromise, tokenId),
+      getLiquidityTokenIds: async () => await getLiquidityTokenIds(instancePromise),
+      getLiquidityTokens: async () => await getLiquidityTokens(instancePromise),
+      getBlockNumber: async () => await getBlockNumber(instancePromise),
+      getOwnedTokens: async (address) => await getOwnedTokens(instancePromise, address),
+      getAssetsInfo: async () => await getAssetsInfo(instancePromise),
+      getInvestedPools: async (address) => await getInvestedPools(instancePromise, address),
+      getAmountOfTokenIdInPool: async (firstTokenId, secondTokenId) => await getAmountOfTokenIdInPool(
+        instancePromise,
+        firstTokenId,
+        secondTokenId
+      ),
+      getLiquidityPool: async (liquidityTokenId) => await getLiquidityPool(instancePromise, liquidityTokenId),
+      getPool: async (liquidityTokenId) => await getPool(instancePromise, liquidityTokenId),
+      getPools: async () => await getPools(instancePromise),
+      getTotalIssuanceOfTokens: async () => await getTotalIssuanceOfTokens(instancePromise)
+    },
+    fee: {
+      withdraw: async (args) => await forWithdraw(instancePromise, args),
+      activateLiquidity: async (args) => await forActivateLiquidity(instancePromise, args),
+      deactivateLiquidity: async (args) => await forDeactivateLiquidity(instancePromise, args),
+      claimRewards: async (args) => await forClaimRewards(instancePromise, args),
+      createPool: async (args) => await forCreatePool(instancePromise, args),
+      sellAsset: async (args) => await forSellAsset(instancePromise, args),
+      buyAsset: async (args) => await forBuyAsset(instancePromise, args),
+      mintLiquidity: async (args) => await forMintLiquidity(instancePromise, args),
+      burnLiquidity: async (args) => await forBurnLiquidity(instancePromise, args),
+      transferAllToken: async (args) => await forTransferAllToken(instancePromise, args),
+      transferToken: async (args) => await forTransferToken(instancePromise, args)
     }
   };
-}();
+}
+var Mangata = {
+  instance: createMangataInstance
+};
 export {
   Mangata
 };

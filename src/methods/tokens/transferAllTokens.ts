@@ -3,7 +3,7 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { MangataGenericEvent } from "../../types/common";
 import { Transfer } from "../../types/tokens";
-import { signTx } from "../../signTx";
+import { signTx } from "../../utils/signTx";
 
 async function transferAllTokens(
   instancePromise: Promise<ApiPromise>,
