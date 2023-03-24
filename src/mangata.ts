@@ -96,6 +96,7 @@ import { Batch, batch } from "./methods/utility/batch";
 import { batchAll } from "./methods/utility/batchAll";
 import { forceBatch } from "./methods/utility/forceBatch";
 import { getOrCreateInstance } from "./utils/getOrCreateInstance";
+import { waitForNewBlock } from "./methods/rpc/waitForNewBlock";
 
 function createMangataInstance(urls: string[]): MangataInstance {
   const instancePromise = getOrCreateInstance(urls);
@@ -145,7 +146,9 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await calculateRewardsAmount(instancePromise, args),
       getNodeVersion: async () => await getNodeVersion(instancePromise),
       getNodeName: async () => await getNodeName(instancePromise),
-      getChain: async () => await getChain(instancePromise)
+      getChain: async () => await getChain(instancePromise),
+      waitForNewBlock: async (blockNumber?: number) =>
+        await waitForNewBlock(instancePromise, blockNumber)
     },
     tokens: {
       transferAllTokens: async (args: Transfer) =>

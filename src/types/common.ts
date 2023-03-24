@@ -123,6 +123,7 @@ export interface MangataInstance {
     getNodeVersion: () => Promise<string>;
     getNodeName: () => Promise<string>;
     getChain: () => Promise<string>;
+    waitForNewBlock: (blockNumber?: number) => Promise<boolean>;
   };
   tokens: {
     transferAllTokens: (args: Transfer) => Promise<MangataGenericEvent[]>;

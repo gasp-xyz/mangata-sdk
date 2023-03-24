@@ -16,7 +16,8 @@
   },
   "scripts": {
     "start": "NODE_OPTIONS='--experimental-specifier-resolution=node' node dist/index.js",
-    "build": "tsup"
+    "build": "tsup",
+    "test": "vitest --config ./vitest.config.ts --run"
   },
   "keywords": [],
   "author": "Michal",
@@ -28,8 +29,11 @@
   },
   "devDependencies": {
     "@types/big.js": "^6.1.6",
+    "@types/uuid": "^9.0.1",
     "tsup": "^6.6.3",
     "type-fest": "^3.6.1",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "uuid": "^9.0.0",
+    "vitest": "^0.29.7"
   }
 }
