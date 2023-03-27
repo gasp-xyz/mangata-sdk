@@ -1,3 +1,10 @@
+# [1.17.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.16.1...v1.17.0) (2023-03-27)
+
+
+### Features
+
+* add method for sending tokens from statemine ([7a65c55](https://github.com/mangata-finance/mangata-sdk/commit/7a65c55f15e23d220760923bc99037631a6348cc))
+
 ## [1.16.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.16.0...v1.16.1) (2023-02-23)
 
 
