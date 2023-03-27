@@ -28,12 +28,18 @@ export type Liquidity = Merge<
 
 export type BurnLiquidity = Merge<Except<Liquidity, "liquidityTokenId">, Price>;
 
-export type MintLiquidity = Merge<
-  Omit<BurnLiquidity, "amount">,
-  {
-    firstTokenAmount: TokenAmount;
-    expectedSecondTokenAmount: TokenAmount;
-  }
+type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
+
+export type MintLiquidity = Prettify<
+  Merge<
+    Omit<BurnLiquidity, "amount">,
+    {
+      firstTokenAmount: TokenAmount;
+      expectedSecondTokenAmount: TokenAmount;
+    }
+  >
 >;
 
 export type Asset = {
@@ -45,8 +51,8 @@ export type Asset = {
 export type MaxAmountIn = Merge<Asset, { maxAmountIn: TokenAmount }>;
 export type MinAmountOut = Merge<Asset, { minAmountOut: TokenAmount }>;
 
-export type BuyAsset = Merge<ExtrinsicCommon, MaxAmountIn>;
-export type SellAsset = Merge<ExtrinsicCommon, MinAmountOut>;
+export type BuyAsset = Prettify<Merge<ExtrinsicCommon, MaxAmountIn>>;
+export type SellAsset = Prettify<Merge<ExtrinsicCommon, MinAmountOut>>;
 
 export type Pool = {
   firstTokenId: TokenId;
