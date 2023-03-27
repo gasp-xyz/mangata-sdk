@@ -347,6 +347,87 @@ export class Tx {
       });
   }
 
+  static async sendTokenFromStatemineToMangata(...args: DepositXcmTuple) {
+    const [
+      mangataApi,
+      url,
+      tokenSymbol,
+      destWeight,
+      account,
+      mangataAddress,
+      amount,
+      txOptions
+    ] = args;
+    const provider = new WsProvider(url);
+    const api = await new ApiPromise({ provider, noInitWarn: true }).isReady;
+    const correctMangataAddress = encodeAddress(mangataAddress, 42);
+
+    const assetRegistryMetadata =
+      await mangataApi.query.assetRegistry.metadata.entries();
+
+    const assetMetadata = assetRegistryMetadata.find((metadata) => {
+      const symbol = metadata[1].value.symbol.toPrimitive();
+      return symbol === tokenSymbol;
+    });
+
+    if (assetMetadata && assetMetadata[1].value.location) {
+      const { location } = assetMetadata[1].unwrap();
+      const decodedLocation = JSON.parse(location.toString());
+
+      await api.tx.polkadotXcm
+        .limitedReserveTransferAssets(
+          {
+            V1: {
+              interior: {
+                X1: {
+                  Parachain: 2110
+                }
+              },
+              parents: 1
+            }
+          },
+          {
+            V1: {
+              interior: {
+                X1: {
+                  AccountId32: {
+                    id: api
+                      .createType("AccountId32", correctMangataAddress)
+                      .toHex(),
+                    network: {
+                      Any: ""
+                    }
+                  }
+                }
+              },
+              parents: 0
+            }
+          },
+          {
+            V1: [
+              {
+                fun: {
+                  Fungible: amount
+                },
+                id: {
+                  Concrete: {
+                    parents: "1",
+                    interior: decodedLocation.v1.interior
+                  }
+                }
+              }
+            ]
+          },
+          0,
+          { Limited: new BN(destWeight) }
+        )
+        .signAndSend(account, {
+          signer: txOptions?.signer,
+          nonce: txOptions?.nonce
+        });
+    }
+  }
+
   static async sendTokenFromParachainToMangata(...args: DepositXcmTuple) {
     const [
       mangataApi,

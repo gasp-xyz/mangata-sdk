@@ -154,6 +154,28 @@ export class Mangata {
     await api.disconnect();
   }
 
+  public async sendTokenFromStatemineToMangata(
+    url: string,
+    tokenSymbol: string,
+    destWeight: string,
+    account: string | KeyringPair,
+    mangataAddress: string,
+    amount: BN,
+    txOptions?: XcmTxOptions
+  ) {
+    const api = await this.getApi();
+    return await Tx.sendTokenFromStatemineToMangata(
+      api,
+      url,
+      tokenSymbol,
+      destWeight,
+      account,
+      mangataAddress,
+      amount,
+      txOptions
+    );
+  }
+
   public async sendTokenFromParachainToMangata(
     url: string,
     tokenSymbol: string,
