@@ -251,42 +251,41 @@ export class Fee {
     const provider = new WsProvider(kusamaEndpointUrl);
     const kusamaApi = await new ApiPromise({ provider }).isReady;
 
-    const dispatchInfo = await kusamaApi.tx.xcmPallet
-      .limitedReserveTransferAssets(
-        {
-          V3: {
-            parents: 0,
-            interior: {
-              X1: { Parachain: parachainId }
-            }
+    const tx = kusamaApi.tx.xcmPallet.limitedReserveTransferAssets(
+      {
+        V3: {
+          parents: 0,
+          interior: {
+            X1: { Parachain: parachainId }
           }
-        },
-        {
-          V3: {
-            parents: 0,
-            interior: {
-              X1: {
-                AccountId32: {
-                  id: kusamaApi
-                    .createType("AccountId32", destinationMangataAddress)
-                    .toHex()
-                }
+        }
+      },
+      {
+        V3: {
+          parents: 0,
+          interior: {
+            X1: {
+              AccountId32: {
+                id: kusamaApi
+                  .createType("AccountId32", destinationMangataAddress)
+                  .toHex()
               }
             }
           }
-        },
-        {
-          V3: [
-            {
-              id: { Concrete: { parents: 0, interior: "Here" } },
-              fun: { Fungible: amount }
-            }
-          ]
-        },
-        0,
-        "Unlimited"
-      )
-      .paymentInfo(ksmAccount);
+        }
+      },
+      {
+        V3: [
+          {
+            id: { Concrete: { parents: 0, interior: "Here" } },
+            fun: { Fungible: amount }
+          }
+        ]
+      },
+      0,
+      "Unlimited"
+    );
+    const dispatchInfo = await tx.paymentInfo(ksmAccount);
     return fromBN(new BN(dispatchInfo.partialFee.toString()), 12);
   }
   static async sendKusamaTokenFromParachainToRelayFee(
