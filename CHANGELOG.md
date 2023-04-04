@@ -1,3 +1,17 @@
+# [1.18.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.17.2...v1.18.0) (2023-04-04)
+
+
+### Bug Fixes
+
+* deposit ksm fee ([6fcb3fd](https://github.com/mangata-finance/mangata-sdk/commit/6fcb3fd9095893d95184a438d5f5b50fb094a958))
+* kusama fee method ([58afe77](https://github.com/mangata-finance/mangata-sdk/commit/58afe7728bc1aa0f1993f446c567ca7c10a39cbf))
+* update version ([4eeb87c](https://github.com/mangata-finance/mangata-sdk/commit/4eeb87c867d9ff86a30b047ffdb2253593ff51e9))
+
+
+### Features
+
+* deprecated xcm ([85595bb](https://github.com/mangata-finance/mangata-sdk/commit/85595bb14dceab9fa78d70ea505093f7b456e57a))
+
 ## [1.17.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.17.1...v1.17.2) (2023-04-04)
 
 
