@@ -34,6 +34,20 @@ export const getCorrectLocation = (tokenSymbol: string, location: any) => {
         x1: { generalKey: "0x0104" }
       }
     };
+  } else if (tokenSymbol === "USDT") {
+    return {
+      parents: "0",
+      interior: {
+        x2: [{ PalletInstance: 50 }, { GeneralIndex: 1984 }]
+      }
+    };
+  } else if (tokenSymbol === "RMRK") {
+    return {
+      parents: "0",
+      interior: {
+        x2: [{ PalletInstance: 50 }, { GeneralIndex: 8 }]
+      }
+    };
   } else {
     return {
       parents: "1",

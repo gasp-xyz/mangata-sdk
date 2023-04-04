@@ -410,10 +410,7 @@ export class Tx {
                   Fungible: amount
                 },
                 id: {
-                  Concrete: {
-                    parents: "1",
-                    interior: decodedLocation.v1.interior
-                  }
+                  Concrete: getCorrectLocation(tokenSymbol, decodedLocation)
                 }
               }
             ]
