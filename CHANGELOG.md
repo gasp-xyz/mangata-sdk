@@ -1,3 +1,10 @@
+## [1.17.3](https://github.com/mangata-finance/mangata-sdk/compare/v1.17.2...v1.17.3) (2023-04-04)
+
+
+### Bug Fixes
+
+* kusama fee method ([58afe77](https://github.com/mangata-finance/mangata-sdk/commit/58afe7728bc1aa0f1993f446c567ca7c10a39cbf))
+
 ## [1.17.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.17.1...v1.17.2) (2023-04-04)
 
 
