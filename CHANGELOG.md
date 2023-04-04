@@ -1,3 +1,11 @@
+## [1.18.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.18.0...v1.18.1) (2023-04-04)
+
+
+### Bug Fixes
+
+* update types ([fcda2d8](https://github.com/mangata-finance/mangata-sdk/commit/fcda2d8c2dabec794518f0edfb02b233f90bdc9d))
+* update version ([93f3aa5](https://github.com/mangata-finance/mangata-sdk/commit/93f3aa5cc91fc66be445ebb102587770b57df797))
+
 # [1.18.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.17.2...v1.18.0) (2023-04-04)
 
 
