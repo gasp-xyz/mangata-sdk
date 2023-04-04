@@ -29,15 +29,15 @@ interface MangataGenericEvent {
     } | null;
 }
 
-declare type TxOptions = Partial<{
+type TxOptions = Partial<{
     nonce: BN;
     signer: Signer;
     statusCallback: (result: ISubmittableResult) => void;
     extrinsicStatus: (events: MangataGenericEvent[]) => void;
 }>;
-declare type XcmTxOptions = Partial<Omit<TxOptions, "statusCallback" | "extrinsicStatus">>;
+type XcmTxOptions = Partial<Omit<TxOptions, "statusCallback" | "extrinsicStatus">>;
 
-declare type AssetInfo = {
+type AssetInfo = {
     id: string;
     infoToken: {
         name: string;
@@ -46,7 +46,7 @@ declare type AssetInfo = {
         decimals: string;
     };
 };
-declare type TToken = {
+type TToken = {
     id: TTokenId;
     chainId: number;
     name: TTokenName;
@@ -55,19 +55,19 @@ declare type TToken = {
     decimals: number;
     balance: TokenBalance;
 };
-declare type TTokenMainInfo = Omit<TToken, "id" | "balance" | "chainId">;
-declare type TTokenInfo = Omit<TToken, "balance">;
-declare type TTokenId = string;
-declare type TTokenAddress = string;
-declare type TTokenName = string;
-declare type TTokenSymbol = string;
-declare type TFreeBalance = BN;
-declare type TReservedBalance = BN;
-declare type TFrozenBalance = BN;
-declare type TTokens = Record<TTokenId, TToken>;
-declare type TBalances = Record<TTokenId, BN>;
-declare type TMainTokens = Record<TTokenId, TTokenInfo>;
-declare type TPool = {
+type TTokenMainInfo = Omit<TToken, "id" | "balance" | "chainId">;
+type TTokenInfo = Omit<TToken, "balance">;
+type TTokenId = string;
+type TTokenAddress = string;
+type TTokenName = string;
+type TTokenSymbol = string;
+type TFreeBalance = BN;
+type TReservedBalance = BN;
+type TFrozenBalance = BN;
+type TTokens = Record<TTokenId, TToken>;
+type TBalances = Record<TTokenId, BN>;
+type TMainTokens = Record<TTokenId, TTokenInfo>;
+type TPool = {
     firstTokenId: TTokenId;
     secondTokenId: TTokenId;
     firstTokenAmount: BN;
@@ -75,23 +75,23 @@ declare type TPool = {
     liquidityTokenId: TTokenId;
     isPromoted: boolean;
 };
-declare type TPoolWithShare = TPool & {
+type TPoolWithShare = TPool & {
     share: BN;
     firstTokenRatio: BN;
     secondTokenRatio: BN;
     activatedLPTokens: BN;
     nonActivatedLPTokens: BN;
 };
-declare type TPoolWithRatio = TPool & {
+type TPoolWithRatio = TPool & {
     firstTokenRatio: BN;
     secondTokenRatio: BN;
 };
-declare type TokenBalance = {
+type TokenBalance = {
     free: TFreeBalance;
     reserved: TReservedBalance;
     frozen: TFreeBalance;
 };
-declare type DepositXcmTuple = [
+type DepositXcmTuple = [
     mangataApi: ApiPromise,
     url: string,
     tokenSymbol: string,
@@ -101,7 +101,7 @@ declare type DepositXcmTuple = [
     amount: BN,
     txOptions?: XcmTxOptions
 ];
-declare type WithdrawXcmTuple = [
+type WithdrawXcmTuple = [
     api: ApiPromise,
     tokenSymbol: string,
     withWeight: string,
@@ -170,6 +170,7 @@ declare class Mangata {
      * Disconnect from the node
      */
     disconnect(): Promise<void>;
+    sendTokenFromStatemineToMangata(url: string, tokenSymbol: string, destWeight: string, account: string | KeyringPair, mangataAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
     sendTokenFromParachainToMangata(url: string, tokenSymbol: string, destWeight: string, account: string | KeyringPair, mangataAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
     sendTokenFromMangataToParachain(tokenSymbol: string, withWeight: string, parachainId: number, account: string | KeyringPair, destinationAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
     sendTokenFromParachainToMangataFee(url: string, tokenSymbol: string, destWeight: string, account: string | KeyringPair, mangataAddress: string, amount: BN): Promise<string>;
