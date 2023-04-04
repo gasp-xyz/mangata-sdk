@@ -1,3 +1,10 @@
+## [1.17.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.17.1...v1.17.2) (2023-04-04)
+
+
+### Bug Fixes
+
+* ksm deposit ([8eb9e69](https://github.com/mangata-finance/mangata-sdk/commit/8eb9e69270df18d9c56b6e58c3d19b6f2e8ac1fa))
+
 ## [1.17.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.17.0...v1.17.1) (2023-04-04)
 
 
