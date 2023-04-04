@@ -1,3 +1,10 @@
+## [1.17.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.17.0...v1.17.1) (2023-04-04)
+
+
+### Bug Fixes
+
+* update correct location for USDT and RMRK ([5734a99](https://github.com/mangata-finance/mangata-sdk/commit/5734a99dd46bd7e2377aaf318371872cd585b6c3))
+
 # [1.17.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.16.1...v1.17.0) (2023-03-27)
 
 
