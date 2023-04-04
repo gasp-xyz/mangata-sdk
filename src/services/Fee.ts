@@ -148,6 +148,9 @@ export class Fee {
     }
   }
 
+  /**
+   * @deprecated
+   */
   static async sendTurTokenFromTuringToMangataFee(
     api: ApiPromise,
     turingUrl: string,
@@ -208,6 +211,9 @@ export class Fee {
     return fromBN(new BN(dispatchInfo.partialFee.toString()), 10);
   }
 
+  /**
+   * @deprecated
+   */
   static async sendTurTokenFromMangataToTuringFee(
     api: ApiPromise,
     mangataAccount: string | KeyringPair,
