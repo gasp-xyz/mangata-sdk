@@ -251,54 +251,41 @@ export class Fee {
     const provider = new WsProvider(kusamaEndpointUrl);
     const kusamaApi = await new ApiPromise({ provider }).isReady;
 
-    const destination = {
-      V1: {
-        interior: {
-          X1: {
-            ParaChain: parachainId
-          }
-        },
-        parents: 0
-      }
-    };
-
-    const beneficiary = {
-      V1: {
-        interior: {
-          X1: {
-            AccountId32: {
-              id: kusamaApi
-                .createType(
-                  "AccountId32",
-                  encodeAddress(destinationMangataAddress, 42)
-                )
-                .toHex(),
-              network: "Any"
-            }
-          }
-        },
-        parents: 0
-      }
-    };
-
-    const assets = {
-      V1: [
-        {
-          fun: {
-            Fungible: amount
-          },
-          id: {
-            Concrete: {
-              interior: "Here",
-              parents: 0
-            }
-          }
-        }
-      ]
-    };
-
     const dispatchInfo = await kusamaApi.tx.xcmPallet
-      .reserveTransferAssets(destination, beneficiary, assets, 0)
+      .limitedReserveTransferAssets(
+        {
+          V3: {
+            parents: 0,
+            interior: {
+              X1: { Parachain: parachainId }
+            }
+          }
+        },
+        {
+          V3: {
+            parents: 0,
+            interior: {
+              X1: {
+                AccountId32: {
+                  id: kusamaApi
+                    .createType("AccountId32", destinationMangataAddress)
+                    .toHex()
+                }
+              }
+            }
+          }
+        },
+        {
+          V3: [
+            {
+              id: { Concrete: { parents: 0, interior: "Here" } },
+              fun: { Fungible: amount }
+            }
+          ]
+        },
+        0,
+        "Unlimited"
+      )
       .paymentInfo(ksmAccount);
     return fromBN(new BN(dispatchInfo.partialFee.toString()), 12);
   }
