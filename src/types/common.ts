@@ -17,6 +17,7 @@ import {
 } from "../types/query";
 import {
   Deposit,
+  DepositStatemine,
   RelayDeposit,
   RelayWithdraw,
   Withdraw
@@ -100,6 +101,7 @@ export interface MangataInstance {
   xTokens: {
     deposit: (args: Deposit) => Promise<void>;
     depositKsm: (args: RelayDeposit) => Promise<void>;
+    depositStatemineTokens: (args: DepositStatemine) => Promise<void>;
     withdraw: (args: Withdraw) => Promise<void>;
     withdrawKsm: (args: RelayWithdraw) => Promise<void>;
   };

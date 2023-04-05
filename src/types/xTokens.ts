@@ -61,6 +61,19 @@ export type Deposit = Merge<
   }
 >;
 
+export type DepositStatemine = Merge<
+  ExtrinsicCommon,
+  {
+    url: string;
+    assets: any;
+    destination: any;
+    weight: any;
+    feeAssetItem: any;
+    beneficiary: any;
+    weightLimit: any;
+  }
+>;
+
 export type Withdraw = Merge<
   ExtrinsicCommon,
   {
@@ -78,7 +91,6 @@ export type RelayDeposit = Merge<
     url: string;
     address: Address;
     amount: TokenAmount;
-    parachainId: number;
   }
 >;
 

@@ -4,13 +4,13 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { it, expect, beforeEach } from "vitest";
 
 import { instance, SUDO_USER_NAME } from "./instance";
-import type { CreatePool, MintLiquidity } from "../src";
 import {
   createMangataToken,
   createToken,
   createUser,
   getExtrinsicData
 } from "./utility";
+import { BurnLiquidity, CreatePool } from "../src";
 
 let testUser: KeyringPair;
 let sudoUser: KeyringPair;
@@ -41,7 +41,9 @@ beforeEach(async () => {
   });
 });
 
-it("should mint liquidity", async () => {
+it("should burn liquidity", async () => {
+  const beforePools = await instance.query.getPools();
+
   const argsPool: CreatePool = {
     account: testUser,
     firstTokenId: firstTokenId!,
@@ -58,22 +60,41 @@ it("should mint liquidity", async () => {
   };
   await instance.xyk.createPool(argsPool);
 
+  const liquidityTokenId = await instance.query.getLiquidityTokenId(
+    firstTokenId!,
+    secondTokenId!
+  );
+
+  const investedPools = await instance.query.getInvestedPools(testUser.address);
+
+  const investedPool = investedPools.find(
+    (investedPool) =>
+      investedPool.liquidityTokenId === liquidityTokenId.toString()
+  );
+
   await instance.rpc.waitForNewBlock(2);
 
-  const argsMintLiquidity: MintLiquidity = {
+  const amountToBurn =
+    investedPool &&
+    investedPool.nonActivatedLPTokens.add(investedPool.activatedLPTokens);
+
+  const argsBurnLiquidity: BurnLiquidity = {
     account: testUser,
     firstTokenId: firstTokenId!,
     secondTokenId: secondTokenId!,
-    firstTokenAmount: new BN(10000),
-    expectedSecondTokenAmount: new BN(5001),
+    amount: amountToBurn!,
     txOptions: {
       extrinsicStatus: (data) => {
-        const searchTerms = ["xyk", "LiquidityMinted", testUser.address];
-        const extrinsicData = getExtrinsicData({ data, searchTerms });
-        return expect(extrinsicData?.method).toEqual("LiquidityMinted");
+        console.log(JSON.stringify(data));
       }
     }
   };
 
-  await instance.xyk.mintLiquidity(argsMintLiquidity);
+  await instance.xyk.burnLiquidity(argsBurnLiquidity);
+
+  await instance.rpc.waitForNewBlock(2);
+
+  const afterPools = await instance.query.getPools();
+
+  expect(beforePools.length).toEqual(afterPools.length);
 });

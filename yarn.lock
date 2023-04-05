@@ -229,10 +229,12 @@
   resolved "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.17.12.tgz#3a11d13e9a5b0c05db88991b234d8baba1f96487"
   integrity sha512-JOOxw49BVZx2/5tW3FqkdjSD/5gXYeVGPDcB0lvap0gLQshkh1Nyel1QazC+wNxus3xPlsYAgqU1BUmrmCvWtw==
 
-"@mangata-finance/types@^0.17.0":
-  version "0.17.0"
-  resolved "https://registry.npmjs.org/@mangata-finance/types/-/types-0.17.0.tgz#299b0bd21e30e17ee65c25f18d4a89871f521930"
-  integrity sha512-v0o7rePG4P2fDH1yVvSfuHpHQCA7Xki9IwPMTu51Y4FoQdvD1zHUOI4mIOc3ssjOAJsCePNdsTm+/xj3DeiSxQ==
+"@mangata-finance/types@^0.22.0":
+  version "0.22.0"
+  resolved "https://registry.npmjs.org/@mangata-finance/types/-/types-0.22.0.tgz#bba8874072da186d456287390ad25d49be6992cd"
+  integrity sha512-s/6IJ2MTA7Ag8wbYxPpWREUk8sEMBnSzAEapX1/n/IiX25anhHqO6+8vmASKuZfNT/i0xjVL2Lcl3usblJKMEg==
+  dependencies:
+    "@polkadot/api-base" "^9.14.2"
 
 "@noble/hashes@1.2.0":
   version "1.2.0"
@@ -278,7 +280,7 @@
     "@polkadot/types-codec" "9.14.2"
     "@polkadot/util" "^10.4.2"
 
-"@polkadot/api-base@9.14.2":
+"@polkadot/api-base@9.14.2", "@polkadot/api-base@^9.14.2":
   version "9.14.2"
   resolved "https://registry.npmjs.org/@polkadot/api-base/-/api-base-9.14.2.tgz#605b44e3692a125bd8d97eed9cea8af9d0c454e2"
   integrity sha512-ky9fmzG1Tnrjr/SBZ0aBB21l0TFr+CIyQenQczoUyVgiuxVaI/2Bp6R2SFrHhG28P+PW2/RcYhn2oIAR2Z2fZQ==

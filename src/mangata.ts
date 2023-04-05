@@ -24,6 +24,7 @@ import { mintLiquidity } from "./methods/xyk/mintLiquidity";
 import { deposit } from "./methods/xTokens/deposit";
 import {
   Deposit,
+  DepositStatemine,
   RelayDeposit,
   RelayWithdraw,
   Withdraw
@@ -97,6 +98,7 @@ import { batchAll } from "./methods/utility/batchAll";
 import { forceBatch } from "./methods/utility/forceBatch";
 import { getOrCreateInstance } from "./utils/getOrCreateInstance";
 import { waitForNewBlock } from "./methods/rpc/waitForNewBlock";
+import { depositStatemineTokens } from "./methods/xTokens/depositStatemineTokens";
 
 function createMangataInstance(urls: string[]): MangataInstance {
   const instancePromise = getOrCreateInstance(urls);
@@ -109,6 +111,8 @@ function createMangataInstance(urls: string[]): MangataInstance {
     xTokens: {
       deposit: async (args: Deposit) => await deposit(args),
       depositKsm: async (args: RelayDeposit) => await depositKsm(args),
+      depositStatemineTokens: async (args: DepositStatemine) =>
+        await depositStatemineTokens(args),
       withdraw: async (args: Withdraw) => await withdraw(instancePromise, args),
       withdrawKsm: async (args: RelayWithdraw) =>
         await withdrawKsm(instancePromise, args)

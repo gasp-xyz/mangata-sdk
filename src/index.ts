@@ -9,6 +9,7 @@ export {
   CreatePool,
   MintLiquidity,
   SellAsset,
-  BuyAsset
+  BuyAsset,
+  BurnLiquidity
 } from "./types/xyk";
 export { MangataGenericEvent } from "./types/common";
