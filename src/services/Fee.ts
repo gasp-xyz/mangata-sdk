@@ -277,7 +277,7 @@ export class Fee {
       const dispatchInfo = await api.tx.polkadotXcm
         .limitedReserveTransferAssets(
           {
-            V1: {
+            V3: {
               interior: {
                 X1: {
                   Parachain: 2110
@@ -287,16 +287,13 @@ export class Fee {
             }
           },
           {
-            V1: {
+            V3: {
               interior: {
                 X1: {
                   AccountId32: {
                     id: api
                       .createType("AccountId32", correctMangataAddress)
-                      .toHex(),
-                    network: {
-                      Any: ""
-                    }
+                      .toHex()
                   }
                 }
               },
@@ -304,7 +301,7 @@ export class Fee {
             }
           },
           {
-            V1: [
+            V3: [
               {
                 fun: {
                   Fungible: amount
