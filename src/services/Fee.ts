@@ -7,7 +7,7 @@ import { encodeAddress } from "@polkadot/util-crypto";
 import { fromBN } from "../utils/BNutility";
 import { DepositXcmTuple, WithdrawXcmTuple } from "../types/AssetInfo";
 import { getWeightXTokens } from "../utils/getWeightXTokens";
-import { getCorrectLocation } from "src/utils/getCorrectLocation";
+import { getCorrectLocation } from "../utils/getCorrectLocation";
 
 export class Fee {
   static async sendTokenFromParachainToMangataFee(...args: DepositXcmTuple) {
@@ -320,6 +320,8 @@ export class Fee {
         )
         .paymentInfo(account);
       return fromBN(new BN(dispatchInfo.partialFee.toString()), 12);
+    } else {
+      return "0";
     }
   }
 
