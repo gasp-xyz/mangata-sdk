@@ -7,6 +7,7 @@ import { encodeAddress } from "@polkadot/util-crypto";
 import { fromBN } from "../utils/BNutility";
 import { DepositXcmTuple, WithdrawXcmTuple } from "../types/AssetInfo";
 import { getWeightXTokens } from "../utils/getWeightXTokens";
+import { getCorrectLocation } from "src/utils/getCorrectLocation";
 
 export class Fee {
   static async sendTokenFromParachainToMangataFee(...args: DepositXcmTuple) {
@@ -247,6 +248,81 @@ export class Fee {
     return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
 
+  static async sendTokenFromStatemineToMangataFee(...args: DepositXcmTuple) {
+    const [
+      mangataApi,
+      url,
+      tokenSymbol,
+      destWeight,
+      account,
+      mangataAddress,
+      amount
+    ] = args;
+    const provider = new WsProvider(url);
+    const api = await new ApiPromise({ provider, noInitWarn: true }).isReady;
+    const correctMangataAddress = encodeAddress(mangataAddress, 42);
+
+    const assetRegistryMetadata =
+      await mangataApi.query.assetRegistry.metadata.entries();
+
+    const assetMetadata = assetRegistryMetadata.find((metadata) => {
+      const symbol = metadata[1].value.symbol.toPrimitive();
+      return symbol === tokenSymbol;
+    });
+
+    if (assetMetadata && assetMetadata[1].value.location) {
+      const { location, decimals } = assetMetadata[1].unwrap();
+      const decodedLocation = JSON.parse(location.toString());
+
+      const dispatchInfo = await api.tx.polkadotXcm
+        .limitedReserveTransferAssets(
+          {
+            V1: {
+              interior: {
+                X1: {
+                  Parachain: 2110
+                }
+              },
+              parents: 1
+            }
+          },
+          {
+            V1: {
+              interior: {
+                X1: {
+                  AccountId32: {
+                    id: api
+                      .createType("AccountId32", correctMangataAddress)
+                      .toHex(),
+                    network: {
+                      Any: ""
+                    }
+                  }
+                }
+              },
+              parents: 0
+            }
+          },
+          {
+            V1: [
+              {
+                fun: {
+                  Fungible: amount
+                },
+                id: {
+                  Concrete: getCorrectLocation(tokenSymbol, decodedLocation)
+                }
+              }
+            ]
+          },
+          0,
+          { Limited: new BN(destWeight) }
+        )
+        .paymentInfo(account);
+      return fromBN(new BN(dispatchInfo.partialFee.toString()), 12);
+    }
+  }
+
   static async sendKusamaTokenFromRelayToParachainFee(
     kusamaEndpointUrl: string,
     ksmAccount: string | KeyringPair,
@@ -294,6 +370,7 @@ export class Fee {
     const dispatchInfo = await tx.paymentInfo(ksmAccount);
     return fromBN(new BN(dispatchInfo.partialFee.toString()), 12);
   }
+
   static async sendKusamaTokenFromParachainToRelayFee(
     api: ApiPromise,
     mangataAccount: string | KeyringPair,
