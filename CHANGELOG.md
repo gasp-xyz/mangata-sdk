@@ -1,3 +1,10 @@
+## [1.19.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.19.0...v1.19.1) (2023-04-05)
+
+
+### Bug Fixes
+
+* correct location path ([3273654](https://github.com/mangata-finance/mangata-sdk/commit/327365483d521fa5b3088ffe02520b3718b19f55))
+
 # [1.19.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.18.2...v1.19.0) (2023-04-05)
 
 
