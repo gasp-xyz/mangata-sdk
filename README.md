@@ -1,7 +1,7 @@
 <h2 align="center">Mangata Finance SDK</h2>
 
 <p align="center">
-    Mangata Software Development Kit (SDK) is a toolset for convenient communication with Mangata Substrate node.
+    Mangata Development Kit (SDK) is a toolset for convenient communication with Mangata Substrate node.
 </p>
 
 ![Artwork](https://blog.mangata.finance/assets/posts/themis-cover.png)
@@ -36,7 +36,9 @@ const { Mangata } = require("@mangata-finance/sdk");
 
 async function main() {
   // Connect to the mainet (also testnet, mainnet)
-  const mangata = Mangata.getInstance(["wss://mangata-x.api.onfinality.io/public-ws"]);
+  const mangata = Mangata.getInstance([
+    "wss://mangata-x.api.onfinality.io/public-ws"
+  ]);
 
   // Retrieve the chainName, nodeName & nodeVersion information
   const [chain, nodeName, nodeVersion] = await Promise.all([
