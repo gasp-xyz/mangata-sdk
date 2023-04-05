@@ -1,3 +1,10 @@
+# [1.19.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.18.2...v1.19.0) (2023-04-05)
+
+
+### Features
+
+* add method fee for statemine ([00eb074](https://github.com/mangata-finance/mangata-sdk/commit/00eb07430213bdb61477e0719e900f3dac3e56d8))
+
 ## [1.18.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.18.1...v1.18.2) (2023-04-04)
 
 
