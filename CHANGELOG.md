@@ -1,3 +1,10 @@
+## [1.19.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.19.1...v1.19.2) (2023-04-05)
+
+
+### Bug Fixes
+
+* statemine methods ([d6e9def](https://github.com/mangata-finance/mangata-sdk/commit/d6e9def8e15a7b8b66fb811e6e2afa43c8e4806c))
+
 ## [1.19.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.19.0...v1.19.1) (2023-04-05)
 
 
