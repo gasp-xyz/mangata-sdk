@@ -1,3 +1,11 @@
+## [1.19.3](https://github.com/mangata-finance/mangata-sdk/compare/v1.19.2...v1.19.3) (2023-04-06)
+
+
+### Bug Fixes
+
+* header title ([1cb4735](https://github.com/mangata-finance/mangata-sdk/commit/1cb4735297926d826b7ac75afbc4e0ef3afdf40d))
+* weight limit ([3886a07](https://github.com/mangata-finance/mangata-sdk/commit/3886a072b5aac0f42f54fc8b3118272a8992b4eb))
+
 ## [1.19.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.19.1...v1.19.2) (2023-04-05)
 
 
