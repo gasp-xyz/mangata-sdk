@@ -271,7 +271,7 @@ export class Fee {
     });
 
     if (assetMetadata && assetMetadata[1].value.location) {
-      const { location, decimals } = assetMetadata[1].unwrap();
+      const { location } = assetMetadata[1].unwrap();
       const decodedLocation = JSON.parse(location.toString());
 
       const dispatchInfo = await api.tx.polkadotXcm
@@ -313,7 +313,12 @@ export class Fee {
             ]
           },
           0,
-          { Limited: new BN(destWeight) }
+          {
+            Limited: {
+              refTime: new BN(destWeight),
+              proofSize: 0
+            }
+          }
         )
         .paymentInfo(account);
       return fromBN(new BN(dispatchInfo.partialFee.toString()), 12);
@@ -364,7 +369,12 @@ export class Fee {
         ]
       },
       0,
-      "Unlimited"
+      {
+        Limited: {
+          refTime: new BN("298368000"),
+          proofSize: 0
+        }
+      }
     );
     const dispatchInfo = await tx.paymentInfo(ksmAccount);
     return fromBN(new BN(dispatchInfo.partialFee.toString()), 12);

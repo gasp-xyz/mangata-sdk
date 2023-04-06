@@ -294,7 +294,12 @@ export class Tx {
           ]
         },
         0,
-        "Unlimited"
+        {
+          Limited: {
+            refTime: new BN("298368000"),
+            proofSize: 0
+          }
+        }
       )
       .signAndSend(ksmAccount, {
         signer: txOptions?.signer,
@@ -404,7 +409,12 @@ export class Tx {
             ]
           },
           0,
-          { Limited: new BN(destWeight) }
+          {
+            Limited: {
+              refTime: new BN(destWeight),
+              proofSize: 0
+            }
+          }
         )
         .signAndSend(account, {
           signer: txOptions?.signer,
