@@ -1,7 +1,7 @@
 <h2 align="center">Mangata Finance SDK</h2>
 
 <p align="center">
-    Mangata Development Kit (SDK) is a toolset for convenient communication with Mangata Substrate node.
+    Mangata SDK is a toolset for convenient communication with Mangata Substrate node.
 </p>
 
 ![Artwork](https://blog.mangata.finance/assets/posts/themis-cover.png)
