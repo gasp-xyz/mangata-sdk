@@ -1,3 +1,10 @@
+## [1.19.4](https://github.com/mangata-finance/mangata-sdk/compare/v1.19.3...v1.19.4) (2023-04-11)
+
+
+### Bug Fixes
+
+* change module for mining active pool ([2c7c869](https://github.com/mangata-finance/mangata-sdk/commit/2c7c8698006db028c9f69de674928fceb26c22d4))
+
 ## [1.19.3](https://github.com/mangata-finance/mangata-sdk/compare/v1.19.2...v1.19.3) (2023-04-06)
 
 
