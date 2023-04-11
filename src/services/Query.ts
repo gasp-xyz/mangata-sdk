@@ -138,7 +138,7 @@ export class Query {
       .reduce((obj, item) => {
         const asset = {
           ...item,
-          name: item.name.replace(/0x\w+/, "").replace(/[A-Z]/g, " $&").trim(),
+          name: item.name.replace(/0x\w+/, "").replace(/[A-Z]/g, "$&").trim(),
           symbol: item.symbol.includes("TKN")
             ? item.symbol
                 .split("-")
