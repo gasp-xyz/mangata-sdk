@@ -23,7 +23,7 @@
   "author": "Michal",
   "license": "ISC",
   "dependencies": {
-    "@mangata-finance/types": "^0.22.0",
+    "@mangata-finance/types": "^0.23.0",
     "@polkadot/api": "^9.9.4",
     "big.js": "^6.2.1"
   },

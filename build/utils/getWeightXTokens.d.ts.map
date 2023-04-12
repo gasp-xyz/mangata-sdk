@@ -1,1 +1,0 @@
-{"version":3,"file":"getWeightXTokens.d.ts","sourceRoot":"","sources":["../../src/utils/getWeightXTokens.ts"],"names":[],"mappings":"AAEA,OAAO,EAAE,4BAA4B,EAAE,MAAM,qBAAqB,CAAC;AACnE,OAAO,EAAE,EAAE,EAAE,MAAM,gBAAgB,CAAC;AAEpC,eAAO,MAAM,gBAAgB,WACnB,EAAE,kBACM,6BAA6B,SAAS,CAAC,KACtD,EAAE,GAAG;IAAE,OAAO,EAAE,EAAE,CAAA;CAMpB,CAAC"}

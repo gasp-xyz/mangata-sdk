@@ -1,5 +1,7 @@
+export { TransferTokens } from "./methods/tokens/transferTokens";
+export { Transfer } from "./types/tokens";
+
 export { signTx } from "./utils/signTx";
-export {};
 
 export { ExtrinsicCommon, MangataInstance } from "./types/common";
 export { Batch } from "./methods/utility/batch";

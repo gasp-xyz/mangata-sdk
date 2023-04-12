@@ -1,5 +1,3 @@
-import { ApiPromise, WsProvider } from "@polkadot/api";
-import { options } from "@mangata-finance/types";
 import { deactivateLiquidity } from "./methods/xyk/deactivateLiquidity";
 import {
   BurnLiquidity,
@@ -15,7 +13,10 @@ import {
 import { activateLiquidity } from "./methods/xyk/activateLiquidity";
 import { burnLiquidity } from "./methods/xyk/burnLiquidity";
 import { transferAllTokens } from "./methods/tokens/transferAllTokens";
-import { transferTokens } from "./methods/tokens/transferTokens";
+import {
+  TransferTokens,
+  transferTokens
+} from "./methods/tokens/transferTokens";
 
 import "@mangata-finance/types";
 import { Transfer } from "./types/tokens";
@@ -157,7 +158,7 @@ function createMangataInstance(urls: string[]): MangataInstance {
     tokens: {
       transferAllTokens: async (args: Transfer) =>
         await transferAllTokens(instancePromise, args, false),
-      transferTokens: async (args: Transfer & { amount: TokenAmount }) =>
+      transferTokens: async (args: TransferTokens) =>
         await transferTokens(instancePromise, args, false)
     },
     submitableExtrinsic: {

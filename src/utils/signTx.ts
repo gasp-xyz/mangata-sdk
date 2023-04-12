@@ -87,7 +87,6 @@ export const signTx = async (
                   blockHeader.hash
                 );
 
-                //increment
                 executionBlockNr.iaddn(1);
 
                 const index = extinsics.findIndex((extrinsic) => {
