@@ -444,10 +444,10 @@ export class Fee {
     api: ApiPromise,
     account: string | KeyringPair,
     liquidityTokenId: string,
-    amount: BN
+    _amount: BN
   ): Promise<string> {
     const dispatchInfo = await api.tx.xyk
-      .claimRewardsV2(liquidityTokenId, amount)
+      .claimRewards(liquidityTokenId)
       .paymentInfo(account);
     return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
