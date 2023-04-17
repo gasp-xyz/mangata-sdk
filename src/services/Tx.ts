@@ -78,10 +78,8 @@ export const signTx = async (
           const executionBlockStopNr = inclusionBlockNr.addn(10);
           const executionBlockNr = executionBlockStartNr;
 
-          console.info(`Subscribing`);
           const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
             async (lastHeader) => {
-              console.info(`New Head ${lastHeader.number.toBn().toString()}`);
               const lastBlockNumber = lastHeader.number.toBn();
 
               if (executionBlockNr.gt(executionBlockStopNr)) {
@@ -164,11 +162,8 @@ export const signTx = async (
                   });
 
                 txOptions?.extrinsicStatus?.(eventsTriggeredByTx);
-                console.info(`Resolving`);
                 resolve(eventsTriggeredByTx);
-                console.info(`Resolved`);
                 unsub();
-                console.info(`unsub`);
               }
             }
           );
