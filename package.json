@@ -1,6 +1,6 @@
 {
   "name": "@mangata-finance/sdk",
-  "version": "1.19.4",
+  "version": "1.19.5",
   "description": "SDK for communication with Mangata node",
   "main": "./index.js",
   "module": "./index.mjs",

@@ -1,3 +1,10 @@
+## [1.19.5](https://github.com/mangata-finance/mangata-sdk/compare/v1.19.4...v1.19.5) (2023-04-17)
+
+
+### Bug Fixes
+
+* remove unnecessary logs ([de81419](https://github.com/mangata-finance/mangata-sdk/commit/de81419c902440167e15e415f47e827666a8b27e))
+
 ## [1.19.4](https://github.com/mangata-finance/mangata-sdk/compare/v1.19.3...v1.19.4) (2023-04-11)
 
 
