@@ -450,7 +450,7 @@ export class Tx {
       let destination = null;
       if (tokenSymbols.includes(tokenSymbol)) {
         asset = {
-          V3: {
+          V2: {
             id: {
               Concrete: getCorrectLocation(tokenSymbol, decodedLocation)
             },
@@ -461,7 +461,7 @@ export class Tx {
         };
 
         destination = {
-          V3: {
+          V2: {
             parents: 1,
             interior: {
               X2: [
@@ -514,10 +514,20 @@ export class Tx {
         };
       }
 
-      const destWeightLimit = getWeightXTokens(
-        new BN(destWeight),
-        api.tx.xTokens.transferMultiasset
-      );
+      let destWeightLimit = null;
+      if (tokenSymbols.includes(tokenSymbol)) {
+        destWeightLimit = {
+          Limited: {
+            refTime: new BN(destWeight),
+            proofSize: 0
+          }
+        };
+      } else {
+        destWeightLimit = getWeightXTokens(
+          new BN(destWeight),
+          api.tx.xTokens.transferMultiasset
+        );
+      }
 
       await api.tx.xTokens
         .transferMultiasset(asset, destination, destWeightLimit)

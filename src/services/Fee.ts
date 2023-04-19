@@ -21,7 +21,7 @@ export class Fee {
       amount
     ] = args;
     const provider = new WsProvider(url);
-    const api = await new ApiPromise({ provider }).isReady;
+    const api = await new ApiPromise({ provider, noInitWarn: true }).isReady;
     const correctMangataAddress = encodeAddress(mangataAddress, 42);
 
     const assetRegistryMetadata =
@@ -42,7 +42,7 @@ export class Fee {
       let destination = null;
       if (tokenSymbols.includes(tokenSymbol)) {
         asset = {
-          V3: {
+          V2: {
             id: {
               Concrete: {
                 parents: "1",
@@ -56,7 +56,7 @@ export class Fee {
         };
 
         destination = {
-          V3: {
+          V2: {
             parents: 1,
             interior: {
               X2: [
@@ -112,10 +112,20 @@ export class Fee {
         };
       }
 
-      const destWeightLimit = getWeightXTokens(
-        new BN(destWeight),
-        api.tx.xTokens.transferMultiasset
-      );
+      let destWeightLimit = null;
+      if (tokenSymbols.includes(tokenSymbol)) {
+        destWeightLimit = {
+          Limited: {
+            refTime: new BN(destWeight),
+            proofSize: 0
+          }
+        };
+      } else {
+        destWeightLimit = getWeightXTokens(
+          new BN(destWeight),
+          api.tx.xTokens.transferMultiasset
+        );
+      }
 
       const dispatchInfo = await api.tx.xTokens
         .transferMultiasset(asset, destination, destWeightLimit)
@@ -375,7 +385,8 @@ export class Fee {
     parachainId: number
   ): Promise<string> {
     const provider = new WsProvider(kusamaEndpointUrl);
-    const kusamaApi = await new ApiPromise({ provider }).isReady;
+    const kusamaApi = await new ApiPromise({ provider, noInitWarn: true })
+      .isReady;
 
     const tx = kusamaApi.tx.xcmPallet.limitedReserveTransferAssets(
       {
