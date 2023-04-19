@@ -37,40 +37,80 @@ export class Fee {
       const decodedLocation = JSON.parse(location.toString());
       const decodedDecimals = JSON.parse(decimals.toString());
 
-      const asset = {
-        V1: {
-          id: {
-            Concrete: {
-              parents: "1",
-              interior: decodedLocation.v1.interior
-            }
-          },
-          fun: {
-            Fungible: amount
-          }
-        }
-      };
-
-      const destination = {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              {
-                Parachain: 2110
-              },
-              {
-                AccountId32: {
-                  network: "Any",
-                  id: api
-                    .createType("AccountId32", correctMangataAddress)
-                    .toHex()
-                }
+      const tokenSymbols = ["BNC", "vBNC", "ZLK", "vsKSM", "vKSM"];
+      let asset = null;
+      let destination = null;
+      if (tokenSymbols.includes(tokenSymbol)) {
+        asset = {
+          V3: {
+            id: {
+              Concrete: {
+                parents: "1",
+                interior: decodedLocation.v1.interior
               }
-            ]
+            },
+            fun: {
+              Fungible: amount
+            }
           }
-        }
-      };
+        };
+
+        destination = {
+          V3: {
+            parents: 1,
+            interior: {
+              X2: [
+                {
+                  Parachain: 2110
+                },
+                {
+                  AccountId32: {
+                    network: "Any",
+                    id: api
+                      .createType("AccountId32", correctMangataAddress)
+                      .toHex()
+                  }
+                }
+              ]
+            }
+          }
+        };
+      } else {
+        asset = {
+          V1: {
+            id: {
+              Concrete: {
+                parents: "1",
+                interior: decodedLocation.v1.interior
+              }
+            },
+            fun: {
+              Fungible: amount
+            }
+          }
+        };
+
+        destination = {
+          V1: {
+            parents: 1,
+            interior: {
+              X2: [
+                {
+                  Parachain: 2110
+                },
+                {
+                  AccountId32: {
+                    network: "Any",
+                    id: api
+                      .createType("AccountId32", correctMangataAddress)
+                      .toHex()
+                  }
+                }
+              ]
+            }
+          }
+        };
+      }
 
       const destWeightLimit = getWeightXTokens(
         new BN(destWeight),
