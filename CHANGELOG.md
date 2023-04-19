@@ -1,3 +1,10 @@
+## [1.19.6](https://github.com/mangata-finance/mangata-sdk/compare/v1.19.5...v1.19.6) (2023-04-18)
+
+
+### Bug Fixes
+
+* upgrade bifrost tokens xcm to v3 ([e74ce7b](https://github.com/mangata-finance/mangata-sdk/commit/e74ce7b9c248ed46ba867f092bd27c823dca4f4c))
+
 ## [1.19.5](https://github.com/mangata-finance/mangata-sdk/compare/v1.19.4...v1.19.5) (2023-04-17)
 
 
