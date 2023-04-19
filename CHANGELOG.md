@@ -1,3 +1,10 @@
+## [1.19.7](https://github.com/mangata-finance/mangata-sdk/compare/v1.19.6...v1.19.7) (2023-04-19)
+
+
+### Bug Fixes
+
+* update fee method for xcm to v3 ([095aaf8](https://github.com/mangata-finance/mangata-sdk/commit/095aaf8616c12645d86e5d9eebbda86b552d6bdd))
+
 ## [1.19.6](https://github.com/mangata-finance/mangata-sdk/compare/v1.19.5...v1.19.6) (2023-04-18)
 
 
