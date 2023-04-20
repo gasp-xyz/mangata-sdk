@@ -445,7 +445,7 @@ export class Tx {
       const { location } = assetMetadata[1].unwrap();
       const decodedLocation = JSON.parse(location.toString());
 
-      const tokenSymbols = ["BNC", "vBNC", "ZLK", "vsKSM", "vKSM"];
+      const tokenSymbols = ["BNC", "vBNC", "ZLK", "vsKSM", "vKSM", "IMBU"];
       let asset = null;
       let destination = null;
       if (tokenSymbols.includes(tokenSymbol)) {

@@ -37,17 +37,14 @@ export class Fee {
       const decodedLocation = JSON.parse(location.toString());
       const decodedDecimals = JSON.parse(decimals.toString());
 
-      const tokenSymbols = ["BNC", "vBNC", "ZLK", "vsKSM", "vKSM"];
+      const tokenSymbols = ["BNC", "vBNC", "ZLK", "vsKSM", "vKSM", "IMBU"];
       let asset = null;
       let destination = null;
       if (tokenSymbols.includes(tokenSymbol)) {
         asset = {
           V2: {
             id: {
-              Concrete: {
-                parents: "1",
-                interior: decodedLocation.v1.interior
-              }
+              Concrete: getCorrectLocation(tokenSymbol, decodedLocation)
             },
             fun: {
               Fungible: amount
