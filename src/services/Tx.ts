@@ -66,15 +66,20 @@ export const signTx = async (
         );
 
         txOptions?.statusCallback?.(result);
-        if (result.status.isInBlock && !subscribed) {
+        if ((result.status.isInBlock || result.status.isFinalized ) && !subscribed) {
           subscribed = true;
-          console.info(`Status In Block : ${result.status.value.toString()}`);
-          const inclusionBlockHash = result.status.asInBlock.toString();
+          let inclusionBlockHash;
+          if (result.status.isInBlock) {
+            inclusionBlockHash = result.status.asInBlock.toString();
+          }else if (result.status.isFinalized) {
+            inclusionBlockHash = result.status.asFinalized.toString();
+          }
+
           const inclusionBlockHeader = await api.rpc.chain.getHeader(
             inclusionBlockHash
           );
           const inclusionBlockNr = inclusionBlockHeader.number.toBn();
-          const executionBlockStartNr = inclusionBlockNr.addn(1);
+          const executionBlockStartNr = inclusionBlockNr.addn(0);
           const executionBlockStopNr = inclusionBlockNr.addn(10);
           const executionBlockNr = executionBlockStartNr;
 
