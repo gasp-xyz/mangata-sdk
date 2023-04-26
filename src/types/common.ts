@@ -12,12 +12,11 @@ import {
   TokenBalance,
   TPool,
   TPoolWithRatio,
-  TToken,
+  Token,
   TTokenInfo
 } from "../types/query";
 import {
   Deposit,
-  DepositStatemine,
   RelayDeposit,
   RelayWithdraw,
   Withdraw
@@ -48,6 +47,13 @@ import { DeactivateLiquidityFee } from "../methods/fee/forDeactivateLiquidity";
 import { ActivateLiquidityFee } from "../methods/fee/forActivateLiquidity";
 import { WithdrawFee } from "../methods/fee/forWithdraw";
 import { Batch } from "../methods/utility/batch";
+import { WithdrawKsmFee } from "../methods/fee/forWithdrawKsm";
+import { DepositFromParachainFee } from "src/methods/fee/forDepositFromParachain";
+import { DepositFromKusamaOrStatemineFee } from "src/methods/fee/forDepositFromKusamaOrStatemine";
+
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
 
 export type ExtrinsicCommon = {
   account: Account;
@@ -99,9 +105,8 @@ export type MangataSubmittableExtrinsic = SubmittableExtrinsic<
 
 export interface MangataInstance {
   xTokens: {
-    deposit: (args: Deposit) => Promise<void>;
-    depositKsm: (args: RelayDeposit) => Promise<void>;
-    depositStatemineTokens: (args: DepositStatemine) => Promise<void>;
+    depositFromParachain: (args: Deposit) => Promise<void>;
+    depositFromKusamaOrStatemine: (args: RelayDeposit) => Promise<void>;
     withdraw: (args: Withdraw) => Promise<void>;
     withdrawKsm: (args: RelayWithdraw) => Promise<void>;
   };
@@ -172,7 +177,7 @@ export interface MangataInstance {
     getBlockNumber: () => Promise<string>;
     getOwnedTokens: (
       address: Address
-    ) => Promise<{ [id: TokenId]: TToken } | null>;
+    ) => Promise<{ [id: TokenId]: Token } | null>;
     getAssetsInfo: () => Promise<TMainTokens>;
     getInvestedPools: (address: Address) => Promise<
       (TPool & {
@@ -193,7 +198,12 @@ export interface MangataInstance {
     getTotalIssuanceOfTokens: () => Promise<TBalances>;
   };
   fee: {
+    depositFromKusamaOrStatemine: (
+      args: DepositFromKusamaOrStatemineFee
+    ) => Promise<string>;
+    depositFromParachain: (args: DepositFromParachainFee) => Promise<string>;
     withdraw: (args: WithdrawFee) => Promise<string>;
+    withdrawKsm: (args: WithdrawKsmFee) => Promise<string>;
     activateLiquidity: (args: ActivateLiquidityFee) => Promise<string>;
     deactivateLiquidity: (args: DeactivateLiquidityFee) => Promise<string>;
     claimRewards: (args: ClaimRewardsFee) => Promise<string>;
@@ -205,7 +215,14 @@ export interface MangataInstance {
     transferAllToken: (args: TransferAllFee) => Promise<string>;
     transferToken: (args: TransferTokenFee) => Promise<string>;
   };
-  apiPromise: Promise<ApiPromise>;
+  util: {
+    calculateFutureRewardsAmountForMinting: (
+      liquidityTokenId: string,
+      mintingAmount: BN,
+      blocksToPass: BN
+    ) => Promise<BN>;
+  };
+  api: () => Promise<ApiPromise>;
   batch: (args: Batch) => Promise<MangataGenericEvent[]>;
   batchAll: (args: Batch) => Promise<MangataGenericEvent[]>;
   forceBatch: (args: Batch) => Promise<MangataGenericEvent[]>;

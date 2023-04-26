@@ -3,7 +3,7 @@ import { BN } from "@polkadot/util";
 import { Merge } from "type-fest";
 import { Pool } from "./xyk";
 
-export type TToken = {
+export type Token = {
   id: TokenId;
   name: string;
   symbol: string;
@@ -11,7 +11,7 @@ export type TToken = {
   balance: TokenBalance;
 };
 
-export type TTokenInfo = Omit<TToken, "balance">;
+export type TTokenInfo = Omit<Token, "balance">;
 export type TBalances = Record<TokenId, BN>;
 export type TMainTokens = Record<TokenId, TTokenInfo>;
 export type TokenBalance = {

@@ -1,3 +1,4 @@
+import { BN } from "@polkadot/util";
 import { deactivateLiquidity } from "./methods/xyk/deactivateLiquidity";
 import {
   BurnLiquidity,
@@ -18,14 +19,12 @@ import {
   transferTokens
 } from "./methods/tokens/transferTokens";
 
-import "@mangata-finance/types";
 import { Transfer } from "./types/tokens";
 import { Address, MangataInstance, TokenAmount, TokenId } from "./types/common";
 import { mintLiquidity } from "./methods/xyk/mintLiquidity";
-import { deposit } from "./methods/xTokens/deposit";
+import { depositFromParachain } from "./methods/xTokens/depositFromParachain";
 import {
   Deposit,
-  DepositStatemine,
   RelayDeposit,
   RelayWithdraw,
   Withdraw
@@ -61,7 +60,6 @@ import { getLiquidityTokenId } from "./methods/query/getLiquidityTokenId";
 import { getNonce } from "./methods/query/getNonce";
 import { withdraw } from "./methods/xTokens/withdraw";
 import { withdrawKsm } from "./methods/xTokens/withdrawKsm";
-import { depositKsm } from "./methods/xTokens/depositKsm";
 import {
   forTransferAllToken,
   TransferAllFee
@@ -99,21 +97,31 @@ import { batchAll } from "./methods/utility/batchAll";
 import { forceBatch } from "./methods/utility/forceBatch";
 import { getOrCreateInstance } from "./utils/getOrCreateInstance";
 import { waitForNewBlock } from "./methods/rpc/waitForNewBlock";
-import { depositStatemineTokens } from "./methods/xTokens/depositStatemineTokens";
+import { depositFromKusamaOrStatemine } from "./methods/xTokens/depositFromKusamaOrStatemine";
+import { calculateFutureRewardsAmountForMinting } from "./utils/calculateFutureRewardsAmountForMinting";
+import { WithdrawKsmFee, forWithdrawKsm } from "./methods/fee/forWithdrawKsm";
+import {
+  DepositFromParachainFee,
+  forDepositFromParachain
+} from "./methods/fee/forDepositFromParachain";
+import {
+  DepositFromKusamaOrStatemineFee,
+  forDepositFromKusamaOrStatemine
+} from "./methods/fee/forDepositFromKusamaOrStatemine";
 
 function createMangataInstance(urls: string[]): MangataInstance {
   const instancePromise = getOrCreateInstance(urls);
 
   return {
-    apiPromise: instancePromise,
+    api: async () => await instancePromise,
     batch: async (args: Batch) => await batch(instancePromise, args),
     batchAll: async (args: Batch) => await batchAll(instancePromise, args),
     forceBatch: async (args: Batch) => await forceBatch(instancePromise, args),
     xTokens: {
-      deposit: async (args: Deposit) => await deposit(args),
-      depositKsm: async (args: RelayDeposit) => await depositKsm(args),
-      depositStatemineTokens: async (args: DepositStatemine) =>
-        await depositStatemineTokens(args),
+      depositFromParachain: async (args: Deposit) =>
+        await depositFromParachain(args),
+      depositFromKusamaOrStatemine: async (args: RelayDeposit) =>
+        await depositFromKusamaOrStatemine(args),
       withdraw: async (args: Withdraw) => await withdraw(instancePromise, args),
       withdrawKsm: async (args: RelayWithdraw) =>
         await withdrawKsm(instancePromise, args)
@@ -224,8 +232,14 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await getTotalIssuanceOfTokens(instancePromise)
     },
     fee: {
+      depositFromParachain: async (args: DepositFromParachainFee) =>
+        await forDepositFromParachain(args),
+      depositFromKusamaOrStatemine: (args: DepositFromKusamaOrStatemineFee) =>
+        forDepositFromKusamaOrStatemine(args),
       withdraw: async (args: WithdrawFee) =>
         await forWithdraw(instancePromise, args),
+      withdrawKsm: async (args: WithdrawKsmFee) =>
+        await forWithdrawKsm(instancePromise, args),
       activateLiquidity: async (args: ActivateLiquidityFee) =>
         await forActivateLiquidity(instancePromise, args),
       deactivateLiquidity: async (args: DeactivateLiquidityFee) =>
@@ -246,6 +260,19 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await forTransferAllToken(instancePromise, args),
       transferToken: async (args: TransferTokenFee) =>
         await forTransferToken(instancePromise, args)
+    },
+    util: {
+      calculateFutureRewardsAmountForMinting: async (
+        liquidityTokenId: string,
+        mintingAmount: BN,
+        blocksToPass: BN
+      ) =>
+        await calculateFutureRewardsAmountForMinting(
+          instancePromise,
+          liquidityTokenId,
+          mintingAmount,
+          blocksToPass
+        )
     }
   };
 }

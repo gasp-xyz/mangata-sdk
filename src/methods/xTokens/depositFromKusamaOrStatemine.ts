@@ -1,7 +1,7 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import { DepositStatemine } from "../../types/xTokens";
+import { RelayDeposit } from "../../types/xTokens";
 
-export const depositStatemineTokens = async (args: DepositStatemine) => {
+export const depositFromKusamaOrStatemine = async (args: RelayDeposit) => {
   const {
     url,
     destination,
@@ -12,8 +12,11 @@ export const depositStatemineTokens = async (args: DepositStatemine) => {
     txOptions,
     account
   } = args;
-  const provider = new WsProvider(url);
-  const api = await new ApiPromise({ provider, noInitWarn: true }).isReady;
+
+  const api = await new ApiPromise({
+    provider: new WsProvider(url),
+    noInitWarn: true
+  }).isReady;
 
   await api.tx.polkadotXcm
     .limitedReserveTransferAssets(

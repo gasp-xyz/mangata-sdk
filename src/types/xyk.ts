@@ -1,4 +1,10 @@
-import { TokenAmount, ExtrinsicCommon, TokenId, Address } from "./common";
+import {
+  TokenAmount,
+  ExtrinsicCommon,
+  TokenId,
+  Address,
+  Prettify
+} from "./common";
 import { Merge, Except } from "type-fest";
 
 export type Rewards = {
@@ -27,10 +33,6 @@ export type Liquidity = Merge<
 >;
 
 export type BurnLiquidity = Merge<Except<Liquidity, "liquidityTokenId">, Price>;
-
-type Prettify<T> = {
-  [K in keyof T]: T[K];
-} & {};
 
 export type MintLiquidity = Prettify<
   Merge<
