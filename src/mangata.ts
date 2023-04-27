@@ -1,33 +1,47 @@
 import { BN } from "@polkadot/util";
 import { deactivateLiquidity } from "./methods/xyk/deactivateLiquidity";
 import {
+  ActivateLiquidityFee,
   BurnLiquidity,
+  BurnLiquidityFee,
   BuyAsset,
+  BuyAssetFee,
+  ClaimRewardsFee,
   CreatePool,
+  CreatePoolFee,
+  DeactivateLiquidityFee,
   Liquidity,
   MintLiquidity,
+  MintLiquidityFee,
   Price,
   Reserve,
   Rewards,
-  SellAsset
+  SellAsset,
+  SellAssetFee
 } from "./types/xyk";
 import { activateLiquidity } from "./methods/xyk/activateLiquidity";
 import { burnLiquidity } from "./methods/xyk/burnLiquidity";
 import { transferAllTokens } from "./methods/tokens/transferAllTokens";
-import {
-  TransferTokens,
-  transferTokens
-} from "./methods/tokens/transferTokens";
+import { transferTokens } from "./methods/tokens/transferTokens";
 
-import { Transfer } from "./types/tokens";
+import {
+  Transfer,
+  TransferAllFee,
+  TransferTokenFee,
+  TransferTokens
+} from "./types/tokens";
 import { Address, MangataInstance, TokenAmount, TokenId } from "./types/common";
 import { mintLiquidity } from "./methods/xyk/mintLiquidity";
 import { depositFromParachain } from "./methods/xTokens/depositFromParachain";
 import {
   Deposit,
+  DepositFromKusamaOrStatemineFee,
+  DepositFromParachainFee,
   RelayDeposit,
   RelayWithdraw,
-  Withdraw
+  Withdraw,
+  WithdrawFee,
+  WithdrawKsmFee
 } from "./types/xTokens";
 import { buyAsset } from "./methods/xyk/buyAsset";
 import { sellAsset } from "./methods/xyk/sellAsset";
@@ -60,54 +74,28 @@ import { getLiquidityTokenId } from "./methods/query/getLiquidityTokenId";
 import { getNonce } from "./methods/query/getNonce";
 import { withdraw } from "./methods/xTokens/withdraw";
 import { withdrawKsm } from "./methods/xTokens/withdrawKsm";
-import {
-  forTransferAllToken,
-  TransferAllFee
-} from "./methods/fee/forTransferAllToken";
-import {
-  forTransferToken,
-  TransferTokenFee
-} from "./methods/fee/forTransferToken";
-import {
-  BurnLiquidityFee,
-  forBurnLiquidity
-} from "./methods/fee/forBurnLiquidity";
-import {
-  forMintLiquidity,
-  MintLiquidityFee
-} from "./methods/fee/forMintLiquidity";
-import { BuyAssetFee, forBuyAsset } from "./methods/fee/forBuyAsset";
-import { forSellAsset, SellAssetFee } from "./methods/fee/forSellAsset";
-import { CreatePoolFee, forCreatePool } from "./methods/fee/forCreatePool";
-import {
-  ClaimRewardsFee,
-  forClaimRewards
-} from "./methods/fee/forClaimRewards";
-import {
-  DeactivateLiquidityFee,
-  forDeactivateLiquidity
-} from "./methods/fee/forDeactivateLiquidity";
-import {
-  ActivateLiquidityFee,
-  forActivateLiquidity
-} from "./methods/fee/forActivateLiquidity";
-import { forWithdraw, WithdrawFee } from "./methods/fee/forWithdraw";
-import { Batch, batch } from "./methods/utility/batch";
+import { forTransferAllToken } from "./methods/fee/forTransferAllToken";
+import { forTransferToken } from "./methods/fee/forTransferToken";
+import { forBurnLiquidity } from "./methods/fee/forBurnLiquidity";
+import { forMintLiquidity } from "./methods/fee/forMintLiquidity";
+import { forBuyAsset } from "./methods/fee/forBuyAsset";
+import { forSellAsset } from "./methods/fee/forSellAsset";
+import { forCreatePool } from "./methods/fee/forCreatePool";
+import { forClaimRewards } from "./methods/fee/forClaimRewards";
+import { forDeactivateLiquidity } from "./methods/fee/forDeactivateLiquidity";
+import { forActivateLiquidity } from "./methods/fee/forActivateLiquidity";
+import { forWithdraw } from "./methods/fee/forWithdraw";
+import { batch } from "./methods/utility/batch";
 import { batchAll } from "./methods/utility/batchAll";
 import { forceBatch } from "./methods/utility/forceBatch";
 import { getOrCreateInstance } from "./utils/getOrCreateInstance";
 import { waitForNewBlock } from "./methods/rpc/waitForNewBlock";
 import { depositFromKusamaOrStatemine } from "./methods/xTokens/depositFromKusamaOrStatemine";
 import { calculateFutureRewardsAmountForMinting } from "./utils/calculateFutureRewardsAmountForMinting";
-import { WithdrawKsmFee, forWithdrawKsm } from "./methods/fee/forWithdrawKsm";
-import {
-  DepositFromParachainFee,
-  forDepositFromParachain
-} from "./methods/fee/forDepositFromParachain";
-import {
-  DepositFromKusamaOrStatemineFee,
-  forDepositFromKusamaOrStatemine
-} from "./methods/fee/forDepositFromKusamaOrStatemine";
+import { forWithdrawKsm } from "./methods/fee/forWithdrawKsm";
+import { forDepositFromParachain } from "./methods/fee/forDepositFromParachain";
+import { forDepositFromKusamaOrStatemine } from "./methods/fee/forDepositFromKusamaOrStatemine";
+import { Batch } from "./types/utility";
 
 function createMangataInstance(urls: string[]): MangataInstance {
   const instancePromise = getOrCreateInstance(urls);

@@ -1,10 +1,7 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { Except } from "type-fest";
-import { RelayDeposit } from "../../types/xTokens";
+import { DepositFromKusamaOrStatemineFee } from "../../types/xTokens";
 import { fromBN } from "../../utils/bnUtility";
-
-export type DepositFromKusamaOrStatemineFee = Except<RelayDeposit, "txOptions">;
 
 export const forDepositFromKusamaOrStatemine = async (
   args: DepositFromKusamaOrStatemineFee

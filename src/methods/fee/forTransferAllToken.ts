@@ -1,10 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { Transfer } from "../../types/tokens";
-import { Except } from "type-fest";
+import { TransferAllFee } from "../../types/tokens";
 import { fromBN } from "../../utils/bnUtility";
-
-export type TransferAllFee = Except<Transfer, "txOptions">;
 
 export const forTransferAllToken = async (
   instancePromise: Promise<ApiPromise>,

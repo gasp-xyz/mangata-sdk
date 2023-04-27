@@ -1,10 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { BurnLiquidity } from "../../types/xyk";
+import { BurnLiquidityFee } from "../../types/xyk";
 import { fromBN } from "../../utils/bnUtility";
-import { Except } from "type-fest";
-
-export type BurnLiquidityFee = Except<BurnLiquidity, "txOptions">;
 
 export const forBurnLiquidity = async (
   instancePromise: Promise<ApiPromise>,

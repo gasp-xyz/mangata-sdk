@@ -1,10 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { CreatePool } from "../../types/xyk";
+import { CreatePoolFee } from "../../types/xyk";
 import { fromBN } from "../../utils/bnUtility";
-import { Except } from "type-fest";
-
-export type CreatePoolFee = Except<CreatePool, "txOptions">;
 
 export const forCreatePool = async (
   instancePromise: Promise<ApiPromise>,

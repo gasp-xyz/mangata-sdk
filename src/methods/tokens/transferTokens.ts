@@ -1,13 +1,9 @@
 import { ApiPromise } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
-import { Merge } from "type-fest";
 import { MangataGenericEvent } from "../../types/common";
-import { TokenAmount } from "../../types/common";
-import { Transfer } from "../../types/tokens";
+import { TransferTokens } from "../../types/tokens";
 import { signTx } from "../../utils/signTx";
-
-export type TransferTokens = Merge<Transfer, { amount: TokenAmount }>;
 
 async function transferTokens(
   instancePromise: Promise<ApiPromise>,

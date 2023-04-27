@@ -17,39 +17,36 @@ import {
 } from "../types/query";
 import {
   Deposit,
+  DepositFromKusamaOrStatemineFee,
+  DepositFromParachainFee,
   RelayDeposit,
   RelayWithdraw,
-  Withdraw
+  Withdraw,
+  WithdrawFee,
+  WithdrawKsmFee
 } from "../types/xTokens";
 
 import {
+  ActivateLiquidityFee,
   BurnLiquidity,
+  BurnLiquidityFee,
   BuyAsset,
+  BuyAssetFee,
+  ClaimRewardsFee,
   CreatePool,
+  CreatePoolFee,
+  DeactivateLiquidityFee,
   Liquidity,
   MintLiquidity,
+  MintLiquidityFee,
   Price,
   Reserve,
   Rewards,
-  SellAsset
+  SellAsset,
+  SellAssetFee
 } from "../types/xyk";
-import { Transfer } from "../types/tokens";
-
-import { TransferAllFee } from "../methods/fee/forTransferAllToken";
-import { TransferTokenFee } from "../methods/fee/forTransferToken";
-import { BurnLiquidityFee } from "../methods/fee/forBurnLiquidity";
-import { MintLiquidityFee } from "../methods/fee/forMintLiquidity";
-import { BuyAssetFee } from "../methods/fee/forBuyAsset";
-import { SellAssetFee } from "../methods/fee/forSellAsset";
-import { CreatePoolFee } from "../methods/fee/forCreatePool";
-import { ClaimRewardsFee } from "../methods/fee/forClaimRewards";
-import { DeactivateLiquidityFee } from "../methods/fee/forDeactivateLiquidity";
-import { ActivateLiquidityFee } from "../methods/fee/forActivateLiquidity";
-import { WithdrawFee } from "../methods/fee/forWithdraw";
-import { Batch } from "../methods/utility/batch";
-import { WithdrawKsmFee } from "../methods/fee/forWithdrawKsm";
-import { DepositFromParachainFee } from "src/methods/fee/forDepositFromParachain";
-import { DepositFromKusamaOrStatemineFee } from "src/methods/fee/forDepositFromKusamaOrStatemine";
+import { Transfer, TransferAllFee, TransferTokenFee } from "../types/tokens";
+import { Batch } from "./utility";
 
 export type Prettify<T> = {
   [K in keyof T]: T[K];

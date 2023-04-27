@@ -1,17 +1,14 @@
-export { TransferTokens } from "./methods/tokens/transferTokens";
-export { Transfer } from "./types/tokens";
-
 export { signTx } from "./utils/signTx";
 
-export { ExtrinsicCommon, MangataInstance } from "./types/common";
-export { Batch } from "./methods/utility/batch";
 export { Mangata } from "./mangata";
-export {
-  Reserve,
-  CreatePool,
-  MintLiquidity,
-  SellAsset,
-  BuyAsset,
-  BurnLiquidity
-} from "./types/xyk";
-export { MangataGenericEvent } from "./types/common";
+
+export * from "./utils/bigConstants";
+export * from "./utils/bnConstants";
+export * from "./utils/bnUtility";
+
+export * from "./types/xTokens";
+export * from "./types/common";
+export * from "./types/query";
+export * from "./types/tokens";
+export * from "./types/xyk";
+export * from "./types/utility";

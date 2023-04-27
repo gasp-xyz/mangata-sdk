@@ -1,10 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { Except } from "type-fest";
-import { MintLiquidity } from "../../types/xyk";
+import { MintLiquidityFee } from "../../types/xyk";
 import { fromBN } from "../../utils/bnUtility";
-
-export type MintLiquidityFee = Except<MintLiquidity, "txOptions">;
 
 export const forMintLiquidity = async (
   instancePromise: Promise<ApiPromise>,

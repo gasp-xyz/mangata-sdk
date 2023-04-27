@@ -1,13 +1,13 @@
 import { ApiPromise } from "@polkadot/api";
 import { TokenId } from "../../types/common";
-import { TToken } from "../../types/query";
+import { Token } from "../../types/query";
 import { getAccountBalances } from "../../utils/getAccountBalances";
 import { getAssetsInfo } from "./getAssetsInfo";
 
 export const getOwnedTokens = async (
   instancePromise: Promise<ApiPromise>,
   address: string
-): Promise<{ [id: TokenId]: TToken } | null> => {
+): Promise<{ [id: TokenId]: Token } | null> => {
   if (!address) return null;
   const api = await instancePromise;
   const [assetsInfo, accountBalances] = await Promise.all([
@@ -23,5 +23,5 @@ export const getOwnedTokens = async (
       };
     }
     return acc;
-  }, {} as { [id: TokenId]: TToken });
+  }, {} as { [id: TokenId]: Token });
 };

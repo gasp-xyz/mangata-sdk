@@ -1,11 +1,8 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { Except } from "type-fest";
-import { RelayWithdraw } from "../../types/xTokens";
+import { WithdrawKsmFee } from "../../types/xTokens";
 import { getWeightXTokens } from "../../utils/getWeightXTokens";
 import { fromBN } from "../../utils/bnUtility";
-
-export type WithdrawKsmFee = Except<RelayWithdraw, "txOptions">;
 
 export const forWithdrawKsm = async (
   instancePromise: Promise<ApiPromise>,

@@ -5,7 +5,7 @@ import {
   TxOptions,
   Prettify
 } from "./common";
-import { Merge } from "type-fest";
+import { Merge, Except } from "type-fest";
 
 export type XcmTxOptions = Partial<
   Omit<TxOptions, "statusCallback" | "extrinsicStatus">
@@ -57,3 +57,8 @@ export type RelayWithdraw = Prettify<
     }
   >
 >;
+
+export type WithdrawKsmFee = Except<RelayWithdraw, "txOptions">;
+export type WithdrawFee = Except<Withdraw, "txOptions">;
+export type DepositFromParachainFee = Except<Deposit, "txOptions">;
+export type DepositFromKusamaOrStatemineFee = Except<RelayDeposit, "txOptions">;

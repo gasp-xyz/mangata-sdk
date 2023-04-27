@@ -64,3 +64,12 @@ export type Pool = {
 };
 
 export type CreatePool = Merge<ExtrinsicCommon, Pool>;
+
+export type SellAssetFee = Except<SellAsset, "txOptions">;
+export type MintLiquidityFee = Except<MintLiquidity, "txOptions">;
+export type DeactivateLiquidityFee = Except<Liquidity, "txOptions">;
+export type CreatePoolFee = Except<CreatePool, "txOptions">;
+export type ClaimRewardsFee = Except<Liquidity, "txOptions">;
+export type BuyAssetFee = Except<BuyAsset, "txOptions">;
+export type BurnLiquidityFee = Except<BurnLiquidity, "txOptions">;
+export type ActivateLiquidityFee = Except<Liquidity, "txOptions">;
