@@ -35,6 +35,8 @@ export const withdraw = async (
       ""
     );
 
+    const accountId = api.createType("AccountId32", correctAddress).toHex();
+
     const destination = {
       V1: {
         parents: 1,
@@ -46,7 +48,7 @@ export const withdraw = async (
             {
               AccountId32: {
                 network: "Any",
-                id: api.createType("AccountId32", correctAddress).toHex()
+                id: accountId
               }
             }
           ]

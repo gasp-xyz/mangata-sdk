@@ -9,29 +9,31 @@ export const withdrawKsm = async (
 ) => {
   const api = await instancePromise;
   const { account, kusamaAddress, amount, txOptions } = args;
-  const destination = {
-    V1: {
-      parents: 1,
-      interior: {
-        X1: {
-          AccountId32: {
-            network: "Any",
-            id: api.createType("AccountId32", kusamaAddress).toHex()
-          }
-        }
+  const tx = api.tx.xTokens.transfer;
+  const accountId = api.createType("AccountId32", kusamaAddress).toHex();
+  const defaultWeight = new BN("6000000000");
+  const interior = {
+    X1: {
+      AccountId32: {
+        network: "Any",
+        id: accountId
       }
     }
   };
+  const destination = {
+    V1: {
+      parents: 1,
+      interior
+    }
+  };
 
-  const destWeightLimit = getWeightXTokens(
-    new BN("6000000000"),
-    api.tx.xTokens.transfer
-  );
+  const destWeightLimit = getWeightXTokens(defaultWeight, tx);
+  const options = {
+    signer: txOptions?.signer,
+    nonce: txOptions?.nonce
+  };
 
   await api.tx.xTokens
     .transfer("4", amount, destination, destWeightLimit)
-    .signAndSend(account, {
-      signer: txOptions?.signer,
-      nonce: txOptions?.nonce
-    });
+    .signAndSend(account, options);
 };

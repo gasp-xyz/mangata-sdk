@@ -26,7 +26,7 @@ export const createUser = (keyring: Keyring, name?: string) => {
 
 export const createToken = async (instance: MangataInstance, args: Options) => {
   const { user, sudo, amount } = args;
-  const api = await instance.apiPromise;
+  const api = await instance.api();
   const nonce = await instance.query.getNonce(sudo.address);
   const tx = api.tx.sudo.sudo(api.tx.tokens.create(user.address, amount));
   const txOptions = { nonce };
@@ -57,7 +57,7 @@ export const createMangataToken = async (
   args: Options
 ) => {
   const { user, sudo, amount } = args;
-  const api = await instance.apiPromise;
+  const api = await instance.api();
   const nonce = await instance.query.getNonce(sudo.address);
   const tx = api.tx.sudo.sudo(api.tx.tokens.mint("0", user.address, amount));
   const txOptions = { nonce };

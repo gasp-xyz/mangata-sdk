@@ -1,7 +1,7 @@
 import { BN } from "@polkadot/util";
 import { Keyring } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
-import { it, expect, afterAll, beforeEach } from "vitest";
+import { it, expect, beforeEach } from "vitest";
 
 import { instance, SUDO_USER_NAME } from "./instance";
 import type { BuyAsset, CreatePool } from "../src";

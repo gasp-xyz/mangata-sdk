@@ -33,8 +33,3 @@ it("should calculate sell price for 1 KSM", async () => {
   const actualprice = fromBN(sellPrice);
   expect(actualprice).toEqual(expectedPrice);
 });
-
-afterAll(async () => {
-  const api = await instance.apiPromise;
-  await api.disconnect();
-});
