@@ -1,9 +1,9 @@
-import { Withdraw } from "src/types/xTokens";
 import { encodeAddress } from "@polkadot/util-crypto";
 import { BN } from "@polkadot/util";
 import { ApiPromise } from "@polkadot/api";
 import { getWeightXTokens } from "../../utils/getWeightXTokens";
 import { signTx } from "../../utils/signTx";
+import { Withdraw } from "../../types/xTokens";
 
 export const withdraw = async (
   instancePromise: Promise<ApiPromise>,
