@@ -18,7 +18,8 @@
     "start": "NODE_OPTIONS='--experimental-specifier-resolution=node' node dist/index.js",
     "build": "tsup",
     "test": "vitest --config ./vitest.config.ts --run",
-    "eslint": "node_modules/.bin/eslint --max-warnings 0 . --ext .ts"
+    "eslint": "node_modules/.bin/eslint --max-warnings 0 . --ext .ts",
+    "peer": "add-no-save --peer-deps"
   },
   "keywords": [],
   "author": "Michal",
@@ -40,6 +41,7 @@
     "type-fest": "^3.6.1",
     "typescript": "^4.7.4",
     "uuid": "^9.0.0",
-    "vitest": "^0.29.7"
+    "vitest": "^0.29.7",
+    "yarn-add-no-save": "^1.0.3"
   }
 }

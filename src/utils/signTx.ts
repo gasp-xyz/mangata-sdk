@@ -107,15 +107,17 @@ export const signTx = async (
                   );
                 }
 
-                const eventsTriggeredByTx: MangataGenericEvent[] = events
-                  .filter((currentBlockEvent) => {
+                const eventsTriggeredByTx: MangataGenericEvent[] = (
+                  events as any
+                )
+                  .filter((currentBlockEvent: any) => {
                     return (
                       currentBlockEvent.phase.isApplyExtrinsic &&
                       currentBlockEvent.phase.asApplyExtrinsic.toNumber() ===
                         index
                     );
                   })
-                  .map((eventRecord) => {
+                  .map((eventRecord: any) => {
                     const { event, phase } = eventRecord;
                     const types = event.typeDef;
                     const eventData: MangataEventData[] = event.data.map(
