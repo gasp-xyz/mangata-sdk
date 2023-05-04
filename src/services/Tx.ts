@@ -60,8 +60,7 @@ export const signTx = async (
     try {
       const unsub = await tx.send(async (result: ISubmittableResult) => {
         console.info(
-          `Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} => ${
-            result.status.type
+          `Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} => ${result.status.type
           }(${result.status.value.toString()})${serializeTx(api, tx)}`
         );
 
@@ -140,7 +139,7 @@ export const signTx = async (
                     return (
                       currentBlockEvent.phase.isApplyExtrinsic &&
                       currentBlockEvent.phase.asApplyExtrinsic.toNumber() ===
-                        index
+                      index
                     );
                   })
                   .map((eventRecord) => {
@@ -709,7 +708,7 @@ export class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      api.tx.xyk.activateLiquidityV2(liquditityTokenId, amount, null),
+      api.tx.proofOfStake.activateLiquidity(liquditityTokenId, amount, null),
       account,
       txOptions
     );
@@ -724,7 +723,7 @@ export class Tx {
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      api.tx.xyk.deactivateLiquidityV2(liquditityTokenId, amount),
+      api.tx.proofOfStake.deactivateLiquidity(liquditityTokenId, amount),
       account,
       txOptions
     );
@@ -734,12 +733,12 @@ export class Tx {
     api: ApiPromise,
     account: string | KeyringPair,
     liquidityTokenId: string,
-    amount: BN,
+    _amount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      api.tx.xyk.claimRewardsV2(liquidityTokenId, amount),
+      api.tx.proofOfStake.claimRewardsAll(liquidityTokenId),
       account,
       txOptions
     );
