@@ -5,6 +5,7 @@ export { Mangata } from "./mangata";
 export * from "./utils/bigConstants";
 export * from "./utils/bnConstants";
 export * from "./utils/bnUtility";
+export * from "./utils/toFixed";
 
 export * from "./types/xTokens";
 export * from "./types/common";
