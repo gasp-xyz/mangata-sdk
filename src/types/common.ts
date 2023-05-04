@@ -13,7 +13,8 @@ import {
   TPool,
   TPoolWithRatio,
   Token,
-  TTokenInfo
+  TTokenInfo,
+  TPoolWithShare
 } from "../types/query";
 import {
   Deposit,
@@ -176,15 +177,7 @@ export interface MangataInstance {
       address: Address
     ) => Promise<{ [id: TokenId]: Token } | null>;
     getAssetsInfo: () => Promise<TMainTokens>;
-    getInvestedPools: (address: Address) => Promise<
-      (TPool & {
-        share: BN;
-        firstTokenRatio: BN;
-        secondTokenRatio: BN;
-        activatedLPTokens: BN;
-        nonActivatedLPTokens: BN;
-      })[]
-    >;
+    getInvestedPools: (address: Address) => Promise<TPoolWithShare[]>;
     getAmountOfTokensInPool: (
       firstTokenId: TokenId,
       secondTokenId: TokenId

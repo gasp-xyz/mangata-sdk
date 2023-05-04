@@ -31,3 +31,11 @@ export type TPoolWithRatio = Merge<
     secondTokenRatio: BN;
   }
 >;
+
+export type TPoolWithShare = TPool & {
+  share: BN;
+  firstTokenRatio: BN;
+  secondTokenRatio: BN;
+  activatedLPTokens: BN;
+  nonActivatedLPTokens: BN;
+};

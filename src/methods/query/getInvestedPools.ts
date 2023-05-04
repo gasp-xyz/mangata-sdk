@@ -1,6 +1,5 @@
 import { ApiPromise } from "@polkadot/api";
-import { BN } from "@polkadot/util";
-import { TPool, TTokenInfo } from "../../types/query";
+import { TPoolWithShare, TTokenInfo } from "../../types/query";
 import { BN_ZERO } from "../../utils/bnConstants";
 import { calculateLiquidityShare } from "../../utils/calculateLiquidityShare";
 import { getAccountBalances } from "../../utils/getAccountBalances";
@@ -13,7 +12,7 @@ import { getAmountOfTokensInPool } from "./getAmountOfTokensInPool";
 export const getInvestedPools = async (
   instancePromise: Promise<ApiPromise>,
   address: Address
-) => {
+): Promise<TPoolWithShare[]> => {
   const api = await instancePromise;
   const [assetsInfo, accountBalances, liquidityTokensPromoted] =
     await Promise.all([
@@ -64,13 +63,7 @@ export const getInvestedPools = async (
           : getRatio(secondTokenAmount, firstTokenAmount),
         activatedLPTokens: userLiquidityBalance.reserved,
         nonActivatedLPTokens: userLiquidityBalance.free
-      } as TPool & {
-        share: BN;
-        firstTokenRatio: BN;
-        secondTokenRatio: BN;
-        activatedLPTokens: BN;
-        nonActivatedLPTokens: BN;
-      };
+      } as TPoolWithShare;
 
       return poolInfo;
     });
