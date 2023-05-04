@@ -8,7 +8,7 @@ env:
   TEST_PALLET_ADDRESS: ${{ secrets.TEST_PALLET_ADDRESS }}
   TEST_SUDO_NAME: ${{ secrets.TEST_SUDO_NAME }}
   TX_VERBOSE: true
-
+# here is commnet
 jobs:
   complete-setup:
     runs-on: ubuntu-latest
