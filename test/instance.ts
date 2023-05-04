@@ -1,4 +1,4 @@
-import { Mangata } from "../src/Mangata";
+import { Mangata } from "../src";
 
 const uri = process.env.API_URL || "ws://127.0.0.1:9947";
 
