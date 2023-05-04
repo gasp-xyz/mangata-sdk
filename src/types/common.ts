@@ -185,7 +185,7 @@ export interface MangataInstance {
         nonActivatedLPTokens: BN;
       })[]
     >;
-    getAmountOfTokenIdInPool: (
+    getAmountOfTokensInPool: (
       firstTokenId: TokenId,
       secondTokenId: TokenId
     ) => Promise<BN[]>;
@@ -213,7 +213,7 @@ export interface MangataInstance {
     transferToken: (args: TransferTokenFee) => Promise<string>;
   };
   util: {
-    calculateFutureRewardsAmountForMinting: (
+    calculateMintingFutureRewards: (
       liquidityTokenId: string,
       mintingAmount: BN,
       blocksToPass: BN

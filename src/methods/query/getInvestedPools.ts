@@ -8,7 +8,7 @@ import { getAssetsInfoWithIds } from "../../utils/getAssetsInfoWithIds";
 import { getLiquidityPromotedPools } from "../../utils/getLiquidityPromotedPools";
 import { getRatio } from "../../utils/getRatio";
 import { Address } from "../../types/common";
-import { getAmountOfTokenIdInPool } from "./getAmountOfTokenIdInPool";
+import { getAmountOfTokensInPool } from "./getAmountOfTokensInPool";
 
 export const getInvestedPools = async (
   instancePromise: Promise<ApiPromise>,
@@ -37,7 +37,7 @@ export const getInvestedPools = async (
       const firstTokenId = asset.symbol.split("-")[0];
       const secondTokenId = asset.symbol.split("-")[1];
       const [firstTokenAmount, secondTokenAmount] =
-        await getAmountOfTokenIdInPool(
+        await getAmountOfTokensInPool(
           instancePromise,
           firstTokenId.toString(),
           secondTokenId.toString()

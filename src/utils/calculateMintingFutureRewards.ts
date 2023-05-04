@@ -1,7 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
 
-export const calculateFutureRewardsAmountForMinting = async (
+export const calculateMintingFutureRewards = async (
   apiPromise: Promise<ApiPromise>,
   liquidityTokenId: string,
   mintingAmount: BN,

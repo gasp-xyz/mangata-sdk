@@ -2,7 +2,7 @@ import { ApiPromise } from "@polkadot/api";
 import { BN, isHex, hexToU8a } from "@polkadot/util";
 import { MangataEventData, ErrorData } from "../types/common";
 
-export const getError = (
+export const getTxError = (
   api: ApiPromise,
   method: string,
   eventData: MangataEventData[]

@@ -1,3 +1,4 @@
+import "@mangata-finance/types";
 import { BN } from "@polkadot/util";
 import { deactivateLiquidity } from "./methods/xyk/deactivateLiquidity";
 import {
@@ -59,7 +60,7 @@ import { getChain } from "./methods/rpc/getChain";
 import { getPools } from "./methods/query/getPools";
 import { getPool } from "./methods/query/getPool";
 import { getLiquidityPool } from "./methods/query/getLiquidityPool";
-import { getAmountOfTokenIdInPool } from "./methods/query/getAmountOfTokenIdInPool";
+import { getAmountOfTokensInPool } from "./methods/query/getAmountOfTokensInPool";
 import { getInvestedPools } from "./methods/query/getInvestedPools";
 import { getTotalIssuanceOfTokens } from "./methods/query/getTotalIssuanceOfTokens";
 import { getOwnedTokens } from "./methods/query/getOwnedTokens";
@@ -91,7 +92,7 @@ import { forceBatch } from "./methods/utility/forceBatch";
 import { getOrCreateInstance } from "./utils/getOrCreateInstance";
 import { waitForNewBlock } from "./methods/rpc/waitForNewBlock";
 import { depositFromKusamaOrStatemine } from "./methods/xTokens/depositFromKusamaOrStatemine";
-import { calculateFutureRewardsAmountForMinting } from "./utils/calculateFutureRewardsAmountForMinting";
+import { calculateMintingFutureRewards } from "./utils/calculateMintingFutureRewards";
 import { forWithdrawKsm } from "./methods/fee/forWithdrawKsm";
 import { forDepositFromParachain } from "./methods/fee/forDepositFromParachain";
 import { forDepositFromKusamaOrStatemine } from "./methods/fee/forDepositFromKusamaOrStatemine";
@@ -202,11 +203,11 @@ function createMangataInstance(urls: string[]): MangataInstance {
       getAssetsInfo: async () => await getAssetsInfo(instancePromise),
       getInvestedPools: async (address: Address) =>
         await getInvestedPools(instancePromise, address),
-      getAmountOfTokenIdInPool: async (
+      getAmountOfTokensInPool: async (
         firstTokenId: TokenId,
         secondTokenId: TokenId
       ) =>
-        await getAmountOfTokenIdInPool(
+        await getAmountOfTokensInPool(
           instancePromise,
           firstTokenId,
           secondTokenId
@@ -250,12 +251,12 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await forTransferToken(instancePromise, args)
     },
     util: {
-      calculateFutureRewardsAmountForMinting: async (
+      calculateMintingFutureRewards: async (
         liquidityTokenId: string,
         mintingAmount: BN,
         blocksToPass: BN
       ) =>
-        await calculateFutureRewardsAmountForMinting(
+        await calculateMintingFutureRewards(
           instancePromise,
           liquidityTokenId,
           mintingAmount,

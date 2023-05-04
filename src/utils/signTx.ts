@@ -15,7 +15,7 @@ import { serializeTx } from "./serialize";
 import { getTxNonce } from "./getTxNonce";
 import { dbInstance } from "./inMemoryDatabase";
 import { truncatedString } from "./truncatedString";
-import { getError } from "./getTxError";
+import { getTxError } from "./getTxError";
 
 export const signTx = async (
   api: ApiPromise,
@@ -136,7 +136,7 @@ export const signTx = async (
                       method: event.method,
                       metaDocumentation: event.meta.docs.toString(),
                       eventData,
-                      error: getError(api, event.method, eventData)
+                      error: getTxError(api, event.method, eventData)
                     } as MangataGenericEvent;
                   });
 

@@ -4,7 +4,7 @@ import { getRatio } from "../../utils/getRatio";
 import { TokenId } from "../../types/common";
 import { TPoolWithRatio } from "../../types/query";
 import { getLiquidityPool } from "./getLiquidityPool";
-import { getAmountOfTokenIdInPool } from "./getAmountOfTokenIdInPool";
+import { getAmountOfTokensInPool } from "./getAmountOfTokensInPool";
 import { BN_ZERO } from "../../utils/bnConstants";
 
 export const getPool = async (
@@ -25,7 +25,7 @@ export const getPool = async (
   const isPoolPromoted = promotedPoolInfos[liquidityTokenId];
 
   const [firstTokenId, secondTokenId] = liquidityPoolTokens;
-  const [firstTokenAmount, secondTokenAmount] = await getAmountOfTokenIdInPool(
+  const [firstTokenAmount, secondTokenAmount] = await getAmountOfTokensInPool(
     instancePromise,
     firstTokenId.toString(),
     secondTokenId.toString()
