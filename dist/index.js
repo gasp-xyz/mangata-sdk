@@ -8202,6 +8202,17 @@ function createMangataInstance(urls) {
 var Mangata = {
   instance: createMangataInstance
 };
+
+// src/utils/toFixed.ts
+var toFixed = (value, decimals) => {
+  const decimalsRegex = new RegExp(`^-?\\d+(?:\\.\\d{0,${decimals}})?`, "gm");
+  const withDesiredDecimalPlaces = value.match(decimalsRegex);
+  const trailingZeroesRegex = /^-?0*(\d+(?:\.(?:(?!0+$)\d)+)?)/gm;
+  const withoutTrailingZeroes = (withDesiredDecimalPlaces?.[0] || value).match(
+    trailingZeroesRegex
+  );
+  return withoutTrailingZeroes?.[0] ?? value;
+};
 export {
   BIG_BILLION,
   BIG_HUNDRED,
@@ -8236,7 +8247,8 @@ export {
   Mangata,
   fromBN,
   signTx,
-  toBN
+  toBN,
+  toFixed
 };
 /*! Bundled license information:
 

@@ -1,7 +1,7 @@
 import { TokenId } from "./common";
 import { BN } from "@polkadot/util";
 import { Merge } from "type-fest";
-import { Pool } from "./xyk";
+import { PoolBase } from "./xyk";
 
 export type Token = {
   id: TokenId;
@@ -19,20 +19,20 @@ export type TokenBalance = {
   reserved: BN;
   frozen: BN;
 };
-export type TPool = Merge<
-  Pool,
+export type Pool = Merge<
+  PoolBase,
   { liquidityTokenId: TokenId; isPromoted: boolean }
 >;
 
 export type TPoolWithRatio = Merge<
-  TPool,
+  Pool,
   {
     firstTokenRatio: BN;
     secondTokenRatio: BN;
   }
 >;
 
-export type TPoolWithShare = TPool & {
+export type TPoolWithShare = Pool & {
   share: BN;
   firstTokenRatio: BN;
   secondTokenRatio: BN;

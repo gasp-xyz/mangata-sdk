@@ -56,14 +56,14 @@ export type MinAmountOut = Merge<Asset, { minAmountOut: TokenAmount }>;
 export type BuyAsset = Prettify<Merge<ExtrinsicCommon, MaxAmountIn>>;
 export type SellAsset = Prettify<Merge<ExtrinsicCommon, MinAmountOut>>;
 
-export type Pool = {
+export type PoolBase = {
   firstTokenId: TokenId;
   firstTokenAmount: TokenAmount;
   secondTokenId: TokenId;
   secondTokenAmount: TokenAmount;
 };
 
-export type CreatePool = Merge<ExtrinsicCommon, Pool>;
+export type CreatePool = Merge<ExtrinsicCommon, PoolBase>;
 
 export type SellAssetFee = Except<SellAsset, "txOptions">;
 export type MintLiquidityFee = Except<MintLiquidity, "txOptions">;

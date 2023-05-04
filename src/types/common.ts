@@ -10,7 +10,6 @@ import {
   TBalances,
   TMainTokens,
   TokenBalance,
-  TPool,
   TPoolWithRatio,
   Token,
   TTokenInfo,

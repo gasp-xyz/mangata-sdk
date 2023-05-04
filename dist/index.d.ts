@@ -43,13 +43,13 @@ type MinAmountOut = Merge<Asset, {
 }>;
 type BuyAsset = Prettify<Merge<ExtrinsicCommon, MaxAmountIn>>;
 type SellAsset = Prettify<Merge<ExtrinsicCommon, MinAmountOut>>;
-type Pool = {
+type PoolBase = {
     firstTokenId: TokenId;
     firstTokenAmount: TokenAmount;
     secondTokenId: TokenId;
     secondTokenAmount: TokenAmount;
 };
-type CreatePool = Merge<ExtrinsicCommon, Pool>;
+type CreatePool = Merge<ExtrinsicCommon, PoolBase>;
 type SellAssetFee = Except<SellAsset, "txOptions">;
 type MintLiquidityFee = Except<MintLiquidity, "txOptions">;
 type DeactivateLiquidityFee = Except<Liquidity, "txOptions">;
@@ -74,14 +74,21 @@ type TokenBalance = {
     reserved: BN;
     frozen: BN;
 };
-type TPool = Merge<Pool, {
+type Pool = Merge<PoolBase, {
     liquidityTokenId: TokenId;
     isPromoted: boolean;
 }>;
-type TPoolWithRatio = Merge<TPool, {
+type TPoolWithRatio = Merge<Pool, {
     firstTokenRatio: BN;
     secondTokenRatio: BN;
 }>;
+type TPoolWithShare = Pool & {
+    share: BN;
+    firstTokenRatio: BN;
+    secondTokenRatio: BN;
+    activatedLPTokens: BN;
+    nonActivatedLPTokens: BN;
+};
 
 type XcmTxOptions = Partial<Omit<TxOptions, "statusCallback" | "extrinsicStatus">>;
 type Deposit = Prettify<Merge<ExtrinsicCommon, {
@@ -240,13 +247,7 @@ interface MangataInstance {
             [id: TokenId]: Token;
         } | null>;
         getAssetsInfo: () => Promise<TMainTokens>;
-        getInvestedPools: (address: Address) => Promise<(TPool & {
-            share: BN;
-            firstTokenRatio: BN;
-            secondTokenRatio: BN;
-            activatedLPTokens: BN;
-            nonActivatedLPTokens: BN;
-        })[]>;
+        getInvestedPools: (address: Address) => Promise<TPoolWithShare[]>;
         getAmountOfTokensInPool: (firstTokenId: TokenId, secondTokenId: TokenId) => Promise<BN[]>;
         getLiquidityPool: (liquidityTokenId: TokenId) => Promise<BN[]>;
         getPool: (liquidityTokenId: TokenId) => Promise<TPoolWithRatio>;
@@ -320,4 +321,6 @@ declare const BN_DIV_NUMERATOR_MULTIPLIER: BN;
 declare const toBN: (value: string, exponent?: number) => BN;
 declare const fromBN: (value: BN, exponent?: number) => string;
 
-export { Account, ActivateLiquidityFee, Address, Asset, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Batch, BurnLiquidity, BurnLiquidityFee, BuyAsset, BuyAssetFee, ClaimRewardsFee, CreatePool, CreatePoolFee, Database, DeactivateLiquidityFee, Deposit, DepositFromKusamaOrStatemineFee, DepositFromParachainFee, ErrorData, ExtrinsicCommon, Liquidity, Mangata, MangataEventData, MangataGenericEvent, MangataInstance, MangataSubmittableExtrinsic, MaxAmountIn, MinAmountOut, MintLiquidity, MintLiquidityFee, Pool, Prettify, Price, RelayDeposit, RelayWithdraw, Reserve, Rewards, SellAsset, SellAssetFee, TBalances, TMainTokens, TPool, TPoolWithRatio, TTokenInfo, Token, TokenAmount, TokenBalance, TokenId, TokenSymbol, Transfer, TransferAllFee, TransferTokenFee, TransferTokens, TxOptions, Withdraw, WithdrawFee, WithdrawKsmFee, XcmTxOptions, fromBN, signTx, toBN };
+declare const toFixed: (value: string, decimals: number) => string;
+
+export { Account, ActivateLiquidityFee, Address, Asset, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Batch, BurnLiquidity, BurnLiquidityFee, BuyAsset, BuyAssetFee, ClaimRewardsFee, CreatePool, CreatePoolFee, Database, DeactivateLiquidityFee, Deposit, DepositFromKusamaOrStatemineFee, DepositFromParachainFee, ErrorData, ExtrinsicCommon, Liquidity, Mangata, MangataEventData, MangataGenericEvent, MangataInstance, MangataSubmittableExtrinsic, MaxAmountIn, MinAmountOut, MintLiquidity, MintLiquidityFee, Pool, PoolBase, Prettify, Price, RelayDeposit, RelayWithdraw, Reserve, Rewards, SellAsset, SellAssetFee, TBalances, TMainTokens, TPoolWithRatio, TPoolWithShare, TTokenInfo, Token, TokenAmount, TokenBalance, TokenId, TokenSymbol, Transfer, TransferAllFee, TransferTokenFee, TransferTokens, TxOptions, Withdraw, WithdrawFee, WithdrawKsmFee, XcmTxOptions, fromBN, signTx, toBN, toFixed };
