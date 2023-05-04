@@ -1,16 +1,27 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { ActivateLiquidityFee } from "../../types/xyk";
+import { CreatePoolFee } from "../../types/xyk";
 import { fromBN } from "../../utils/bnUtility";
 
-export const forActivateLiquidity = async (
+export const getCreatePoolFee = async (
   instancePromise: Promise<ApiPromise>,
-  args: ActivateLiquidityFee
+  args: CreatePoolFee
 ): Promise<string> => {
   const api = await instancePromise;
-  const { liquidityTokenId, amount, account } = args;
+  const {
+    firstTokenId,
+    firstTokenAmount,
+    secondTokenId,
+    secondTokenAmount,
+    account
+  } = args;
   const dispatchInfo = await api.tx.xyk
-    .activateLiquidityV2(liquidityTokenId, amount, null)
+    .createPool(
+      firstTokenId,
+      firstTokenAmount,
+      secondTokenId,
+      secondTokenAmount
+    )
     .paymentInfo(account);
   return fromBN(new BN(dispatchInfo.partialFee.toString()));
 };

@@ -75,17 +75,6 @@ import { getLiquidityTokenId } from "./methods/query/getLiquidityTokenId";
 import { getNonce } from "./methods/query/getNonce";
 import { withdraw } from "./methods/xTokens/withdraw";
 import { withdrawKsm } from "./methods/xTokens/withdrawKsm";
-import { forTransferAllToken } from "./methods/fee/forTransferAllToken";
-import { forTransferToken } from "./methods/fee/forTransferToken";
-import { forBurnLiquidity } from "./methods/fee/forBurnLiquidity";
-import { forMintLiquidity } from "./methods/fee/forMintLiquidity";
-import { forBuyAsset } from "./methods/fee/forBuyAsset";
-import { forSellAsset } from "./methods/fee/forSellAsset";
-import { forCreatePool } from "./methods/fee/forCreatePool";
-import { forClaimRewards } from "./methods/fee/forClaimRewards";
-import { forDeactivateLiquidity } from "./methods/fee/forDeactivateLiquidity";
-import { forActivateLiquidity } from "./methods/fee/forActivateLiquidity";
-import { forWithdraw } from "./methods/fee/forWithdraw";
 import { batch } from "./methods/utility/batch";
 import { batchAll } from "./methods/utility/batchAll";
 import { forceBatch } from "./methods/utility/forceBatch";
@@ -93,10 +82,21 @@ import { getOrCreateInstance } from "./utils/getOrCreateInstance";
 import { waitForNewBlock } from "./methods/rpc/waitForNewBlock";
 import { depositFromKusamaOrStatemine } from "./methods/xTokens/depositFromKusamaOrStatemine";
 import { calculateMintingFutureRewards } from "./utils/calculateMintingFutureRewards";
-import { forWithdrawKsm } from "./methods/fee/forWithdrawKsm";
-import { forDepositFromParachain } from "./methods/fee/forDepositFromParachain";
-import { forDepositFromKusamaOrStatemine } from "./methods/fee/forDepositFromKusamaOrStatemine";
 import { Batch } from "./types/utility";
+import { getActivateLiquidityFee } from "./methods/fee/getActivateLiquidityFee";
+import { getDepositFromParachainFee } from "./methods/fee/getDepositFromParachainFee";
+import { getDepositFromKusamaOrStatemineFee } from "./methods/fee/getDepositFromKusamaOrStatemineFee";
+import { getWithdrawFee } from "./methods/fee/getWithdrawFee";
+import { getWithdrawKsmFee } from "./methods/fee/getWithdrawKsmFee";
+import { getDeactivateLiquidityFee } from "./methods/fee/getDeactivateLiquidityFee";
+import { getClaimRewardsFee } from "./methods/fee/getClaimRewardsFee";
+import { getCreatePoolFee } from "./methods/fee/getCreatePoolFee";
+import { getSellAssetFee } from "./methods/fee/getSellAssetFee";
+import { getBuyAssetFee } from "./methods/fee/getBuyAssetFee";
+import { getMintLiquidityFee } from "./methods/fee/getMintLiquidityFee";
+import { getBurnLiquidityFee } from "./methods/fee/getBurnLiquidityFee";
+import { getTransferAllTokenFee } from "./methods/fee/getTransferAllTokenFee";
+import { getTransferTokenFee } from "./methods/fee/getTransferTokenFee";
 
 function createMangataInstance(urls: string[]): MangataInstance {
   const instancePromise = getOrCreateInstance(urls);
@@ -222,33 +222,33 @@ function createMangataInstance(urls: string[]): MangataInstance {
     },
     fee: {
       depositFromParachain: async (args: DepositFromParachainFee) =>
-        await forDepositFromParachain(args),
+        await getDepositFromParachainFee(args),
       depositFromKusamaOrStatemine: (args: DepositFromKusamaOrStatemineFee) =>
-        forDepositFromKusamaOrStatemine(args),
+        getDepositFromKusamaOrStatemineFee(args),
       withdraw: async (args: WithdrawFee) =>
-        await forWithdraw(instancePromise, args),
+        await getWithdrawFee(instancePromise, args),
       withdrawKsm: async (args: WithdrawKsmFee) =>
-        await forWithdrawKsm(instancePromise, args),
+        await getWithdrawKsmFee(instancePromise, args),
       activateLiquidity: async (args: ActivateLiquidityFee) =>
-        await forActivateLiquidity(instancePromise, args),
+        await getActivateLiquidityFee(instancePromise, args),
       deactivateLiquidity: async (args: DeactivateLiquidityFee) =>
-        await forDeactivateLiquidity(instancePromise, args),
+        await getDeactivateLiquidityFee(instancePromise, args),
       claimRewards: async (args: ClaimRewardsFee) =>
-        await forClaimRewards(instancePromise, args),
+        await getClaimRewardsFee(instancePromise, args),
       createPool: async (args: CreatePoolFee) =>
-        await forCreatePool(instancePromise, args),
+        await getCreatePoolFee(instancePromise, args),
       sellAsset: async (args: SellAssetFee) =>
-        await forSellAsset(instancePromise, args),
+        await getSellAssetFee(instancePromise, args),
       buyAsset: async (args: BuyAssetFee) =>
-        await forBuyAsset(instancePromise, args),
+        await getBuyAssetFee(instancePromise, args),
       mintLiquidity: async (args: MintLiquidityFee) =>
-        await forMintLiquidity(instancePromise, args),
+        await getMintLiquidityFee(instancePromise, args),
       burnLiquidity: async (args: BurnLiquidityFee) =>
-        await forBurnLiquidity(instancePromise, args),
+        await getBurnLiquidityFee(instancePromise, args),
       transferAllToken: async (args: TransferAllFee) =>
-        await forTransferAllToken(instancePromise, args),
+        await getTransferAllTokenFee(instancePromise, args),
       transferToken: async (args: TransferTokenFee) =>
-        await forTransferToken(instancePromise, args)
+        await getTransferTokenFee(instancePromise, args)
     },
     util: {
       calculateMintingFutureRewards: async (

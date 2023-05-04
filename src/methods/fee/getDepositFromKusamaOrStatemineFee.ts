@@ -3,7 +3,7 @@ import { BN } from "@polkadot/util";
 import { DepositFromKusamaOrStatemineFee } from "../../types/xTokens";
 import { fromBN } from "../../utils/bnUtility";
 
-export const forDepositFromKusamaOrStatemine = async (
+export const getDepositFromKusamaOrStatemineFee = async (
   args: DepositFromKusamaOrStatemineFee
 ) => {
   const {

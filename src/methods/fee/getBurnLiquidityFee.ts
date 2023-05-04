@@ -1,16 +1,16 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { SellAssetFee } from "../../types/xyk";
+import { BurnLiquidityFee } from "../../types/xyk";
 import { fromBN } from "../../utils/bnUtility";
 
-export const forSellAsset = async (
+export const getBurnLiquidityFee = async (
   instancePromise: Promise<ApiPromise>,
-  args: SellAssetFee
+  args: BurnLiquidityFee
 ): Promise<string> => {
   const api = await instancePromise;
-  const { soldTokenId, boughtTokenId, amount, minAmountOut, account } = args;
+  const { amount, firstTokenId, secondTokenId, account } = args;
   const dispatchInfo = await api.tx.xyk
-    .sellAsset(soldTokenId, boughtTokenId, amount, minAmountOut)
+    .burnLiquidity(firstTokenId, secondTokenId, amount)
     .paymentInfo(account);
   return fromBN(new BN(dispatchInfo.partialFee.toString()));
 };

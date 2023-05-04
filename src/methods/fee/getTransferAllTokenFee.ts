@@ -3,7 +3,7 @@ import { BN } from "@polkadot/util";
 import { TransferAllFee } from "../../types/tokens";
 import { fromBN } from "../../utils/bnUtility";
 
-export const forTransferAllToken = async (
+export const getTransferAllTokenFee = async (
   instancePromise: Promise<ApiPromise>,
   args: TransferAllFee
 ): Promise<string> => {

@@ -4,7 +4,7 @@ import { WithdrawKsmFee } from "../../types/xTokens";
 import { getWeightXTokens } from "../../utils/getWeightXTokens";
 import { fromBN } from "../../utils/bnUtility";
 
-export const forWithdrawKsm = async (
+export const getWithdrawKsmFee = async (
   instancePromise: Promise<ApiPromise>,
   args: WithdrawKsmFee
 ) => {

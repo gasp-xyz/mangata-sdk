@@ -3,7 +3,7 @@ import { BN } from "@polkadot/util";
 import { MintLiquidityFee } from "../../types/xyk";
 import { fromBN } from "../../utils/bnUtility";
 
-export const forMintLiquidity = async (
+export const getMintLiquidityFee = async (
   instancePromise: Promise<ApiPromise>,
   args: MintLiquidityFee
 ): Promise<string> => {

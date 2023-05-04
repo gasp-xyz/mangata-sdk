@@ -1,16 +1,16 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { DeactivateLiquidityFee } from "../../types/xyk";
+import { ClaimRewardsFee } from "../../types/xyk";
 import { fromBN } from "../../utils/bnUtility";
 
-export const forDeactivateLiquidity = async (
+export const getClaimRewardsFee = async (
   instancePromise: Promise<ApiPromise>,
-  args: DeactivateLiquidityFee
+  args: ClaimRewardsFee
 ): Promise<string> => {
   const api = await instancePromise;
   const { liquidityTokenId, amount, account } = args;
   const dispatchInfo = await api.tx.xyk
-    .deactivateLiquidityV2(liquidityTokenId, amount)
+    .claimRewardsV2(liquidityTokenId, amount)
     .paymentInfo(account);
   return fromBN(new BN(dispatchInfo.partialFee.toString()));
 };
