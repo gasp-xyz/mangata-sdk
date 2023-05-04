@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  - pull_request
+
+env:
+  API_URL: "ws://127.0.0.1:9947"
+  TEST_PALLET_ADDRESS: ${{ secrets.TEST_PALLET_ADDRESS }}
+  TEST_SUDO_NAME: ${{ secrets.TEST_SUDO_NAME }}
+  TX_VERBOSE: true
+
+jobs:
+  complete-setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Clone mangata node repository
+        uses: actions/checkout@v3
+        with:
+          repository: mangata-finance/mangata-node
+          path: mangata-repo
+          ref: develop
+
+      - name: Setup Node version and cache dependencies
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+          cache: "yarn"
+
+      - name: Install WASM toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          target: wasm32-unknown-unknown
+
+      - name: Replace parachain docker image reference in config
+        working-directory: mangata-repo/launch
+        run: sed -i 's+mangatasolutions/mangata-node:dev+mangatasolutions/mangata-node:develop+g' config.yml
+
+      - name: Run the Node
+        working-directory: mangata-repo/launch
+        run: |
+          yarn install
+          yarn gen
+          yarn up
+          docker ps
+
+      - name: Sleep for 3 minutes
+        run: sleep 180s
+
+      - name: Install deps
+        run: yarn install
+
+      - name: Lint
+        run: yarn eslint
+
+      - name: Build the SDK
+        run: yarn build
+
+      - name: Run tests
+        run: yarn test
