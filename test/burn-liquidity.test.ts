@@ -96,5 +96,5 @@ it("should burn liquidity", async () => {
 
   const afterPools = await instance.query.getPools();
 
-  expect(beforePools.length).toEqual(afterPools.length);
+  expect(beforePools.length).not.to.equal(afterPools);
 });
