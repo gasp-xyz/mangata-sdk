@@ -11,14 +11,14 @@ export type XcmTxOptions = Partial<
   Omit<TxOptions, "statusCallback" | "extrinsicStatus">
 >;
 
-export type Deposit = Prettify<
+export type Deposit<A = unknown, D = unknown, W = unknown> = Prettify<
   Merge<
     ExtrinsicCommon,
     {
       url: string;
-      asset: any;
-      destination: any;
-      weightLimit: any;
+      asset: A;
+      destination: D;
+      weightLimit: W;
     }
   >
 >;
@@ -34,16 +34,22 @@ export type Withdraw = Merge<
   }
 >;
 
-export type RelayDeposit = Prettify<
+export type RelayDeposit<
+  A = unknown,
+  D = unknown,
+  F = unknown,
+  B = unknown,
+  W = unknown
+> = Prettify<
   Merge<
     ExtrinsicCommon,
     {
       url: string;
-      assets: any;
-      destination: any;
-      feeAssetItem: any;
-      beneficiary: any;
-      weightLimit: any;
+      assets: A;
+      destination: D;
+      feeAssetItem: F;
+      beneficiary: B;
+      weightLimit: W;
     }
   >
 >;
