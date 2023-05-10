@@ -2220,7 +2220,7 @@ var require_bn = __commonJS({
         } else {
           x = x.clone();
         }
-        var A = new BN3(1);
+        var A3 = new BN3(1);
         var B = new BN3(0);
         var C = new BN3(0);
         var D = new BN3(1);
@@ -2238,11 +2238,11 @@ var require_bn = __commonJS({
           if (i > 0) {
             x.iushrn(i);
             while (i-- > 0) {
-              if (A.isOdd() || B.isOdd()) {
-                A.iadd(yp);
+              if (A3.isOdd() || B.isOdd()) {
+                A3.iadd(yp);
                 B.isub(xp);
               }
-              A.iushrn(1);
+              A3.iushrn(1);
               B.iushrn(1);
             }
           }
@@ -2261,11 +2261,11 @@ var require_bn = __commonJS({
           }
           if (x.cmp(y) >= 0) {
             x.isub(y);
-            A.isub(C);
+            A3.isub(C);
             B.isub(D);
           } else {
             y.isub(x);
-            C.isub(A);
+            C.isub(A3);
             D.isub(B);
           }
         }
@@ -2605,7 +2605,7 @@ var require_bn = __commonJS({
         }
         return r;
       };
-      MPrime.prototype.split = function split2(input, out) {
+      MPrime.prototype.split = function split3(input, out) {
         input.iushrn(this.n, 0, out);
       };
       MPrime.prototype.imulK = function imulK(num) {
@@ -2619,7 +2619,7 @@ var require_bn = __commonJS({
         );
       }
       inherits(K256, MPrime);
-      K256.prototype.split = function split2(input, output2) {
+      K256.prototype.split = function split3(input, output2) {
         var mask = 4194303;
         var outLen = Math.min(input.length, 9);
         for (var i = 0; i < outLen; i++) {
@@ -3825,6 +3825,11 @@ var getPool = async (instancePromise, liquidityTokenId) => {
   };
 };
 
+// src/methods/query/getInvestedPools.ts
+import { pipe } from "fp-ts/function";
+import * as A from "fp-ts/Array";
+import * as S from "fp-ts/string";
+
 // src/utils/calculateLiquidityShare.ts
 var calculateLiquidityShare = async (api, liquidityAssetId, userLiquidityTokenAmount) => {
   if (userLiquidityTokenAmount.isZero())
@@ -3867,40 +3872,44 @@ var getInvestedPools = async (instancePromise, address) => {
     getAccountBalances(api, address),
     getLiquidityPromotedPools(api)
   ]);
-  const poolsInfo = Object.values(assetsInfo).reduce((acc, asset) => {
-    if (Object.keys(accountBalances).includes(asset.id) && asset.name.includes("Liquidity Pool Token")) {
-      acc.push(asset);
-    }
-    return acc;
-  }, []).map(async (asset) => {
-    const userLiquidityBalance = accountBalances[asset.id];
-    const firstTokenId = asset.symbol.split("-")[0];
-    const secondTokenId = asset.symbol.split("-")[1];
-    const [firstTokenAmount, secondTokenAmount] = await getAmountOfTokensInPool(
-      instancePromise,
-      firstTokenId.toString(),
-      secondTokenId.toString()
-    );
-    const share = await calculateLiquidityShare(
-      api,
-      asset.id,
-      userLiquidityBalance.free.add(userLiquidityBalance.reserved)
-    );
-    const poolInfo = {
-      firstTokenId,
-      secondTokenId,
-      firstTokenAmount,
-      secondTokenAmount,
-      liquidityTokenId: asset.id,
-      isPromoted: liquidityTokensPromoted.includes(asset.id),
-      share,
-      firstTokenRatio: share.eq(BN_ZERO) ? BN_ZERO : getRatio(firstTokenAmount, secondTokenAmount),
-      secondTokenRatio: share.eq(BN_ZERO) ? BN_ZERO : getRatio(secondTokenAmount, firstTokenAmount),
-      activatedLPTokens: userLiquidityBalance.reserved,
-      nonActivatedLPTokens: userLiquidityBalance.free
-    };
-    return poolInfo;
-  });
+  const poolsInfo = pipe(
+    Object.values(assetsInfo),
+    A.reduce([], (acc, asset) => {
+      if (Object.keys(accountBalances).includes(asset.id) && asset.name.includes("Liquidity Pool Token")) {
+        acc.push(asset);
+      }
+      return acc;
+    }),
+    A.map(async (asset) => {
+      const userLiquidityBalance = accountBalances[asset.id];
+      const firstTokenId = pipe(asset.symbol, S.split("-"))[0];
+      const secondTokenId = pipe(asset.symbol, S.split("-"))[1];
+      const [firstTokenAmount, secondTokenAmount] = await getAmountOfTokensInPool(
+        instancePromise,
+        firstTokenId.toString(),
+        secondTokenId.toString()
+      );
+      const share = await calculateLiquidityShare(
+        api,
+        asset.id,
+        userLiquidityBalance.free.add(userLiquidityBalance.reserved)
+      );
+      const poolInfo = {
+        firstTokenId,
+        secondTokenId,
+        firstTokenAmount,
+        secondTokenAmount,
+        liquidityTokenId: asset.id,
+        isPromoted: liquidityTokensPromoted.includes(asset.id),
+        share,
+        firstTokenRatio: share.eq(BN_ZERO) ? BN_ZERO : getRatio(firstTokenAmount, secondTokenAmount),
+        secondTokenRatio: share.eq(BN_ZERO) ? BN_ZERO : getRatio(secondTokenAmount, firstTokenAmount),
+        activatedLPTokens: userLiquidityBalance.reserved,
+        nonActivatedLPTokens: userLiquidityBalance.free
+      };
+      return poolInfo;
+    })
+  );
   return Promise.all(poolsInfo);
 };
 
@@ -3917,24 +3926,39 @@ var getTotalIssuanceOfTokens = async (instancePromise) => {
 };
 
 // src/methods/query/getAssetsInfo.ts
+import { pipe as pipe2 } from "fp-ts/function";
+import * as A2 from "fp-ts/Array";
+import * as S2 from "fp-ts/string";
 var getAssetsInfo = async (instancePromise) => {
   const api = await instancePromise;
   const completeAssetsInfo = await getCompleteAssetsInfo(api);
-  return Object.values(completeAssetsInfo).filter((assetsInfo) => !["1", "3", "6"].includes(assetsInfo.id)).reduce((obj, item) => {
-    const asset = {
-      ...item,
-      name: item.name.replace(/0x\w+/, "").replace(/[A-Z]/g, "$&").trim(),
-      symbol: item.symbol.includes("TKN") ? item.symbol.split("-").reduce((acc, curr) => {
-        const currentValue = curr.replace("TKN", "");
-        const tokenId = currentValue.startsWith("0x") ? hexToBn(currentValue).toString() : currentValue;
-        const symbol = completeAssetsInfo[tokenId].symbol;
-        acc.push(symbol);
-        return acc;
-      }, []).join("-") : item.symbol
-    };
-    obj[asset.id] = asset;
-    return obj;
-  }, {});
+  return pipe2(
+    Object.values(completeAssetsInfo),
+    A2.filter((assetsInfo) => !["1", "3", "6"].includes(assetsInfo.id)),
+    A2.reduce({}, (obj, item) => {
+      const asset = {
+        ...item,
+        name: pipe2(
+          item.name,
+          S2.replace(/0x\w+/, ""),
+          S2.replace(/[A-Z]/g, "$&"),
+          S2.trim
+        ),
+        symbol: pipe2(item.symbol, S2.includes("TKN")) ? pipe2(
+          item.symbol.split("-"),
+          A2.reduce([], (acc, curr) => {
+            const currentValue = pipe2(curr, S2.replace("TKN", ""));
+            const tokenId = pipe2(currentValue, S2.startsWith("0x")) ? hexToBn(currentValue).toString() : currentValue;
+            const symbol = completeAssetsInfo[tokenId].symbol;
+            acc.push(symbol);
+            return acc;
+          })
+        ).join("-") : item.symbol
+      };
+      obj[asset.id] = asset;
+      return obj;
+    })
+  );
 };
 
 // src/methods/query/getOwnedTokens.ts
@@ -4257,9 +4281,9 @@ function createWasmFn(root, wasmBytes2, asmFn) {
 
 // node_modules/@polkadot/wasm-util/base64.js
 var chr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-var map = new Array(256);
+var map2 = new Array(256);
 for (let i = 0; i < chr.length; i++) {
-  map[chr.charCodeAt(i)] = i;
+  map2[chr.charCodeAt(i)] = i;
 }
 function base64Decode(data, out) {
   const len = out.length;
@@ -4267,7 +4291,7 @@ function base64Decode(data, out) {
   let bits2 = 0;
   let pos = -1;
   for (let i = 0; pos < len; i++) {
-    byte = byte << 6 | map[data.charCodeAt(i)];
+    byte = byte << 6 | map2[data.charCodeAt(i)];
     if ((bits2 += 6) >= 8) {
       out[++pos] = byte >>> (bits2 -= 8) & 255;
     }
@@ -5373,7 +5397,7 @@ function fromBig(n, le = false) {
     return { h: Number(n & U32_MASK64), l: Number(n >> _32n & U32_MASK64) };
   return { h: Number(n >> _32n & U32_MASK64) | 0, l: Number(n & U32_MASK64) | 0 };
 }
-function split(lst, le = false) {
+function split2(lst, le = false) {
   let Ah = new Uint32Array(lst.length);
   let Al = new Uint32Array(lst.length);
   for (let i = 0; i < lst.length; i++) {
@@ -5407,7 +5431,7 @@ var add5L = (Al, Bl, Cl, Dl, El) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >
 var add5H = (low, Ah, Bh, Ch, Dh, Eh) => Ah + Bh + Ch + Dh + Eh + (low / 2 ** 32 | 0) | 0;
 var u64 = {
   fromBig,
-  split,
+  split: split2,
   toBig,
   shrSH,
   shrSL,

@@ -8,6 +8,9 @@ import { getLiquidityPromotedPools } from "../../utils/getLiquidityPromotedPools
 import { getRatio } from "../../utils/getRatio";
 import { Address } from "../../types/common";
 import { getAmountOfTokensInPool } from "./getAmountOfTokensInPool";
+import { pipe } from "fp-ts/function";
+import * as A from "fp-ts/Array";
+import * as S from "fp-ts/string";
 
 export const getInvestedPools = async (
   instancePromise: Promise<ApiPromise>,
@@ -21,20 +24,16 @@ export const getInvestedPools = async (
       getLiquidityPromotedPools(api)
     ]);
 
-  const poolsInfo = Object.values(assetsInfo)
-    .reduce((acc, asset) => {
-      if (
+  const poolsInfo = pipe(
+    Object.values(assetsInfo),
+    A.filter(
+      (asset) =>
         Object.keys(accountBalances).includes(asset.id) &&
-        asset.name.includes("Liquidity Pool Token")
-      ) {
-        acc.push(asset);
-      }
-      return acc;
-    }, [] as TTokenInfo[])
-    .map(async (asset: TTokenInfo) => {
+        asset.name.includes("LiquidityPoolToken")
+    ),
+    A.map(async (asset: TTokenInfo) => {
       const userLiquidityBalance = accountBalances[asset.id];
-      const firstTokenId = asset.symbol.split("-")[0];
-      const secondTokenId = asset.symbol.split("-")[1];
+      const [firstTokenId, secondTokenId] = pipe(asset.symbol, S.split("-"));
       const [firstTokenAmount, secondTokenAmount] =
         await getAmountOfTokensInPool(
           instancePromise,
@@ -47,7 +46,7 @@ export const getInvestedPools = async (
         userLiquidityBalance.free.add(userLiquidityBalance.reserved)
       );
 
-      const poolInfo = {
+      return {
         firstTokenId,
         secondTokenId,
         firstTokenAmount,
@@ -64,9 +63,8 @@ export const getInvestedPools = async (
         activatedLPTokens: userLiquidityBalance.reserved,
         nonActivatedLPTokens: userLiquidityBalance.free
       } as TPoolWithShare;
-
-      return poolInfo;
-    });
+    })
+  );
 
   return Promise.all(poolsInfo);
 };
