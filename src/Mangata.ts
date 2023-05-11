@@ -1086,4 +1086,40 @@ export class Mangata {
     const api = await this.getApi();
     return await Query.getPools(api);
   }
+
+  public async multiswapSellAsset(
+    account: string | KeyringPair,
+    tokenIds: BN[],
+    soldAssetAmount: BN,
+    minAmountOut: BN,
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    const api = await this.getApi();
+    return await Tx.multiswapSellAsset(
+      api,
+      account,
+      tokenIds,
+      soldAssetAmount,
+      minAmountOut,
+      txOptions
+    );
+  }
+
+  public async multiswapBuyAsset(
+    account: string | KeyringPair,
+    tokenIds: BN[],
+    boughtAssetAmount: BN,
+    maxAmountIn: BN,
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    const api = await this.getApi();
+    return await Tx.multiswapBuyAsset(
+      api,
+      account,
+      tokenIds,
+      boughtAssetAmount,
+      maxAmountIn,
+      txOptions
+    );
+  }
 }

@@ -869,4 +869,36 @@ export class Tx {
       txOptions
     );
   }
+
+  static async multiswapSellAsset(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    tokenIds: BN[],
+    soldAssetAmount: BN,
+    minAmountOut: BN,
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    return await signTx(
+      api,
+      api.tx.xyk.multiswapSellAsset(tokenIds, soldAssetAmount, minAmountOut),
+      account,
+      txOptions
+    );
+  }
+
+  static async multiswapBuyAsset(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    tokenIds: BN[],
+    boughtAssetAmount: BN,
+    maxAmountIn: BN,
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    return await signTx(
+      api,
+      api.tx.xyk.multiswapBuyAsset(tokenIds, boughtAssetAmount, maxAmountIn),
+      account,
+      txOptions
+    );
+  }
 }
