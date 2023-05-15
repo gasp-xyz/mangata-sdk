@@ -14,6 +14,8 @@ import {
   Liquidity,
   MintLiquidity,
   MintLiquidityFee,
+  MultiswapBuyAsset,
+  MultiswapSellAsset,
   Price,
   Reserve,
   Rewards,
@@ -97,6 +99,8 @@ import { getMintLiquidityFee } from "./methods/fee/getMintLiquidityFee";
 import { getBurnLiquidityFee } from "./methods/fee/getBurnLiquidityFee";
 import { getTransferAllTokenFee } from "./methods/fee/getTransferAllTokenFee";
 import { getTransferTokenFee } from "./methods/fee/getTransferTokenFee";
+import { multiswapBuyAsset } from "./methods/xyk/multiswapBuyAsset";
+import { multiswapSellAsset } from "./methods/xyk/multiswapSellAsset";
 
 function createMangataInstance(urls: string[]): MangataInstance {
   const instancePromise = getOrCreateInstance(urls);
@@ -131,7 +135,11 @@ function createMangataInstance(urls: string[]): MangataInstance {
       createPool: async (args: CreatePool) =>
         await createPool(instancePromise, args, false),
       claimRewards: async (args: Liquidity) =>
-        await claimRewards(instancePromise, args, false)
+        await claimRewards(instancePromise, args, false),
+      multiswapBuyAsset: async (args: MultiswapBuyAsset) =>
+        await multiswapBuyAsset(instancePromise, args, false),
+      multiswapSellAsset: async (args: MultiswapSellAsset) =>
+        await multiswapSellAsset(instancePromise, args, false)
     },
     rpc: {
       calculateBuyPriceId: async (args: Price) =>

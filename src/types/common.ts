@@ -39,6 +39,8 @@ import {
   Liquidity,
   MintLiquidity,
   MintLiquidityFee,
+  MultiswapBuyAsset,
+  MultiswapSellAsset,
   Price,
   Reserve,
   Rewards,
@@ -116,6 +118,12 @@ export interface MangataInstance {
     sellAsset: (args: SellAsset) => Promise<MangataGenericEvent[]>;
     createPool: (args: CreatePool) => Promise<MangataGenericEvent[]>;
     claimRewards: (args: Liquidity) => Promise<MangataGenericEvent[]>;
+    multiswapSellAsset: (
+      args: MultiswapSellAsset
+    ) => Promise<MangataGenericEvent[]>;
+    multiswapBuyAsset: (
+      args: MultiswapBuyAsset
+    ) => Promise<MangataGenericEvent[]>;
   };
   rpc: {
     calculateBuyPriceId: (args: Price) => Promise<BN>;

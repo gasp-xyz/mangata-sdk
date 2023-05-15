@@ -5,6 +5,7 @@ import {
   Address,
   Prettify
 } from "./common";
+
 import { Merge, Except } from "type-fest";
 
 export type Rewards = {
@@ -73,3 +74,20 @@ export type ClaimRewardsFee = Except<Liquidity, "txOptions">;
 export type BuyAssetFee = Except<BuyAsset, "txOptions">;
 export type BurnLiquidityFee = Except<BurnLiquidity, "txOptions">;
 export type ActivateLiquidityFee = Except<Liquidity, "txOptions">;
+export type MultiSwapBase = Merge<
+  ExtrinsicCommon,
+  {
+    tokenIds: TokenId[];
+    amount: TokenAmount;
+  }
+>;
+
+export type MultiswapSellAsset = Merge<
+  MultiSwapBase,
+  { minAmountOut: MinAmountOut }
+>;
+
+export type MultiswapBuyAsset = Merge<
+  MultiSwapBase,
+  { maxAmountIn: MinAmountOut }
+>;
