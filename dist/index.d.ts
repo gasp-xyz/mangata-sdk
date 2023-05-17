@@ -63,10 +63,10 @@ type MultiSwapBase = Merge<ExtrinsicCommon, {
     amount: TokenAmount;
 }>;
 type MultiswapSellAsset = Merge<MultiSwapBase, {
-    minAmountOut: MinAmountOut;
+    minAmountOut: TokenAmount;
 }>;
 type MultiswapBuyAsset = Merge<MultiSwapBase, {
-    maxAmountIn: MinAmountOut;
+    maxAmountIn: TokenAmount;
 }>;
 
 type Token = {
