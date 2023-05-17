@@ -3,9 +3,9 @@ import { hexToBn, isHex, BN, BN_ZERO } from "@polkadot/util";
 import { TokenId } from "../../types/common";
 import { TMainTokens, TTokenInfo } from "../../types/query";
 import { getCompleteAssetsInfo } from "../../utils/getCompleteAssetsInfo";
-import { pipe } from "fp-ts/lib/function";
-import * as A from "fp-ts/lib/Array";
-import * as S from "fp-ts/lib/string";
+import { pipe } from "fp-ts/es6/function";
+import * as A from "fp-ts/es6/Array";
+import * as S from "fp-ts/es6/string";
 
 export const getAssetsInfo = async (
   instancePromise: Promise<ApiPromise>

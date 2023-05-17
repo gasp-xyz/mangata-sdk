@@ -8,9 +8,9 @@ import { getLiquidityPromotedPools } from "../../utils/getLiquidityPromotedPools
 import { getRatio } from "../../utils/getRatio";
 import { Address } from "../../types/common";
 import { getAmountOfTokensInPool } from "./getAmountOfTokensInPool";
-import { pipe } from "fp-ts/lib/function";
-import * as A from "fp-ts/lib/Array";
-import * as S from "fp-ts/lib/string";
+import { pipe } from "fp-ts/es6/function";
+import * as A from "fp-ts/es6/Array";
+import * as S from "fp-ts/es6/string";
 
 export const getInvestedPools = async (
   instancePromise: Promise<ApiPromise>,

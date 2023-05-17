@@ -3,8 +3,8 @@ import { TokenId } from "../../types/common";
 import { Token } from "../../types/query";
 import { getAccountBalances } from "../../utils/getAccountBalances";
 import { getAssetsInfo } from "./getAssetsInfo";
-import { pipe } from "fp-ts/lib/function";
-import * as A from "fp-ts/lib/Array";
+import { pipe } from "fp-ts/es6/function";
+import * as A from "fp-ts/es6/Array";
 
 export const getOwnedTokens = async (
   instancePromise: Promise<ApiPromise>,
