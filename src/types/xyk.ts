@@ -84,10 +84,10 @@ export type MultiSwapBase = Merge<
 
 export type MultiswapSellAsset = Merge<
   MultiSwapBase,
-  { minAmountOut: MinAmountOut }
+  { minAmountOut: TokenAmount }
 >;
 
 export type MultiswapBuyAsset = Merge<
   MultiSwapBase,
-  { maxAmountIn: MinAmountOut }
+  { maxAmountIn: TokenAmount }
 >;
