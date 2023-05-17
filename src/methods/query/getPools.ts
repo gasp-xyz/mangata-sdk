@@ -7,7 +7,7 @@ import { getLiquidityPromotedPools } from "../../utils/getLiquidityPromotedPools
 import { getPoolsBalance } from "../../utils/getPoolsBalance";
 import { getRatio } from "../../utils/getRatio";
 import { pipe } from "fp-ts/lib/function";
-import * as A from "fp-ts/Array";
+import * as A from "fp-ts/lib/Array";
 
 export const getPools = async (
   instancePromise: Promise<ApiPromise>

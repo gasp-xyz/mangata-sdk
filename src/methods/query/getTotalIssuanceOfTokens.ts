@@ -1,8 +1,8 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { pipe } from "fp-ts/function";
-import * as A from "fp-ts/Array";
-import * as S from "fp-ts/string";
+import { pipe } from "fp-ts/lib/function";
+import * as A from "fp-ts/lib/Array";
+import * as S from "fp-ts/lib/string";
 import { TokenAmount } from "../../types/common";
 import { TBalances } from "../../types/query";
 

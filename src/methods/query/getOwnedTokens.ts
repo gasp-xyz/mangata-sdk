@@ -4,7 +4,7 @@ import { Token } from "../../types/query";
 import { getAccountBalances } from "../../utils/getAccountBalances";
 import { getAssetsInfo } from "./getAssetsInfo";
 import { pipe } from "fp-ts/lib/function";
-import * as A from "fp-ts/Array";
+import * as A from "fp-ts/lib/Array";
 
 export const getOwnedTokens = async (
   instancePromise: Promise<ApiPromise>,

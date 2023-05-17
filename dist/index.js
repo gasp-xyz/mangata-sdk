@@ -3752,7 +3752,7 @@ var getRatio = (left, right) => {
 
 // src/methods/query/getPools.ts
 import { pipe } from "fp-ts/lib/function";
-import * as A from "fp-ts/Array";
+import * as A from "fp-ts/lib/Array";
 var getPools = async (instancePromise) => {
   const api = await instancePromise;
   const [assetsInfo, liquidityAssets, liquidityTokensPromoted] = await Promise.all([
@@ -3866,9 +3866,9 @@ var getAccountBalances = async (api, address) => {
 };
 
 // src/methods/query/getInvestedPools.ts
-import { pipe as pipe2 } from "fp-ts/function";
-import * as A2 from "fp-ts/Array";
-import * as S from "fp-ts/string";
+import { pipe as pipe2 } from "fp-ts/lib/function";
+import * as A2 from "fp-ts/lib/Array";
+import * as S from "fp-ts/lib/string";
 var getInvestedPools = async (instancePromise, address) => {
   const api = await instancePromise;
   const [assetsInfo, accountBalances, liquidityTokensPromoted] = await Promise.all([
@@ -3913,9 +3913,9 @@ var getInvestedPools = async (instancePromise, address) => {
 };
 
 // src/methods/query/getTotalIssuanceOfTokens.ts
-import { pipe as pipe3 } from "fp-ts/function";
-import * as A3 from "fp-ts/Array";
-import * as S2 from "fp-ts/string";
+import { pipe as pipe3 } from "fp-ts/lib/function";
+import * as A3 from "fp-ts/lib/Array";
+import * as S2 from "fp-ts/lib/string";
 var getTotalIssuanceOfTokens = async (instancePromise) => {
   const api = await instancePromise;
   const balancesResponse = await api.query.tokens.totalIssuance.entries();
@@ -3931,9 +3931,9 @@ var getTotalIssuanceOfTokens = async (instancePromise) => {
 };
 
 // src/methods/query/getAssetsInfo.ts
-import { pipe as pipe4 } from "fp-ts/function";
-import * as A4 from "fp-ts/Array";
-import * as S3 from "fp-ts/string";
+import { pipe as pipe4 } from "fp-ts/lib/function";
+import * as A4 from "fp-ts/lib/Array";
+import * as S3 from "fp-ts/lib/string";
 var getAssetsInfo = async (instancePromise) => {
   const api = await instancePromise;
   const completeAssetsInfo = await getCompleteAssetsInfo(api);
@@ -3968,7 +3968,7 @@ var getAssetsInfo = async (instancePromise) => {
 
 // src/methods/query/getOwnedTokens.ts
 import { pipe as pipe5 } from "fp-ts/lib/function";
-import * as A5 from "fp-ts/Array";
+import * as A5 from "fp-ts/lib/Array";
 var getOwnedTokens = async (instancePromise, address) => {
   const api = await instancePromise;
   const [assetsInfo, accountBalances] = await Promise.all([
@@ -3999,7 +3999,7 @@ var getBlockNumber = async (instancePromise) => {
 
 // src/methods/query/getLiquidityTokens.ts
 import { pipe as pipe6 } from "fp-ts/lib/function";
-import * as A6 from "fp-ts/Array";
+import * as A6 from "fp-ts/lib/Array";
 var getLiquidityTokens = async (instancePromise) => {
   const assetsInfo = await getAssetsInfo(instancePromise);
   return pipe6(
@@ -4014,7 +4014,7 @@ var getLiquidityTokens = async (instancePromise) => {
 
 // src/methods/query/getLiquidityTokenIds.ts
 import { pipe as pipe7 } from "fp-ts/lib/function";
-import * as A7 from "fp-ts/Array";
+import * as A7 from "fp-ts/lib/Array";
 var getLiquidityTokenIds = async (instancePromise) => {
   const api = await instancePromise;
   const liquidityTokens = await api.query.xyk.liquidityAssets.entries();
