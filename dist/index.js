@@ -3907,7 +3907,7 @@ import * as A from "fp-ts/es6/Array.js";
 var getTotalIssuanceOfTokens = async (instancePromise) => {
   const api = await instancePromise;
   const balancesResponse = await api.query.tokens.totalIssuance.entries();
-  pipe(
+  return pipe(
     balancesResponse,
     A.reduce({}, (acc, [key, value]) => {
       const id = key.toHuman()[0].replace(/[, ]/g, "");
@@ -3916,12 +3916,6 @@ var getTotalIssuanceOfTokens = async (instancePromise) => {
       return acc;
     })
   );
-  return balancesResponse.reduce((acc, [key, value]) => {
-    const id = key.toHuman()[0].replace(/[, ]/g, "");
-    const balance = new import_bn.default(value.toString());
-    acc[id] = balance;
-    return acc;
-  }, {});
 };
 
 // src/methods/query/getAssetsInfo.ts
