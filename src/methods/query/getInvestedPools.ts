@@ -8,6 +8,7 @@ import { getLiquidityPromotedPools } from "../../utils/getLiquidityPromotedPools
 import { getRatio } from "../../utils/getRatio";
 import { Address } from "../../types/common";
 import { getAmountOfTokensInPool } from "./getAmountOfTokensInPool";
+import { pipe, filter, map } from "rambda";
 
 export const getInvestedPools = async (
   instancePromise: Promise<ApiPromise>,
@@ -21,13 +22,13 @@ export const getInvestedPools = async (
       getLiquidityPromotedPools(api)
     ]);
 
-  const poolsInfo = Object.values(assetsInfo)
-    .filter(
+  const poolsInfo = pipe(
+    filter(
       (asset: TTokenInfo) =>
         Object.keys(accountBalances).includes(asset.id) &&
         asset.name.includes("LiquidityPoolToken")
-    )
-    .map(async (asset: TTokenInfo) => {
+    ),
+    map(async (asset: TTokenInfo) => {
       const userLiquidityBalance = accountBalances[asset.id];
       const [firstTokenId, secondTokenId] = asset.symbol.split("-");
       const [firstTokenAmount, secondTokenAmount] =
@@ -59,7 +60,8 @@ export const getInvestedPools = async (
         activatedLPTokens: userLiquidityBalance.reserved,
         nonActivatedLPTokens: userLiquidityBalance.free
       } as TPoolWithShare;
-    });
+    })
+  )(Object.values(assetsInfo));
 
   return Promise.all(poolsInfo);
 };

@@ -3,6 +3,7 @@ import { TokenId } from "../../types/common";
 import { Token } from "../../types/query";
 import { getAccountBalances } from "../../utils/getAccountBalances";
 import { getAssetsInfo } from "./getAssetsInfo";
+import { pipe, filter, map } from "rambda";
 
 export const getOwnedTokens = async (
   instancePromise: Promise<ApiPromise>,
@@ -15,14 +16,16 @@ export const getOwnedTokens = async (
   ]);
 
   return Object.fromEntries(
-    Object.entries(assetsInfo)
-      .filter(([id]) => Object.keys(accountBalances).includes(id))
-      .map(([id, assetInfo]) => [
+    pipe(
+      Object.entries,
+      filter(([id]) => Object.keys(accountBalances).includes(id)),
+      map(([id, assetInfo]) => [
         id,
         {
           ...assetInfo,
           balance: accountBalances[id]
         }
       ])
+    )(assetsInfo)
   ) as { [id: TokenId]: Token };
 };

@@ -1,6 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
-import { hexToBn, isHex, BN, BN_ZERO } from "@polkadot/util";
-import { TokenId } from "../../types/common";
+import { hexToBn } from "@polkadot/util";
+import { pipe, filter, reduce, replace, trim, split, join } from "rambda";
 import { TMainTokens, TTokenInfo } from "../../types/query";
 import { getCompleteAssetsInfo } from "../../utils/getCompleteAssetsInfo";
 
@@ -11,18 +11,22 @@ export const getAssetsInfo = async (
   const completeAssetsInfo = await getCompleteAssetsInfo(api);
   // we need to filter out ETH and Dummy liquidity token
   // then we need to display symbol for liquidity token
-  return Object.values(completeAssetsInfo)
-    .filter(
+  return pipe(
+    filter(
       (assetsInfo: TTokenInfo) => !["1", "3", "6"].includes(assetsInfo.id)
-    )
-    .reduce((obj, item: TTokenInfo) => {
+    ),
+    reduce((obj, item) => {
       const asset = {
         ...item,
-        name: item.name.replace(/0x\w+/, "").replace(/[A-Z]/g, "$&").trim(),
+        name: pipe(
+          replace(/0x\w+/, ""),
+          replace(/[A-Z]/g, "$&"),
+          trim
+        )(item.name),
         symbol: item.symbol.includes("TKN")
-          ? item.symbol
-              .split("-")
-              .reduce((acc, curr: string) => {
+          ? pipe(
+              split("-"),
+              reduce((acc, curr: string) => {
                 const currentValue = curr.replace("TKN", "");
                 const tokenId = currentValue.startsWith("0x")
                   ? hexToBn(currentValue).toString()
@@ -30,11 +34,13 @@ export const getAssetsInfo = async (
                 const symbol = completeAssetsInfo[tokenId].symbol;
                 acc.push(symbol);
                 return acc;
-              }, [] as string[])
-              .join("-")
+              }, [] as string[]),
+              join("-")
+            )(item.symbol)
           : item.symbol
       };
       obj[asset.id] = asset;
       return obj;
-    }, {} as { [id: TokenId]: TTokenInfo });
+    }, {} as TMainTokens)
+  )(Object.values(completeAssetsInfo));
 };

@@ -6,6 +6,7 @@ import { getLiquidityAssets } from "../../utils/getLiquidityAssets";
 import { getLiquidityPromotedPools } from "../../utils/getLiquidityPromotedPools";
 import { getPoolsBalance } from "../../utils/getPoolsBalance";
 import { getRatio } from "../../utils/getRatio";
+import { pipe, filter, map } from "rambda";
 
 export const getPools = async (
   instancePromise: Promise<ApiPromise>
@@ -19,11 +20,11 @@ export const getPools = async (
     ]);
   const poolBalances = await getPoolsBalance(api, liquidityAssets);
 
-  return Object.values(assetsInfo)
-    .filter((asset: TTokenInfo) =>
+  return pipe(
+    filter((asset: TTokenInfo) =>
       Object.values(liquidityAssets).includes(asset.id)
-    )
-    .map((asset: TTokenInfo) => {
+    ),
+    map((asset: TTokenInfo) => {
       const [firstTokenAmount, secondTokenAmount] = poolBalances[asset.id];
       const [firstTokenId, secondTokenId] = asset.symbol.split("-");
       const firstTokenRatio = getRatio(firstTokenAmount, secondTokenAmount);
@@ -39,5 +40,6 @@ export const getPools = async (
         secondTokenRatio,
         isPromoted
       } as Pool & { firstTokenRatio: BN; secondTokenRatio: BN };
-    });
+    })
+  )(Object.values(assetsInfo));
 };
