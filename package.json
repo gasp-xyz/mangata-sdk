@@ -30,7 +30,7 @@
   "dependencies": {
     "@mangata-finance/types": "^0.23.0",
     "big.js": "^6.2.1",
-    "fp-ts": "^2.14.0"
+    "fp-ts": "^2.15.0"
   },
   "devDependencies": {
     "@types/big.js": "^6.1.6",

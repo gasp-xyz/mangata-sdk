@@ -2220,7 +2220,7 @@ var require_bn = __commonJS({
         } else {
           x = x.clone();
         }
-        var A8 = new BN3(1);
+        var A2 = new BN3(1);
         var B = new BN3(0);
         var C = new BN3(0);
         var D = new BN3(1);
@@ -2238,11 +2238,11 @@ var require_bn = __commonJS({
           if (i > 0) {
             x.iushrn(i);
             while (i-- > 0) {
-              if (A8.isOdd() || B.isOdd()) {
-                A8.iadd(yp);
+              if (A2.isOdd() || B.isOdd()) {
+                A2.iadd(yp);
                 B.isub(xp);
               }
-              A8.iushrn(1);
+              A2.iushrn(1);
               B.iushrn(1);
             }
           }
@@ -2261,11 +2261,11 @@ var require_bn = __commonJS({
           }
           if (x.cmp(y) >= 0) {
             x.isub(y);
-            A8.isub(C);
+            A2.isub(C);
             B.isub(D);
           } else {
             y.isub(x);
-            C.isub(A8);
+            C.isub(A2);
             D.isub(B);
           }
         }
@@ -2605,7 +2605,7 @@ var require_bn = __commonJS({
         }
         return r;
       };
-      MPrime.prototype.split = function split3(input, out) {
+      MPrime.prototype.split = function split2(input, out) {
         input.iushrn(this.n, 0, out);
       };
       MPrime.prototype.imulK = function imulK(num) {
@@ -2619,7 +2619,7 @@ var require_bn = __commonJS({
         );
       }
       inherits(K256, MPrime);
-      K256.prototype.split = function split3(input, output2) {
+      K256.prototype.split = function split2(input, output2) {
         var mask = 4194303;
         var outLen = Math.min(input.length, 9);
         for (var i = 0; i < outLen; i++) {
@@ -3751,8 +3751,6 @@ var getRatio = (left, right) => {
 };
 
 // src/methods/query/getPools.ts
-import { pipe } from "fp-ts/es6/function";
-import * as A from "fp-ts/es6/Array";
 var getPools = async (instancePromise) => {
   const api = await instancePromise;
   const [assetsInfo, liquidityAssets, liquidityTokensPromoted] = await Promise.all([
@@ -3761,27 +3759,25 @@ var getPools = async (instancePromise) => {
     getLiquidityPromotedPools(api)
   ]);
   const poolBalances = await getPoolsBalance(api, liquidityAssets);
-  return pipe(
-    Object.values(assetsInfo),
-    A.filter((asset) => Object.values(liquidityAssets).includes(asset.id)),
-    A.map(({ symbol, id: liquidityTokenId }) => {
-      const [firstTokenAmount, secondTokenAmount] = poolBalances[liquidityTokenId];
-      const [firstTokenId, secondTokenId] = symbol.split("-");
-      const firstTokenRatio = getRatio(firstTokenAmount, secondTokenAmount);
-      const secondTokenRatio = getRatio(secondTokenAmount, firstTokenAmount);
-      const isPromoted = liquidityTokensPromoted.includes(liquidityTokenId);
-      return {
-        firstTokenId,
-        secondTokenId,
-        firstTokenAmount,
-        secondTokenAmount,
-        liquidityTokenId,
-        firstTokenRatio,
-        secondTokenRatio,
-        isPromoted
-      };
-    })
-  );
+  return Object.values(assetsInfo).filter(
+    (asset) => Object.values(liquidityAssets).includes(asset.id)
+  ).map((asset) => {
+    const [firstTokenAmount, secondTokenAmount] = poolBalances[asset.id];
+    const [firstTokenId, secondTokenId] = asset.symbol.split("-");
+    const firstTokenRatio = getRatio(firstTokenAmount, secondTokenAmount);
+    const secondTokenRatio = getRatio(secondTokenAmount, firstTokenAmount);
+    const isPromoted = liquidityTokensPromoted.includes(asset.id);
+    return {
+      firstTokenId,
+      secondTokenId,
+      firstTokenAmount,
+      secondTokenAmount,
+      liquidityTokenId: asset.id,
+      firstTokenRatio,
+      secondTokenRatio,
+      isPromoted
+    };
+  });
 };
 
 // src/methods/query/getLiquidityPool.ts
@@ -3866,9 +3862,6 @@ var getAccountBalances = async (api, address) => {
 };
 
 // src/methods/query/getInvestedPools.ts
-import { pipe as pipe2 } from "fp-ts/es6/function";
-import * as A2 from "fp-ts/es6/Array";
-import * as S from "fp-ts/es6/string";
 var getInvestedPools = async (instancePromise, address) => {
   const api = await instancePromise;
   const [assetsInfo, accountBalances, liquidityTokensPromoted] = await Promise.all([
@@ -3876,99 +3869,85 @@ var getInvestedPools = async (instancePromise, address) => {
     getAccountBalances(api, address),
     getLiquidityPromotedPools(api)
   ]);
-  const poolsInfo = pipe2(
-    Object.values(assetsInfo),
-    A2.filter(
-      (asset) => Object.keys(accountBalances).includes(asset.id) && asset.name.includes("LiquidityPoolToken")
-    ),
-    A2.map(async (asset) => {
-      const userLiquidityBalance = accountBalances[asset.id];
-      const [firstTokenId, secondTokenId] = pipe2(asset.symbol, S.split("-"));
-      const [firstTokenAmount, secondTokenAmount] = await getAmountOfTokensInPool(
-        instancePromise,
-        firstTokenId.toString(),
-        secondTokenId.toString()
-      );
-      const share = await calculateLiquidityShare(
-        api,
-        asset.id,
-        userLiquidityBalance.free.add(userLiquidityBalance.reserved)
-      );
-      return {
-        firstTokenId,
-        secondTokenId,
-        firstTokenAmount,
-        secondTokenAmount,
-        liquidityTokenId: asset.id,
-        isPromoted: liquidityTokensPromoted.includes(asset.id),
-        share,
-        firstTokenRatio: share.eq(BN_ZERO) ? BN_ZERO : getRatio(firstTokenAmount, secondTokenAmount),
-        secondTokenRatio: share.eq(BN_ZERO) ? BN_ZERO : getRatio(secondTokenAmount, firstTokenAmount),
-        activatedLPTokens: userLiquidityBalance.reserved,
-        nonActivatedLPTokens: userLiquidityBalance.free
-      };
-    })
-  );
+  const poolsInfo = Object.values(assetsInfo).filter(
+    (asset) => Object.keys(accountBalances).includes(asset.id) && asset.name.includes("LiquidityPoolToken")
+  ).map(async (asset) => {
+    const userLiquidityBalance = accountBalances[asset.id];
+    const [firstTokenId, secondTokenId] = asset.symbol.split("-");
+    const [firstTokenAmount, secondTokenAmount] = await getAmountOfTokensInPool(
+      instancePromise,
+      firstTokenId.toString(),
+      secondTokenId.toString()
+    );
+    const share = await calculateLiquidityShare(
+      api,
+      asset.id,
+      userLiquidityBalance.free.add(userLiquidityBalance.reserved)
+    );
+    return {
+      firstTokenId,
+      secondTokenId,
+      firstTokenAmount,
+      secondTokenAmount,
+      liquidityTokenId: asset.id,
+      isPromoted: liquidityTokensPromoted.includes(asset.id),
+      share,
+      firstTokenRatio: share.eq(BN_ZERO) ? BN_ZERO : getRatio(firstTokenAmount, secondTokenAmount),
+      secondTokenRatio: share.eq(BN_ZERO) ? BN_ZERO : getRatio(secondTokenAmount, firstTokenAmount),
+      activatedLPTokens: userLiquidityBalance.reserved,
+      nonActivatedLPTokens: userLiquidityBalance.free
+    };
+  });
   return Promise.all(poolsInfo);
 };
 
 // src/methods/query/getTotalIssuanceOfTokens.ts
-import { pipe as pipe3 } from "fp-ts/es6/function";
-import * as A3 from "fp-ts/es6/Array";
-import * as S2 from "fp-ts/es6/string";
+import { pipe } from "fp-ts/es6/function.js";
+import * as A from "fp-ts/es6/Array.js";
 var getTotalIssuanceOfTokens = async (instancePromise) => {
   const api = await instancePromise;
   const balancesResponse = await api.query.tokens.totalIssuance.entries();
-  return pipe3(
+  pipe(
     balancesResponse,
-    A3.reduce({}, (acc, [key, value]) => {
-      const id = pipe3(key.toHuman()[0], S2.replace(/[, ]/g, ""));
+    A.reduce({}, (acc, [key, value]) => {
+      const id = key.toHuman()[0].replace(/[, ]/g, "");
       const balance = new import_bn.default(value.toString());
       acc[id] = balance;
       return acc;
     })
   );
+  return balancesResponse.reduce((acc, [key, value]) => {
+    const id = key.toHuman()[0].replace(/[, ]/g, "");
+    const balance = new import_bn.default(value.toString());
+    acc[id] = balance;
+    return acc;
+  }, {});
 };
 
 // src/methods/query/getAssetsInfo.ts
-import { pipe as pipe4 } from "fp-ts/es6/function";
-import * as A4 from "fp-ts/es6/Array";
-import * as S3 from "fp-ts/es6/string";
 var getAssetsInfo = async (instancePromise) => {
   const api = await instancePromise;
   const completeAssetsInfo = await getCompleteAssetsInfo(api);
-  return pipe4(
-    Object.values(completeAssetsInfo),
-    A4.filter((assetsInfo) => !["1", "3", "6"].includes(assetsInfo.id)),
-    A4.reduce({}, (obj, item) => {
-      const asset = {
-        ...item,
-        name: pipe4(
-          item.name,
-          S3.replace(/0x\w+/, ""),
-          S3.replace(/[A-Z]/g, "$&"),
-          S3.trim
-        ),
-        symbol: pipe4(item.symbol, S3.includes("TKN")) ? pipe4(
-          item.symbol.split("-"),
-          A4.reduce([], (acc, curr) => {
-            const currentValue = pipe4(curr, S3.replace("TKN", ""));
-            const tokenId = pipe4(currentValue, S3.startsWith("0x")) ? hexToBn(currentValue).toString() : currentValue;
-            const symbol = completeAssetsInfo[tokenId].symbol;
-            acc.push(symbol);
-            return acc;
-          })
-        ).join("-") : item.symbol
-      };
-      obj[asset.id] = asset;
-      return obj;
-    })
-  );
+  return Object.values(completeAssetsInfo).filter(
+    (assetsInfo) => !["1", "3", "6"].includes(assetsInfo.id)
+  ).reduce((obj, item) => {
+    const asset = {
+      ...item,
+      name: item.name.replace(/0x\w+/, "").replace(/[A-Z]/g, "$&").trim(),
+      symbol: item.symbol.includes("TKN") ? item.symbol.split("-").reduce((acc, curr) => {
+        const currentValue = curr.replace("TKN", "");
+        const tokenId = currentValue.startsWith("0x") ? hexToBn(currentValue).toString() : currentValue;
+        const symbol = completeAssetsInfo[tokenId].symbol;
+        acc.push(symbol);
+        return acc;
+      }, []).join("-") : item.symbol
+    };
+    obj[asset.id] = asset;
+    return obj;
+  }, {});
 };
 
 // src/methods/query/getOwnedTokens.ts
-import { pipe as pipe5 } from "fp-ts/es6/function";
-import * as A5 from "fp-ts/es6/Array";
 var getOwnedTokens = async (instancePromise, address) => {
   const api = await instancePromise;
   const [assetsInfo, accountBalances] = await Promise.all([
@@ -3976,17 +3955,13 @@ var getOwnedTokens = async (instancePromise, address) => {
     getAccountBalances(api, address)
   ]);
   return Object.fromEntries(
-    pipe5(
-      Object.entries(assetsInfo),
-      A5.filter(([id]) => Object.keys(accountBalances).includes(id)),
-      A5.map(([id, assetInfo]) => [
-        id,
-        {
-          ...assetInfo,
-          balance: accountBalances[id]
-        }
-      ])
-    )
+    Object.entries(assetsInfo).filter(([id]) => Object.keys(accountBalances).includes(id)).map(([id, assetInfo]) => [
+      id,
+      {
+        ...assetInfo,
+        balance: accountBalances[id]
+      }
+    ])
   );
 };
 
@@ -3998,30 +3973,19 @@ var getBlockNumber = async (instancePromise) => {
 };
 
 // src/methods/query/getLiquidityTokens.ts
-import { pipe as pipe6 } from "fp-ts/es6/function";
-import * as A6 from "fp-ts/es6/Array";
 var getLiquidityTokens = async (instancePromise) => {
   const assetsInfo = await getAssetsInfo(instancePromise);
-  return pipe6(
-    Object.values(assetsInfo),
-    A6.filter((asset) => asset.name.includes("LiquidityPoolToken")),
-    A6.reduce({}, (acc, curr) => {
-      acc[curr.id] = curr;
-      return acc;
-    })
-  );
+  return Object.values(assetsInfo).filter((asset) => asset.name.includes("LiquidityPoolToken")).reduce((acc, curr) => {
+    acc[curr.id] = curr;
+    return acc;
+  }, {});
 };
 
 // src/methods/query/getLiquidityTokenIds.ts
-import { pipe as pipe7 } from "fp-ts/es6/function";
-import * as A7 from "fp-ts/es6/Array";
 var getLiquidityTokenIds = async (instancePromise) => {
   const api = await instancePromise;
   const liquidityTokens = await api.query.xyk.liquidityAssets.entries();
-  return pipe7(
-    liquidityTokens,
-    A7.map((liquidityToken) => liquidityToken[1].toString())
-  );
+  return liquidityTokens.map((liquidityToken) => liquidityToken[1].toString());
 };
 
 // src/methods/query/getTokenInfo.ts
@@ -4299,16 +4263,16 @@ function createWasmFn(root, wasmBytes2, asmFn) {
 
 // node_modules/@polkadot/wasm-util/base64.js
 var chr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-var map5 = new Array(256);
+var map = new Array(256);
 for (let i = 0, count = chr.length; i < count; i++) {
-  map5[chr.charCodeAt(i)] = i;
+  map[chr.charCodeAt(i)] = i;
 }
 function base64Decode(data, out) {
   let byte = 0;
   let bits2 = 0;
   let pos = -1;
   for (let i = 0, count = out.length; pos < count; i++) {
-    byte = byte << 6 | map5[data.charCodeAt(i)];
+    byte = byte << 6 | map[data.charCodeAt(i)];
     if ((bits2 += 6) >= 8) {
       out[++pos] = byte >>> (bits2 -= 8) & 255;
     }
@@ -5414,7 +5378,7 @@ function fromBig(n, le = false) {
     return { h: Number(n & U32_MASK64), l: Number(n >> _32n & U32_MASK64) };
   return { h: Number(n >> _32n & U32_MASK64) | 0, l: Number(n & U32_MASK64) | 0 };
 }
-function split2(lst, le = false) {
+function split(lst, le = false) {
   let Ah = new Uint32Array(lst.length);
   let Al = new Uint32Array(lst.length);
   for (let i = 0; i < lst.length; i++) {
@@ -5448,7 +5412,7 @@ var add5L = (Al, Bl, Cl, Dl, El) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >
 var add5H = (low, Ah, Bh, Ch, Dh, Eh) => Ah + Bh + Ch + Dh + Eh + (low / 2 ** 32 | 0) | 0;
 var u64 = {
   fromBig,
-  split: split2,
+  split,
   toBig,
   shrSH,
   shrSL,
