@@ -2220,7 +2220,7 @@ var require_bn = __commonJS({
         } else {
           x = x.clone();
         }
-        var A2 = new BN3(1);
+        var A = new BN3(1);
         var B = new BN3(0);
         var C = new BN3(0);
         var D = new BN3(1);
@@ -2238,11 +2238,11 @@ var require_bn = __commonJS({
           if (i > 0) {
             x.iushrn(i);
             while (i-- > 0) {
-              if (A2.isOdd() || B.isOdd()) {
-                A2.iadd(yp);
+              if (A.isOdd() || B.isOdd()) {
+                A.iadd(yp);
                 B.isub(xp);
               }
-              A2.iushrn(1);
+              A.iushrn(1);
               B.iushrn(1);
             }
           }
@@ -2261,11 +2261,11 @@ var require_bn = __commonJS({
           }
           if (x.cmp(y) >= 0) {
             x.isub(y);
-            A2.isub(C);
+            A.isub(C);
             B.isub(D);
           } else {
             y.isub(x);
-            C.isub(A2);
+            C.isub(A);
             D.isub(B);
           }
         }
@@ -3902,20 +3902,15 @@ var getInvestedPools = async (instancePromise, address) => {
 };
 
 // src/methods/query/getTotalIssuanceOfTokens.ts
-import { pipe } from "fp-ts/es6/function.js";
-import * as A from "fp-ts/es6/Array.js";
 var getTotalIssuanceOfTokens = async (instancePromise) => {
   const api = await instancePromise;
   const balancesResponse = await api.query.tokens.totalIssuance.entries();
-  return pipe(
-    balancesResponse,
-    A.reduce({}, (acc, [key, value]) => {
-      const id = key.toHuman()[0].replace(/[, ]/g, "");
-      const balance = new import_bn.default(value.toString());
-      acc[id] = balance;
-      return acc;
-    })
-  );
+  return balancesResponse.reduce((acc, [key, value]) => {
+    const id = key.toHuman()[0].replace(/[, ]/g, "");
+    const balance = new import_bn.default(value.toString());
+    acc[id] = balance;
+    return acc;
+  }, {});
 };
 
 // src/methods/query/getAssetsInfo.ts
