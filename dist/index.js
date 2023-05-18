@@ -3962,12 +3962,16 @@ var getBlockNumber = async (instancePromise) => {
 };
 
 // src/methods/query/getLiquidityTokens.ts
+import { pipe, filter, reduce } from "rambda";
 var getLiquidityTokens = async (instancePromise) => {
   const assetsInfo = await getAssetsInfo(instancePromise);
-  return Object.values(assetsInfo).filter((asset) => asset.name.includes("LiquidityPoolToken")).reduce((acc, curr) => {
-    acc[curr.id] = curr;
-    return acc;
-  }, {});
+  return pipe(
+    filter((asset) => asset.name.includes("LiquidityPoolToken")),
+    reduce((acc, curr) => {
+      acc[curr.id] = curr;
+      return acc;
+    }, {})
+  )(Object.values(assetsInfo));
 };
 
 // src/methods/query/getLiquidityTokenIds.ts
