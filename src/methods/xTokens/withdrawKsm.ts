@@ -3,6 +3,9 @@ import { BN } from "@polkadot/util";
 import { RelayWithdraw } from "../../types/xTokens";
 import { getWeightXTokens } from "../../utils/getWeightXTokens";
 
+/**
+ * @since 2.0.0
+ */
 export const withdrawKsm = async (
   instancePromise: Promise<ApiPromise>,
   args: RelayWithdraw

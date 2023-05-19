@@ -18,7 +18,7 @@ async function deactivateLiquidity(
 ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
 
 /**
-
+* @since 2.0.0
 Deactivates liquidity for a given liquidity token ID and amount.
 @param instancePromise A promise that resolves to an instance of the Polkadot API.
 @param args An object containing account, liquidityTokenId, amount, and txOptions properties.

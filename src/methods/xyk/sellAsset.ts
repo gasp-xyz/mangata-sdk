@@ -18,7 +18,7 @@ async function sellAsset(
 ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
 
 /**
-
+* @since 2.0.0
 Sells an asset and returns either an array of generic events (if isForBatch=false) or a SubmittableExtrinsic (if isForBatch=true).
 @param instancePromise - A Promise that resolves to an instance of ApiPromise.
 @param  args - An object containing the necessary parameters for selling the asset.

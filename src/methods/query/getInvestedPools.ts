@@ -10,6 +10,9 @@ import { Address } from "../../types/common";
 import { getAmountOfTokensInPool } from "./getAmountOfTokensInPool";
 import { pipe, filter, map } from "rambda";
 
+/**
+ * @since 2.0.0
+ */
 export const getInvestedPools = async (
   instancePromise: Promise<ApiPromise>,
   address: Address

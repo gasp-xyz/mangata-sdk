@@ -18,6 +18,7 @@ async function claimRewards(
 ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
 
 /**
+ *@since 2.0.0
  * Claims rewards for liquidity providers.
  * @param instancePromise A Promise that resolves to an ApiPromise object from the Polkadot JS API.
  * @param args An object of type Liquidity containing the liquidity pool token ID, the amount of liquidity to claim rewards for, and the account to claim rewards for.

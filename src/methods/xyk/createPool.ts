@@ -17,6 +17,7 @@ async function createPool(
 ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
 
 /**
+ * @since 2.0.0
 Creates a new pool
 @param instancePromise - The API promise that resolves to a PolkadotJS API instance
 @param args - An object containing the necessary information to create a new pool

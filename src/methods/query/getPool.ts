@@ -7,6 +7,9 @@ import { getLiquidityPool } from "./getLiquidityPool";
 import { getAmountOfTokensInPool } from "./getAmountOfTokensInPool";
 import { BN_ZERO } from "../../utils/bnConstants";
 
+/**
+ * @since 2.0.0
+ */
 export const getPool = async (
   instancePromise: Promise<ApiPromise>,
   liquidityTokenId: TokenId

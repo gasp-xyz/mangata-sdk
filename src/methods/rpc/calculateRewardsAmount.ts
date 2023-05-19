@@ -2,6 +2,9 @@ import { ApiPromise } from "@polkadot/api";
 import { BN, isHex, hexToBn } from "@polkadot/util";
 import { Rewards } from "../../types/xyk";
 
+/**
+ * @since 2.0.0
+ */
 export const calculateRewardsAmount = async (
   instancePromise: Promise<ApiPromise>,
   args: Rewards

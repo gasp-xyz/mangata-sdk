@@ -4,6 +4,9 @@ import { pipe, filter, reduce, replace, trim, split, join } from "rambda";
 import { TMainTokens, TTokenInfo } from "../../types/query";
 import { getCompleteAssetsInfo } from "../../utils/getCompleteAssetsInfo";
 
+/**
+ * @since 2.0.0
+ */
 export const getAssetsInfo = async (
   instancePromise: Promise<ApiPromise>
 ): Promise<TMainTokens> => {

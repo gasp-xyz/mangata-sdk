@@ -2,6 +2,9 @@ import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
 import { Price } from "../../types/xyk";
 
+/**
+ * @since 2.0.0
+ */
 export const calculateBuyPriceId = async (
   instancePromise: Promise<ApiPromise>,
   args: Price

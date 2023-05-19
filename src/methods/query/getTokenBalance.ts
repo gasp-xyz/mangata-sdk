@@ -3,6 +3,9 @@ import { Address, TokenId } from "../../types/common";
 import { TokenBalance } from "../../types/query";
 import { hexToBn, isHex, BN } from "@polkadot/util";
 
+/**
+ * @since 2.0.0
+ */
 export const getTokenBalance = async (
   instancePromise: Promise<ApiPromise>,
   address: Address,

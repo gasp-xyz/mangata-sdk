@@ -3,6 +3,9 @@ import { BN } from "@polkadot/util";
 import { CreatePoolFee } from "../../types/xyk";
 import { fromBN } from "../../utils/bnUtility";
 
+/**
+ * @since 2.0.0
+ */
 export const getCreatePoolFee = async (
   instancePromise: Promise<ApiPromise>,
   args: CreatePoolFee

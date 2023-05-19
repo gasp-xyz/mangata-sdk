@@ -5,6 +5,9 @@ import { ApiPromise } from "@polkadot/api";
 import { getWeightXTokens } from "../../utils/getWeightXTokens";
 import { fromBN } from "../../utils/bnUtility";
 
+/**
+ * @since 2.0.0
+ */
 export const getWithdrawFee = async (
   instancePromise: Promise<ApiPromise>,
   args: WithdrawFee

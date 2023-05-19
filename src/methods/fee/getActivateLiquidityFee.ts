@@ -3,6 +3,9 @@ import { BN } from "@polkadot/util";
 import { ActivateLiquidityFee } from "../../types/xyk";
 import { fromBN } from "../../utils/bnUtility";
 
+/**
+ * @since 2.0.0
+ */
 export const getActivateLiquidityFee = async (
   instancePromise: Promise<ApiPromise>,
   args: ActivateLiquidityFee

@@ -2,6 +2,9 @@ import { ApiPromise } from "@polkadot/api";
 import { BN, isHex, hexToBn } from "@polkadot/util";
 import { TokenId } from "../../types/common";
 
+/**
+ * @since 2.0.0
+ */
 export const getAmountOfTokensInPool = async (
   instancePromise: Promise<ApiPromise>,
   firstTokenId: TokenId,

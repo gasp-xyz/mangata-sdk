@@ -3,6 +3,9 @@ import { TokenId } from "../../types/common";
 import { BN } from "@polkadot/util";
 import { BN_ZERO } from "../../utils/bnConstants";
 
+/**
+ * @since 2.0.0
+ */
 export const getLiquidityTokenId = async (
   instancePromise: Promise<ApiPromise>,
   firstTokenId: TokenId,

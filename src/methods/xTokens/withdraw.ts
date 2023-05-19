@@ -5,6 +5,9 @@ import { getWeightXTokens } from "../../utils/getWeightXTokens";
 import { signTx } from "../../utils/signTx";
 import { Withdraw } from "../../types/xTokens";
 
+/**
+ * @since 2.0.0
+ */
 export const withdraw = async (
   instancePromise: Promise<ApiPromise>,
   args: Withdraw

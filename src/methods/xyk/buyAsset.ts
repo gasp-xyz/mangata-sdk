@@ -18,6 +18,7 @@ async function buyAsset(
 ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
 
 /**
+ * @since 2.0.0
  * Buy a token asset
  * @param instancePromise A promise that resolves to an instance of the `ApiPromise` class.
  * @param args An object containing the arguments needed to execute the transaction.

@@ -3,6 +3,9 @@ import { BN } from "@polkadot/util";
 import { DepositFromParachainFee } from "../../types/xTokens";
 import { fromBN } from "../../utils/bnUtility";
 
+/**
+ * @since 2.0.0
+ */
 export const getDepositFromParachainFee = async (
   args: DepositFromParachainFee
 ) => {

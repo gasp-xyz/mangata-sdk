@@ -18,6 +18,7 @@ async function burnLiquidity(
 ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
 
 /**
+ * @since 2.0.0
  * Burn liquidity tokens and receive back the underlying assets.
  *
  *

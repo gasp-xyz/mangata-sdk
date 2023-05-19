@@ -4,6 +4,9 @@ import { TMainTokens, TTokenInfo } from "../../types/query";
 import { getAssetsInfo } from "./getAssetsInfo";
 import { pipe, filter, reduce } from "rambda";
 
+/**
+ * @since 2.0.0
+ */
 export const getLiquidityTokens = async (
   instancePromise: Promise<ApiPromise>
 ): Promise<TMainTokens> => {

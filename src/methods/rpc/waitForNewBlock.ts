@@ -1,5 +1,8 @@
 import { ApiPromise } from "@polkadot/api";
 
+/**
+ * @since 2.0.0
+ */
 export const waitForNewBlock = async (
   instancePromise: Promise<ApiPromise>,
   blockCount?: number

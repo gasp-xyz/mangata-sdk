@@ -1,6 +1,9 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { Deposit } from "../../types/xTokens";
 
+/**
+ * @since 2.0.0
+ */
 export const depositFromParachain = async (args: Deposit): Promise<void> => {
   const { url, asset, destination, weightLimit, account, txOptions } = args;
   const api = await new ApiPromise({

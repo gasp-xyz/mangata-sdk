@@ -5,6 +5,9 @@ import { getAccountBalances } from "../../utils/getAccountBalances";
 import { getAssetsInfo } from "./getAssetsInfo";
 import { pipe, filter, map } from "rambda";
 
+/**
+ * @since 2.0.0
+ */
 export const getOwnedTokens = async (
   instancePromise: Promise<ApiPromise>,
   address: string

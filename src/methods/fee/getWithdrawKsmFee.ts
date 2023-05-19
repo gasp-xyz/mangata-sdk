@@ -4,6 +4,9 @@ import { WithdrawKsmFee } from "../../types/xTokens";
 import { getWeightXTokens } from "../../utils/getWeightXTokens";
 import { fromBN } from "../../utils/bnUtility";
 
+/**
+ * @since 2.0.0
+ */
 export const getWithdrawKsmFee = async (
   instancePromise: Promise<ApiPromise>,
   args: WithdrawKsmFee

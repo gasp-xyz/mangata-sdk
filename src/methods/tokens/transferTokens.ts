@@ -17,6 +17,9 @@ async function transferTokens(
   isForBatch: true
 ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
 
+/**
+ * @since 2.0.0
+ */
 async function transferTokens(
   instancePromise: Promise<ApiPromise>,
   args: TransferTokens,

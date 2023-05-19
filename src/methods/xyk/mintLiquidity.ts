@@ -19,7 +19,7 @@ async function mintLiquidity(
 
 /**
  * Mint liquidity tokens by providing two assets
- *
+ * @since 2.0.0
  * @remarks
  * This function allows a user to mint liquidity tokens by providing two assets.
  * The user must provide an account to send the transaction from, as well as the

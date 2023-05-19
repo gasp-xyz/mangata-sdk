@@ -2,6 +2,9 @@ import { ApiPromise } from "@polkadot/api";
 import { TokenId } from "../../types/common";
 import { BN } from "@polkadot/util";
 
+/**
+ * @since 2.0.0
+ */
 export const getTotalIssuance = async (
   instancePromise: Promise<ApiPromise>,
   tokenId: TokenId

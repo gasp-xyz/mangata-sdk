@@ -8,6 +8,9 @@ import { getPoolsBalance } from "../../utils/getPoolsBalance";
 import { getRatio } from "../../utils/getRatio";
 import { pipe, filter, map } from "rambda";
 
+/**
+ * @since 2.0.0
+ */
 export const getPools = async (
   instancePromise: Promise<ApiPromise>
 ): Promise<TPoolWithRatio[]> => {

@@ -4,6 +4,9 @@ import { TokenAmount } from "../../types/common";
 import { TBalances } from "../../types/query";
 import { pipe, reduce } from "rambda";
 
+/**
+ * @since 2.0.0
+ */
 export const getTotalIssuanceOfTokens = async (
   instancePromise: Promise<ApiPromise>
 ): Promise<TBalances> => {
