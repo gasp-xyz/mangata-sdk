@@ -84,7 +84,7 @@ import { getOrCreateInstance } from "./utils/getOrCreateInstance";
 import { waitForNewBlock } from "./methods/rpc/waitForNewBlock";
 import { depositFromKusamaOrStatemine } from "./methods/xTokens/depositFromKusamaOrStatemine";
 import { calculateMintingFutureRewards } from "./utils/calculateMintingFutureRewards";
-import { Batch } from "./types/utility";
+import { Batch, PriceImpact } from "./types/utility";
 import { getActivateLiquidityFee } from "./methods/fee/getActivateLiquidityFee";
 import { getDepositFromParachainFee } from "./methods/fee/getDepositFromParachainFee";
 import { getDepositFromKusamaOrStatemineFee } from "./methods/fee/getDepositFromKusamaOrStatemineFee";
@@ -101,6 +101,7 @@ import { getTransferAllTokenFee } from "./methods/fee/getTransferAllTokenFee";
 import { getTransferTokenFee } from "./methods/fee/getTransferTokenFee";
 import { multiswapBuyAsset } from "./methods/xyk/multiswapBuyAsset";
 import { multiswapSellAsset } from "./methods/xyk/multiswapSellAsset";
+import { getPriceImpact } from "./utils/getPriceImpact";
 
 function createMangataInstance(urls: string[]): MangataInstance {
   const instancePromise = getOrCreateInstance(urls);
@@ -275,7 +276,8 @@ function createMangataInstance(urls: string[]): MangataInstance {
 }
 
 const Mangata = {
-  instance: createMangataInstance
+  instance: createMangataInstance,
+  getPriceImpact: (args: PriceImpact) => getPriceImpact(args)
 };
 
 export { Mangata };

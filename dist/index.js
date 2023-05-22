@@ -53,8 +53,8 @@ var require_bn = __commonJS({
         ctor.prototype = new TempCtor();
         ctor.prototype.constructor = ctor;
       }
-      function BN3(number2, base, endian) {
-        if (BN3.isBN(number2)) {
+      function BN2(number2, base, endian) {
+        if (BN2.isBN(number2)) {
           return number2;
         }
         this.negative = 0;
@@ -70,12 +70,12 @@ var require_bn = __commonJS({
         }
       }
       if (typeof module3 === "object") {
-        module3.exports = BN3;
+        module3.exports = BN2;
       } else {
-        exports2.BN = BN3;
+        exports2.BN = BN2;
       }
-      BN3.BN = BN3;
-      BN3.wordSize = 26;
+      BN2.BN = BN2;
+      BN2.wordSize = 26;
       var Buffer2;
       try {
         if (typeof window !== "undefined" && typeof window.Buffer !== "undefined") {
@@ -85,23 +85,23 @@ var require_bn = __commonJS({
         }
       } catch (e) {
       }
-      BN3.isBN = function isBN(num) {
-        if (num instanceof BN3) {
+      BN2.isBN = function isBN(num) {
+        if (num instanceof BN2) {
           return true;
         }
-        return num !== null && typeof num === "object" && num.constructor.wordSize === BN3.wordSize && Array.isArray(num.words);
+        return num !== null && typeof num === "object" && num.constructor.wordSize === BN2.wordSize && Array.isArray(num.words);
       };
-      BN3.max = function max2(left, right) {
+      BN2.max = function max2(left, right) {
         if (left.cmp(right) > 0)
           return left;
         return right;
       };
-      BN3.min = function min(left, right) {
+      BN2.min = function min(left, right) {
         if (left.cmp(right) < 0)
           return left;
         return right;
       };
-      BN3.prototype._init = function init(number2, base, endian) {
+      BN2.prototype._init = function init(number2, base, endian) {
         if (typeof number2 === "number") {
           return this._initNumber(number2, base, endian);
         }
@@ -129,7 +129,7 @@ var require_bn = __commonJS({
           }
         }
       };
-      BN3.prototype._initNumber = function _initNumber(number2, base, endian) {
+      BN2.prototype._initNumber = function _initNumber(number2, base, endian) {
         if (number2 < 0) {
           this.negative = 1;
           number2 = -number2;
@@ -156,7 +156,7 @@ var require_bn = __commonJS({
           return;
         this._initArray(this.toArray(), base, endian);
       };
-      BN3.prototype._initArray = function _initArray(number2, base, endian) {
+      BN2.prototype._initArray = function _initArray(number2, base, endian) {
         assert2(typeof number2.length === "number");
         if (number2.length <= 0) {
           this.words = [0];
@@ -214,7 +214,7 @@ var require_bn = __commonJS({
         }
         return r;
       }
-      BN3.prototype._parseHex = function _parseHex(number2, start, endian) {
+      BN2.prototype._parseHex = function _parseHex(number2, start, endian) {
         this.length = Math.ceil((number2.length - start) / 6);
         this.words = new Array(this.length);
         for (var i = 0; i < this.length; i++) {
@@ -270,7 +270,7 @@ var require_bn = __commonJS({
         }
         return r;
       }
-      BN3.prototype._parseBase = function _parseBase(number2, base, start) {
+      BN2.prototype._parseBase = function _parseBase(number2, base, start) {
         this.words = [0];
         this.length = 1;
         for (var limbLen = 0, limbPow = 1; limbPow <= 67108863; limbPow *= base) {
@@ -306,7 +306,7 @@ var require_bn = __commonJS({
         }
         this._strip();
       };
-      BN3.prototype.copy = function copy(dest) {
+      BN2.prototype.copy = function copy(dest) {
         dest.words = new Array(this.length);
         for (var i = 0; i < this.length; i++) {
           dest.words[i] = this.words[i];
@@ -321,27 +321,27 @@ var require_bn = __commonJS({
         dest.negative = src.negative;
         dest.red = src.red;
       }
-      BN3.prototype._move = function _move(dest) {
+      BN2.prototype._move = function _move(dest) {
         move(dest, this);
       };
-      BN3.prototype.clone = function clone() {
-        var r = new BN3(null);
+      BN2.prototype.clone = function clone() {
+        var r = new BN2(null);
         this.copy(r);
         return r;
       };
-      BN3.prototype._expand = function _expand(size) {
+      BN2.prototype._expand = function _expand(size) {
         while (this.length < size) {
           this.words[this.length++] = 0;
         }
         return this;
       };
-      BN3.prototype._strip = function strip() {
+      BN2.prototype._strip = function strip() {
         while (this.length > 1 && this.words[this.length - 1] === 0) {
           this.length--;
         }
         return this._normSign();
       };
-      BN3.prototype._normSign = function _normSign() {
+      BN2.prototype._normSign = function _normSign() {
         if (this.length === 1 && this.words[0] === 0) {
           this.negative = 0;
         }
@@ -349,12 +349,12 @@ var require_bn = __commonJS({
       };
       if (typeof Symbol !== "undefined" && typeof Symbol.for === "function") {
         try {
-          BN3.prototype[Symbol.for("nodejs.util.inspect.custom")] = inspect;
+          BN2.prototype[Symbol.for("nodejs.util.inspect.custom")] = inspect;
         } catch (e) {
-          BN3.prototype.inspect = inspect;
+          BN2.prototype.inspect = inspect;
         }
       } else {
-        BN3.prototype.inspect = inspect;
+        BN2.prototype.inspect = inspect;
       }
       function inspect() {
         return (this.red ? "<BN-R: " : "<BN: ") + this.toString(16) + ">";
@@ -465,7 +465,7 @@ var require_bn = __commonJS({
         52521875,
         60466176
       ];
-      BN3.prototype.toString = function toString(base, padding2) {
+      BN2.prototype.toString = function toString(base, padding2) {
         base = base || 10;
         padding2 = padding2 | 0 || 1;
         var out;
@@ -527,7 +527,7 @@ var require_bn = __commonJS({
         }
         assert2(false, "Base should be between 2 and 36");
       };
-      BN3.prototype.toNumber = function toNumber() {
+      BN2.prototype.toNumber = function toNumber() {
         var ret = this.words[0];
         if (this.length === 2) {
           ret += this.words[1] * 67108864;
@@ -538,15 +538,15 @@ var require_bn = __commonJS({
         }
         return this.negative !== 0 ? -ret : ret;
       };
-      BN3.prototype.toJSON = function toJSON() {
+      BN2.prototype.toJSON = function toJSON() {
         return this.toString(16, 2);
       };
       if (Buffer2) {
-        BN3.prototype.toBuffer = function toBuffer(endian, length) {
+        BN2.prototype.toBuffer = function toBuffer(endian, length) {
           return this.toArrayLike(Buffer2, endian, length);
         };
       }
-      BN3.prototype.toArray = function toArray(endian, length) {
+      BN2.prototype.toArray = function toArray(endian, length) {
         return this.toArrayLike(Array, endian, length);
       };
       var allocate = function allocate2(ArrayType, size) {
@@ -555,7 +555,7 @@ var require_bn = __commonJS({
         }
         return new ArrayType(size);
       };
-      BN3.prototype.toArrayLike = function toArrayLike(ArrayType, endian, length) {
+      BN2.prototype.toArrayLike = function toArrayLike(ArrayType, endian, length) {
         this._strip();
         var byteLength = this.byteLength();
         var reqLength = length || Math.max(1, byteLength);
@@ -566,7 +566,7 @@ var require_bn = __commonJS({
         this["_toArrayLike" + postfix](res, byteLength);
         return res;
       };
-      BN3.prototype._toArrayLikeLE = function _toArrayLikeLE(res, byteLength) {
+      BN2.prototype._toArrayLikeLE = function _toArrayLikeLE(res, byteLength) {
         var position = 0;
         var carry = 0;
         for (var i = 0, shift = 0; i < this.length; i++) {
@@ -596,7 +596,7 @@ var require_bn = __commonJS({
           }
         }
       };
-      BN3.prototype._toArrayLikeBE = function _toArrayLikeBE(res, byteLength) {
+      BN2.prototype._toArrayLikeBE = function _toArrayLikeBE(res, byteLength) {
         var position = res.length - 1;
         var carry = 0;
         for (var i = 0, shift = 0; i < this.length; i++) {
@@ -627,11 +627,11 @@ var require_bn = __commonJS({
         }
       };
       if (Math.clz32) {
-        BN3.prototype._countBits = function _countBits(w) {
+        BN2.prototype._countBits = function _countBits(w) {
           return 32 - Math.clz32(w);
         };
       } else {
-        BN3.prototype._countBits = function _countBits(w) {
+        BN2.prototype._countBits = function _countBits(w) {
           var t = w;
           var r = 0;
           if (t >= 4096) {
@@ -653,7 +653,7 @@ var require_bn = __commonJS({
           return r + t;
         };
       }
-      BN3.prototype._zeroBits = function _zeroBits(w) {
+      BN2.prototype._zeroBits = function _zeroBits(w) {
         if (w === 0)
           return 26;
         var t = w;
@@ -679,7 +679,7 @@ var require_bn = __commonJS({
         }
         return r;
       };
-      BN3.prototype.bitLength = function bitLength() {
+      BN2.prototype.bitLength = function bitLength() {
         var w = this.words[this.length - 1];
         var hi = this._countBits(w);
         return (this.length - 1) * 26 + hi;
@@ -693,7 +693,7 @@ var require_bn = __commonJS({
         }
         return w;
       }
-      BN3.prototype.zeroBits = function zeroBits() {
+      BN2.prototype.zeroBits = function zeroBits() {
         if (this.isZero())
           return 0;
         var r = 0;
@@ -705,34 +705,34 @@ var require_bn = __commonJS({
         }
         return r;
       };
-      BN3.prototype.byteLength = function byteLength() {
+      BN2.prototype.byteLength = function byteLength() {
         return Math.ceil(this.bitLength() / 8);
       };
-      BN3.prototype.toTwos = function toTwos(width) {
+      BN2.prototype.toTwos = function toTwos(width) {
         if (this.negative !== 0) {
           return this.abs().inotn(width).iaddn(1);
         }
         return this.clone();
       };
-      BN3.prototype.fromTwos = function fromTwos(width) {
+      BN2.prototype.fromTwos = function fromTwos(width) {
         if (this.testn(width - 1)) {
           return this.notn(width).iaddn(1).ineg();
         }
         return this.clone();
       };
-      BN3.prototype.isNeg = function isNeg() {
+      BN2.prototype.isNeg = function isNeg() {
         return this.negative !== 0;
       };
-      BN3.prototype.neg = function neg() {
+      BN2.prototype.neg = function neg() {
         return this.clone().ineg();
       };
-      BN3.prototype.ineg = function ineg() {
+      BN2.prototype.ineg = function ineg() {
         if (!this.isZero()) {
           this.negative ^= 1;
         }
         return this;
       };
-      BN3.prototype.iuor = function iuor(num) {
+      BN2.prototype.iuor = function iuor(num) {
         while (this.length < num.length) {
           this.words[this.length++] = 0;
         }
@@ -741,21 +741,21 @@ var require_bn = __commonJS({
         }
         return this._strip();
       };
-      BN3.prototype.ior = function ior(num) {
+      BN2.prototype.ior = function ior(num) {
         assert2((this.negative | num.negative) === 0);
         return this.iuor(num);
       };
-      BN3.prototype.or = function or(num) {
+      BN2.prototype.or = function or(num) {
         if (this.length > num.length)
           return this.clone().ior(num);
         return num.clone().ior(this);
       };
-      BN3.prototype.uor = function uor(num) {
+      BN2.prototype.uor = function uor(num) {
         if (this.length > num.length)
           return this.clone().iuor(num);
         return num.clone().iuor(this);
       };
-      BN3.prototype.iuand = function iuand(num) {
+      BN2.prototype.iuand = function iuand(num) {
         var b;
         if (this.length > num.length) {
           b = num;
@@ -768,21 +768,21 @@ var require_bn = __commonJS({
         this.length = b.length;
         return this._strip();
       };
-      BN3.prototype.iand = function iand(num) {
+      BN2.prototype.iand = function iand(num) {
         assert2((this.negative | num.negative) === 0);
         return this.iuand(num);
       };
-      BN3.prototype.and = function and(num) {
+      BN2.prototype.and = function and(num) {
         if (this.length > num.length)
           return this.clone().iand(num);
         return num.clone().iand(this);
       };
-      BN3.prototype.uand = function uand(num) {
+      BN2.prototype.uand = function uand(num) {
         if (this.length > num.length)
           return this.clone().iuand(num);
         return num.clone().iuand(this);
       };
-      BN3.prototype.iuxor = function iuxor(num) {
+      BN2.prototype.iuxor = function iuxor(num) {
         var a;
         var b;
         if (this.length > num.length) {
@@ -803,21 +803,21 @@ var require_bn = __commonJS({
         this.length = a.length;
         return this._strip();
       };
-      BN3.prototype.ixor = function ixor(num) {
+      BN2.prototype.ixor = function ixor(num) {
         assert2((this.negative | num.negative) === 0);
         return this.iuxor(num);
       };
-      BN3.prototype.xor = function xor(num) {
+      BN2.prototype.xor = function xor(num) {
         if (this.length > num.length)
           return this.clone().ixor(num);
         return num.clone().ixor(this);
       };
-      BN3.prototype.uxor = function uxor(num) {
+      BN2.prototype.uxor = function uxor(num) {
         if (this.length > num.length)
           return this.clone().iuxor(num);
         return num.clone().iuxor(this);
       };
-      BN3.prototype.inotn = function inotn(width) {
+      BN2.prototype.inotn = function inotn(width) {
         assert2(typeof width === "number" && width >= 0);
         var bytesNeeded = Math.ceil(width / 26) | 0;
         var bitsLeft = width % 26;
@@ -833,10 +833,10 @@ var require_bn = __commonJS({
         }
         return this._strip();
       };
-      BN3.prototype.notn = function notn(width) {
+      BN2.prototype.notn = function notn(width) {
         return this.clone().inotn(width);
       };
-      BN3.prototype.setn = function setn(bit, val) {
+      BN2.prototype.setn = function setn(bit, val) {
         assert2(typeof bit === "number" && bit >= 0);
         var off = bit / 26 | 0;
         var wbit = bit % 26;
@@ -848,7 +848,7 @@ var require_bn = __commonJS({
         }
         return this._strip();
       };
-      BN3.prototype.iadd = function iadd(num) {
+      BN2.prototype.iadd = function iadd(num) {
         var r;
         if (this.negative !== 0 && num.negative === 0) {
           this.negative = 0;
@@ -891,7 +891,7 @@ var require_bn = __commonJS({
         }
         return this;
       };
-      BN3.prototype.add = function add2(num) {
+      BN2.prototype.add = function add2(num) {
         var res;
         if (num.negative !== 0 && this.negative === 0) {
           num.negative = 0;
@@ -908,7 +908,7 @@ var require_bn = __commonJS({
           return this.clone().iadd(num);
         return num.clone().iadd(this);
       };
-      BN3.prototype.isub = function isub(num) {
+      BN2.prototype.isub = function isub(num) {
         if (num.negative !== 0) {
           num.negative = 0;
           var r = this.iadd(num);
@@ -957,7 +957,7 @@ var require_bn = __commonJS({
         }
         return this._strip();
       };
-      BN3.prototype.sub = function sub(num) {
+      BN2.prototype.sub = function sub(num) {
         return this.clone().isub(num);
       };
       function smallMulTo(self2, num, out) {
@@ -1585,7 +1585,7 @@ var require_bn = __commonJS({
       function jumboMulTo(self2, num, out) {
         return bigMulTo(self2, num, out);
       }
-      BN3.prototype.mulTo = function mulTo(num, out) {
+      BN2.prototype.mulTo = function mulTo(num, out) {
         var res;
         var len = this.length + num.length;
         if (this.length === 10 && num.length === 10) {
@@ -1605,7 +1605,7 @@ var require_bn = __commonJS({
       }
       FFTM.prototype.makeRBT = function makeRBT(N) {
         var t = new Array(N);
-        var l = BN3.prototype._countBits(N) - 1;
+        var l = BN2.prototype._countBits(N) - 1;
         for (var i = 0; i < N; i++) {
           t[i] = this.revBin(i, l, N);
         }
@@ -1742,20 +1742,20 @@ var require_bn = __commonJS({
         out.length = x.length + y.length;
         return out._strip();
       };
-      BN3.prototype.mul = function mul(num) {
-        var out = new BN3(null);
+      BN2.prototype.mul = function mul(num) {
+        var out = new BN2(null);
         out.words = new Array(this.length + num.length);
         return this.mulTo(num, out);
       };
-      BN3.prototype.mulf = function mulf(num) {
-        var out = new BN3(null);
+      BN2.prototype.mulf = function mulf(num) {
+        var out = new BN2(null);
         out.words = new Array(this.length + num.length);
         return jumboMulTo(this, num, out);
       };
-      BN3.prototype.imul = function imul(num) {
+      BN2.prototype.imul = function imul(num) {
         return this.clone().mulTo(num, this);
       };
-      BN3.prototype.imuln = function imuln(num) {
+      BN2.prototype.imuln = function imuln(num) {
         var isNegNum = num < 0;
         if (isNegNum)
           num = -num;
@@ -1776,19 +1776,19 @@ var require_bn = __commonJS({
         }
         return isNegNum ? this.ineg() : this;
       };
-      BN3.prototype.muln = function muln(num) {
+      BN2.prototype.muln = function muln(num) {
         return this.clone().imuln(num);
       };
-      BN3.prototype.sqr = function sqr() {
+      BN2.prototype.sqr = function sqr() {
         return this.mul(this);
       };
-      BN3.prototype.isqr = function isqr() {
+      BN2.prototype.isqr = function isqr() {
         return this.imul(this.clone());
       };
-      BN3.prototype.pow = function pow(num) {
+      BN2.prototype.pow = function pow(num) {
         var w = toBitArray(num);
         if (w.length === 0)
-          return new BN3(1);
+          return new BN2(1);
         var res = this;
         for (var i = 0; i < w.length; i++, res = res.sqr()) {
           if (w[i] !== 0)
@@ -1803,7 +1803,7 @@ var require_bn = __commonJS({
         }
         return res;
       };
-      BN3.prototype.iushln = function iushln(bits2) {
+      BN2.prototype.iushln = function iushln(bits2) {
         assert2(typeof bits2 === "number" && bits2 >= 0);
         var r = bits2 % 26;
         var s = (bits2 - r) / 26;
@@ -1833,11 +1833,11 @@ var require_bn = __commonJS({
         }
         return this._strip();
       };
-      BN3.prototype.ishln = function ishln(bits2) {
+      BN2.prototype.ishln = function ishln(bits2) {
         assert2(this.negative === 0);
         return this.iushln(bits2);
       };
-      BN3.prototype.iushrn = function iushrn(bits2, hint, extended) {
+      BN2.prototype.iushrn = function iushrn(bits2, hint, extended) {
         assert2(typeof bits2 === "number" && bits2 >= 0);
         var h;
         if (hint) {
@@ -1882,23 +1882,23 @@ var require_bn = __commonJS({
         }
         return this._strip();
       };
-      BN3.prototype.ishrn = function ishrn(bits2, hint, extended) {
+      BN2.prototype.ishrn = function ishrn(bits2, hint, extended) {
         assert2(this.negative === 0);
         return this.iushrn(bits2, hint, extended);
       };
-      BN3.prototype.shln = function shln(bits2) {
+      BN2.prototype.shln = function shln(bits2) {
         return this.clone().ishln(bits2);
       };
-      BN3.prototype.ushln = function ushln(bits2) {
+      BN2.prototype.ushln = function ushln(bits2) {
         return this.clone().iushln(bits2);
       };
-      BN3.prototype.shrn = function shrn(bits2) {
+      BN2.prototype.shrn = function shrn(bits2) {
         return this.clone().ishrn(bits2);
       };
-      BN3.prototype.ushrn = function ushrn(bits2) {
+      BN2.prototype.ushrn = function ushrn(bits2) {
         return this.clone().iushrn(bits2);
       };
-      BN3.prototype.testn = function testn(bit) {
+      BN2.prototype.testn = function testn(bit) {
         assert2(typeof bit === "number" && bit >= 0);
         var r = bit % 26;
         var s = (bit - r) / 26;
@@ -1908,7 +1908,7 @@ var require_bn = __commonJS({
         var w = this.words[s];
         return !!(w & q);
       };
-      BN3.prototype.imaskn = function imaskn(bits2) {
+      BN2.prototype.imaskn = function imaskn(bits2) {
         assert2(typeof bits2 === "number" && bits2 >= 0);
         var r = bits2 % 26;
         var s = (bits2 - r) / 26;
@@ -1926,10 +1926,10 @@ var require_bn = __commonJS({
         }
         return this._strip();
       };
-      BN3.prototype.maskn = function maskn(bits2) {
+      BN2.prototype.maskn = function maskn(bits2) {
         return this.clone().imaskn(bits2);
       };
-      BN3.prototype.iaddn = function iaddn(num) {
+      BN2.prototype.iaddn = function iaddn(num) {
         assert2(typeof num === "number");
         assert2(num < 67108864);
         if (num < 0)
@@ -1947,7 +1947,7 @@ var require_bn = __commonJS({
         }
         return this._iaddn(num);
       };
-      BN3.prototype._iaddn = function _iaddn(num) {
+      BN2.prototype._iaddn = function _iaddn(num) {
         this.words[0] += num;
         for (var i = 0; i < this.length && this.words[i] >= 67108864; i++) {
           this.words[i] -= 67108864;
@@ -1960,7 +1960,7 @@ var require_bn = __commonJS({
         this.length = Math.max(this.length, i + 1);
         return this;
       };
-      BN3.prototype.isubn = function isubn(num) {
+      BN2.prototype.isubn = function isubn(num) {
         assert2(typeof num === "number");
         assert2(num < 67108864);
         if (num < 0)
@@ -1983,20 +1983,20 @@ var require_bn = __commonJS({
         }
         return this._strip();
       };
-      BN3.prototype.addn = function addn(num) {
+      BN2.prototype.addn = function addn(num) {
         return this.clone().iaddn(num);
       };
-      BN3.prototype.subn = function subn(num) {
+      BN2.prototype.subn = function subn(num) {
         return this.clone().isubn(num);
       };
-      BN3.prototype.iabs = function iabs() {
+      BN2.prototype.iabs = function iabs() {
         this.negative = 0;
         return this;
       };
-      BN3.prototype.abs = function abs() {
+      BN2.prototype.abs = function abs() {
         return this.clone().iabs();
       };
-      BN3.prototype._ishlnsubmul = function _ishlnsubmul(num, mul, shift) {
+      BN2.prototype._ishlnsubmul = function _ishlnsubmul(num, mul, shift) {
         var len = num.length + shift;
         var i;
         this._expand(len);
@@ -2026,7 +2026,7 @@ var require_bn = __commonJS({
         this.negative = 1;
         return this._strip();
       };
-      BN3.prototype._wordDiv = function _wordDiv(num, mode) {
+      BN2.prototype._wordDiv = function _wordDiv(num, mode) {
         var shift = this.length - num.length;
         var a = this.clone();
         var b = num;
@@ -2041,7 +2041,7 @@ var require_bn = __commonJS({
         var m = a.length - b.length;
         var q;
         if (mode !== "mod") {
-          q = new BN3(null);
+          q = new BN2(null);
           q.length = m + 1;
           q.words = new Array(q.length);
           for (var i = 0; i < q.length; i++) {
@@ -2083,12 +2083,12 @@ var require_bn = __commonJS({
           mod: a
         };
       };
-      BN3.prototype.divmod = function divmod(num, mode, positive) {
+      BN2.prototype.divmod = function divmod(num, mode, positive) {
         assert2(!num.isZero());
         if (this.isZero()) {
           return {
-            div: new BN3(0),
-            mod: new BN3(0)
+            div: new BN2(0),
+            mod: new BN2(0)
           };
         }
         var div, mod, res;
@@ -2133,7 +2133,7 @@ var require_bn = __commonJS({
         }
         if (num.length > this.length || this.cmp(num) < 0) {
           return {
-            div: new BN3(0),
+            div: new BN2(0),
             mod: this
           };
         }
@@ -2147,26 +2147,26 @@ var require_bn = __commonJS({
           if (mode === "mod") {
             return {
               div: null,
-              mod: new BN3(this.modrn(num.words[0]))
+              mod: new BN2(this.modrn(num.words[0]))
             };
           }
           return {
             div: this.divn(num.words[0]),
-            mod: new BN3(this.modrn(num.words[0]))
+            mod: new BN2(this.modrn(num.words[0]))
           };
         }
         return this._wordDiv(num, mode);
       };
-      BN3.prototype.div = function div(num) {
+      BN2.prototype.div = function div(num) {
         return this.divmod(num, "div", false).div;
       };
-      BN3.prototype.mod = function mod(num) {
+      BN2.prototype.mod = function mod(num) {
         return this.divmod(num, "mod", false).mod;
       };
-      BN3.prototype.umod = function umod(num) {
+      BN2.prototype.umod = function umod(num) {
         return this.divmod(num, "mod", true).mod;
       };
-      BN3.prototype.divRound = function divRound(num) {
+      BN2.prototype.divRound = function divRound(num) {
         var dm = this.divmod(num);
         if (dm.mod.isZero())
           return dm.div;
@@ -2178,7 +2178,7 @@ var require_bn = __commonJS({
           return dm.div;
         return dm.div.negative !== 0 ? dm.div.isubn(1) : dm.div.iaddn(1);
       };
-      BN3.prototype.modrn = function modrn(num) {
+      BN2.prototype.modrn = function modrn(num) {
         var isNegNum = num < 0;
         if (isNegNum)
           num = -num;
@@ -2190,10 +2190,10 @@ var require_bn = __commonJS({
         }
         return isNegNum ? -acc : acc;
       };
-      BN3.prototype.modn = function modn(num) {
+      BN2.prototype.modn = function modn(num) {
         return this.modrn(num);
       };
-      BN3.prototype.idivn = function idivn(num) {
+      BN2.prototype.idivn = function idivn(num) {
         var isNegNum = num < 0;
         if (isNegNum)
           num = -num;
@@ -2207,10 +2207,10 @@ var require_bn = __commonJS({
         this._strip();
         return isNegNum ? this.ineg() : this;
       };
-      BN3.prototype.divn = function divn(num) {
+      BN2.prototype.divn = function divn(num) {
         return this.clone().idivn(num);
       };
-      BN3.prototype.egcd = function egcd(p) {
+      BN2.prototype.egcd = function egcd(p) {
         assert2(p.negative === 0);
         assert2(!p.isZero());
         var x = this;
@@ -2220,10 +2220,10 @@ var require_bn = __commonJS({
         } else {
           x = x.clone();
         }
-        var A = new BN3(1);
-        var B = new BN3(0);
-        var C = new BN3(0);
-        var D = new BN3(1);
+        var A = new BN2(1);
+        var B = new BN2(0);
+        var C = new BN2(0);
+        var D = new BN2(1);
         var g = 0;
         while (x.isEven() && y.isEven()) {
           x.iushrn(1);
@@ -2275,7 +2275,7 @@ var require_bn = __commonJS({
           gcd: y.iushln(g)
         };
       };
-      BN3.prototype._invmp = function _invmp(p) {
+      BN2.prototype._invmp = function _invmp(p) {
         assert2(p.negative === 0);
         assert2(!p.isZero());
         var a = this;
@@ -2285,8 +2285,8 @@ var require_bn = __commonJS({
         } else {
           a = a.clone();
         }
-        var x1 = new BN3(1);
-        var x2 = new BN3(0);
+        var x1 = new BN2(1);
+        var x2 = new BN2(0);
         var delta = b.clone();
         while (a.cmpn(1) > 0 && b.cmpn(1) > 0) {
           for (var i = 0, im = 1; (a.words[0] & im) === 0 && i < 26; ++i, im <<= 1)
@@ -2330,7 +2330,7 @@ var require_bn = __commonJS({
         }
         return res;
       };
-      BN3.prototype.gcd = function gcd2(num) {
+      BN2.prototype.gcd = function gcd2(num) {
         if (this.isZero())
           return num.abs();
         if (num.isZero())
@@ -2362,19 +2362,19 @@ var require_bn = __commonJS({
         } while (true);
         return b.iushln(shift);
       };
-      BN3.prototype.invm = function invm(num) {
+      BN2.prototype.invm = function invm(num) {
         return this.egcd(num).a.umod(num);
       };
-      BN3.prototype.isEven = function isEven() {
+      BN2.prototype.isEven = function isEven() {
         return (this.words[0] & 1) === 0;
       };
-      BN3.prototype.isOdd = function isOdd() {
+      BN2.prototype.isOdd = function isOdd() {
         return (this.words[0] & 1) === 1;
       };
-      BN3.prototype.andln = function andln(num) {
+      BN2.prototype.andln = function andln(num) {
         return this.words[0] & num;
       };
-      BN3.prototype.bincn = function bincn(bit) {
+      BN2.prototype.bincn = function bincn(bit) {
         assert2(typeof bit === "number");
         var r = bit % 26;
         var s = (bit - r) / 26;
@@ -2398,10 +2398,10 @@ var require_bn = __commonJS({
         }
         return this;
       };
-      BN3.prototype.isZero = function isZero() {
+      BN2.prototype.isZero = function isZero() {
         return this.length === 1 && this.words[0] === 0;
       };
-      BN3.prototype.cmpn = function cmpn(num) {
+      BN2.prototype.cmpn = function cmpn(num) {
         var negative = num < 0;
         if (this.negative !== 0 && !negative)
           return -1;
@@ -2423,7 +2423,7 @@ var require_bn = __commonJS({
           return -res | 0;
         return res;
       };
-      BN3.prototype.cmp = function cmp(num) {
+      BN2.prototype.cmp = function cmp(num) {
         if (this.negative !== 0 && num.negative === 0)
           return -1;
         if (this.negative === 0 && num.negative !== 0)
@@ -2433,7 +2433,7 @@ var require_bn = __commonJS({
           return -res | 0;
         return res;
       };
-      BN3.prototype.ucmp = function ucmp(num) {
+      BN2.prototype.ucmp = function ucmp(num) {
         if (this.length > num.length)
           return 1;
         if (this.length < num.length)
@@ -2453,112 +2453,112 @@ var require_bn = __commonJS({
         }
         return res;
       };
-      BN3.prototype.gtn = function gtn(num) {
+      BN2.prototype.gtn = function gtn(num) {
         return this.cmpn(num) === 1;
       };
-      BN3.prototype.gt = function gt(num) {
+      BN2.prototype.gt = function gt(num) {
         return this.cmp(num) === 1;
       };
-      BN3.prototype.gten = function gten(num) {
+      BN2.prototype.gten = function gten(num) {
         return this.cmpn(num) >= 0;
       };
-      BN3.prototype.gte = function gte(num) {
+      BN2.prototype.gte = function gte(num) {
         return this.cmp(num) >= 0;
       };
-      BN3.prototype.ltn = function ltn(num) {
+      BN2.prototype.ltn = function ltn(num) {
         return this.cmpn(num) === -1;
       };
-      BN3.prototype.lt = function lt(num) {
+      BN2.prototype.lt = function lt(num) {
         return this.cmp(num) === -1;
       };
-      BN3.prototype.lten = function lten(num) {
+      BN2.prototype.lten = function lten(num) {
         return this.cmpn(num) <= 0;
       };
-      BN3.prototype.lte = function lte(num) {
+      BN2.prototype.lte = function lte(num) {
         return this.cmp(num) <= 0;
       };
-      BN3.prototype.eqn = function eqn(num) {
+      BN2.prototype.eqn = function eqn(num) {
         return this.cmpn(num) === 0;
       };
-      BN3.prototype.eq = function eq(num) {
+      BN2.prototype.eq = function eq(num) {
         return this.cmp(num) === 0;
       };
-      BN3.red = function red(num) {
+      BN2.red = function red(num) {
         return new Red(num);
       };
-      BN3.prototype.toRed = function toRed(ctx) {
+      BN2.prototype.toRed = function toRed(ctx) {
         assert2(!this.red, "Already a number in reduction context");
         assert2(this.negative === 0, "red works only with positives");
         return ctx.convertTo(this)._forceRed(ctx);
       };
-      BN3.prototype.fromRed = function fromRed() {
+      BN2.prototype.fromRed = function fromRed() {
         assert2(this.red, "fromRed works only with numbers in reduction context");
         return this.red.convertFrom(this);
       };
-      BN3.prototype._forceRed = function _forceRed(ctx) {
+      BN2.prototype._forceRed = function _forceRed(ctx) {
         this.red = ctx;
         return this;
       };
-      BN3.prototype.forceRed = function forceRed(ctx) {
+      BN2.prototype.forceRed = function forceRed(ctx) {
         assert2(!this.red, "Already a number in reduction context");
         return this._forceRed(ctx);
       };
-      BN3.prototype.redAdd = function redAdd(num) {
+      BN2.prototype.redAdd = function redAdd(num) {
         assert2(this.red, "redAdd works only with red numbers");
         return this.red.add(this, num);
       };
-      BN3.prototype.redIAdd = function redIAdd(num) {
+      BN2.prototype.redIAdd = function redIAdd(num) {
         assert2(this.red, "redIAdd works only with red numbers");
         return this.red.iadd(this, num);
       };
-      BN3.prototype.redSub = function redSub(num) {
+      BN2.prototype.redSub = function redSub(num) {
         assert2(this.red, "redSub works only with red numbers");
         return this.red.sub(this, num);
       };
-      BN3.prototype.redISub = function redISub(num) {
+      BN2.prototype.redISub = function redISub(num) {
         assert2(this.red, "redISub works only with red numbers");
         return this.red.isub(this, num);
       };
-      BN3.prototype.redShl = function redShl(num) {
+      BN2.prototype.redShl = function redShl(num) {
         assert2(this.red, "redShl works only with red numbers");
         return this.red.shl(this, num);
       };
-      BN3.prototype.redMul = function redMul(num) {
+      BN2.prototype.redMul = function redMul(num) {
         assert2(this.red, "redMul works only with red numbers");
         this.red._verify2(this, num);
         return this.red.mul(this, num);
       };
-      BN3.prototype.redIMul = function redIMul(num) {
+      BN2.prototype.redIMul = function redIMul(num) {
         assert2(this.red, "redMul works only with red numbers");
         this.red._verify2(this, num);
         return this.red.imul(this, num);
       };
-      BN3.prototype.redSqr = function redSqr() {
+      BN2.prototype.redSqr = function redSqr() {
         assert2(this.red, "redSqr works only with red numbers");
         this.red._verify1(this);
         return this.red.sqr(this);
       };
-      BN3.prototype.redISqr = function redISqr() {
+      BN2.prototype.redISqr = function redISqr() {
         assert2(this.red, "redISqr works only with red numbers");
         this.red._verify1(this);
         return this.red.isqr(this);
       };
-      BN3.prototype.redSqrt = function redSqrt() {
+      BN2.prototype.redSqrt = function redSqrt() {
         assert2(this.red, "redSqrt works only with red numbers");
         this.red._verify1(this);
         return this.red.sqrt(this);
       };
-      BN3.prototype.redInvm = function redInvm() {
+      BN2.prototype.redInvm = function redInvm() {
         assert2(this.red, "redInvm works only with red numbers");
         this.red._verify1(this);
         return this.red.invm(this);
       };
-      BN3.prototype.redNeg = function redNeg() {
+      BN2.prototype.redNeg = function redNeg() {
         assert2(this.red, "redNeg works only with red numbers");
         this.red._verify1(this);
         return this.red.neg(this);
       };
-      BN3.prototype.redPow = function redPow(num) {
+      BN2.prototype.redPow = function redPow(num) {
         assert2(this.red && !num.red, "redPow(normalNum)");
         this.red._verify1(this);
         return this.red.pow(this, num);
@@ -2571,13 +2571,13 @@ var require_bn = __commonJS({
       };
       function MPrime(name, p) {
         this.name = name;
-        this.p = new BN3(p, 16);
+        this.p = new BN2(p, 16);
         this.n = this.p.bitLength();
-        this.k = new BN3(1).iushln(this.n).isub(this.p);
+        this.k = new BN2(1).iushln(this.n).isub(this.p);
         this.tmp = this._tmp();
       }
       MPrime.prototype._tmp = function _tmp() {
-        var tmp = new BN3(null);
+        var tmp = new BN2(null);
         tmp.words = new Array(Math.ceil(this.n / 13));
         return tmp;
       };
@@ -2605,7 +2605,7 @@ var require_bn = __commonJS({
         }
         return r;
       };
-      MPrime.prototype.split = function split2(input, out) {
+      MPrime.prototype.split = function split3(input, out) {
         input.iushrn(this.n, 0, out);
       };
       MPrime.prototype.imulK = function imulK(num) {
@@ -2619,7 +2619,7 @@ var require_bn = __commonJS({
         );
       }
       inherits(K256, MPrime);
-      K256.prototype.split = function split2(input, output2) {
+      K256.prototype.split = function split3(input, output2) {
         var mask = 4194303;
         var outLen = Math.min(input.length, 9);
         for (var i = 0; i < outLen; i++) {
@@ -2703,7 +2703,7 @@ var require_bn = __commonJS({
         }
         return num;
       };
-      BN3._prime = function prime(name) {
+      BN2._prime = function prime(name) {
         if (primes[name])
           return primes[name];
         var prime2;
@@ -2723,7 +2723,7 @@ var require_bn = __commonJS({
       };
       function Red(m) {
         if (typeof m === "string") {
-          var prime = BN3._prime(m);
+          var prime = BN2._prime(m);
           this.m = prime.p;
           this.prime = prime;
         } else {
@@ -2811,7 +2811,7 @@ var require_bn = __commonJS({
         var mod3 = this.m.andln(3);
         assert2(mod3 % 2 === 1);
         if (mod3 === 3) {
-          var pow = this.m.add(new BN3(1)).iushrn(2);
+          var pow = this.m.add(new BN2(1)).iushrn(2);
           return this.pow(a, pow);
         }
         var q = this.m.subn(1);
@@ -2821,11 +2821,11 @@ var require_bn = __commonJS({
           q.iushrn(1);
         }
         assert2(!q.isZero());
-        var one = new BN3(1).toRed(this);
+        var one = new BN2(1).toRed(this);
         var nOne = one.redNeg();
         var lpow = this.m.subn(1).iushrn(1);
         var z = this.m.bitLength();
-        z = new BN3(2 * z * z).toRed(this);
+        z = new BN2(2 * z * z).toRed(this);
         while (this.pow(z, lpow).cmp(nOne) !== 0) {
           z.redIAdd(nOne);
         }
@@ -2839,7 +2839,7 @@ var require_bn = __commonJS({
             tmp = tmp.redSqr();
           }
           assert2(i < m);
-          var b = this.pow(c, new BN3(1).iushln(m - i - 1));
+          var b = this.pow(c, new BN2(1).iushln(m - i - 1));
           r = r.redMul(b);
           c = b.redSqr();
           t = t.redMul(c);
@@ -2858,12 +2858,12 @@ var require_bn = __commonJS({
       };
       Red.prototype.pow = function pow(a, num) {
         if (num.isZero())
-          return new BN3(1).toRed(this);
+          return new BN2(1).toRed(this);
         if (num.cmpn(1) === 0)
           return a.clone();
         var windowSize = 4;
         var wnd = new Array(1 << windowSize);
-        wnd[0] = new BN3(1).toRed(this);
+        wnd[0] = new BN2(1).toRed(this);
         wnd[1] = a;
         for (var i = 2; i < wnd.length; i++) {
           wnd[i] = this.mul(wnd[i - 1], a);
@@ -2908,7 +2908,7 @@ var require_bn = __commonJS({
         res.red = null;
         return res;
       };
-      BN3.mont = function mont(num) {
+      BN2.mont = function mont(num) {
         return new Mont(num);
       };
       function Mont(m) {
@@ -2917,7 +2917,7 @@ var require_bn = __commonJS({
         if (this.shift % 26 !== 0) {
           this.shift += 26 - this.shift % 26;
         }
-        this.r = new BN3(1).iushln(this.shift);
+        this.r = new BN2(1).iushln(this.shift);
         this.r2 = this.imod(this.r.sqr());
         this.rinv = this.r._invmp(this.m);
         this.minv = this.rinv.mul(this.r).isubn(1).div(this.m);
@@ -2952,7 +2952,7 @@ var require_bn = __commonJS({
       };
       Mont.prototype.mul = function mul(a, b) {
         if (a.isZero() || b.isZero())
-          return new BN3(0)._forceRed(this);
+          return new BN2(0)._forceRed(this);
         var t = a.mul(b);
         var c = t.maskn(this.shift).mul(this.minv).imaskn(this.shift).mul(this.m);
         var u = t.isub(c).iushrn(this.shift);
@@ -3642,8 +3642,8 @@ var getChain = async (instancePromise) => {
 
 // src/utils/getCompleteAssetsInfo.ts
 var getCompleteAssetsInfo = async (api) => {
-  const assetsInfoResponse = await api.query.assetRegistry.metadata.entries();
-  return assetsInfoResponse.reduce((obj, [key, value]) => {
+  const assets = await api.query.assetRegistry.metadata.entries();
+  return assets.reduce((obj, [key, value]) => {
     const tokenId = key.toHuman()[0].replace(/[, ]/g, "");
     const { name, decimals, symbol } = value.unwrap();
     const assetInfo = {
@@ -3751,6 +3751,7 @@ var getRatio = (left, right) => {
 };
 
 // src/methods/query/getPools.ts
+import { pipe, filter, map } from "rambda";
 var getPools = async (instancePromise) => {
   const api = await instancePromise;
   const [assetsInfo, liquidityAssets, liquidityTokensPromoted] = await Promise.all([
@@ -3759,25 +3760,28 @@ var getPools = async (instancePromise) => {
     getLiquidityPromotedPools(api)
   ]);
   const poolBalances = await getPoolsBalance(api, liquidityAssets);
-  return Object.values(assetsInfo).filter(
-    (asset) => Object.values(liquidityAssets).includes(asset.id)
-  ).map((asset) => {
-    const [firstTokenAmount, secondTokenAmount] = poolBalances[asset.id];
-    const [firstTokenId, secondTokenId] = asset.symbol.split("-");
-    const firstTokenRatio = getRatio(firstTokenAmount, secondTokenAmount);
-    const secondTokenRatio = getRatio(secondTokenAmount, firstTokenAmount);
-    const isPromoted = liquidityTokensPromoted.includes(asset.id);
-    return {
-      firstTokenId,
-      secondTokenId,
-      firstTokenAmount,
-      secondTokenAmount,
-      liquidityTokenId: asset.id,
-      firstTokenRatio,
-      secondTokenRatio,
-      isPromoted
-    };
-  });
+  return pipe(
+    filter(
+      (asset) => Object.values(liquidityAssets).includes(asset.id)
+    ),
+    map((asset) => {
+      const [firstTokenAmount, secondTokenAmount] = poolBalances[asset.id];
+      const [firstTokenId, secondTokenId] = asset.symbol.split("-");
+      const firstTokenRatio = getRatio(firstTokenAmount, secondTokenAmount);
+      const secondTokenRatio = getRatio(secondTokenAmount, firstTokenAmount);
+      const isPromoted = liquidityTokensPromoted.includes(asset.id);
+      return {
+        firstTokenId,
+        secondTokenId,
+        firstTokenAmount,
+        secondTokenAmount,
+        liquidityTokenId: asset.id,
+        firstTokenRatio,
+        secondTokenRatio,
+        isPromoted
+      };
+    })
+  )(Object.values(assetsInfo));
 };
 
 // src/methods/query/getLiquidityPool.ts
@@ -3862,6 +3866,7 @@ var getAccountBalances = async (api, address) => {
 };
 
 // src/methods/query/getInvestedPools.ts
+import { pipe as pipe2, filter as filter2, map as map2 } from "rambda";
 var getInvestedPools = async (instancePromise, address) => {
   const api = await instancePromise;
   const [assetsInfo, accountBalances, liquidityTokensPromoted] = await Promise.all([
@@ -3869,89 +3874,113 @@ var getInvestedPools = async (instancePromise, address) => {
     getAccountBalances(api, address),
     getLiquidityPromotedPools(api)
   ]);
-  const poolsInfo = Object.values(assetsInfo).filter(
-    (asset) => Object.keys(accountBalances).includes(asset.id) && asset.name.includes("LiquidityPoolToken")
-  ).map(async (asset) => {
-    const userLiquidityBalance = accountBalances[asset.id];
-    const [firstTokenId, secondTokenId] = asset.symbol.split("-");
-    const [firstTokenAmount, secondTokenAmount] = await getAmountOfTokensInPool(
-      instancePromise,
-      firstTokenId.toString(),
-      secondTokenId.toString()
-    );
-    const share = await calculateLiquidityShare(
-      api,
-      asset.id,
-      userLiquidityBalance.free.add(userLiquidityBalance.reserved)
-    );
-    return {
-      firstTokenId,
-      secondTokenId,
-      firstTokenAmount,
-      secondTokenAmount,
-      liquidityTokenId: asset.id,
-      isPromoted: liquidityTokensPromoted.includes(asset.id),
-      share,
-      firstTokenRatio: share.eq(BN_ZERO) ? BN_ZERO : getRatio(firstTokenAmount, secondTokenAmount),
-      secondTokenRatio: share.eq(BN_ZERO) ? BN_ZERO : getRatio(secondTokenAmount, firstTokenAmount),
-      activatedLPTokens: userLiquidityBalance.reserved,
-      nonActivatedLPTokens: userLiquidityBalance.free
-    };
-  });
+  const poolsInfo = pipe2(
+    filter2(
+      (asset) => Object.keys(accountBalances).includes(asset.id) && asset.name.includes("LiquidityPoolToken")
+    ),
+    map2(async (asset) => {
+      const userLiquidityBalance = accountBalances[asset.id];
+      const [firstTokenId, secondTokenId] = asset.symbol.split("-");
+      const [firstTokenAmount, secondTokenAmount] = await getAmountOfTokensInPool(
+        instancePromise,
+        firstTokenId.toString(),
+        secondTokenId.toString()
+      );
+      const share = await calculateLiquidityShare(
+        api,
+        asset.id,
+        userLiquidityBalance.free.add(userLiquidityBalance.reserved)
+      );
+      return {
+        firstTokenId,
+        secondTokenId,
+        firstTokenAmount,
+        secondTokenAmount,
+        liquidityTokenId: asset.id,
+        isPromoted: liquidityTokensPromoted.includes(asset.id),
+        share,
+        firstTokenRatio: share.eq(BN_ZERO) ? BN_ZERO : getRatio(firstTokenAmount, secondTokenAmount),
+        secondTokenRatio: share.eq(BN_ZERO) ? BN_ZERO : getRatio(secondTokenAmount, firstTokenAmount),
+        activatedLPTokens: userLiquidityBalance.reserved,
+        nonActivatedLPTokens: userLiquidityBalance.free
+      };
+    })
+  )(Object.values(assetsInfo));
   return Promise.all(poolsInfo);
 };
 
 // src/methods/query/getTotalIssuanceOfTokens.ts
+import { pipe as pipe3, reduce } from "rambda";
 var getTotalIssuanceOfTokens = async (instancePromise) => {
   const api = await instancePromise;
   const balancesResponse = await api.query.tokens.totalIssuance.entries();
-  return balancesResponse.reduce((acc, [key, value]) => {
-    const id = key.toHuman()[0].replace(/[, ]/g, "");
-    const balance = new import_bn.default(value.toString());
-    acc[id] = balance;
-    return acc;
-  }, {});
+  return pipe3(
+    reduce((acc, [key, value]) => {
+      const id = key.toHuman()[0].replace(/[, ]/g, "");
+      const balance = new import_bn.default(value.toString());
+      acc[id] = balance;
+      return acc;
+    }, {})
+  )(balancesResponse);
 };
 
 // src/methods/query/getAssetsInfo.ts
+import { pipe as pipe4, filter as filter3, reduce as reduce2, replace, trim, split, join } from "rambda";
 var getAssetsInfo = async (instancePromise) => {
   const api = await instancePromise;
   const completeAssetsInfo = await getCompleteAssetsInfo(api);
-  return Object.values(completeAssetsInfo).filter(
-    (assetsInfo) => !["1", "3", "6"].includes(assetsInfo.id)
-  ).reduce((obj, item) => {
-    const asset = {
-      ...item,
-      name: item.name.replace(/0x\w+/, "").replace(/[A-Z]/g, "$&").trim(),
-      symbol: item.symbol.includes("TKN") ? item.symbol.split("-").reduce((acc, curr) => {
-        const currentValue = curr.replace("TKN", "");
-        const tokenId = currentValue.startsWith("0x") ? hexToBn(currentValue).toString() : currentValue;
-        const symbol = completeAssetsInfo[tokenId].symbol;
-        acc.push(symbol);
-        return acc;
-      }, []).join("-") : item.symbol
-    };
-    obj[asset.id] = asset;
-    return obj;
-  }, {});
+  return pipe4(
+    filter3(
+      (assetsInfo) => !["1", "3", "6"].includes(assetsInfo.id)
+    ),
+    reduce2((obj, item) => {
+      const asset = {
+        ...item,
+        name: pipe4(
+          replace(/0x\w+/, ""),
+          replace(/[A-Z]/g, "$&"),
+          trim
+        )(item.name),
+        symbol: item.symbol.includes("TKN") ? pipe4(
+          split("-"),
+          reduce2((acc, curr) => {
+            const currentValue = curr.replace("TKN", "");
+            const tokenId = currentValue.startsWith("0x") ? hexToBn(currentValue).toString() : currentValue;
+            const symbol = completeAssetsInfo[tokenId].symbol;
+            acc.push(symbol);
+            return acc;
+          }, []),
+          join("-")
+        )(item.symbol) : item.symbol
+      };
+      obj[asset.id] = asset;
+      return obj;
+    }, {})
+  )(Object.values(completeAssetsInfo));
 };
 
 // src/methods/query/getOwnedTokens.ts
+import { pipe as pipe5, filter as filter4, map as map3 } from "rambda";
 var getOwnedTokens = async (instancePromise, address) => {
   const api = await instancePromise;
   const [assetsInfo, accountBalances] = await Promise.all([
     getAssetsInfo(instancePromise),
     getAccountBalances(api, address)
   ]);
-  return Object.fromEntries(
-    Object.entries(assetsInfo).filter(([id]) => Object.keys(accountBalances).includes(id)).map(([id, assetInfo]) => [
-      id,
-      {
-        ...assetInfo,
-        balance: accountBalances[id]
-      }
-    ])
+  const ownedTokens = Object.fromEntries(
+    pipe5(
+      Object.entries,
+      filter4(([id]) => Object.keys(accountBalances).includes(id)),
+      map3(([id, assetInfo]) => [
+        id,
+        {
+          ...assetInfo,
+          balance: accountBalances[id]
+        }
+      ])
+    )(assetsInfo)
   );
+  return ownedTokens;
 };
 
 // src/methods/query/getBlockNumber.ts
@@ -3962,12 +3991,12 @@ var getBlockNumber = async (instancePromise) => {
 };
 
 // src/methods/query/getLiquidityTokens.ts
-import { pipe, filter, reduce } from "rambda";
+import { pipe as pipe6, filter as filter5, reduce as reduce3 } from "rambda";
 var getLiquidityTokens = async (instancePromise) => {
   const assetsInfo = await getAssetsInfo(instancePromise);
-  return pipe(
-    filter((asset) => asset.name.includes("LiquidityPoolToken")),
-    reduce((acc, curr) => {
+  return pipe6(
+    filter5((asset) => asset.name.includes("LiquidityPoolToken")),
+    reduce3((acc, curr) => {
       acc[curr.id] = curr;
       return acc;
     }, {})
@@ -4256,16 +4285,16 @@ function createWasmFn(root, wasmBytes2, asmFn) {
 
 // node_modules/@polkadot/wasm-util/base64.js
 var chr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-var map = new Array(256);
+var map4 = new Array(256);
 for (let i = 0, count = chr.length; i < count; i++) {
-  map[chr.charCodeAt(i)] = i;
+  map4[chr.charCodeAt(i)] = i;
 }
 function base64Decode(data, out) {
   let byte = 0;
   let bits2 = 0;
   let pos = -1;
   for (let i = 0, count = out.length; pos < count; i++) {
-    byte = byte << 6 | map[data.charCodeAt(i)];
+    byte = byte << 6 | map4[data.charCodeAt(i)];
     if ((bits2 += 6) >= 8) {
       out[++pos] = byte >>> (bits2 -= 8) & 255;
     }
@@ -4650,7 +4679,7 @@ function alphabet(alphabet2) {
     }
   };
 }
-function join(separator = "") {
+function join2(separator = "") {
   if (typeof separator !== "string")
     throw new Error("join separator should be string");
   return {
@@ -4832,13 +4861,13 @@ function unsafeWrapper(fn) {
     }
   };
 }
-var base16 = chain(radix2(4), alphabet("0123456789ABCDEF"), join(""));
-var base32 = chain(radix2(5), alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"), padding(5), join(""));
-var base32hex = chain(radix2(5), alphabet("0123456789ABCDEFGHIJKLMNOPQRSTUV"), padding(5), join(""));
-var base32crockford = chain(radix2(5), alphabet("0123456789ABCDEFGHJKMNPQRSTVWXYZ"), join(""), normalize((s) => s.toUpperCase().replace(/O/g, "0").replace(/[IL]/g, "1")));
-var base64 = chain(radix2(6), alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"), padding(6), join(""));
-var base64url = chain(radix2(6), alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"), padding(6), join(""));
-var genBase58 = (abc) => chain(radix(58), alphabet(abc), join(""));
+var base16 = chain(radix2(4), alphabet("0123456789ABCDEF"), join2(""));
+var base32 = chain(radix2(5), alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"), padding(5), join2(""));
+var base32hex = chain(radix2(5), alphabet("0123456789ABCDEFGHIJKLMNOPQRSTUV"), padding(5), join2(""));
+var base32crockford = chain(radix2(5), alphabet("0123456789ABCDEFGHJKMNPQRSTVWXYZ"), join2(""), normalize((s) => s.toUpperCase().replace(/O/g, "0").replace(/[IL]/g, "1")));
+var base64 = chain(radix2(6), alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"), padding(6), join2(""));
+var base64url = chain(radix2(6), alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"), padding(6), join2(""));
+var genBase58 = (abc) => chain(radix(58), alphabet(abc), join2(""));
 var base58 = genBase58("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
 var base58flickr = genBase58("123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ");
 var base58xrp = genBase58("rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz");
@@ -4867,7 +4896,7 @@ var base58xmr = {
     return Uint8Array.from(res);
   }
 };
-var BECH_ALPHABET = chain(alphabet("qpzry9x8gf2tvdw0s3jn54khce6mua7l"), join(""));
+var BECH_ALPHABET = chain(alphabet("qpzry9x8gf2tvdw0s3jn54khce6mua7l"), join2(""));
 var POLYMOD_GENERATORS = [996825010, 642813549, 513874426, 1027748829, 705979059];
 function bech32Polymod(pre) {
   const b = pre >> 25;
@@ -4949,7 +4978,7 @@ var utf8 = {
   encode: (data) => new TextDecoder().decode(data),
   decode: (str) => new TextEncoder().encode(str)
 };
-var hex = chain(radix2(4), alphabet("0123456789abcdef"), join(""), normalize((s) => {
+var hex = chain(radix2(4), alphabet("0123456789abcdef"), join2(""), normalize((s) => {
   if (typeof s !== "string" || s.length % 2)
     throw new TypeError(`hex.decode: expected string, got ${typeof s} with length ${s.length}`);
   return s.toLowerCase();
@@ -5371,7 +5400,7 @@ function fromBig(n, le = false) {
     return { h: Number(n & U32_MASK64), l: Number(n >> _32n & U32_MASK64) };
   return { h: Number(n >> _32n & U32_MASK64) | 0, l: Number(n & U32_MASK64) | 0 };
 }
-function split(lst, le = false) {
+function split2(lst, le = false) {
   let Ah = new Uint32Array(lst.length);
   let Al = new Uint32Array(lst.length);
   for (let i = 0; i < lst.length; i++) {
@@ -5405,7 +5434,7 @@ var add5L = (Al, Bl, Cl, Dl, El) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >
 var add5H = (low, Ah, Bh, Ch, Dh, Eh) => Ah + Bh + Ch + Dh + Eh + (low / 2 ** 32 | 0) | 0;
 var u64 = {
   fromBig,
-  split,
+  split: split2,
   toBig,
   shrSH,
   shrSL,
@@ -8113,6 +8142,50 @@ async function multiswapSellAsset(instancePromise, args, isForBatch) {
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }
 
+// src/utils/getPriceImpact.ts
+import Big3 from "big.js";
+
+// src/utils/isInputValid.ts
+var isInputValid = (value) => {
+  const valueNum = +value;
+  return !(!value || isNaN(Number(value)) || isNaN(valueNum) || valueNum < 0);
+};
+
+// src/utils/toFixed.ts
+var toFixed = (value, decimals) => {
+  const decimalsRegex = new RegExp(`^-?\\d+(?:\\.\\d{0,${decimals}})?`, "gm");
+  const withDesiredDecimalPlaces = value.match(decimalsRegex);
+  const trailingZeroesRegex = /^-?0*(\d+(?:\.(?:(?!0+$)\d)+)?)/gm;
+  const withoutTrailingZeroes = (withDesiredDecimalPlaces?.[0] || value).match(
+    trailingZeroesRegex
+  );
+  return withoutTrailingZeroes?.[0] ?? value;
+};
+
+// src/utils/getPriceImpact.ts
+var getPriceImpact = (args) => {
+  const { poolBalance, poolDecimals, firstTokenAmount, secondTokenAmount } = args;
+  if (!poolBalance || !poolDecimals || !isInputValid(firstTokenAmount) || !isInputValid(secondTokenAmount)) {
+    return;
+  }
+  const firstReserveBefore = poolBalance.firstTokenBalance;
+  const secondReserveBefore = poolBalance.secondTokenBalance;
+  const soldAmount = toBN(firstTokenAmount, poolDecimals.firstTokenDecimals);
+  const boughtAmount = toBN(
+    secondTokenAmount,
+    poolDecimals.secondTokenDecimals
+  );
+  if (boughtAmount.gte(secondReserveBefore))
+    return "";
+  const numerator = firstReserveBefore.add(soldAmount).mul(BN_TEN_THOUSAND).mul(secondReserveBefore);
+  const denominator = secondReserveBefore.sub(boughtAmount).mul(firstReserveBefore);
+  const res = numerator.div(denominator).sub(BN_TEN_THOUSAND);
+  const resStr = res.toString();
+  const resBig = Big3(resStr);
+  const resFormatted = toFixed(resBig.div(BIG_HUNDRED).toString(), 2);
+  return resFormatted;
+};
+
 // src/mangata.ts
 function createMangataInstance(urls) {
   const instancePromise = getOrCreateInstance(urls);
@@ -8216,18 +8289,8 @@ function createMangataInstance(urls) {
   };
 }
 var Mangata = {
-  instance: createMangataInstance
-};
-
-// src/utils/toFixed.ts
-var toFixed = (value, decimals) => {
-  const decimalsRegex = new RegExp(`^-?\\d+(?:\\.\\d{0,${decimals}})?`, "gm");
-  const withDesiredDecimalPlaces = value.match(decimalsRegex);
-  const trailingZeroesRegex = /^-?0*(\d+(?:\.(?:(?!0+$)\d)+)?)/gm;
-  const withoutTrailingZeroes = (withDesiredDecimalPlaces?.[0] || value).match(
-    trailingZeroesRegex
-  );
-  return withoutTrailingZeroes?.[0] ?? value;
+  instance: createMangataInstance,
+  getPriceImpact: (args) => getPriceImpact(args)
 };
 export {
   BIG_BILLION,

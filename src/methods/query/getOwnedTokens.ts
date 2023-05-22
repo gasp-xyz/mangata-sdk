@@ -18,7 +18,7 @@ export const getOwnedTokens = async (
     getAccountBalances(api, address)
   ]);
 
-  return Object.fromEntries(
+  const ownedTokens = Object.fromEntries(
     pipe(
       Object.entries,
       filter(([id]) => Object.keys(accountBalances).includes(id)),
@@ -30,5 +30,7 @@ export const getOwnedTokens = async (
         }
       ])
     )(assetsInfo)
-  ) as { [id: TokenId]: Token };
+  );
+
+  return ownedTokens as { [id: TokenId]: Token };
 };

@@ -5,9 +5,9 @@ import { TokenId } from "../types/common";
 import { TTokenInfo } from "../types/query";
 
 export const getCompleteAssetsInfo = async (api: ApiPromise) => {
-  const assetsInfoResponse = await api.query.assetRegistry.metadata.entries();
+  const assets = await api.query.assetRegistry.metadata.entries();
 
-  return assetsInfoResponse.reduce((obj, [key, value]) => {
+  return assets.reduce((obj, [key, value]) => {
     const tokenId = (key.toHuman() as string[])[0].replace(/[, ]/g, "");
     const { name, decimals, symbol } = value.unwrap();
     const assetInfo = {
