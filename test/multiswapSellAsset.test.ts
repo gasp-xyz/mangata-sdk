@@ -41,7 +41,7 @@ beforeEach(async () => {
   });
 });
 
-it.skip("should sell asset", async () => {
+it("should sell asset", async () => {
   const argsPool: CreatePool = {
     account: testUser,
     firstTokenId: firstTokenId!,
@@ -67,7 +67,9 @@ it.skip("should sell asset", async () => {
     minAmountOut: new BN(100),
     txOptions: {
       extrinsicStatus: (data) => {
-        console.log(data);
+        const searchTerms = ["xyk", "AssetsSwapped", testUser.address];
+        const extrinsicData = getExtrinsicData({ data, searchTerms });
+        return expect(extrinsicData?.method).toEqual("AssetsSwapped");
       }
     }
   };
