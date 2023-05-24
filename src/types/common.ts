@@ -105,7 +105,8 @@ export type MangataSubmittableExtrinsic = SubmittableExtrinsic<
 export interface MangataInstance {
   xTokens: {
     depositFromParachain: (args: Deposit) => Promise<void>;
-    depositFromKusamaOrStatemine: (args: RelayDeposit) => Promise<void>;
+    depositFromKusama: (args: RelayDeposit) => Promise<void>;
+    depositFromStatemine: (args: RelayDeposit) => Promise<void>;
     withdraw: (args: Withdraw) => Promise<void>;
     withdrawKsm: (args: RelayWithdraw) => Promise<void>;
   };

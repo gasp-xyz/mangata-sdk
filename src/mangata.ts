@@ -82,7 +82,8 @@ import { batchAll } from "./methods/utility/batchAll";
 import { forceBatch } from "./methods/utility/forceBatch";
 import { getOrCreateInstance } from "./utils/getOrCreateInstance";
 import { waitForNewBlock } from "./methods/rpc/waitForNewBlock";
-import { depositFromKusamaOrStatemine } from "./methods/xTokens/depositFromKusamaOrStatemine";
+import { depositFromKusama } from "./methods/xTokens/depositFromKusama";
+import { depositFromStatemine } from "./methods/xTokens/depositFromStatemine";
 import { calculateMintingFutureRewards } from "./utils/calculateMintingFutureRewards";
 import { Batch, PriceImpact } from "./types/utility";
 import { getActivateLiquidityFee } from "./methods/fee/getActivateLiquidityFee";
@@ -114,8 +115,10 @@ function createMangataInstance(urls: string[]): MangataInstance {
     xTokens: {
       depositFromParachain: async (args: Deposit) =>
         await depositFromParachain(args),
-      depositFromKusamaOrStatemine: async (args: RelayDeposit) =>
-        await depositFromKusamaOrStatemine(args),
+      depositFromKusama: async (args: RelayDeposit) =>
+        await depositFromKusama(args),
+      depositFromStatemine: async (args: RelayDeposit) =>
+        await depositFromStatemine(args),
       withdraw: async (args: Withdraw) => await withdraw(instancePromise, args),
       withdrawKsm: async (args: RelayWithdraw) =>
         await withdrawKsm(instancePromise, args)

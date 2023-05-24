@@ -4,7 +4,7 @@ import { RelayDeposit } from "../../types/xTokens";
 /**
  * @since 2.0.0
  */
-export const depositFromKusamaOrStatemine = async (args: RelayDeposit) => {
+export const depositFromKusama = async (args: RelayDeposit) => {
   const {
     url,
     destination,

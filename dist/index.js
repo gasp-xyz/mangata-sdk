@@ -7805,9 +7805,9 @@ var waitForNewBlock = async (instancePromise, blockCount) => {
   });
 };
 
-// src/methods/xTokens/depositFromKusamaOrStatemine.ts
+// src/methods/xTokens/depositFromKusama.ts
 import { ApiPromise as ApiPromise3, WsProvider as WsProvider3 } from "@polkadot/api";
-var depositFromKusamaOrStatemine = async (args) => {
+var depositFromKusama = async (args) => {
   const {
     url,
     destination,
@@ -7820,6 +7820,35 @@ var depositFromKusamaOrStatemine = async (args) => {
   } = args;
   const api = await new ApiPromise3({
     provider: new WsProvider3(url),
+    noInitWarn: true
+  }).isReady;
+  await api.tx.xcmPallet.limitedReserveTransferAssets(
+    destination,
+    beneficiary,
+    assets,
+    feeAssetItem,
+    weightLimit
+  ).signAndSend(account, {
+    signer: txOptions?.signer,
+    nonce: txOptions?.nonce
+  });
+};
+
+// src/methods/xTokens/depositFromStatemine.ts
+import { ApiPromise as ApiPromise4, WsProvider as WsProvider4 } from "@polkadot/api";
+var depositFromStatemine = async (args) => {
+  const {
+    url,
+    destination,
+    beneficiary,
+    assets,
+    feeAssetItem,
+    weightLimit,
+    txOptions,
+    account
+  } = args;
+  const api = await new ApiPromise4({
+    provider: new WsProvider4(url),
     noInitWarn: true
   }).isReady;
   await api.tx.polkadotXcm.limitedReserveTransferAssets(
@@ -7919,11 +7948,11 @@ var getActivateLiquidityFee = async (instancePromise, args) => {
 };
 
 // src/methods/fee/getDepositFromParachainFee.ts
-import { ApiPromise as ApiPromise4, WsProvider as WsProvider4 } from "@polkadot/api";
+import { ApiPromise as ApiPromise5, WsProvider as WsProvider5 } from "@polkadot/api";
 var getDepositFromParachainFee = async (args) => {
   const { url, asset, destination, weightLimit, account } = args;
-  const api = await new ApiPromise4({
-    provider: new WsProvider4(url),
+  const api = await new ApiPromise5({
+    provider: new WsProvider5(url),
     noInitWarn: true
   }).isReady;
   const dispatchInfo = await api.tx.xTokens.transferMultiasset(asset, destination, weightLimit).paymentInfo(account);
@@ -7931,7 +7960,7 @@ var getDepositFromParachainFee = async (args) => {
 };
 
 // src/methods/fee/getDepositFromKusamaOrStatemineFee.ts
-import { ApiPromise as ApiPromise5, WsProvider as WsProvider5 } from "@polkadot/api";
+import { ApiPromise as ApiPromise6, WsProvider as WsProvider6 } from "@polkadot/api";
 var getDepositFromKusamaOrStatemineFee = async (args) => {
   const {
     url,
@@ -7942,8 +7971,8 @@ var getDepositFromKusamaOrStatemineFee = async (args) => {
     weightLimit,
     account
   } = args;
-  const api = await new ApiPromise5({
-    provider: new WsProvider5(url),
+  const api = await new ApiPromise6({
+    provider: new WsProvider6(url),
     noInitWarn: true
   }).isReady;
   const dispatchInfo = await api.tx.polkadotXcm.limitedReserveTransferAssets(
@@ -8196,7 +8225,8 @@ function createMangataInstance(urls) {
     forceBatch: async (args) => await forceBatch(instancePromise, args),
     xTokens: {
       depositFromParachain: async (args) => await depositFromParachain(args),
-      depositFromKusamaOrStatemine: async (args) => await depositFromKusamaOrStatemine(args),
+      depositFromKusama: async (args) => await depositFromKusama(args),
+      depositFromStatemine: async (args) => await depositFromStatemine(args),
       withdraw: async (args) => await withdraw(instancePromise, args),
       withdrawKsm: async (args) => await withdrawKsm(instancePromise, args)
     },
