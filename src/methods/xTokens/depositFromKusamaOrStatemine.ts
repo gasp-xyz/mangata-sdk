@@ -21,7 +21,7 @@ export const depositFromKusamaOrStatemine = async (args: RelayDeposit) => {
     noInitWarn: true
   }).isReady;
 
-  await api.tx.polkadotXcm
+  await api.tx.xcmPallet
     .limitedReserveTransferAssets(
       destination,
       beneficiary,
