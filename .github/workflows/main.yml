@@ -13,6 +13,7 @@ jobs:
   complete-setup:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Clone mangata node repository
         uses: actions/checkout@v3
         with:
@@ -20,22 +21,21 @@ jobs:
           path: mangata-repo
           ref: develop
 
+      - name: Setup Node version and cache dependencies
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+          cache: "npm"
+
       - name: Install WASM toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
           target: wasm32-unknown-unknown
 
-      - name: Build the node
-        working-directory: mangata-repo
-        run: cargo build --release --features=mangata-rococo
-
       - name: Replace parachain docker image reference in config
         working-directory: mangata-repo/launch
-        run: sed -i 's+mangatasolutions/mangata-node:dev+mangatasolutions/mangata-node:develop+g' config.yml
-
-      - name: Setup yarn
-        run: npm install -g yarn
+        run: sed -i 's+mangatasolutions/mangata-node:.*+mangatasolutions/mangata-node:develop+g' config.yml
 
       - name: Run the Node
         working-directory: mangata-repo/launch
@@ -43,23 +43,10 @@ jobs:
           yarn install
           yarn gen
           yarn up
-
-      - name: Docker ps - chceck mangata node image
-        run: docker ps
+          docker ps
 
       - name: Sleep for 3 minutes
         run: sleep 180s
-
-      - uses: actions/checkout@v3
-
-      - name: Setup Node version and cache dependencies
-        uses: actions/setup-node@v3
-        with:
-          node-version: "14"
-          cache: "npm"
-
-      - name: set registry
-        run: npm config set registry https://registry.npmjs.org
 
       - name: Set network timeout
         run: npm ci
