@@ -1,8 +1,8 @@
-import { SubmittableExtrinsic, Signer } from '@polkadot/api/types';
+import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 import { ApiPromise } from '@polkadot/api';
 import { BN } from '@polkadot/util';
 import { KeyringPair } from '@polkadot/keyring/types';
-import { ISubmittableResult, Codec } from '@polkadot/types/types';
+import { Codec, ISubmittableResult } from '@polkadot/types/types';
 import { Event, Phase } from '@polkadot/types/interfaces';
 import { Merge, Except } from 'type-fest';
 import Big from 'big.js';
@@ -146,7 +146,7 @@ type TransferTokenFee = Merge<Except<Transfer, "txOptions">, {
 type TransferAllFee = Except<Transfer, "txOptions">;
 
 type Batch = Merge<ExtrinsicCommon, {
-    calls: SubmittableExtrinsic<"promise", ISubmittableResult>[];
+    calls: MangataSubmittableExtrinsic[];
 }>;
 type PriceImpact = {
     poolBalance: {
