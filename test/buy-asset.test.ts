@@ -4,7 +4,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { it, expect, beforeEach } from "vitest";
 
 import { instance, SUDO_USER_NAME } from "./instance";
-import type { BuyAsset, CreatePool } from "../src";
+import type { Batch, BuyAsset, CreatePool } from "../src";
 import {
   createMangataToken,
   createToken,
@@ -65,15 +65,20 @@ it("should buy asset", async () => {
     soldTokenId: firstTokenId!,
     boughtTokenId: secondTokenId!,
     amount: new BN(1000),
-    maxAmountIn: new BN(60000),
+    maxAmountIn: new BN(60000)
+  };
+
+  const tx1 = await instance.submitableExtrinsic.buyAsset(argsBuyAsset);
+  const tx2 = await instance.submitableExtrinsic.buyAsset(argsBuyAsset);
+
+  const argsBatch: Batch = {
+    account: testUser,
+    calls: [tx1, tx2],
     txOptions: {
       extrinsicStatus: (data) => {
-        const searchTerms = ["xyk", "AssetsSwapped", testUser.address];
-        const extrinsicData = getExtrinsicData({ data, searchTerms });
-        return expect(extrinsicData?.method).toEqual("AssetsSwapped");
+        return expect(data[data.length - 1].method).toEqual("ExtrinsicSuccess");
       }
     }
   };
-
-  await instance.xyk.buyAsset(argsBuyAsset);
+  await instance.batch(argsBatch);
 });
