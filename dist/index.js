@@ -3283,6 +3283,7 @@ var getTxError = (api, method, eventData) => {
 var signTx = async (api, tx, account, txOptions) => {
   return new Promise(async (resolve, reject) => {
     const extractedAccount = typeof account === "string" ? account : account.address;
+    let subscribed = false;
     const nonce = await getTxNonce(api, extractedAccount, txOptions);
     try {
       await tx.signAsync(account, { nonce, signer: txOptions?.signer });
@@ -3298,13 +3299,19 @@ var signTx = async (api, tx, account, txOptions) => {
           `Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} => ${result.status.type}(${result.status.value.toString()})${serializeTx(api, tx)}`
         );
         txOptions?.statusCallback?.(result);
-        if (result.status.isInBlock) {
-          const inclusionBlockHash = result.status.asInBlock.toString();
+        if ((result.status.isInBlock || result.status.isFinalized) && !subscribed) {
+          subscribed = true;
+          let inclusionBlockHash;
+          if (result.status.isInBlock) {
+            inclusionBlockHash = result.status.asInBlock.toString();
+          } else if (result.status.isFinalized) {
+            inclusionBlockHash = result.status.asFinalized.toString();
+          }
           const inclusionBlockHeader = await api.rpc.chain.getHeader(
             inclusionBlockHash
           );
           const inclusionBlockNr = inclusionBlockHeader.number.toBn();
-          const executionBlockStartNr = inclusionBlockNr.addn(1);
+          const executionBlockStartNr = inclusionBlockNr.addn(0);
           const executionBlockStopNr = inclusionBlockNr.addn(10);
           const executionBlockNr = executionBlockStartNr;
           const unsubscribeNewHeads = await api.rpc.chain.subscribeNewHeads(
