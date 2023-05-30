@@ -8,25 +8,21 @@ import { toFixed } from "./toFixed";
 import { PriceImpact } from "../types/utility";
 
 export const getPriceImpact = (args: PriceImpact) => {
-  const { poolBalance, poolDecimals, firstTokenAmount, secondTokenAmount } =
-    args;
+  const [poolBalance, tokenDecimals, tokenAmounts] = args;
   if (
     !poolBalance ||
-    !poolDecimals ||
-    !isInputValid(firstTokenAmount) ||
-    !isInputValid(secondTokenAmount)
+    !tokenDecimals ||
+    !isInputValid(tokenAmounts[0].toString()) ||
+    !isInputValid(tokenAmounts[1].toString())
   ) {
     return;
   }
 
-  const firstReserveBefore = poolBalance.firstTokenBalance;
-  const secondReserveBefore = poolBalance.secondTokenBalance;
+  const firstReserveBefore = poolBalance[0];
+  const secondReserveBefore = poolBalance[1];
 
-  const soldAmount = toBN(firstTokenAmount, poolDecimals.firstTokenDecimals);
-  const boughtAmount = toBN(
-    secondTokenAmount,
-    poolDecimals.secondTokenDecimals
-  );
+  const soldAmount = toBN(tokenAmounts[0].toString(), tokenDecimals[0]);
+  const boughtAmount = toBN(tokenAmounts[1].toString(), tokenDecimals[1]);
 
   if (boughtAmount.gte(secondReserveBefore)) return "";
 
