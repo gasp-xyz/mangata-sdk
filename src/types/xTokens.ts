@@ -37,7 +37,7 @@ export type Withdraw = Merge<
 export type RelayDeposit<
   A = unknown,
   D = unknown,
-  F = unknown,
+  F = number,
   B = unknown,
   W = unknown
 > = Prettify<
@@ -67,4 +67,5 @@ export type RelayWithdraw = Prettify<
 export type WithdrawKsmFee = Except<RelayWithdraw, "txOptions">;
 export type WithdrawFee = Except<Withdraw, "txOptions">;
 export type DepositFromParachainFee = Except<Deposit, "txOptions">;
-export type DepositFromKusamaOrStatemineFee = Except<RelayDeposit, "txOptions">;
+export type DepositFromKusamaFee = Except<RelayDeposit, "txOptions">;
+export type DepositFromStatemineFee = Except<RelayDeposit, "txOptions">;

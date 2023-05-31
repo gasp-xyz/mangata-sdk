@@ -38,8 +38,9 @@ import { mintLiquidity } from "./methods/xyk/mintLiquidity";
 import { depositFromParachain } from "./methods/xTokens/depositFromParachain";
 import {
   Deposit,
-  DepositFromKusamaOrStatemineFee,
+  DepositFromKusamaFee,
   DepositFromParachainFee,
+  DepositFromStatemineFee,
   RelayDeposit,
   RelayWithdraw,
   Withdraw,
@@ -88,7 +89,6 @@ import { calculateMintingFutureRewards } from "./utils/calculateMintingFutureRew
 import { Batch, PriceImpact } from "./types/utility";
 import { getActivateLiquidityFee } from "./methods/fee/getActivateLiquidityFee";
 import { getDepositFromParachainFee } from "./methods/fee/getDepositFromParachainFee";
-import { getDepositFromKusamaOrStatemineFee } from "./methods/fee/getDepositFromKusamaOrStatemineFee";
 import { getWithdrawFee } from "./methods/fee/getWithdrawFee";
 import { getWithdrawKsmFee } from "./methods/fee/getWithdrawKsmFee";
 import { getDeactivateLiquidityFee } from "./methods/fee/getDeactivateLiquidityFee";
@@ -103,7 +103,14 @@ import { getTransferTokenFee } from "./methods/fee/getTransferTokenFee";
 import { multiswapBuyAsset } from "./methods/xyk/multiswapBuyAsset";
 import { multiswapSellAsset } from "./methods/xyk/multiswapSellAsset";
 import { getPriceImpact } from "./utils/getPriceImpact";
+import { getDepositFromKusamaFee } from "./methods/fee/getDepositFromKusamaFee";
+import { getDepositFromStatemineFee } from "./methods/fee/getDepositFromStatemineFee";
 
+/**
+ * Creates a MangataInstance object with various methods for interacting with the Mangata node.
+ * @param urls - An array of URLs for connecting to the Mangata node.
+ * @returns A MangataInstance object.
+ */
 function createMangataInstance(urls: string[]): MangataInstance {
   const instancePromise = getOrCreateInstance(urls);
 
@@ -235,8 +242,10 @@ function createMangataInstance(urls: string[]): MangataInstance {
     fee: {
       depositFromParachain: async (args: DepositFromParachainFee) =>
         await getDepositFromParachainFee(args),
-      depositFromKusamaOrStatemine: (args: DepositFromKusamaOrStatemineFee) =>
-        getDepositFromKusamaOrStatemineFee(args),
+      depositFromKusama: (args: DepositFromKusamaFee) =>
+        getDepositFromKusamaFee(args),
+      depositFromStatemine: (args: DepositFromStatemineFee) =>
+        getDepositFromStatemineFee(args),
       withdraw: async (args: WithdrawFee) =>
         await getWithdrawFee(instancePromise, args),
       withdrawKsm: async (args: WithdrawKsmFee) =>
