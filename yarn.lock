@@ -152,9 +152,9 @@
   integrity sha512-LxcyMGxwmTh2lY9FwHPGWOHmYFCZvbrFCBZL4FzSSsxsRPuhrYUg/49/0KDfW8tnIEaEHtfmn6+NPN+1DqaNmA==
 
 "@humanwhocodes/config-array@^0.11.8":
-  version "0.11.8"
-  resolved "https://registry.npmjs.org/@humanwhocodes/config-array/-/config-array-0.11.8.tgz#03595ac2075a4dc0f191cc2131de14fbd7d410b9"
-  integrity sha512-UybHIJzJnR5Qc/MsD9Kr+RpO2h+/P1GhOwdiLPXK5TWk5sgTdu88bTD9UP+CKbPPh5Rni1u0GjAdYQLemG8g+g==
+  version "0.11.9"
+  resolved "https://registry.npmjs.org/@humanwhocodes/config-array/-/config-array-0.11.9.tgz#eb6a9a2c7c2690bb4abcde8a684112b1004c2717"
+  integrity sha512-TtlcCXarBltllJ++jCdnSjzihec7ukhesOAeFWRgCTcEHNVsN1o4nLxq/6JnpYJSUV1/w9v93XkMqQpdX5Zb6w==
   dependencies:
     "@humanwhocodes/object-schema" "^1.2.1"
     debug "^4.1.1"
@@ -207,10 +207,10 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@mangata-finance/types@^0.23.0":
-  version "0.23.0"
-  resolved "https://registry.npmjs.org/@mangata-finance/types/-/types-0.23.0.tgz#f2cc1598dfae070fb8102078d7a31dc9759bf825"
-  integrity sha512-7eNdZ837fqZi82/rZz0LsI6cYi5xfxSaSoH3jz/qf1fIF8pB1ryvQWitIe5TT4Xt3QA6U25pEicN0IOgvHgOgg==
+"@mangata-finance/types@^0.24.0":
+  version "0.24.0"
+  resolved "https://registry.npmjs.org/@mangata-finance/types/-/types-0.24.0.tgz#f721108dd2aa21627a4e182f2b4b7e3c6fbf350c"
+  integrity sha512-RlP+i3aL/fGHZruXi+c7W8Zb3tlf+xShI32SiiiTBLjhySvoRyCaOO/rRE37VVwrKYu82ixaN9texnJxshi7NQ==
   dependencies:
     "@polkadot/api-base" "^9.14.2"
 

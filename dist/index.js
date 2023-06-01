@@ -8245,6 +8245,18 @@ var getDepositFromStatemineFee = async (args) => {
   return fromBN(new import_bn.default(dispatchInfo.partialFee.toString()));
 };
 
+// src/methods/query/getFeeLockMetadata.ts
+var getFeeLockMetadata = async (instancePromise) => {
+  const api = await instancePromise;
+  const feeLockMetadata = (await api.query.feeLock.feeLockMetadata()).toHuman();
+  return {
+    periodLength: feeLockMetadata.periodLength.replace(/[,]/g, ""),
+    feeLockAmount: feeLockMetadata.feeLockAmount.replace(/[,]/g, ""),
+    swapValueThreshold: feeLockMetadata.swapValueThreshold.replace(/[,]/g, ""),
+    whitelistedTokens: feeLockMetadata.whitelistedTokens
+  };
+};
+
 // src/mangata.ts
 function createMangataInstance(urls) {
   const instancePromise = getOrCreateInstance(urls);
@@ -8320,7 +8332,8 @@ function createMangataInstance(urls) {
       getLiquidityPool: async (liquidityTokenId) => await getLiquidityPool(instancePromise, liquidityTokenId),
       getPool: async (liquidityTokenId) => await getPool(instancePromise, liquidityTokenId),
       getPools: async () => await getPools(instancePromise),
-      getTotalIssuanceOfTokens: async () => await getTotalIssuanceOfTokens(instancePromise)
+      getTotalIssuanceOfTokens: async () => await getTotalIssuanceOfTokens(instancePromise),
+      getFeeLockMetadata: async () => await getFeeLockMetadata(instancePromise)
     },
     fee: {
       depositFromParachain: async (args) => await getDepositFromParachainFee(args),

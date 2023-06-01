@@ -28,7 +28,7 @@
     "@polkadot/api": "^9.9.4"
   },
   "dependencies": {
-    "@mangata-finance/types": "^0.23.0",
+    "@mangata-finance/types": "^0.24.0",
     "big.js": "^6.2.1",
     "rambda": "^7.5.0"
   },

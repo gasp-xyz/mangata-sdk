@@ -105,6 +105,7 @@ import { multiswapSellAsset } from "./methods/xyk/multiswapSellAsset";
 import { getPriceImpact } from "./utils/getPriceImpact";
 import { getDepositFromKusamaFee } from "./methods/fee/getDepositFromKusamaFee";
 import { getDepositFromStatemineFee } from "./methods/fee/getDepositFromStatemineFee";
+import { getFeeLockMetadata } from "./methods/query/getFeeLockMetadata";
 
 /**
  * Creates a MangataInstance object with various methods for interacting with the Mangata node.
@@ -237,7 +238,8 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await getPool(instancePromise, liquidityTokenId),
       getPools: async () => await getPools(instancePromise),
       getTotalIssuanceOfTokens: async () =>
-        await getTotalIssuanceOfTokens(instancePromise)
+        await getTotalIssuanceOfTokens(instancePromise),
+      getFeeLockMetadata: async () => await getFeeLockMetadata(instancePromise)
     },
     fee: {
       depositFromParachain: async (args: DepositFromParachainFee) =>

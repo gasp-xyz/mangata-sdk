@@ -13,7 +13,8 @@ import {
   TPoolWithRatio,
   Token,
   TTokenInfo,
-  TPoolWithShare
+  TPoolWithShare,
+  FeeLockType
 } from "../types/query";
 import {
   Deposit,
@@ -491,6 +492,8 @@ export interface MangataInstance {
      * Retrieves the total issuance of all tokens.
      */
     getTotalIssuanceOfTokens: () => Promise<TBalances>;
+
+    getFeeLockMetadata: () => Promise<FeeLockType>;
   };
   /**
    * Represents a collection of fee calculation functions for different operations.

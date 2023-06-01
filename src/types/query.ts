@@ -39,3 +39,10 @@ export type TPoolWithShare = Pool & {
   activatedLPTokens: BN;
   nonActivatedLPTokens: BN;
 };
+
+export type FeeLockType = {
+  periodLength: string;
+  feeLockAmount: string;
+  swapValueThreshold: string;
+  whitelistedTokens: number[];
+};
