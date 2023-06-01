@@ -6,6 +6,8 @@ export * from "./utils/bigConstants";
 export * from "./utils/bnConstants";
 export * from "./utils/bnUtility";
 export * from "./utils/toFixed";
+export * from "./utils/isBuyAssetTransactionSuccessful";
+export * from "./utils/isSellAssetTransactionSuccessful";
 
 export * from "./types/xTokens";
 export * from "./types/common";

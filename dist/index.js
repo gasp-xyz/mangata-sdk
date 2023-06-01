@@ -7966,32 +7966,6 @@ var getDepositFromParachainFee = async (args) => {
   return fromBN(new import_bn.default(dispatchInfo.partialFee.toString()));
 };
 
-// src/methods/fee/getDepositFromKusamaOrStatemineFee.ts
-import { ApiPromise as ApiPromise6, WsProvider as WsProvider6 } from "@polkadot/api";
-var getDepositFromKusamaOrStatemineFee = async (args) => {
-  const {
-    url,
-    destination,
-    beneficiary,
-    assets,
-    feeAssetItem,
-    weightLimit,
-    account
-  } = args;
-  const api = await new ApiPromise6({
-    provider: new WsProvider6(url),
-    noInitWarn: true
-  }).isReady;
-  const dispatchInfo = await api.tx.polkadotXcm.limitedReserveTransferAssets(
-    destination,
-    beneficiary,
-    assets,
-    feeAssetItem,
-    weightLimit
-  ).paymentInfo(account);
-  return fromBN(new import_bn.default(dispatchInfo.partialFee.toString()));
-};
-
 // src/methods/fee/getWithdrawFee.ts
 var getWithdrawFee = async (instancePromise, args) => {
   const api = await instancePromise;
@@ -8219,6 +8193,58 @@ var getPriceImpact = (args) => {
   return resFormatted;
 };
 
+// src/methods/fee/getDepositFromKusamaFee.ts
+import { ApiPromise as ApiPromise6, WsProvider as WsProvider6 } from "@polkadot/api";
+var getDepositFromKusamaFee = async (args) => {
+  const {
+    url,
+    destination,
+    beneficiary,
+    assets,
+    feeAssetItem,
+    weightLimit,
+    account
+  } = args;
+  const api = await new ApiPromise6({
+    provider: new WsProvider6(url),
+    noInitWarn: true
+  }).isReady;
+  const dispatchInfo = await api.tx.xcmPallet.limitedReserveTransferAssets(
+    destination,
+    beneficiary,
+    assets,
+    feeAssetItem,
+    weightLimit
+  ).paymentInfo(account);
+  return fromBN(new import_bn.default(dispatchInfo.partialFee.toString()));
+};
+
+// src/methods/fee/getDepositFromStatemineFee.ts
+import { ApiPromise as ApiPromise7, WsProvider as WsProvider7 } from "@polkadot/api";
+var getDepositFromStatemineFee = async (args) => {
+  const {
+    url,
+    destination,
+    beneficiary,
+    assets,
+    feeAssetItem,
+    weightLimit,
+    account
+  } = args;
+  const api = await new ApiPromise7({
+    provider: new WsProvider7(url),
+    noInitWarn: true
+  }).isReady;
+  const dispatchInfo = await api.tx.polkadotXcm.limitedReserveTransferAssets(
+    destination,
+    beneficiary,
+    assets,
+    feeAssetItem,
+    weightLimit
+  ).paymentInfo(account);
+  return fromBN(new import_bn.default(dispatchInfo.partialFee.toString()));
+};
+
 // src/mangata.ts
 function createMangataInstance(urls) {
   const instancePromise = getOrCreateInstance(urls);
@@ -8298,7 +8324,8 @@ function createMangataInstance(urls) {
     },
     fee: {
       depositFromParachain: async (args) => await getDepositFromParachainFee(args),
-      depositFromKusamaOrStatemine: (args) => getDepositFromKusamaOrStatemineFee(args),
+      depositFromKusama: (args) => getDepositFromKusamaFee(args),
+      depositFromStatemine: (args) => getDepositFromStatemineFee(args),
       withdraw: async (args) => await getWithdrawFee(instancePromise, args),
       withdrawKsm: async (args) => await getWithdrawKsmFee(instancePromise, args),
       activateLiquidity: async (args) => await getActivateLiquidityFee(instancePromise, args),
@@ -8325,6 +8352,24 @@ function createMangataInstance(urls) {
 var Mangata = {
   instance: createMangataInstance,
   getPriceImpact: (args) => getPriceImpact(args)
+};
+
+// src/utils/isBuyAssetTransactionSuccessful.ts
+var isBuyAssetTransactionSuccessful = (events) => {
+  const hasSuccess = events.some((item) => item.method === "ExtrinsicSuccess");
+  const hasFailed = events.some(
+    (item) => item.method === "BuyAssetFailedDueToSlippage" || item.method === "MultiSwapAssetFailedOnAtomicSwap"
+  );
+  return hasSuccess && !hasFailed;
+};
+
+// src/utils/isSellAssetTransactionSuccessful.ts
+var isSellAssetTransactionSuccessful = (events) => {
+  const hasSuccess = events.some((item) => item.method === "ExtrinsicSuccess");
+  const hasFailed = events.some(
+    (item) => item.method === "SellAssetFailedDueToSlippage" || item.method === "MultiSwapAssetFailedOnAtomicSwap"
+  );
+  return hasSuccess && !hasFailed;
 };
 export {
   BIG_BILLION,
@@ -8359,6 +8404,8 @@ export {
   BN_ZERO,
   Mangata,
   fromBN,
+  isBuyAssetTransactionSuccessful,
+  isSellAssetTransactionSuccessful,
   signTx,
   toBN,
   toFixed
