@@ -10,8 +10,7 @@ import {
   TPool,
   TTokenAddress,
   TTokenId,
-  TPoolWithRatio,
-  TPoolWithShare
+  TPoolWithRatio
 } from "../types/AssetInfo";
 import { getCompleteAssetsInfo } from "../utils/getCompleteAssetsInfo";
 import { getLiquidityAssets } from "../utils/getLiquidityAssets";
@@ -268,9 +267,9 @@ export class Query {
       api,
       liquidityTokenId
     );
-    const promotedPoolRewardsV2 =
-      await api.query.issuance.promotedPoolsRewardsV2();
-    const promotedPoolInfos = promotedPoolRewardsV2.toHuman() as {
+    const promotedPoolRewards =
+      await api.query.proofOfStake.promotedPoolRewards();
+    const promotedPoolInfos = promotedPoolRewards.toHuman() as {
       [key: string]: {
         weight: string;
         rewards: string;
@@ -291,10 +290,7 @@ export class Query {
       firstTokenAmount,
       secondTokenAmount,
       liquidityTokenId,
-      isPromoted:
-        isPoolPromoted === undefined
-          ? false
-          : new BN(isPoolPromoted.rewards.replace(/[, ]/g, "")).gt(BN_ZERO),
+      isPromoted: !!isPoolPromoted,
       firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
       secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount)
     } as TPoolWithRatio;

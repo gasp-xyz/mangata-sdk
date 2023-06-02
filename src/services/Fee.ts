@@ -473,8 +473,8 @@ export class Fee {
     liquditityTokenId: string,
     amount: BN
   ): Promise<string> {
-    const dispatchInfo = await api.tx.xyk
-      .activateLiquidityV2(liquditityTokenId, amount, null)
+    const dispatchInfo = await api.tx.proofOfStake
+      .activateLiquidity(liquditityTokenId, amount, null)
       .paymentInfo(account);
     return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
@@ -485,8 +485,8 @@ export class Fee {
     liquditityTokenId: string,
     amount: BN
   ): Promise<string> {
-    const dispatchInfo = await api.tx.xyk
-      .deactivateLiquidityV2(liquditityTokenId, amount)
+    const dispatchInfo = await api.tx.proofOfStake
+      .deactivateLiquidity(liquditityTokenId, amount)
       .paymentInfo(account);
     return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
@@ -494,11 +494,10 @@ export class Fee {
   static async claimRewardsFee(
     api: ApiPromise,
     account: string | KeyringPair,
-    liquidityTokenId: string,
-    amount: BN
+    liquidityTokenId: string
   ): Promise<string> {
-    const dispatchInfo = await api.tx.xyk
-      .claimRewardsV2(liquidityTokenId, amount)
+    const dispatchInfo = await api.tx.proofOfStake
+      .claimRewardsAll(liquidityTokenId)
       .paymentInfo(account);
     return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }

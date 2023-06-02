@@ -476,11 +476,10 @@ export class Mangata {
 
   public async claimRewardsFee(
     account: string | KeyringPair,
-    liquditityTokenId: string,
-    amount: BN
+    liquditityTokenId: string
   ) {
     const api = await this.getApi();
-    return await Fee.claimRewardsFee(api, account, liquditityTokenId, amount);
+    return await Fee.claimRewardsFee(api, account, liquditityTokenId);
   }
 
   public async claimRewards(
