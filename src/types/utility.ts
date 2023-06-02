@@ -12,7 +12,11 @@ export type Batch = Merge<
 >;
 
 export type PoolReserves = [BN, BN];
-export type TokenAmounts = [BN, BN];
+export type TokenAmounts = [string, string];
 export type TokenDecimals = [number, number];
 
-export type PriceImpact = [PoolReserves, TokenDecimals, TokenAmounts];
+export type PriceImpact = {
+  poolReserves: PoolReserves;
+  decimals: TokenDecimals;
+  tokenAmounts: TokenAmounts;
+};
