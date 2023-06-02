@@ -8174,14 +8174,14 @@ var toFixed = (value, decimals) => {
 
 // src/utils/getPriceImpact.ts
 var getPriceImpact = (args) => {
-  const [poolBalance, tokenDecimals, tokenAmounts] = args;
-  if (!poolBalance || !tokenDecimals || !isInputValid(tokenAmounts[0].toString()) || !isInputValid(tokenAmounts[1].toString())) {
+  const { poolReserves, decimals, tokenAmounts } = args;
+  if (!poolReserves || !decimals || !isInputValid(tokenAmounts[0]) || !isInputValid(tokenAmounts[1])) {
     return;
   }
-  const firstReserveBefore = poolBalance[0];
-  const secondReserveBefore = poolBalance[1];
-  const soldAmount = toBN(tokenAmounts[0].toString(), tokenDecimals[0]);
-  const boughtAmount = toBN(tokenAmounts[1].toString(), tokenDecimals[1]);
+  const firstReserveBefore = poolReserves[0];
+  const secondReserveBefore = poolReserves[1];
+  const soldAmount = toBN(tokenAmounts[0].toString(), decimals[0]);
+  const boughtAmount = toBN(tokenAmounts[1].toString(), decimals[1]);
   if (boughtAmount.gte(secondReserveBefore))
     return "";
   const numerator = firstReserveBefore.add(soldAmount).mul(BN_TEN_THOUSAND).mul(secondReserveBefore);

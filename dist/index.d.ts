@@ -156,9 +156,13 @@ type Batch = Merge<ExtrinsicCommon, {
     calls: MangataSubmittableExtrinsic[];
 }>;
 type PoolReserves = [BN, BN];
-type TokenAmounts = [BN, BN];
+type TokenAmounts = [string, string];
 type TokenDecimals = [number, number];
-type PriceImpact = [PoolReserves, TokenDecimals, TokenAmounts];
+type PriceImpact = {
+    poolReserves: PoolReserves;
+    decimals: TokenDecimals;
+    tokenAmounts: TokenAmounts;
+};
 
 type Prettify<T> = {
     [K in keyof T]: T[K];
