@@ -11,13 +11,18 @@ export const getCompleteAssetsInfo = async (api: ApiPromise) => {
 
   return assetsInfoResponse.reduce((obj, [key, value]) => {
     const tokenId = (key.toHuman() as string[])[0].replace(/[, ]/g, "");
-    const { name, decimals, symbol } = value.unwrap();
+    const v = value.toHuman() as {
+      name: string;
+      decimals: string;
+      symbol: string;
+    };
+    const { name, decimals, symbol } = v;
     const assetInfo = {
       id: tokenId,
       chainId: 0,
       decimals: Number(decimals.toString()),
-      name: hexToString(name.toString()),
-      symbol: hexToString(symbol.toString()),
+      name,
+      symbol,
       address:
         hexToString(symbol.toString()) === "MGA"
           ? MGAaddress

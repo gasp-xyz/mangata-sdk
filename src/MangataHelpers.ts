@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { Keyring } from "@polkadot/api";
 import { KeypairType } from "@polkadot/util-crypto/types";
-import { KeyringPair } from "@polkadot/keyring/types";
+import type { KeyringPair } from "@polkadot/keyring/types";
 import { BN } from "@polkadot/util";
 import { v4 as uuidv4 } from "uuid";
 import Big from "big.js";

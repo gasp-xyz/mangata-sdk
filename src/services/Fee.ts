@@ -27,116 +27,114 @@ export class Fee {
     const assetRegistryMetadata =
       await mangataApi.query.assetRegistry.metadata.entries();
 
-    const assetMetadata = assetRegistryMetadata.find((metadata) => {
-      const symbol = metadata[1].value.symbol.toPrimitive();
-      return symbol === tokenSymbol;
-    });
-
-    if (assetMetadata && assetMetadata[1].value.location) {
-      const { location, decimals } = assetMetadata[1].unwrap();
-      const decodedLocation = JSON.parse(location.toString());
-      const decodedDecimals = JSON.parse(decimals.toString());
-
-      const tokenSymbols = ["BNC", "vBNC", "ZLK", "vsKSM", "vKSM"];
-      let asset = null;
-      let destination = null;
-      if (tokenSymbols.includes(tokenSymbol)) {
-        asset = {
-          V2: {
-            id: {
-              Concrete: {
-                parents: "1",
-                interior: decodedLocation.v1.interior
-              }
-            },
-            fun: {
-              Fungible: amount
-            }
-          }
-        };
-
-        destination = {
-          V2: {
-            parents: 1,
-            interior: {
-              X2: [
-                {
-                  Parachain: 2110
-                },
-                {
-                  AccountId32: {
-                    network: "Any",
-                    id: api
-                      .createType("AccountId32", correctMangataAddress)
-                      .toHex()
-                  }
-                }
-              ]
-            }
-          }
-        };
-      } else {
-        asset = {
-          V1: {
-            id: {
-              Concrete: {
-                parents: "1",
-                interior: decodedLocation.v1.interior
-              }
-            },
-            fun: {
-              Fungible: amount
-            }
-          }
-        };
-
-        destination = {
-          V1: {
-            parents: 1,
-            interior: {
-              X2: [
-                {
-                  Parachain: 2110
-                },
-                {
-                  AccountId32: {
-                    network: "Any",
-                    id: api
-                      .createType("AccountId32", correctMangataAddress)
-                      .toHex()
-                  }
-                }
-              ]
-            }
-          }
-        };
-      }
-
-      let destWeightLimit = null;
-      if (tokenSymbols.includes(tokenSymbol)) {
-        destWeightLimit = {
-          Limited: {
-            refTime: new BN(destWeight),
-            proofSize: 0
-          }
-        };
-      } else {
-        destWeightLimit = getWeightXTokens(
-          new BN(destWeight),
-          api.tx.xTokens.transferMultiasset
-        );
-      }
-
-      const dispatchInfo = await api.tx.xTokens
-        .transferMultiasset(asset, destination, destWeightLimit)
-        .paymentInfo(account);
-      return fromBN(
-        new BN(dispatchInfo.partialFee.toString()),
-        Number(decodedDecimals)
-      );
-    } else {
+    const assetFiltered = assetRegistryMetadata.filter((el) =>
+      JSON.stringify(el[1].toHuman()).includes(tokenSymbol)
+    )[0];
+    if (!Array.isArray(assetFiltered) || !assetFiltered.length) {
       return "0";
     }
+    const assetMetadata = JSON.parse(JSON.stringify(assetFiltered[1].toJSON()));
+
+    if (!assetMetadata.location) {
+      return "0";
+    }
+
+    const { location, decimals } = assetMetadata;
+
+    const tokenSymbols = ["BNC", "vBNC", "ZLK", "vsKSM", "vKSM"];
+    let asset = null;
+    let destination = null;
+    if (tokenSymbols.includes(tokenSymbol)) {
+      asset = {
+        V2: {
+          id: {
+            Concrete: {
+              parents: "1",
+              interior: getCorrectLocation(tokenSymbol, location)
+            }
+          },
+          fun: {
+            Fungible: amount
+          }
+        }
+      };
+
+      destination = {
+        V2: {
+          parents: 1,
+          interior: {
+            X2: [
+              {
+                Parachain: 2110
+              },
+              {
+                AccountId32: {
+                  network: "Any",
+                  id: api
+                    .createType("AccountId32", correctMangataAddress)
+                    .toHex()
+                }
+              }
+            ]
+          }
+        }
+      };
+    } else {
+      asset = {
+        V1: {
+          id: {
+            Concrete: {
+              parents: "1",
+              interior: getCorrectLocation(tokenSymbol, assetMetadata.location)
+            }
+          },
+          fun: {
+            Fungible: amount
+          }
+        }
+      };
+
+      destination = {
+        V1: {
+          parents: 1,
+          interior: {
+            X2: [
+              {
+                Parachain: 2110
+              },
+              {
+                AccountId32: {
+                  network: "Any",
+                  id: api
+                    .createType("AccountId32", correctMangataAddress)
+                    .toHex()
+                }
+              }
+            ]
+          }
+        }
+      };
+    }
+
+    let destWeightLimit = null;
+    if (tokenSymbols.includes(tokenSymbol)) {
+      destWeightLimit = {
+        Limited: {
+          refTime: new BN(destWeight),
+          proofSize: 0
+        }
+      };
+    } else {
+      destWeightLimit = getWeightXTokens(
+        new BN(destWeight),
+        api.tx.xTokens.transferMultiasset
+      );
+    }
+
+    const dispatchInfo = await api.tx.xTokens
+      .transferMultiasset(asset, destination, destWeightLimit)
+      .paymentInfo(account);
+    return fromBN(new BN(dispatchInfo.partialFee.toString()), Number(decimals));
   }
 
   static async sendTokenFromMangataToParachainFee(...args: WithdrawXcmTuple) {
@@ -154,49 +152,47 @@ export class Fee {
     const assetRegistryMetadata =
       await api.query.assetRegistry.metadata.entries();
 
-    const assetMetadata = assetRegistryMetadata.find((metadata) => {
-      const symbol = metadata[1].value.symbol.toPrimitive();
-      return symbol === tokenSymbol;
-    });
-
-    if (assetMetadata && assetMetadata[1].value.location) {
-      const tokenId = (assetMetadata[0].toHuman() as string[])[0].replace(
-        /[, ]/g,
-        ""
-      );
-
-      const destination = {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              {
-                Parachain: parachainId
-              },
-              {
-                AccountId32: {
-                  network: "Any",
-                  id: api.createType("AccountId32", correctAddress).toHex()
-                }
-              }
-            ]
-          }
-        }
-      };
-
-      const destWeightLimit = getWeightXTokens(
-        new BN(withWeight),
-        api.tx.xTokens.transfer
-      );
-
-      const dispatchInfo = await api.tx.xTokens
-        .transfer(tokenId, amount, destination, destWeightLimit)
-        .paymentInfo(account);
-
-      return fromBN(new BN(dispatchInfo.partialFee.toString()));
-    } else {
+    const assetFiltered = assetRegistryMetadata.filter((el) =>
+      JSON.stringify(el[1].toHuman()).includes(tokenSymbol)
+    )[0];
+    if (!Array.isArray(assetFiltered) || !assetFiltered.length) {
       return "0";
     }
+
+    const tokenId = (assetFiltered[0].toHuman() as string[])[0].replace(
+      /[, ]/g,
+      ""
+    );
+
+    const destination = {
+      V1: {
+        parents: 1,
+        interior: {
+          X2: [
+            {
+              Parachain: parachainId
+            },
+            {
+              AccountId32: {
+                network: "Any",
+                id: api.createType("AccountId32", correctAddress).toHex()
+              }
+            }
+          ]
+        }
+      }
+    };
+
+    const destWeightLimit = getWeightXTokens(
+      new BN(withWeight),
+      api.tx.xTokens.transfer
+    );
+
+    const dispatchInfo = await api.tx.xTokens
+      .transfer(tokenId, amount, destination, destWeightLimit)
+      .paymentInfo(account);
+
+    return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
 
   /**
@@ -315,66 +311,68 @@ export class Fee {
     const assetRegistryMetadata =
       await mangataApi.query.assetRegistry.metadata.entries();
 
-    const assetMetadata = assetRegistryMetadata.find((metadata) => {
-      const symbol = metadata[1].value.symbol.toPrimitive();
-      return symbol === tokenSymbol;
-    });
-
-    if (assetMetadata && assetMetadata[1].value.location) {
-      const { location } = assetMetadata[1].unwrap();
-      const decodedLocation = JSON.parse(location.toString());
-
-      const dispatchInfo = await api.tx.polkadotXcm
-        .limitedReserveTransferAssets(
-          {
-            V3: {
-              interior: {
-                X1: {
-                  Parachain: 2110
-                }
-              },
-              parents: 1
-            }
-          },
-          {
-            V3: {
-              interior: {
-                X1: {
-                  AccountId32: {
-                    id: api
-                      .createType("AccountId32", correctMangataAddress)
-                      .toHex()
-                  }
-                }
-              },
-              parents: 0
-            }
-          },
-          {
-            V3: [
-              {
-                fun: {
-                  Fungible: amount
-                },
-                id: {
-                  Concrete: getCorrectLocation(tokenSymbol, decodedLocation)
-                }
-              }
-            ]
-          },
-          0,
-          {
-            Limited: {
-              refTime: new BN(destWeight),
-              proofSize: 0
-            }
-          }
-        )
-        .paymentInfo(account);
-      return fromBN(new BN(dispatchInfo.partialFee.toString()), 12);
-    } else {
+    const assetFiltered = assetRegistryMetadata.filter((el) =>
+      JSON.stringify(el[1].toHuman()).includes(tokenSymbol)
+    )[0];
+    if (!Array.isArray(assetFiltered) || !assetFiltered.length) {
       return "0";
     }
+    const assetMetadata = JSON.parse(JSON.stringify(assetFiltered[1].toJSON()));
+
+    if (!assetMetadata.location) {
+      return "0";
+    }
+
+    const { location } = assetMetadata;
+
+    const dispatchInfo = await api.tx.polkadotXcm
+      .limitedReserveTransferAssets(
+        {
+          V3: {
+            interior: {
+              X1: {
+                Parachain: 2110
+              }
+            },
+            parents: 1
+          }
+        },
+        {
+          V3: {
+            interior: {
+              X1: {
+                AccountId32: {
+                  id: api
+                    .createType("AccountId32", correctMangataAddress)
+                    .toHex()
+                }
+              }
+            },
+            parents: 0
+          }
+        },
+        {
+          V3: [
+            {
+              fun: {
+                Fungible: amount
+              },
+              id: {
+                Concrete: getCorrectLocation(tokenSymbol, location)
+              }
+            }
+          ]
+        },
+        0,
+        {
+          Limited: {
+            refTime: new BN(destWeight),
+            proofSize: 0
+          }
+        }
+      )
+      .paymentInfo(account);
+    return fromBN(new BN(dispatchInfo.partialFee.toString()), 12);
   }
 
   static async sendKusamaTokenFromRelayToParachainFee(
