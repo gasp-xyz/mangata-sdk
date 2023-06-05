@@ -60,17 +60,21 @@ export const signTx = async (
     try {
       const unsub = await tx.send(async (result: ISubmittableResult) => {
         console.info(
-          `Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} => ${result.status.type
+          `Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} => ${
+            result.status.type
           }(${result.status.value.toString()})${serializeTx(api, tx)}`
         );
 
         txOptions?.statusCallback?.(result);
-        if ((result.status.isInBlock || result.status.isFinalized ) && !subscribed) {
+        if (
+          (result.status.isInBlock || result.status.isFinalized) &&
+          !subscribed
+        ) {
           subscribed = true;
           let inclusionBlockHash;
           if (result.status.isInBlock) {
             inclusionBlockHash = result.status.asInBlock.toString();
-          }else if (result.status.isFinalized) {
+          } else if (result.status.isFinalized) {
             inclusionBlockHash = result.status.asFinalized.toString();
           }
 
@@ -109,8 +113,10 @@ export const signTx = async (
                 const extinsics: GenericExtrinsic<AnyTuple>[] = (
                   await api.rpc.chain.getBlock(blockHeader.hash)
                 ).block.extrinsics;
-                const events = await api.query.system.events.at(
-                  blockHeader.hash
+                const events = JSON.parse(
+                  JSON.stringify(
+                    await api.query.system.events.at(blockHeader.hash)
+                  )
                 );
 
                 //increment
@@ -135,14 +141,14 @@ export const signTx = async (
                 }
 
                 const eventsTriggeredByTx: MangataGenericEvent[] = events
-                  .filter((currentBlockEvent) => {
+                  .filter((currentBlockEvent: any) => {
                     return (
                       currentBlockEvent.phase.isApplyExtrinsic &&
                       currentBlockEvent.phase.asApplyExtrinsic.toNumber() ===
-                      index
+                        index
                     );
                   })
-                  .map((eventRecord) => {
+                  .map((eventRecord: any) => {
                     const { event, phase } = eventRecord;
                     const types = event.typeDef;
                     const eventData: MangataEventData[] = event.data.map(
@@ -359,16 +365,12 @@ export class Tx {
 
     const assetRegistryMetadata =
       await mangataApi.query.assetRegistry.metadata.entries();
+    const assetFiltered = assetRegistryMetadata.filter((el) =>
+      JSON.stringify(el[1].toHuman()).includes(tokenSymbol)
+    )[0];
+    const assetMetadata = JSON.parse(JSON.stringify(assetFiltered[1].toJSON()));
 
-    const assetMetadata = assetRegistryMetadata.find((metadata) => {
-      const symbol = metadata[1].value.symbol.toPrimitive();
-      return symbol === tokenSymbol;
-    });
-
-    if (assetMetadata && assetMetadata[1].value.location) {
-      const { location } = assetMetadata[1].unwrap();
-      const decodedLocation = JSON.parse(location.toString());
-
+    if (assetMetadata && assetMetadata.location) {
       await api.tx.polkadotXcm
         .limitedReserveTransferAssets(
           {
@@ -402,7 +404,10 @@ export class Tx {
                   Fungible: amount
                 },
                 id: {
-                  Concrete: getCorrectLocation(tokenSymbol, decodedLocation)
+                  Concrete: getCorrectLocation(
+                    tokenSymbol,
+                    assetMetadata.location
+                  )
                 }
               }
             ]
@@ -439,16 +444,12 @@ export class Tx {
 
     const assetRegistryMetadata =
       await mangataApi.query.assetRegistry.metadata.entries();
+    const assetFiltered = assetRegistryMetadata.filter((el) =>
+      JSON.stringify(el[1].toHuman()).includes(tokenSymbol)
+    )[0];
+    const assetMetadata = JSON.parse(JSON.stringify(assetFiltered[1].toJSON()));
 
-    const assetMetadata = assetRegistryMetadata.find((metadata) => {
-      const symbol = metadata[1].value.symbol.toPrimitive();
-      return symbol === tokenSymbol;
-    });
-
-    if (assetMetadata && assetMetadata[1].value.location) {
-      const { location } = assetMetadata[1].unwrap();
-      const decodedLocation = JSON.parse(location.toString());
-
+    if (assetMetadata && assetMetadata.location) {
       const tokenSymbols = ["BNC", "vBNC", "ZLK", "vsKSM", "vKSM", "IMBU"];
       let asset = null;
       let destination = null;
@@ -456,7 +457,7 @@ export class Tx {
         asset = {
           V2: {
             id: {
-              Concrete: getCorrectLocation(tokenSymbol, decodedLocation)
+              Concrete: getCorrectLocation(tokenSymbol, assetMetadata.location)
             },
             fun: {
               Fungible: amount
@@ -488,7 +489,7 @@ export class Tx {
         asset = {
           V1: {
             id: {
-              Concrete: getCorrectLocation(tokenSymbol, decodedLocation)
+              Concrete: getCorrectLocation(tokenSymbol, assetMetadata.location)
             },
             fun: {
               Fungible: amount
@@ -557,14 +558,13 @@ export class Tx {
 
     const assetRegistryMetadata =
       await api.query.assetRegistry.metadata.entries();
+    const assetFiltered = assetRegistryMetadata.filter((el) =>
+      JSON.stringify(el[1].toHuman()).includes(tokenSymbol)
+    )[0];
+    const assetMetadata = JSON.parse(JSON.stringify(assetFiltered[1].toJSON()));
 
-    const assetMetadata = assetRegistryMetadata.find((metadata) => {
-      const symbol = metadata[1].value.symbol.toPrimitive();
-      return symbol === tokenSymbol;
-    });
-
-    if (assetMetadata && assetMetadata[1].value.location) {
-      const tokenId = (assetMetadata[0].toHuman() as string[])[0].replace(
+    if (assetMetadata && assetMetadata.location) {
+      const tokenId = (assetFiltered[0].toHuman() as string[])[0].replace(
         /[, ]/g,
         ""
       );

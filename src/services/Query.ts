@@ -33,15 +33,16 @@ export class Query {
     firstTokenId: TTokenId,
     secondTokenId: TTokenId
   ): Promise<BN[]> {
-    const balance = await api.query.xyk.pools([firstTokenId, secondTokenId]);
-    const tokenValue1 = balance[0].toString();
-    const tokenValue2 = balance[1].toString();
-    const token1: BN = isHex(tokenValue1)
-      ? hexToBn(tokenValue1)
-      : new BN(tokenValue1);
-    const token2: BN = isHex(tokenValue2)
-      ? hexToBn(tokenValue2)
-      : new BN(tokenValue2);
+    const pool = JSON.parse(
+      JSON.stringify(await api.query.xyk.pools([firstTokenId, secondTokenId]))
+    );
+    const balance = pool as [string, string];
+    const token1: BN = isHex(balance[0])
+      ? hexToBn(balance[0])
+      : new BN(balance[0]);
+    const token2: BN = isHex(balance[1])
+      ? hexToBn(balance[1])
+      : new BN(balance[1]);
     return [token1, token2];
   }
 
@@ -54,7 +55,7 @@ export class Query {
       firstTokenId,
       secondTokenId
     ]);
-    if (!liquidityAssetId.isSome) return BN_ZERO;
+    if (!liquidityAssetId) return BN_ZERO;
     return new BN(liquidityAssetId.toString());
   }
 
@@ -62,9 +63,11 @@ export class Query {
     api: ApiPromise,
     liquidityTokenId: TTokenId
   ): Promise<BN[]> {
-    const liquidityPool = await api.query.xyk.liquidityPools(liquidityTokenId);
-    if (!liquidityPool.isSome) return [new BN(-1), new BN(-1)];
-    return liquidityPool.unwrap().map((num) => new BN(num));
+    const liquidityPool = JSON.parse(
+      JSON.stringify(await api.query.xyk.liquidityPools(liquidityTokenId))
+    );
+    if (!liquidityPool) return [new BN(-1), new BN(-1)];
+    return liquidityPool.map((num: string) => new BN(num));
   }
 
   static async getTotalIssuance(
@@ -72,7 +75,7 @@ export class Query {
     tokenId: TTokenId
   ): Promise<BN> {
     const tokenSupply = await api.query.tokens.totalIssuance(tokenId);
-    return new BN(tokenSupply);
+    return new BN(tokenSupply.toString());
   }
 
   static async getTokenBalance(
@@ -80,9 +83,8 @@ export class Query {
     address: TTokenAddress,
     tokenId: TTokenId
   ): Promise<TokenBalance> {
-    const { free, reserved, frozen } = await api.query.tokens.accounts(
-      address,
-      tokenId
+    const { free, reserved, frozen } = JSON.parse(
+      JSON.stringify(await api.query.tokens.accounts(address, tokenId))
     );
 
     return {
@@ -100,7 +102,7 @@ export class Query {
 
   static async getNextTokenId(api: ApiPromise): Promise<BN> {
     const nextTokenId = await api.query.tokens.nextCurrencyId();
-    return new BN(nextTokenId);
+    return new BN(nextTokenId.toString());
   }
 
   static async getTokenInfo(
