@@ -109,19 +109,17 @@ export const signTx = async (
                   executionBlockNr
                 );
                 const blockHeader = await api.rpc.chain.getHeader(blockHash);
-                const extinsics: GenericExtrinsic<AnyTuple>[] = (
+                const extrinsics: GenericExtrinsic<AnyTuple>[] = (
                   await api.rpc.chain.getBlock(blockHeader.hash)
                 ).block.extrinsics;
-                const events = JSON.parse(
-                  JSON.stringify(
-                    await api.query.system.events.at(blockHeader.hash)
-                  )
-                );
+
+                const apiAt = await api.at(blockHeader.hash);
+                const blockEvents: any = await apiAt.query.system.events();
 
                 //increment
                 executionBlockNr.iaddn(1);
 
-                const index = extinsics.findIndex((extrinsic) => {
+                const index = extrinsics.findIndex((extrinsic) => {
                   return extrinsic.hash.toString() === tx.hash.toString();
                 });
 
@@ -139,7 +137,7 @@ export const signTx = async (
                   );
                 }
 
-                const eventsTriggeredByTx: MangataGenericEvent[] = events
+                const eventsTriggeredByTx: MangataGenericEvent[] = blockEvents
                   .filter((currentBlockEvent: any) => {
                     return (
                       currentBlockEvent.phase.isApplyExtrinsic &&

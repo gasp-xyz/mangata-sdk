@@ -44,13 +44,14 @@ beforeEach(async () => {
 });
 
 it("should transfer tokens from testUser1 to testUser2", async () => {
-  await instance.transferToken(
+  const h = await instance.transferToken(
     testUser,
     secondTokenId.toString(),
     testUser1.address,
     new BN("100"),
     {
       extrinsicStatus: (result) => {
+        console.log("resulttttt", result);
         const eventTransfer = getEventResultFromTxWait(result, [
           "tokens",
           "Transfer",
