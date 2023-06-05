@@ -51,7 +51,6 @@ it("should transfer tokens from testUser1 to testUser2", async () => {
     new BN("100"),
     {
       extrinsicStatus: (result) => {
-        console.log("resulttttt", result);
         const eventTransfer = getEventResultFromTxWait(result, [
           "tokens",
           "Transfer",
