@@ -733,12 +733,11 @@ export class Tx {
     api: ApiPromise,
     account: string | KeyringPair,
     liquidityTokenId: string,
-    amount: BN,
     txOptions?: TxOptions
   ): Promise<MangataGenericEvent[]> {
     return await signTx(
       api,
-      api.tx.xyk.claimRewardsV2(liquidityTokenId, amount),
+      api.tx.proofOfStake.claimRewardsAll(liquidityTokenId),
       account,
       txOptions
     );
