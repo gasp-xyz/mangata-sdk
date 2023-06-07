@@ -81,12 +81,9 @@ export class Fee {
       };
     } else {
       asset = {
-        V1: {
+        V3: {
           id: {
-            Concrete: {
-              parents: "1",
-              interior: getCorrectLocation(tokenSymbol, assetMetadata.location)
-            }
+            Concrete: getCorrectLocation(tokenSymbol, assetMetadata.location)
           },
           fun: {
             Fungible: amount
@@ -95,7 +92,7 @@ export class Fee {
       };
 
       destination = {
-        V1: {
+        V3: {
           parents: 1,
           interior: {
             X2: [
@@ -104,7 +101,6 @@ export class Fee {
               },
               {
                 AccountId32: {
-                  network: "Any",
                   id: api
                     .createType("AccountId32", correctMangataAddress)
                     .toHex()
@@ -116,20 +112,12 @@ export class Fee {
       };
     }
 
-    let destWeightLimit = null;
-    if (tokenSymbols.includes(tokenSymbol)) {
-      destWeightLimit = {
-        Limited: {
-          refTime: new BN(destWeight),
-          proofSize: 0
-        }
-      };
-    } else {
-      destWeightLimit = getWeightXTokens(
-        new BN(destWeight),
-        api.tx.xTokens.transferMultiasset
-      );
-    }
+    const destWeightLimit = {
+      Limited: {
+        refTime: new BN(destWeight),
+        proofSize: 0
+      }
+    };
 
     const dispatchInfo = await api.tx.xTokens
       .transferMultiasset(asset, destination, destWeightLimit)
@@ -164,29 +152,62 @@ export class Fee {
       ""
     );
 
-    const destination = {
-      V1: {
-        parents: 1,
-        interior: {
-          X2: [
-            {
-              Parachain: parachainId
-            },
-            {
-              AccountId32: {
-                network: "Any",
-                id: api.createType("AccountId32", correctAddress).toHex()
-              }
-            }
-          ]
-        }
-      }
-    };
+    const tokenSymbols = ["BNC", "vBNC", "ZLK", "vsKSM", "vKSM"];
+    let destination = null;
 
-    const destWeightLimit = getWeightXTokens(
-      new BN(withWeight),
-      api.tx.xTokens.transfer
-    );
+    if (tokenSymbols.includes(tokenSymbol)) {
+      destination = {
+        V1: {
+          parents: 1,
+          interior: {
+            X2: [
+              {
+                Parachain: parachainId
+              },
+              {
+                AccountId32: {
+                  network: "Any",
+                  id: api.createType("AccountId32", correctAddress).toHex()
+                }
+              }
+            ]
+          }
+        }
+      };
+    } else {
+      destination = {
+        V3: {
+          parents: 1,
+          interior: {
+            X2: [
+              {
+                Parachain: parachainId
+              },
+              {
+                AccountId32: {
+                  id: api.createType("AccountId32", correctAddress).toHex()
+                }
+              }
+            ]
+          }
+        }
+      };
+    }
+
+    let destWeightLimit = null;
+    if (tokenSymbols.includes(tokenSymbol)) {
+      destWeightLimit = getWeightXTokens(
+        new BN(withWeight),
+        api.tx.xTokens.transfer
+      );
+    } else {
+      destWeightLimit = {
+        Limited: {
+          ref_time: new BN(withWeight),
+          proof_size: 0
+        }
+      };
+    }
 
     const dispatchInfo = await api.tx.xTokens
       .transfer(tokenId, amount, destination, destWeightLimit)
@@ -489,13 +510,25 @@ export class Fee {
     return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
 
-  static async claimRewardsFee(
+  static async claimRewardsAllFee(
     api: ApiPromise,
     account: string | KeyringPair,
     liquidityTokenId: string
   ): Promise<string> {
     const dispatchInfo = await api.tx.proofOfStake
       .claimRewardsAll(liquidityTokenId)
+      .paymentInfo(account);
+    return fromBN(new BN(dispatchInfo.partialFee.toString()));
+  }
+
+  static async claimRewardsFee(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    liquidityTokenId: string,
+    amount: BN
+  ): Promise<string> {
+    const dispatchInfo = await api.tx.xyk
+      .claimRewardsV2(liquidityTokenId, amount)
       .paymentInfo(account);
     return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }

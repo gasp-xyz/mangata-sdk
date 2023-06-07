@@ -449,7 +449,7 @@ export class Tx {
     const assetMetadata = JSON.parse(JSON.stringify(assetFiltered[1].toJSON()));
 
     if (assetMetadata && assetMetadata.location) {
-      const tokenSymbols = ["BNC", "vBNC", "ZLK", "vsKSM", "vKSM", "IMBU"];
+      const tokenSymbols = ["BNC", "vBNC", "ZLK", "vsKSM", "vKSM"];
       let asset = null;
       let destination = null;
       if (tokenSymbols.includes(tokenSymbol)) {
@@ -486,7 +486,7 @@ export class Tx {
         };
       } else {
         asset = {
-          V1: {
+          V3: {
             id: {
               Concrete: getCorrectLocation(tokenSymbol, assetMetadata.location)
             },
@@ -497,7 +497,7 @@ export class Tx {
         };
 
         destination = {
-          V1: {
+          V3: {
             parents: 1,
             interior: {
               X2: [
@@ -506,7 +506,6 @@ export class Tx {
                 },
                 {
                   AccountId32: {
-                    network: "Any",
                     id: api
                       .createType("AccountId32", correctMangataAddress)
                       .toHex()
@@ -518,20 +517,12 @@ export class Tx {
         };
       }
 
-      let destWeightLimit = null;
-      if (tokenSymbols.includes(tokenSymbol)) {
-        destWeightLimit = {
-          Limited: {
-            refTime: new BN(destWeight),
-            proofSize: 0
-          }
-        };
-      } else {
-        destWeightLimit = getWeightXTokens(
-          new BN(destWeight),
-          api.tx.xTokens.transferMultiasset
-        );
-      }
+      const destWeightLimit = {
+        Limited: {
+          refTime: new BN(destWeight),
+          proofSize: 0
+        }
+      };
 
       await api.tx.xTokens
         .transferMultiasset(asset, destination, destWeightLimit)
@@ -569,29 +560,61 @@ export class Tx {
         ""
       );
 
-      const destination = {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              {
-                Parachain: parachainId
-              },
-              {
-                AccountId32: {
-                  network: "Any",
-                  id: api.createType("AccountId32", correctAddress).toHex()
+      const tokenSymbols = ["BNC", "vBNC", "ZLK", "vsKSM", "vKSM"];
+      let destination = null;
+      if (tokenSymbols.includes(tokenSymbol)) {
+        destination = {
+          V1: {
+            parents: 1,
+            interior: {
+              X2: [
+                {
+                  Parachain: parachainId
+                },
+                {
+                  AccountId32: {
+                    network: "Any",
+                    id: api.createType("AccountId32", correctAddress).toHex()
+                  }
                 }
-              }
-            ]
+              ]
+            }
           }
-        }
-      };
+        };
+      } else {
+        destination = {
+          V3: {
+            parents: 1,
+            interior: {
+              X2: [
+                {
+                  Parachain: parachainId
+                },
+                {
+                  AccountId32: {
+                    id: api.createType("AccountId32", correctAddress).toHex()
+                  }
+                }
+              ]
+            }
+          }
+        };
+      }
 
-      const destWeightLimit = getWeightXTokens(
-        new BN(withWeight),
-        api.tx.xTokens.transfer
-      );
+      let destWeightLimit = null;
+      if (tokenSymbols.includes(tokenSymbol)) {
+        destWeightLimit = getWeightXTokens(
+          new BN(withWeight),
+          api.tx.xTokens.transfer
+        );
+      } else {
+        destWeightLimit = {
+          Limited: {
+            ref_time: new BN(withWeight),
+            proof_size: 0
+          }
+        };
+      }
 
       await signTx(
         api,
@@ -729,7 +752,7 @@ export class Tx {
     );
   }
 
-  static async claimRewards(
+  static async claimRewardsAll(
     api: ApiPromise,
     account: string | KeyringPair,
     liquidityTokenId: string,
@@ -738,6 +761,21 @@ export class Tx {
     return await signTx(
       api,
       api.tx.proofOfStake.claimRewardsAll(liquidityTokenId),
+      account,
+      txOptions
+    );
+  }
+
+  static async claimRewards(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    liquidityTokenId: string,
+    amount: BN,
+    txOptions?: TxOptions
+  ): Promise<MangataGenericEvent[]> {
+    return await signTx(
+      api,
+      api.tx.xyk.claimRewardsV2(liquidityTokenId, amount),
       account,
       txOptions
     );

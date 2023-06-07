@@ -50,8 +50,7 @@ export const getCorrectLocation = (tokenSymbol: string, location: any) => {
     };
   } else {
     return {
-      parents: "1",
-      interior: location.v1.interior
+      interior: location.v3.interior
     };
   }
 };

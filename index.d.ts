@@ -200,7 +200,16 @@ declare class Mangata {
     deactivateLiquidity(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     calculateFutureRewardsAmountForMinting(liquidityTokenId: string, mintingAmount: BN, blocksToPass: BN): Promise<BN>;
     calculateRewardsAmount(address: string, liquidityTokenId: string): Promise<BN>;
-    claimRewardsFee(account: string | KeyringPair, liquditityTokenId: string): Promise<string>;
+    claimRewardsAllFee(account: string | KeyringPair, liquditityTokenId: string): Promise<string>;
+    /**
+     * @deprecated Please use claimRewardsAllFee method
+     */
+    claimRewardsFee(account: string | KeyringPair, liquditityTokenId: string, amount: BN): Promise<string>;
+    claimRewardsAll(account: string | KeyringPair, liquditityTokenId: string, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
+    /**
+     *
+     * @deprecated Please use  claimRewardsAll method
+     */
     claimRewards(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     createPoolFee(account: string | KeyringPair, firstTokenId: string, firstTokenAmount: BN, secondTokenId: string, secondTokenAmount: BN): Promise<string>;
     /**

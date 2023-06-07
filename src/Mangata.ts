@@ -474,14 +474,39 @@ export class Mangata {
     return await Rpc.calculateRewardsAmount(api, address, liquidityTokenId);
   }
 
-  public async claimRewardsFee(
+  public async claimRewardsAllFee(
     account: string | KeyringPair,
     liquditityTokenId: string
   ) {
     const api = await this.getApi();
-    return await Fee.claimRewardsFee(api, account, liquditityTokenId);
+    return await Fee.claimRewardsAllFee(api, account, liquditityTokenId);
   }
 
+  /**
+   * @deprecated Please use claimRewardsAllFee method
+   */
+  public async claimRewardsFee(
+    account: string | KeyringPair,
+    liquditityTokenId: string,
+    amount: BN
+  ) {
+    const api = await this.getApi();
+    return await Fee.claimRewardsFee(api, account, liquditityTokenId, amount);
+  }
+
+  public async claimRewardsAll(
+    account: string | KeyringPair,
+    liquditityTokenId: string,
+    txOptions?: TxOptions
+  ) {
+    const api = await this.getApi();
+    return await Tx.claimRewardsAll(api, account, liquditityTokenId, txOptions);
+  }
+
+  /**
+   *
+   * @deprecated Please use  claimRewardsAll method
+   */
   public async claimRewards(
     account: string | KeyringPair,
     liquditityTokenId: string,
