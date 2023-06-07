@@ -488,7 +488,10 @@ export class Tx {
         asset = {
           V3: {
             id: {
-              Concrete: getCorrectLocation(tokenSymbol, assetMetadata.location)
+              Concrete: {
+                parents: 1,
+                interior: assetMetadata.location.v3.interior
+              }
             },
             fun: {
               Fungible: amount
