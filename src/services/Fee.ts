@@ -39,81 +39,47 @@ export class Fee {
       return "0";
     }
 
-    const { location, decimals } = assetMetadata;
+    const { decimals } = assetMetadata;
 
     const tokenSymbols = ["BNC", "vBNC", "ZLK", "vsKSM", "vKSM"];
-    let asset = null;
-    let destination = null;
+
+    let location = null;
     if (tokenSymbols.includes(tokenSymbol)) {
-      asset = {
-        V2: {
-          id: {
-            Concrete: {
-              parents: "1",
-              interior: getCorrectLocation(tokenSymbol, location)
-            }
-          },
-          fun: {
-            Fungible: amount
-          }
-        }
-      };
-
-      destination = {
-        V2: {
-          parents: 1,
-          interior: {
-            X2: [
-              {
-                Parachain: 2110
-              },
-              {
-                AccountId32: {
-                  network: "Any",
-                  id: api
-                    .createType("AccountId32", correctMangataAddress)
-                    .toHex()
-                }
-              }
-            ]
-          }
-        }
-      };
+      location = getCorrectLocation(tokenSymbol, assetMetadata.location);
     } else {
-      asset = {
-        V3: {
-          id: {
-            Concrete: {
-              parents: 1,
-              interior: assetMetadata.location.v3.interior
-            }
-          },
-          fun: {
-            Fungible: amount
-          }
-        }
-      };
-
-      destination = {
-        V3: {
-          parents: 1,
-          interior: {
-            X2: [
-              {
-                Parachain: 2110
-              },
-              {
-                AccountId32: {
-                  id: api
-                    .createType("AccountId32", correctMangataAddress)
-                    .toHex()
-                }
-              }
-            ]
-          }
-        }
+      location = {
+        parents: 1,
+        interior: assetMetadata.location.v3.interior
       };
     }
+    const asset = {
+      V3: {
+        id: {
+          Concrete: location
+        },
+        fun: {
+          Fungible: amount
+        }
+      }
+    };
+
+    const destination = {
+      V3: {
+        parents: 1,
+        interior: {
+          X2: [
+            {
+              Parachain: 2110
+            },
+            {
+              AccountId32: {
+                id: api.createType("AccountId32", correctMangataAddress).toHex()
+              }
+            }
+          ]
+        }
+      }
+    };
 
     const destWeightLimit = {
       Limited: {
@@ -155,62 +121,30 @@ export class Fee {
       ""
     );
 
-    const tokenSymbols = ["BNC", "vBNC", "ZLK", "vsKSM", "vKSM"];
-    let destination = null;
-
-    if (tokenSymbols.includes(tokenSymbol)) {
-      destination = {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              {
-                Parachain: parachainId
-              },
-              {
-                AccountId32: {
-                  network: "Any",
-                  id: api.createType("AccountId32", correctAddress).toHex()
-                }
+    const destination = {
+      V3: {
+        parents: 1,
+        interior: {
+          X2: [
+            {
+              Parachain: parachainId
+            },
+            {
+              AccountId32: {
+                id: api.createType("AccountId32", correctAddress).toHex()
               }
-            ]
-          }
+            }
+          ]
         }
-      };
-    } else {
-      destination = {
-        V3: {
-          parents: 1,
-          interior: {
-            X2: [
-              {
-                Parachain: parachainId
-              },
-              {
-                AccountId32: {
-                  id: api.createType("AccountId32", correctAddress).toHex()
-                }
-              }
-            ]
-          }
-        }
-      };
-    }
+      }
+    };
 
-    let destWeightLimit = null;
-    if (tokenSymbols.includes(tokenSymbol)) {
-      destWeightLimit = getWeightXTokens(
-        new BN(withWeight),
-        api.tx.xTokens.transfer
-      );
-    } else {
-      destWeightLimit = {
-        Limited: {
-          ref_time: new BN(withWeight),
-          proof_size: 0
-        }
-      };
-    }
+    const destWeightLimit = {
+      Limited: {
+        ref_time: new BN(withWeight),
+        proof_size: 0
+      }
+    };
 
     const dispatchInfo = await api.tx.xTokens
       .transfer(tokenId, amount, destination, destWeightLimit)

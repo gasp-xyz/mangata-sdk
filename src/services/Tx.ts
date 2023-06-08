@@ -317,12 +317,11 @@ export class Tx {
     txOptions?: XcmTxOptions
   ) {
     const destination = {
-      V1: {
+      V3: {
         parents: 1,
         interior: {
           X1: {
             AccountId32: {
-              network: "Any",
               id: api
                 .createType("AccountId32", destinationKusamaAddress)
                 .toHex()
@@ -332,10 +331,12 @@ export class Tx {
       }
     };
 
-    const destWeightLimit = getWeightXTokens(
-      new BN("6000000000"),
-      api.tx.xTokens.transfer
-    );
+    const destWeightLimit = {
+      Limited: {
+        refTime: new BN("6000000000"),
+        proofSize: 0
+      }
+    };
 
     await api.tx.xTokens
       .transfer("4", amount, destination, destWeightLimit)
@@ -450,75 +451,46 @@ export class Tx {
 
     if (assetMetadata && assetMetadata.location) {
       const tokenSymbols = ["BNC", "vBNC", "ZLK", "vsKSM", "vKSM"];
-      let asset = null;
-      let destination = null;
+      let location = null;
       if (tokenSymbols.includes(tokenSymbol)) {
-        asset = {
-          V2: {
-            id: {
-              Concrete: getCorrectLocation(tokenSymbol, assetMetadata.location)
-            },
-            fun: {
-              Fungible: amount
-            }
-          }
-        };
-
-        destination = {
-          V2: {
-            parents: 1,
-            interior: {
-              X2: [
-                {
-                  Parachain: 2110
-                },
-                {
-                  AccountId32: {
-                    network: "Any",
-                    id: api
-                      .createType("AccountId32", correctMangataAddress)
-                      .toHex()
-                  }
-                }
-              ]
-            }
-          }
-        };
+        location = getCorrectLocation(tokenSymbol, assetMetadata.location);
       } else {
-        asset = {
-          V3: {
-            id: {
-              Concrete: {
-                parents: 1,
-                interior: assetMetadata.location.v3.interior
-              }
-            },
-            fun: {
-              Fungible: amount
-            }
-          }
-        };
-
-        destination = {
-          V3: {
-            parents: 1,
-            interior: {
-              X2: [
-                {
-                  Parachain: 2110
-                },
-                {
-                  AccountId32: {
-                    id: api
-                      .createType("AccountId32", correctMangataAddress)
-                      .toHex()
-                  }
-                }
-              ]
-            }
-          }
+        location = {
+          parents: 1,
+          interior: assetMetadata.location.v3.interior
         };
       }
+
+      const asset = {
+        V3: {
+          id: {
+            Concrete: location
+          },
+          fun: {
+            Fungible: amount
+          }
+        }
+      };
+
+      const destination = {
+        V3: {
+          parents: 1,
+          interior: {
+            X2: [
+              {
+                Parachain: 2110
+              },
+              {
+                AccountId32: {
+                  id: api
+                    .createType("AccountId32", correctMangataAddress)
+                    .toHex()
+                }
+              }
+            ]
+          }
+        }
+      };
 
       const destWeightLimit = {
         Limited: {
@@ -563,61 +535,30 @@ export class Tx {
         ""
       );
 
-      const tokenSymbols = ["BNC", "vBNC", "ZLK", "vsKSM", "vKSM"];
-      let destination = null;
-      if (tokenSymbols.includes(tokenSymbol)) {
-        destination = {
-          V1: {
-            parents: 1,
-            interior: {
-              X2: [
-                {
-                  Parachain: parachainId
-                },
-                {
-                  AccountId32: {
-                    network: "Any",
-                    id: api.createType("AccountId32", correctAddress).toHex()
-                  }
+      const destination = {
+        V3: {
+          parents: 1,
+          interior: {
+            X2: [
+              {
+                Parachain: parachainId
+              },
+              {
+                AccountId32: {
+                  id: api.createType("AccountId32", correctAddress).toHex()
                 }
-              ]
-            }
+              }
+            ]
           }
-        };
-      } else {
-        destination = {
-          V3: {
-            parents: 1,
-            interior: {
-              X2: [
-                {
-                  Parachain: parachainId
-                },
-                {
-                  AccountId32: {
-                    id: api.createType("AccountId32", correctAddress).toHex()
-                  }
-                }
-              ]
-            }
-          }
-        };
-      }
+        }
+      };
 
-      let destWeightLimit = null;
-      if (tokenSymbols.includes(tokenSymbol)) {
-        destWeightLimit = getWeightXTokens(
-          new BN(withWeight),
-          api.tx.xTokens.transfer
-        );
-      } else {
-        destWeightLimit = {
-          Limited: {
-            ref_time: new BN(withWeight),
-            proof_size: 0
-          }
-        };
-      }
+      const destWeightLimit = {
+        Limited: {
+          ref_time: new BN(withWeight),
+          proof_size: 0
+        }
+      };
 
       await signTx(
         api,

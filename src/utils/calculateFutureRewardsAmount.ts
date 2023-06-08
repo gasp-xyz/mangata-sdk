@@ -41,7 +41,7 @@ export const calculateFutureRewardsAmountForMinting = async (
     .div(totalWeight);
 
   const totalActivatedLiquidityInPool =
-    await api.query.proofOfStake.liquidityMiningActivePoolV2(liquidityTokenId);
+    await api.query.proofOfStake.totalActivatedLiquidity(liquidityTokenId);
 
   return rewardsMintedForPool
     .mul(mintingAmount)
