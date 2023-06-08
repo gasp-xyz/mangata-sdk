@@ -482,18 +482,6 @@ export class Mangata {
     return await Fee.claimRewardsAllFee(api, account, liquditityTokenId);
   }
 
-  /**
-   * @deprecated Please use claimRewardsAllFee method
-   */
-  public async claimRewardsFee(
-    account: string | KeyringPair,
-    liquditityTokenId: string,
-    amount: BN
-  ) {
-    const api = await this.getApi();
-    return await Fee.claimRewardsFee(api, account, liquditityTokenId, amount);
-  }
-
   public async claimRewardsAll(
     account: string | KeyringPair,
     liquditityTokenId: string,
@@ -501,26 +489,6 @@ export class Mangata {
   ) {
     const api = await this.getApi();
     return await Tx.claimRewardsAll(api, account, liquditityTokenId, txOptions);
-  }
-
-  /**
-   *
-   * @deprecated Please use  claimRewardsAll method
-   */
-  public async claimRewards(
-    account: string | KeyringPair,
-    liquditityTokenId: string,
-    amount: BN,
-    txOptions?: TxOptions
-  ) {
-    const api = await this.getApi();
-    return await Tx.claimRewards(
-      api,
-      account,
-      liquditityTokenId,
-      amount,
-      txOptions
-    );
   }
 
   public async createPoolFee(

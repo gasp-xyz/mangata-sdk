@@ -458,18 +458,6 @@ export class Fee {
     return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
 
-  static async claimRewardsFee(
-    api: ApiPromise,
-    account: string | KeyringPair,
-    liquidityTokenId: string,
-    amount: BN
-  ): Promise<string> {
-    const dispatchInfo = await api.tx.xyk
-      .claimRewardsV2(liquidityTokenId, amount)
-      .paymentInfo(account);
-    return fromBN(new BN(dispatchInfo.partialFee.toString()));
-  }
-
   static async createPoolFee(
     api: ApiPromise,
     account: string | KeyringPair,
