@@ -38,10 +38,8 @@ export const withdraw = async (
       ""
     );
 
-    const accountId = api.createType("AccountId32", correctAddress).toHex();
-
     const destination = {
-      V1: {
+      V3: {
         parents: 1,
         interior: {
           X2: [
@@ -50,8 +48,7 @@ export const withdraw = async (
             },
             {
               AccountId32: {
-                network: "Any",
-                id: accountId
+                id: api.createType("AccountId32", correctAddress).toHex()
               }
             }
           ]
@@ -59,10 +56,12 @@ export const withdraw = async (
       }
     };
 
-    const destWeightLimit = getWeightXTokens(
-      new BN(withWeight),
-      api.tx.xTokens.transfer
-    );
+    const destWeightLimit = {
+      Limited: {
+        ref_time: new BN(withWeight),
+        proof_size: 0
+      }
+    };
 
     await signTx(
       api,

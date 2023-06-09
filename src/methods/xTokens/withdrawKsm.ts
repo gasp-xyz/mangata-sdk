@@ -1,7 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
 import { RelayWithdraw } from "../../types/xTokens";
-import { getWeightXTokens } from "../../utils/getWeightXTokens";
 
 /**
  * @since 2.0.0
@@ -12,31 +11,30 @@ export const withdrawKsm = async (
 ) => {
   const api = await instancePromise;
   const { account, kusamaAddress, amount, txOptions } = args;
-  const tx = api.tx.xTokens.transfer;
-  const accountId = api.createType("AccountId32", kusamaAddress).toHex();
-  const defaultWeight = new BN("6000000000");
-  const interior = {
-    X1: {
-      AccountId32: {
-        network: "Any",
-        id: accountId
+  const destination = {
+    V3: {
+      parents: 1,
+      interior: {
+        X1: {
+          AccountId32: {
+            id: api.createType("AccountId32", kusamaAddress).toHex()
+          }
+        }
       }
     }
   };
-  const destination = {
-    V1: {
-      parents: 1,
-      interior
-    }
-  };
 
-  const destWeightLimit = getWeightXTokens(defaultWeight, tx);
-  const options = {
-    signer: txOptions?.signer,
-    nonce: txOptions?.nonce
+  const destWeightLimit = {
+    Limited: {
+      refTime: new BN("6000000000"),
+      proofSize: 0
+    }
   };
 
   await api.tx.xTokens
     .transfer("4", amount, destination, destWeightLimit)
-    .signAndSend(account, options);
+    .signAndSend(account, {
+      signer: txOptions?.signer,
+      nonce: txOptions?.nonce
+    });
 };

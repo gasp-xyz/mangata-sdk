@@ -7637,13 +7637,6 @@ function encodeAddress(key, ss58Format = defaults.prefix) {
   return base58Encode(u8aConcat(input, sshash(input).subarray(0, [32, 33].includes(u8a2.length) ? 2 : 1)));
 }
 
-// src/utils/getWeightXTokens.ts
-var getWeightXTokens = (weight, extrinsicCall) => {
-  return extrinsicCall?.meta.args.at(-1)?.type.eq("XcmV2WeightLimit") ? {
-    Limited: weight
-  } : weight;
-};
-
 // src/methods/xTokens/withdraw.ts
 var withdraw = async (instancePromise, args) => {
   const {
@@ -7667,9 +7660,8 @@ var withdraw = async (instancePromise, args) => {
       /[, ]/g,
       ""
     );
-    const accountId = api.createType("AccountId32", correctAddress).toHex();
     const destination = {
-      V1: {
+      V3: {
         parents: 1,
         interior: {
           X2: [
@@ -7678,18 +7670,19 @@ var withdraw = async (instancePromise, args) => {
             },
             {
               AccountId32: {
-                network: "Any",
-                id: accountId
+                id: api.createType("AccountId32", correctAddress).toHex()
               }
             }
           ]
         }
       }
     };
-    const destWeightLimit = getWeightXTokens(
-      new import_bn.default(withWeight),
-      api.tx.xTokens.transfer
-    );
+    const destWeightLimit = {
+      Limited: {
+        ref_time: new import_bn.default(withWeight),
+        proof_size: 0
+      }
+    };
     await signTx(
       api,
       api.tx.xTokens.transfer(tokenId, amount, destination, destWeightLimit),
@@ -7703,29 +7696,28 @@ var withdraw = async (instancePromise, args) => {
 var withdrawKsm = async (instancePromise, args) => {
   const api = await instancePromise;
   const { account, kusamaAddress, amount, txOptions } = args;
-  const tx = api.tx.xTokens.transfer;
-  const accountId = api.createType("AccountId32", kusamaAddress).toHex();
-  const defaultWeight = new import_bn.default("6000000000");
-  const interior = {
-    X1: {
-      AccountId32: {
-        network: "Any",
-        id: accountId
+  const destination = {
+    V3: {
+      parents: 1,
+      interior: {
+        X1: {
+          AccountId32: {
+            id: api.createType("AccountId32", kusamaAddress).toHex()
+          }
+        }
       }
     }
   };
-  const destination = {
-    V1: {
-      parents: 1,
-      interior
+  const destWeightLimit = {
+    Limited: {
+      refTime: new import_bn.default("6000000000"),
+      proofSize: 0
     }
   };
-  const destWeightLimit = getWeightXTokens(defaultWeight, tx);
-  const options2 = {
+  await api.tx.xTokens.transfer("4", amount, destination, destWeightLimit).signAndSend(account, {
     signer: txOptions?.signer,
     nonce: txOptions?.nonce
-  };
-  await api.tx.xTokens.transfer("4", amount, destination, destWeightLimit).signAndSend(account, options2);
+  });
 };
 
 // src/methods/utility/batch.ts
@@ -7939,6 +7931,13 @@ var getDepositFromParachainFee = async (args) => {
   }).isReady;
   const dispatchInfo = await api.tx.xTokens.transferMultiasset(asset, destination, weightLimit).paymentInfo(account);
   return fromBN(new import_bn.default(dispatchInfo.partialFee.toString()));
+};
+
+// src/utils/getWeightXTokens.ts
+var getWeightXTokens = (weight, extrinsicCall) => {
+  return extrinsicCall?.meta.args.at(-1)?.type.eq("XcmV2WeightLimit") ? {
+    Limited: weight
+  } : weight;
 };
 
 // src/methods/fee/getWithdrawFee.ts
