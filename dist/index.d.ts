@@ -597,6 +597,7 @@ interface MangataInstance {
         transferToken: (args: TransferTokenFee) => Promise<string>;
     };
     util: {
+        getUrls: () => string[];
         /**
          * Calculates the future minting rewards for a given liquidity token based on the specified parameters.
          * @param liquidityTokenId - The ID of the liquidity token.

@@ -274,6 +274,7 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await getTransferTokenFee(instancePromise, args)
     },
     util: {
+      getUrls: () => urls,
       calculateMintingFutureRewards: async (
         liquidityTokenId: string,
         mintingAmount: BN,

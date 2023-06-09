@@ -8327,6 +8327,7 @@ function createMangataInstance(urls) {
       transferToken: async (args) => await getTransferTokenFee(instancePromise, args)
     },
     util: {
+      getUrls: () => urls,
       calculateMintingFutureRewards: async (liquidityTokenId, mintingAmount, blocksToPass) => await calculateMintingFutureRewards(
         instancePromise,
         liquidityTokenId,
