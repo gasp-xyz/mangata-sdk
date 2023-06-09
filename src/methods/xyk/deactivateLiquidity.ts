@@ -32,7 +32,7 @@ async function deactivateLiquidity(
 ) {
   const api = await instancePromise;
   const { account, liquidityTokenId, amount, txOptions } = args;
-  const tx = api.tx.xyk.deactivateLiquidityV2(liquidityTokenId, amount);
+  const tx = api.tx.proofOfStake.deactivateLiquidity(liquidityTokenId, amount);
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }
 

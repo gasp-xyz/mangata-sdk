@@ -14,7 +14,7 @@ export const calculateMintingFutureRewards = async (
   const totalRewardsMinted = sessionsToPass.mul(rewardsPerSession);
 
   const promotedPoolRewardsV2 =
-    await api.query.issuance.promotedPoolsRewardsV2();
+    await api.query.proofOfStake.promotedPoolRewards();
   const promotedPoolInfos = promotedPoolRewardsV2.toHuman() as {
     [key: string]: {
       weight: string;
@@ -42,7 +42,7 @@ export const calculateMintingFutureRewards = async (
     .div(totalWeight);
 
   const totalActivatedLiquidityInPool =
-    await api.query.proofOfStake.liquidityMiningActivePoolV2(liquidityTokenId);
+    await api.query.proofOfStake.totalActivatedLiquidity(liquidityTokenId);
 
   return rewardsMintedForPool
     .mul(mintingAmount)

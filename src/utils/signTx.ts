@@ -93,9 +93,8 @@ export const signTx = async (
                 const extinsics: GenericExtrinsic<AnyTuple>[] = (
                   await api.rpc.chain.getBlock(blockHeader.hash)
                 ).block.extrinsics;
-                const events = await api.query.system.events.at(
-                  blockHeader.hash
-                );
+                const apiAt = await api.at(blockHeader.hash);
+                const events = await apiAt.query.system.events();
 
                 executionBlockNr.iaddn(1);
 

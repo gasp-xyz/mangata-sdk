@@ -146,7 +146,7 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await sellAsset(instancePromise, args, false),
       createPool: async (args: CreatePool) =>
         await createPool(instancePromise, args, false),
-      claimRewards: async (args: Liquidity) =>
+      claimRewards: async (args: Omit<Liquidity, "amount">) =>
         await claimRewards(instancePromise, args, false),
       multiswapBuyAsset: async (args: MultiswapBuyAsset) =>
         await multiswapBuyAsset(instancePromise, args, false),
@@ -181,7 +181,7 @@ function createMangataInstance(urls: string[]): MangataInstance {
     submitableExtrinsic: {
       createPool: async (args: CreatePool) =>
         await createPool(instancePromise, args, true),
-      claimRewards: async (args: Liquidity) =>
+      claimRewards: async (args: Omit<Liquidity, "amount">) =>
         await claimRewards(instancePromise, args, true),
       sellAsset: async (args: SellAsset) =>
         await sellAsset(instancePromise, args, true),

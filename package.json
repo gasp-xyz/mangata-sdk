@@ -25,10 +25,10 @@
   "author": "Michal",
   "license": "ISC",
   "peerDependencies": {
-    "@polkadot/api": "^9.9.4"
+    "@polkadot/api": "^10.7.3"
   },
   "dependencies": {
-    "@mangata-finance/types": "^0.24.0",
+    "@mangata-finance/types": "https://github.com/mangata-finance/types#cba1b8b8168b3b59bf898324b001be933923ad22",
     "big.js": "^6.2.1",
     "rambda": "^7.5.0"
   },

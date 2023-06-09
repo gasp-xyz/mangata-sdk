@@ -37,7 +37,11 @@ async function activateLiquidity(
 ) {
   const api = await instancePromise;
   const { account, liquidityTokenId, amount, txOptions } = args;
-  const tx = api.tx.xyk.activateLiquidityV2(liquidityTokenId, amount, null);
+  const tx = api.tx.proofOfStake.activateLiquidity(
+    liquidityTokenId,
+    amount,
+    null
+  );
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }
 

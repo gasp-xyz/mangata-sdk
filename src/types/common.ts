@@ -203,7 +203,9 @@ export interface MangataInstance {
      * @param args - The liquidity parameters.
      * @returns A promise that resolves with an array of MangataGenericEvent objects.
      */
-    claimRewards: (args: Liquidity) => Promise<MangataGenericEvent[]>;
+    claimRewards: (
+      args: Omit<Liquidity, "amount">
+    ) => Promise<MangataGenericEvent[]>;
 
     /**
      * Executes a multiswap sell asset operation.
@@ -330,7 +332,9 @@ export interface MangataInstance {
      * @param args - The liquidity parameters for rewards claiming.
      * @returns A promise that resolves with a MangataSubmittableExtrinsic object.
      */
-    claimRewards: (args: Liquidity) => Promise<MangataSubmittableExtrinsic>;
+    claimRewards: (
+      args: Omit<Liquidity, "amount">
+    ) => Promise<MangataSubmittableExtrinsic>;
 
     /**
      * Sells an asset based on the provided parameters.

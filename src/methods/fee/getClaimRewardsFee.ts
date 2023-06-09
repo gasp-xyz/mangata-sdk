@@ -11,9 +11,9 @@ export const getClaimRewardsFee = async (
   args: ClaimRewardsFee
 ): Promise<string> => {
   const api = await instancePromise;
-  const { liquidityTokenId, amount, account } = args;
-  const dispatchInfo = await api.tx.xyk
-    .claimRewardsV2(liquidityTokenId, amount)
+  const { liquidityTokenId, account } = args;
+  const dispatchInfo = await api.tx.proofOfStake
+    .claimRewardsAll(liquidityTokenId)
     .paymentInfo(account);
   return fromBN(new BN(dispatchInfo.partialFee.toString()));
 };

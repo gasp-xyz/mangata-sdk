@@ -7,13 +7,13 @@ import { Liquidity } from "../../types/xyk";
 
 async function claimRewards(
   instancePromise: Promise<ApiPromise>,
-  args: Liquidity,
+  args: Omit<Liquidity, "amount">,
   isForBatch: false
 ): Promise<MangataGenericEvent[]>;
 
 async function claimRewards(
   instancePromise: Promise<ApiPromise>,
-  args: Liquidity,
+  args: Omit<Liquidity, "amount">,
   isForBatch: true
 ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
 
@@ -28,12 +28,12 @@ async function claimRewards(
 
 async function claimRewards(
   instancePromise: Promise<ApiPromise>,
-  args: Liquidity,
+  args: Omit<Liquidity, "amount">,
   isForBatch: boolean
 ) {
   const api = await instancePromise;
-  const { account, txOptions, liquidityTokenId, amount } = args;
-  const tx = api.tx.xyk.claimRewardsV2(liquidityTokenId, amount);
+  const { account, txOptions, liquidityTokenId } = args;
+  const tx = api.tx.proofOfStake.claimRewardsAll(liquidityTokenId);
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }
 

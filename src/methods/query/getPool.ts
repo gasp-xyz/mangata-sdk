@@ -17,7 +17,7 @@ export const getPool = async (
   const api = await instancePromise;
   const [liquidityPoolTokens, promotedPoolRewardsV2] = await Promise.all([
     getLiquidityPool(instancePromise, liquidityTokenId),
-    api.query.issuance.promotedPoolsRewardsV2()
+    api.query.proofOfStake.promotedPoolRewards()
   ]);
   const promotedPoolInfos = promotedPoolRewardsV2.toHuman() as {
     [key: string]: {

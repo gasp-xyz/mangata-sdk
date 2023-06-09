@@ -12,8 +12,8 @@ export const getDeactivateLiquidityFee = async (
 ): Promise<string> => {
   const api = await instancePromise;
   const { liquidityTokenId, amount, account } = args;
-  const dispatchInfo = await api.tx.xyk
-    .deactivateLiquidityV2(liquidityTokenId, amount)
+  const dispatchInfo = await api.tx.proofOfStake
+    .deactivateLiquidity(liquidityTokenId, amount)
     .paymentInfo(account);
   return fromBN(new BN(dispatchInfo.partialFee.toString()));
 };
