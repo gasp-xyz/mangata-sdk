@@ -200,9 +200,9 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@mangata-finance/types@https://github.com/mangata-finance/types#cba1b8b8168b3b59bf898324b001be933923ad22":
+"@mangata-finance/types@https://github.com/mangata-finance/types#aeedb32d0d2f9f900babf582de78b767ee25c086":
   version "0.24.0"
-  resolved "https://github.com/mangata-finance/types#cba1b8b8168b3b59bf898324b001be933923ad22"
+  resolved "https://github.com/mangata-finance/types#aeedb32d0d2f9f900babf582de78b767ee25c086"
 
 "@microsoft/tsdoc-config@0.16.2":
   version "0.16.2"
