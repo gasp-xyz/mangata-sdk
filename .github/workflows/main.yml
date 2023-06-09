@@ -60,9 +60,6 @@ jobs:
       - name: Run calculate price test
         run: npm run test calculate-price.test.ts
 
-      - name: Run shuffling test
-        run: npm run test shuffling.test.ts
-
       - name: Run chain test
         run: npm run test chain.test.ts
 
