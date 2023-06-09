@@ -170,6 +170,7 @@ declare class Mangata {
      * Disconnect from the node
      */
     disconnect(): Promise<void>;
+    sendTokenFromStatemineToMangataFee(url: string, tokenSymbol: string, destWeight: string, account: string | KeyringPair, mangataAddress: string, amount: BN): Promise<string>;
     sendTokenFromStatemineToMangata(url: string, tokenSymbol: string, destWeight: string, account: string | KeyringPair, mangataAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
     sendTokenFromParachainToMangata(url: string, tokenSymbol: string, destWeight: string, account: string | KeyringPair, mangataAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
     sendTokenFromMangataToParachain(tokenSymbol: string, withWeight: string, parachainId: number, account: string | KeyringPair, destinationAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
@@ -199,8 +200,8 @@ declare class Mangata {
     deactivateLiquidity(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     calculateFutureRewardsAmountForMinting(liquidityTokenId: string, mintingAmount: BN, blocksToPass: BN): Promise<BN>;
     calculateRewardsAmount(address: string, liquidityTokenId: string): Promise<BN>;
-    claimRewardsFee(account: string | KeyringPair, liquditityTokenId: string, amount: BN): Promise<string>;
-    claimRewards(account: string | KeyringPair, liquditityTokenId: string, amount: BN, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
+    claimRewardsAllFee(account: string | KeyringPair, liquditityTokenId: string): Promise<string>;
+    claimRewardsAll(account: string | KeyringPair, liquditityTokenId: string, txOptions?: TxOptions): Promise<MangataGenericEvent[]>;
     createPoolFee(account: string | KeyringPair, firstTokenId: string, firstTokenAmount: BN, secondTokenId: string, secondTokenAmount: BN): Promise<string>;
     /**
      * Extrinsic to create pool

@@ -3,35 +3,60 @@ export const getCorrectLocation = (tokenSymbol: string, location: any) => {
     return {
       parents: "0",
       interior: {
-        x1: { generalKey: "0x0001" }
+        x1: {
+          generalKey: {
+            length: 2,
+            data: "0x0001000000000000000000000000000000000000000000000000000000000000"
+          }
+        }
       }
     };
   } else if (tokenSymbol === "vBNC") {
     return {
       parents: "0",
       interior: {
-        x1: { generalKey: "0x0101" }
+        x1: {
+          generalKey: {
+            length: 2,
+            data: "0x0101000000000000000000000000000000000000000000000000000000000000"
+          }
+        }
       }
     };
   } else if (tokenSymbol === "ZLK") {
     return {
       parents: "0",
       interior: {
-        x1: { generalKey: "0x0207" }
+        x1: {
+          generalKey: {
+            length: 2,
+            data: "0x0207000000000000000000000000000000000000000000000000000000000000"
+          }
+        }
       }
     };
   } else if (tokenSymbol === "vsKSM") {
     return {
       parents: "0",
       interior: {
-        x1: { generalKey: "0x0404" }
+        x1: {
+          generalKey: {
+            length: 2,
+            data: "0x0404000000000000000000000000000000000000000000000000000000000000"
+          }
+        }
       }
     };
   } else if (tokenSymbol === "vKSM") {
     return {
       parents: "0",
       interior: {
-        x1: { generalKey: "0x0104" }
+        x1: {
+          generalKey: {
+            length: 2,
+            data: "0x0104000000000000000000000000000000000000000000000000000000000000"
+          }
+        }
       }
     };
   } else if (tokenSymbol === "USDT") {
@@ -50,8 +75,7 @@ export const getCorrectLocation = (tokenSymbol: string, location: any) => {
     };
   } else {
     return {
-      parents: "1",
-      interior: location.v1.interior
+      interior: location.v3.interior
     };
   }
 };

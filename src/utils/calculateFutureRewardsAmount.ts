@@ -12,9 +12,9 @@ export const calculateFutureRewardsAmountForMinting = async (
   const sessionsToPass = blocksToPass.div(new BN("1200"));
   const totalRewardsMinted = sessionsToPass.mul(rewardsPerSession);
 
-  const promotedPoolRewardsV2 =
-    await api.query.issuance.promotedPoolsRewardsV2();
-  const promotedPoolInfos = promotedPoolRewardsV2.toHuman() as {
+  const promotedPoolRewards =
+    await api.query.proofOfStake.promotedPoolRewards();
+  const promotedPoolInfos = promotedPoolRewards.toHuman() as {
     [key: string]: {
       weight: string;
       rewards: string;
@@ -41,7 +41,7 @@ export const calculateFutureRewardsAmountForMinting = async (
     .div(totalWeight);
 
   const totalActivatedLiquidityInPool =
-    await api.query.proofOfStake.liquidityMiningActivePoolV2(liquidityTokenId);
+    await api.query.proofOfStake.totalActivatedLiquidity(liquidityTokenId);
 
   return rewardsMintedForPool
     .mul(mintingAmount)

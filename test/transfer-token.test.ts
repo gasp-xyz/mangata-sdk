@@ -44,7 +44,7 @@ beforeEach(async () => {
 });
 
 it("should transfer tokens from testUser1 to testUser2", async () => {
-  await instance.transferToken(
+  const h = await instance.transferToken(
     testUser,
     secondTokenId.toString(),
     testUser1.address,
