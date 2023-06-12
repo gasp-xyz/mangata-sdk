@@ -394,17 +394,13 @@ export class Fee {
     amount: BN
   ) {
     const destination = {
-      V1: {
+      V3: {
         parents: 1,
         interior: {
           X1: {
             AccountId32: {
-              network: "Any",
               id: api
-                .createType(
-                  "AccountId32",
-                  encodeAddress(destinationKusamaAddress, 2)
-                )
+                .createType("AccountId32", destinationKusamaAddress)
                 .toHex()
             }
           }
@@ -412,10 +408,12 @@ export class Fee {
       }
     };
 
-    const destWeightLimit = getWeightXTokens(
-      new BN("6000000000"),
-      api.tx.xTokens.transferMultiasset
-    );
+    const destWeightLimit = {
+      Limited: {
+        refTime: new BN("6000000000"),
+        proofSize: 0
+      }
+    };
 
     const dispatchInfo = await api.tx.xTokens
       .transfer("4", amount, destination, destWeightLimit)
@@ -423,6 +421,7 @@ export class Fee {
 
     return fromBN(new BN(dispatchInfo.partialFee.toString()));
   }
+
   static async activateLiquidity(
     api: ApiPromise,
     account: string | KeyringPair,
