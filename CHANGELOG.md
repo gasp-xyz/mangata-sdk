@@ -1,3 +1,10 @@
+## [1.20.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.20.0...v1.20.1) (2023-06-12)
+
+
+### Bug Fixes
+
+* update ksm withdraw ([7028b46](https://github.com/mangata-finance/mangata-sdk/commit/7028b4642a5030359971d10e26222afd67f70a2e))
+
 # [1.20.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.19.8...v1.20.0) (2023-06-09)
 
 
