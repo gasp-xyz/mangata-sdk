@@ -1,3 +1,22 @@
+# [1.20.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.19.8...v1.20.0) (2023-06-09)
+
+
+### Bug Fixes
+
+* parents ([a672886](https://github.com/mangata-finance/mangata-sdk/commit/a672886817d9cc091067591d1b4d2d3930f358aa))
+* remove claim rewards method ([9a2bdec](https://github.com/mangata-finance/mangata-sdk/commit/9a2bdece2d8519550154c7950aff6ce2ef4ec609))
+* remove unnecessary console ([03c2699](https://github.com/mangata-finance/mangata-sdk/commit/03c269972a42318be57644aa2dff05d1e7ffca23))
+* update claim rewards method ([8ffecb5](https://github.com/mangata-finance/mangata-sdk/commit/8ffecb57ecf2764e56ded4e87ea2a2b5aaee54f8))
+* xcm methods ([4cf0dc6](https://github.com/mangata-finance/mangata-sdk/commit/4cf0dc6acb7f2d3066d5679437e399cda147f6da))
+
+
+### Features
+
+* adapt to rococo ([283e605](https://github.com/mangata-finance/mangata-sdk/commit/283e605d8ac65432ee83be07233e0b7b62b8126b))
+* update ([0498f5c](https://github.com/mangata-finance/mangata-sdk/commit/0498f5c335cdfa9450ddbbb15c5fa6f64921b2f8))
+* update all xcm methods ([04faabe](https://github.com/mangata-finance/mangata-sdk/commit/04faabee4c554fdec3a76a6a2e4af02e6c986359))
+* update to latest polkadot api ([1e0a604](https://github.com/mangata-finance/mangata-sdk/commit/1e0a6045e7ecb8b4234adcb8bff5ee902817d0a6))
+
 ## [1.19.8](https://github.com/mangata-finance/mangata-sdk/compare/v1.19.7...v1.19.8) (2023-04-19)
 
 
