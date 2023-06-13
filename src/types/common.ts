@@ -428,8 +428,8 @@ export interface MangataInstance {
      * Retrieves the token balance for a specific address and token ID.
      */
     getTokenBalance: (
-      address: Address,
-      tokenId: TokenId
+      tokenId: TokenId,
+      address: Address
     ) => Promise<TokenBalance>;
 
     /**

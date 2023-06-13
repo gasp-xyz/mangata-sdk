@@ -478,7 +478,7 @@ interface MangataInstance {
         /**
          * Retrieves the token balance for a specific address and token ID.
          */
-        getTokenBalance: (address: Address, tokenId: TokenId) => Promise<TokenBalance>;
+        getTokenBalance: (tokenId: TokenId, address: Address) => Promise<TokenBalance>;
         /**
          * Retrieves detailed information about a specific token.
          */
