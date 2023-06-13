@@ -3,8 +3,12 @@ import { BN } from "@polkadot/util";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { v4 as uuidv4 } from "uuid";
 
-import type { MangataInstance, MangataGenericEvent } from "../src";
-import { signTx } from "../src";
+import type {
+  MangataInstance,
+  MangataGenericEvent,
+  Address,
+  TokenAmount
+} from "../src";
 
 export type Options = {
   user: KeyringPair;
@@ -24,22 +28,9 @@ export const createUser = (keyring: Keyring, name?: string) => {
   return account;
 };
 
-export const createToken = async (instance: MangataInstance, args: Options) => {
-  const { user, sudo, amount } = args;
-  const api = await instance.api();
-  const nonce = await instance.query.getNonce(sudo.address);
-  const tx = api.tx.sudo.sudo(api.tx.tokens.create(user.address, amount));
-  const txOptions = { nonce };
-  const data = await signTx(api, tx, sudo, txOptions);
-  const searchTerms = ["tokens", "Issued", user.address];
-  const extrinsicData = getExtrinsicData({ data, searchTerms });
-
-  return extrinsicData?.eventData[0].data.toString();
-};
-
 export const getExtrinsicData = (result: ExtrinsicData) => {
   const { data, searchTerms } = result;
-  return data.find((e) => {
+  return data.filter((e) => {
     return (
       e.method !== null &&
       searchTerms.every((filterTerm) =>
@@ -51,15 +42,20 @@ export const getExtrinsicData = (result: ExtrinsicData) => {
     );
   });
 };
+export const createToken = async (
+  instance: MangataInstance,
+  address: Address,
+  amount: TokenAmount
+) => {
+  const api = await instance.api();
+  return api.tx.sudo.sudo(api.tx.tokens.create(address, amount));
+};
 
 export const createMangataToken = async (
   instance: MangataInstance,
-  args: Options
+  address: Address,
+  amount: TokenAmount
 ) => {
-  const { user, sudo, amount } = args;
   const api = await instance.api();
-  const nonce = await instance.query.getNonce(sudo.address);
-  const tx = api.tx.sudo.sudo(api.tx.tokens.mint("0", user.address, amount));
-  const txOptions = { nonce };
-  await signTx(api, tx, sudo, txOptions);
+  return api.tx.sudo.sudo(api.tx.tokens.mint("0", address, amount));
 };

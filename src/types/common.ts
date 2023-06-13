@@ -99,10 +99,7 @@ export type TxOptions = {
   extrinsicStatus: (events: MangataGenericEvent[]) => void;
 };
 
-export type MangataSubmittableExtrinsic = SubmittableExtrinsic<
-  "promise",
-  ISubmittableResult
->;
+export type MangataSubmittableExtrinsic = SubmittableExtrinsic<"promise">;
 
 export interface MangataInstance {
   /**

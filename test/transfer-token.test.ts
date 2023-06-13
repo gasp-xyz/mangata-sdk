@@ -10,7 +10,7 @@ import {
   createUser,
   getExtrinsicData
 } from "./utility";
-import { TransferTokens, Transfer } from "../src";
+import { TransferTokens, Transfer, Batch } from "../src";
 
 let testUser: KeyringPair;
 let testUser1: KeyringPair;
@@ -24,23 +24,35 @@ beforeEach(async () => {
   testUser1 = createUser(keyring);
   sudoUser = createUser(keyring, SUDO_USER_NAME);
 
-  firstTokenId = await createToken(instance, {
-    user: testUser,
-    sudo: sudoUser,
-    amount: new BN("1000000000000000000000000")
-  });
+  const nonce = await instance.query.getNonce(sudoUser.address);
 
-  secondTokenId = await createToken(instance, {
-    user: testUser,
-    sudo: sudoUser,
-    amount: new BN("1000000000000000000000000")
-  });
+  const argsBatchAll: Batch = {
+    account: sudoUser,
+    calls: [
+      await createToken(
+        instance,
+        testUser.address,
+        new BN("1000000000000000000000000")
+      ),
+      await createToken(
+        instance,
+        testUser.address,
+        new BN("1000000000000000000000000")
+      ),
+      await createMangataToken(
+        instance,
+        testUser.address,
+        new BN("10000000000000000000000000")
+      )
+    ],
+    txOptions: { nonce }
+  };
 
-  await createMangataToken(instance, {
-    sudo: sudoUser,
-    user: testUser,
-    amount: new BN("10000000000000000000000000")
-  });
+  const data = await instance.batchAll(argsBatchAll);
+  const searchTerms = ["tokens", "Issued", testUser.address];
+  const extrinsicData = getExtrinsicData({ data, searchTerms });
+  firstTokenId = extrinsicData[0].eventData[0].data.toString();
+  secondTokenId = extrinsicData[1].eventData[0].data.toString();
 });
 
 it("should transfer tokens from testUser1 to testUser2", async () => {
@@ -53,7 +65,7 @@ it("should transfer tokens from testUser1 to testUser2", async () => {
       extrinsicStatus: (data) => {
         const searchTerms = ["tokens", "Transfer", testUser.address];
         const extrinsicData = getExtrinsicData({ data, searchTerms });
-        return expect(extrinsicData?.method).toEqual("Transfer");
+        return expect(extrinsicData[0].method).toEqual("Transfer");
       }
     }
   };
@@ -67,7 +79,7 @@ it("should transfer tokens from testUser1 to testUser2", async () => {
       extrinsicStatus: (data) => {
         const searchTerms = ["tokens", "Transfer", testUser.address];
         const extrinsicData = getExtrinsicData({ data, searchTerms });
-        return expect(extrinsicData?.method).toEqual("Transfer");
+        return expect(extrinsicData[0].method).toEqual("Transfer");
       }
     }
   };
