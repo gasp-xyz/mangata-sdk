@@ -8,8 +8,8 @@ import { hexToBn, isHex, BN } from "@polkadot/util";
  */
 export const getTokenBalance = async (
   instancePromise: Promise<ApiPromise>,
-  address: Address,
-  tokenId: TokenId
+  tokenId: TokenId,
+  address: Address
 ): Promise<TokenBalance> => {
   const api = await instancePromise;
   const { free, reserved, frozen } = await api.query.tokens.accounts(
