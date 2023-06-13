@@ -209,7 +209,7 @@ type TxOptions = {
     statusCallback: (result: ISubmittableResult) => void;
     extrinsicStatus: (events: MangataGenericEvent[]) => void;
 };
-type MangataSubmittableExtrinsic = SubmittableExtrinsic<"promise", ISubmittableResult>;
+type MangataSubmittableExtrinsic = SubmittableExtrinsic<"promise">;
 interface MangataInstance {
     /**
      * xTokens methods for interacting with various token-related operations.
