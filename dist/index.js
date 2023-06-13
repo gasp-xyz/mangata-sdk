@@ -4008,7 +4008,7 @@ var getTokenInfo = async (instancePromise, tokenId) => {
 };
 
 // src/methods/query/getTokenBalance.ts
-var getTokenBalance = async (instancePromise, address, tokenId) => {
+var getTokenBalance = async (instancePromise, tokenId, address) => {
   const api = await instancePromise;
   const { free, reserved, frozen } = await api.query.tokens.accounts(
     address,
@@ -4988,7 +4988,7 @@ function createEncode({ coder, ipfs }) {
     return ipfs && ipfsCompat ? `${ipfs}${out}` : out;
   };
 }
-function createValidate({ chars, ipfs, type }) {
+function createValidate({ chars, ipfs, type, withPadding }) {
   return (value, ipfsCompat) => {
     if (typeof value !== "string") {
       throw new Error(`Expected ${type} string input`);
@@ -4996,7 +4996,14 @@ function createValidate({ chars, ipfs, type }) {
       throw new Error(`Expected ipfs-compatible ${type} to start with '${ipfs}'`);
     }
     for (let i = ipfsCompat ? 1 : 0, count = value.length; i < count; i++) {
-      if (!(chars.includes(value[i]) || value[i] === "=" && (i === value.length - 1 || !chars.includes(value[i + 1])))) {
+      if (chars.includes(value[i])) {
+      } else if (withPadding && value[i] === "=") {
+        if (i === count - 1) {
+        } else if (value[i + 1] === "=") {
+        } else {
+          throw new Error(`Invalid ${type} padding sequence "${value[i]}${value[i + 1]}" at index ${i}`);
+        }
+      } else {
         throw new Error(`Invalid ${type} character "${value[i]}" (0x${value.charCodeAt(i).toString(16)}) at index ${i}`);
       }
     }
@@ -7493,6 +7500,9 @@ var knownGenesis = {
   ],
   xxnetwork: [
     "0x50dd5d206917bf10502c68fb4d18a59fc8aa31586f4e8856b493e43544aa82aa"
+  ],
+  zeitgeist: [
+    "0x1bf2a2ecb4a868de66ea8610f2ce7c8c43706561b6476031315f6640fe38e060"
   ]
 };
 
@@ -7543,7 +7553,8 @@ var knownLedger = {
   ternoa: 995,
   unique: 354,
   vtb: 694,
-  xxnetwork: 1955
+  xxnetwork: 1955,
+  zeitgeist: 354
 };
 
 // node_modules/@polkadot/networks/defaults/testnets.js
