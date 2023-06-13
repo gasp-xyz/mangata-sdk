@@ -210,8 +210,8 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await getLiquidityTokenId(instancePromise, firstTokenId, secondTokenId),
       getTotalIssuance: async (tokenId: TokenId) =>
         await getTotalIssuance(instancePromise, tokenId),
-      getTokenBalance: async (address: Address, tokenId: TokenId) =>
-        await getTokenBalance(instancePromise, address, tokenId),
+      getTokenBalance: async (tokenId: TokenId, address: Address) =>
+        await getTokenBalance(instancePromise, tokenId, address),
       getTokenInfo: async (tokenId: TokenId) =>
         await getTokenInfo(instancePromise, tokenId),
       getLiquidityTokenIds: async () =>

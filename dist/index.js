@@ -8301,7 +8301,7 @@ function createMangataInstance(urls) {
       getNonce: async (address) => await getNonce(instancePromise, address),
       getLiquidityTokenId: async (firstTokenId, secondTokenId) => await getLiquidityTokenId(instancePromise, firstTokenId, secondTokenId),
       getTotalIssuance: async (tokenId) => await getTotalIssuance(instancePromise, tokenId),
-      getTokenBalance: async (address, tokenId) => await getTokenBalance(instancePromise, address, tokenId),
+      getTokenBalance: async (tokenId, address) => await getTokenBalance(instancePromise, tokenId, address),
       getTokenInfo: async (tokenId) => await getTokenInfo(instancePromise, tokenId),
       getLiquidityTokenIds: async () => await getLiquidityTokenIds(instancePromise),
       getLiquidityTokens: async () => await getLiquidityTokens(instancePromise),

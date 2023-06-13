@@ -78,8 +78,8 @@ it("should transfer tokens from testUser1 to testUser2", async () => {
   expect(issuance.toString()).toEqual("1000000000000000000000000");
 
   const tokenBalance = await instance.query.getTokenBalance(
-    testUser1.address,
-    firstTokenId!
+    firstTokenId!,
+    testUser1.address
   );
   expect(tokenBalance.free.toString()).toEqual("1000000000000000000000000");
 });
