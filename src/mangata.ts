@@ -154,10 +154,28 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await multiswapSellAsset(instancePromise, args, false)
     },
     rpc: {
-      calculateBuyPriceId: async (args: Price) =>
-        await calculateBuyPriceId(instancePromise, args),
-      calculateSellPriceId: async (args: Price) =>
-        await calculateSellPriceId(instancePromise, args),
+      calculateBuyPriceId: async (
+        soldTokenId: TokenId,
+        boughtTokenId: TokenId,
+        amount: TokenAmount
+      ) =>
+        await calculateBuyPriceId(
+          instancePromise,
+          soldTokenId,
+          boughtTokenId,
+          amount
+        ),
+      calculateSellPriceId: async (
+        soldTokenId: TokenId,
+        boughtTokenId: TokenId,
+        amount: TokenAmount
+      ) =>
+        await calculateSellPriceId(
+          instancePromise,
+          soldTokenId,
+          boughtTokenId,
+          amount
+        ),
       getBurnAmount: async (args: Price) =>
         await getBurnAmount(instancePromise, args),
       calculateSellPrice: async (args: Reserve) =>

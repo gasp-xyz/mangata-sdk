@@ -1,19 +1,20 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { Price } from "../../types/xyk";
+import { TokenAmount, TokenId } from "../../types/common";
 
 /**
  * @since 2.0.0
  */
 export const calculateBuyPriceId = async (
   instancePromise: Promise<ApiPromise>,
-  args: Price
+  soldTokenId: TokenId,
+  boughtTokenId: TokenId,
+  amount: TokenAmount
 ) => {
   const api = await instancePromise;
-  const { firstTokenId, secondTokenId, amount } = args;
   const result = await (api.rpc as any).xyk.calculate_buy_price_id(
-    firstTokenId,
-    secondTokenId,
+    soldTokenId,
+    boughtTokenId,
     amount
   );
   return new BN(result.price);

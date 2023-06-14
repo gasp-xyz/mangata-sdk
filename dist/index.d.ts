@@ -320,13 +320,13 @@ interface MangataInstance {
          * @param args - The price parameters.
          * @returns A promise that resolves with a BN object.
          */
-        calculateBuyPriceId: (args: Price) => Promise<BN>;
+        calculateBuyPriceId: (soldTokenId: TokenId, boughtTokenId: TokenId, amount: TokenAmount) => Promise<BN>;
         /**
          * Calculates the sell price based on the asset's ID.
          * @param args - The price parameters.
          * @returns A promise that resolves with a BN object.
          */
-        calculateSellPriceId: (args: Price) => Promise<BN>;
+        calculateSellPriceId: (soldTokenId: TokenId, boughtTokenId: TokenId, amount: TokenAmount) => Promise<BN>;
         /**
          * Retrieves the burn amount based on the price parameters.
          * @param args - The price parameters.

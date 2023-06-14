@@ -3538,24 +3538,22 @@ async function claimRewards(instancePromise, args, isForBatch) {
 }
 
 // src/methods/rpc/calculateBuyPriceId.ts
-var calculateBuyPriceId = async (instancePromise, args) => {
+var calculateBuyPriceId = async (instancePromise, soldTokenId, boughtTokenId, amount) => {
   const api = await instancePromise;
-  const { firstTokenId, secondTokenId, amount } = args;
   const result = await api.rpc.xyk.calculate_buy_price_id(
-    firstTokenId,
-    secondTokenId,
+    soldTokenId,
+    boughtTokenId,
     amount
   );
   return new import_bn.default(result.price);
 };
 
 // src/methods/rpc/calculateSellPriceId.ts
-var calculateSellPriceId = async (instancePromise, args) => {
+var calculateSellPriceId = async (instancePromise, soldTokenId, boughtTokenId, amount) => {
   const api = await instancePromise;
-  const { firstTokenId, secondTokenId, amount } = args;
   const result = await api.rpc.xyk.calculate_sell_price_id(
-    firstTokenId,
-    secondTokenId,
+    soldTokenId,
+    boughtTokenId,
     amount
   );
   return new import_bn.default(result.price);
@@ -8270,8 +8268,18 @@ function createMangataInstance(urls) {
       multiswapSellAsset: async (args) => await multiswapSellAsset(instancePromise, args, false)
     },
     rpc: {
-      calculateBuyPriceId: async (args) => await calculateBuyPriceId(instancePromise, args),
-      calculateSellPriceId: async (args) => await calculateSellPriceId(instancePromise, args),
+      calculateBuyPriceId: async (soldTokenId, boughtTokenId, amount) => await calculateBuyPriceId(
+        instancePromise,
+        soldTokenId,
+        boughtTokenId,
+        amount
+      ),
+      calculateSellPriceId: async (soldTokenId, boughtTokenId, amount) => await calculateSellPriceId(
+        instancePromise,
+        soldTokenId,
+        boughtTokenId,
+        amount
+      ),
       getBurnAmount: async (args) => await getBurnAmount(instancePromise, args),
       calculateSellPrice: async (args) => await calculateSellPrice(instancePromise, args),
       calculateBuyPrice: async (args) => await calculateBuyPrice(instancePromise, args),
