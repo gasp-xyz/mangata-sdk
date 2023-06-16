@@ -3634,7 +3634,8 @@ var getCompleteAssetsInfo = async (api) => {
   const assets = await api.query.assetRegistry.metadata.entries();
   return assets.reduce((obj, [key, value]) => {
     const tokenId = key.toHuman()[0].replace(/[, ]/g, "");
-    const { name, decimals, symbol } = value.unwrap();
+    const v = value.toHuman();
+    const { name, decimals, symbol } = v;
     const assetInfo = {
       id: tokenId,
       decimals: Number(decimals.toString()),
