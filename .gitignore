@@ -1,8 +1,2 @@
 node_modules/
-build/
-yarn-error.log
-.vscode/
-.DS_Store
-index.d.ts
-index.js
-index.mjs
+**/.DS_Store

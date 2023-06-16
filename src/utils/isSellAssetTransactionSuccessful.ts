@@ -1,13 +1,13 @@
-import { MangataGenericEvent } from "../types/MangataGenericEvent";
+import { MangataGenericEvent } from "../types/common";
 
 export const isSellAssetTransactionSuccessful = (
-  results: MangataGenericEvent[]
+  events: MangataGenericEvent[]
 ) => {
-  const successCount = results.filter(
-    (item) => item.method === "ExtrinsicSuccess"
-  ).length;
-  const failedCount = results.filter(
-    (item) => item.method === "SellAssetFailedDueToSlippage"
-  ).length;
-  return successCount === 1 && failedCount === 0;
+  const hasSuccess = events.some((item) => item.method === "ExtrinsicSuccess");
+  const hasFailed = events.some(
+    (item) =>
+      item.method === "SellAssetFailedDueToSlippage" ||
+      item.method === "MultiSwapAssetFailedOnAtomicSwap"
+  );
+  return hasSuccess && !hasFailed;
 };

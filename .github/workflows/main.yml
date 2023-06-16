@@ -8,7 +8,7 @@ env:
   TEST_PALLET_ADDRESS: ${{ secrets.TEST_PALLET_ADDRESS }}
   TEST_SUDO_NAME: ${{ secrets.TEST_SUDO_NAME }}
   TX_VERBOSE: true
-
+# here is commnet
 jobs:
   complete-setup:
     runs-on: ubuntu-latest
@@ -25,7 +25,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "16"
-          cache: "npm"
+          cache: "yarn"
 
       - name: Install WASM toolchain
         uses: actions-rs/toolchain@v1
@@ -48,47 +48,17 @@ jobs:
       - name: Sleep for 3 minutes
         run: sleep 180s
 
-      - name: Set network timeout
-        run: npm ci
+      - name: Install deps
+        run: yarn install
+
+      - name: Install peer deps
+        run: yarn peer
 
       - name: Lint
-        run: npm run eslint
+        run: yarn eslint
 
       - name: Build the SDK
-        run: npm run build
+        run: yarn build
 
-      - name: Run calculate price test
-        run: npm run test calculate-price.test.ts
-
-      - name: Run chain test
-        run: npm run test chain.test.ts
-
-      - name: Run node name test
-        run: npm run test node-name.test.ts
-
-      - name: Run node version test
-        run: npm run test node-version.test.ts
-
-      - name: Run transfer token test
-        run: npm run test transfer-token.test.ts
-
-      - name: Run pool balance test
-        run: npm run test pool-balance.test.ts
-
-      - name: Run create pool test
-        run: npm run test create-pool.test.ts
-
-      - name: Run burn liquidity test
-        run: npm run test burn-liquidity.test.ts
-
-      - name: Run buy asset test
-        run: npm run test buy-asset.test.ts
-
-      - name: Run mint liquidity test
-        run: npm run test mint-liquidity.test.ts
-
-      - name: Run sell asset test
-        run: npm run test sell-asset.test.ts
-
-      - name: Run sell asset four times test
-        run: npm run test sell-asset-four-times.test.ts
+      - name: Run tests
+        run: yarn test

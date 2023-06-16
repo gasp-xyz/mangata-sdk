@@ -1,108 +1,61 @@
-import { KeyringPair } from "@polkadot/keyring/types";
+import { Keyring } from "@polkadot/api";
 import { BN } from "@polkadot/util";
+import type { KeyringPair } from "@polkadot/keyring/types";
+import { v4 as uuidv4 } from "uuid";
 
-import { signTx } from "../src/services/Tx";
-import { instance } from "./instanceCreation";
-import { MangataGenericEvent } from "../src/types/MangataGenericEvent";
+import type {
+  MangataInstance,
+  MangataGenericEvent,
+  Address,
+  TokenAmount
+} from "../src";
 
-export enum ExtrinsicResult {
-  ExtrinsicSuccess,
-  ExtrinsicFailed,
-  ExtrinsicUndefined
-}
-
-export const createTokenForUser = async (
-  user: KeyringPair,
-  sudo: KeyringPair,
-  amount: BN
-): Promise<BN> => {
-  const api = await instance.getApi();
-  const nonce = await instance.getNonce(sudo.address);
-  const result = await signTx(
-    api,
-    api.tx.sudo.sudo(api.tx.tokens.create(user.address, amount)),
-    sudo,
-    {
-      nonce
-    }
-  );
-  const eventResult = getEventResultFromTxWait(result, [
-    "tokens",
-    "Issued",
-    user.address
-  ]);
-
-  const tokenId = new BN(eventResult.data[0]["data"]);
-
-  return tokenId;
+export type Options = {
+  user: KeyringPair;
+  sudo: KeyringPair;
+  amount: BN;
 };
 
-export const getEventResultFromTxWait = (
-  events: MangataGenericEvent[],
-  searchTerm: string[] = []
-): { state: ExtrinsicResult; data: string | number | any } => {
-  const extrinsicResultMethods = [
-    "ExtrinsicSuccess",
-    "ExtrinsicFailed",
-    "ExtrinsicUndefined"
-  ];
-  let extrinsicResult;
-  if (searchTerm.length > 0) {
-    extrinsicResult = events.find((e) => {
-      return (
-        e.method !== null &&
-        searchTerm.every((filterTerm) =>
-          (
-            JSON.stringify(e.event.toHuman()) +
-            JSON.stringify(e.event.toHuman().data)
-          ).includes(filterTerm)
-        )
-      );
-    });
-  } else {
-    extrinsicResult = events.find(
-      (e) => e.method !== null && extrinsicResultMethods.includes(e.method)
+export type ExtrinsicData = {
+  data: MangataGenericEvent[];
+  searchTerms: string[];
+};
+
+export const createUser = (keyring: Keyring, name?: string) => {
+  const user: string = name ? name : "//testUser_" + uuidv4();
+  const account = keyring.createFromUri(user);
+  keyring.addPair(account);
+  return account;
+};
+
+export const getExtrinsicData = (result: ExtrinsicData) => {
+  const { data, searchTerms } = result;
+  return data.filter((e) => {
+    return (
+      e.method !== null &&
+      searchTerms.every((filterTerm) =>
+        (
+          JSON.stringify(e.event.toHuman()) +
+          JSON.stringify(e.event.toHuman().data)
+        ).includes(filterTerm)
+      )
     );
-  }
-
-  if (extrinsicResult) {
-    switch (extrinsicResult.method) {
-      case extrinsicResultMethods[1]:
-        return {
-          state: ExtrinsicResult.ExtrinsicFailed,
-          data: "Extrinsic Failed"
-        };
-
-      case extrinsicResultMethods[2]:
-        return {
-          state: ExtrinsicResult.ExtrinsicUndefined,
-          data: extrinsicResult.eventData
-        };
-
-      default:
-        return {
-          state: ExtrinsicResult.ExtrinsicSuccess,
-          data: extrinsicResult.eventData
-        };
-    }
-  }
-  return { state: -1, data: "ERROR: NO TX FOUND" };
+  });
+};
+export const createToken = async (
+  instance: MangataInstance,
+  address: Address,
+  amount: TokenAmount
+) => {
+  const api = await instance.api();
+  return api.tx.sudo.sudo(api.tx.tokens.create(address, amount));
 };
 
-export const createMGXToken = async (
-  sudoUser: KeyringPair,
-  user: KeyringPair,
-  amount: BN
-): Promise<void> => {
-  const api = await instance.getApi();
-  const nonce = await instance.getNonce(sudoUser.address);
-  await instance.waitForNewBlock(2);
-  await signTx(
-    api,
-    api.tx.sudo.sudo(api.tx.tokens.mint("0", user.address, new BN(amount))),
-    sudoUser,
-    {
-      nonce
-    }
-  );
+export const createMangataToken = async (
+  instance: MangataInstance,
+  address: Address,
+  amount: TokenAmount
+) => {
+  const api = await instance.api();
+  return api.tx.sudo.sudo(api.tx.tokens.mint("0", address, amount));
 };

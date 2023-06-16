@@ -1,20 +1,17 @@
-import { SubmittableExtrinsic } from "@polkadot/api/types";
-import type { ISubmittableResult } from "@polkadot/types/types";
-import { BN } from "@polkadot/util";
+export { signTx } from "./utils/signTx";
 
-export * from "./Mangata";
-export * from "./MangataHelpers";
-export * from "./utils/BNutility";
+export { Mangata } from "./mangata";
+
 export * from "./utils/bigConstants";
 export * from "./utils/bnConstants";
+export * from "./utils/bnUtility";
 export * from "./utils/toFixed";
-export * from "./utils/isSellAssetTransactionSuccessful";
 export * from "./utils/isBuyAssetTransactionSuccessful";
+export * from "./utils/isSellAssetTransactionSuccessful";
 
-export * from "./types/AssetInfo";
-export * from "./types/MangataEventData";
-export * from "./types/MangataGenericEvent";
-export * from "./types/TxOptions";
-
-export { SubmittableExtrinsic, ISubmittableResult, BN };
-export { signTx } from "./services/Tx";
+export * from "./types/xTokens";
+export * from "./types/common";
+export * from "./types/query";
+export * from "./types/tokens";
+export * from "./types/xyk";
+export * from "./types/utility";

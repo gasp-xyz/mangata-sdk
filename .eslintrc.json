@@ -4,11 +4,10 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "eslint-plugin-tsdoc"],
   "rules": {
     "no-var": "warn",
     "prefer-const": "warn",
-    "no-console": "warn",
     "arrow-body-style": "off",
     "prefer-arrow-callback": "off",
     "semi": 0

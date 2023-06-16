@@ -1,7 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { hexToBn } from "@polkadot/util";
+import { TTokenInfo } from "../types/query";
 
-import { TTokenInfo } from "../types/AssetInfo";
 import { getCompleteAssetsInfo } from "./getCompleteAssetsInfo";
 
 export const getAssetsInfoWithIds = async (api: ApiPromise) => {
@@ -13,7 +13,7 @@ export const getAssetsInfoWithIds = async (api: ApiPromise) => {
     .reduce((obj, item) => {
       const asset = {
         ...item,
-        name: item.name.replace(/0x\w+/, "").replace(/[A-Z]/g, " $&").trim(),
+        name: item.name.replace(/0x\w+/, "").replace(/[A-Z]/g, "$&").trim(),
         symbol: item.symbol.includes("TKN")
           ? item.symbol
               .split("-")

@@ -1,5 +1,3 @@
-// https://github.com/PureStake/xcm-sdk/blob/main/packages/config/src/extrinsic/xTokens/xTokens.util.ts
-// Thanks to this little helper from purestake
 import { SubmittableExtrinsicFunction } from "@polkadot/api/types";
 import { BN } from "@polkadot/util";
 

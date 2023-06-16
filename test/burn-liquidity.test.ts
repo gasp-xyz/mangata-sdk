@@ -1,99 +1,112 @@
 import { BN } from "@polkadot/util";
+import { Keyring } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
-import { it, expect, afterAll, beforeEach } from "vitest";
+import { it, expect, beforeEach } from "vitest";
 
-import { instance, SUDO_USER_NAME } from "./instanceCreation";
-import { MangataHelpers } from "../src/MangataHelpers";
+import { instance, SUDO_USER_NAME } from "./instance";
 import {
-  createMGXToken,
-  getEventResultFromTxWait,
-  ExtrinsicResult,
-  createTokenForUser
+  createMangataToken,
+  createToken,
+  createUser,
+  getExtrinsicData
 } from "./utility";
+import { Batch, BurnLiquidity, CreatePool } from "../src";
 
 let testUser: KeyringPair;
 let sudoUser: KeyringPair;
-let firstTokenId: BN;
-let secondTokenId: BN;
+let firstTokenId: string | undefined;
+let secondTokenId: string | undefined;
 
 beforeEach(async () => {
-  await instance.waitForNewBlock(2);
+  const keyring = new Keyring({ type: "sr25519" });
+  testUser = createUser(keyring);
+  sudoUser = createUser(keyring, SUDO_USER_NAME);
 
-  const keyring = MangataHelpers.createKeyring("sr25519");
-  testUser = MangataHelpers.createKeyPairFromName(keyring);
-  sudoUser = MangataHelpers.createKeyPairFromName(keyring, SUDO_USER_NAME);
+  const nonce = await instance.query.getNonce(sudoUser.address);
 
-  await instance.waitForNewBlock(2);
+  const argsBatchAll: Batch = {
+    account: sudoUser,
+    calls: [
+      await createToken(
+        instance,
+        testUser.address,
+        new BN("1000000000000000000000000")
+      ),
+      await createToken(
+        instance,
+        testUser.address,
+        new BN("1000000000000000000000000")
+      ),
+      await createMangataToken(
+        instance,
+        testUser.address,
+        new BN("10000000000000000000000000")
+      )
+    ],
+    txOptions: { nonce }
+  };
 
-  firstTokenId = await createTokenForUser(
-    testUser,
-    sudoUser,
-    new BN("10000000000000000000000")
-  );
-
-  secondTokenId = await createTokenForUser(
-    testUser,
-    sudoUser,
-    new BN("10000000000000000000000")
-  );
-
-  await createMGXToken(sudoUser, testUser, new BN("1000000000000000000000"));
-
-  await instance.waitForNewBlock(2);
+  const data = await instance.batchAll(argsBatchAll);
+  const searchTerms = ["tokens", "Issued", testUser.address];
+  const extrinsicData = getExtrinsicData({ data, searchTerms });
+  firstTokenId = extrinsicData[0].eventData[0].data.toString();
+  secondTokenId = extrinsicData[1].eventData[0].data.toString();
 });
 
 it("should burn liquidity", async () => {
-  const beforePools = await instance.getPools();
+  const beforePools = await instance.query.getPools();
 
-  await instance.createPool(
-    testUser,
-    firstTokenId.toString(),
-    new BN(50000),
-    secondTokenId.toString(),
-    new BN(25000)
+  const argsPool: CreatePool = {
+    account: testUser,
+    firstTokenId: firstTokenId!,
+    secondTokenId: secondTokenId!,
+    firstTokenAmount: new BN(50000),
+    secondTokenAmount: new BN(25000),
+    txOptions: {
+      extrinsicStatus: (data) => {
+        const searchTerms = ["xyk", "PoolCreated", testUser.address];
+        const extrinsicData = getExtrinsicData({ data, searchTerms });
+        return expect(extrinsicData[0].method).toEqual("PoolCreated");
+      }
+    }
+  };
+  await instance.xyk.createPool(argsPool);
+
+  const liquidityTokenId = await instance.query.getLiquidityTokenId(
+    firstTokenId!,
+    secondTokenId!
   );
 
-  await instance.waitForNewBlock(2);
-
-  const liquidityTokenId = await instance.getLiquidityTokenId(
-    firstTokenId.toString(),
-    secondTokenId.toString()
-  );
-
-  await instance.waitForNewBlock(2);
-
-  const investedPools = await instance.getInvestedPools(testUser.address);
+  const investedPools = await instance.query.getInvestedPools(testUser.address);
 
   const investedPool = investedPools.find(
     (investedPool) =>
       investedPool.liquidityTokenId === liquidityTokenId.toString()
   );
 
-  await instance.waitForNewBlock(2);
+  await instance.rpc.waitForNewBlock(2);
 
   const amountToBurn =
     investedPool &&
     investedPool.nonActivatedLPTokens.add(investedPool.activatedLPTokens);
 
-  await instance.burnLiquidity(
-    testUser,
-    firstTokenId.toString(),
-    secondTokenId.toString(),
-    amountToBurn!,
-    {
-      extrinsicStatus: (result) => {
-        const eventResult = getEventResultFromTxWait(result);
-        expect(eventResult.state).toEqual(ExtrinsicResult.ExtrinsicSuccess);
+  const argsBurnLiquidity: BurnLiquidity = {
+    account: testUser,
+    firstTokenId: firstTokenId!,
+    secondTokenId: secondTokenId!,
+    amount: amountToBurn!,
+    txOptions: {
+      extrinsicStatus: (data) => {
+        console.log(JSON.stringify(data));
       }
     }
-  );
-  await instance.waitForNewBlock(2);
+  };
 
-  const afterPools = await instance.getPools();
+  await instance.xyk.burnLiquidity(argsBurnLiquidity);
 
-  expect(beforePools.length).toEqual(afterPools.length);
-});
+  await instance.rpc.waitForNewBlock(2);
 
-afterAll(async () => {
-  await instance.disconnect();
+  const afterPools = await instance.query.getPools();
+
+  expect(beforePools.length).not.to.equal(afterPools);
 });

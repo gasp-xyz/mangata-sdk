@@ -1,80 +1,51 @@
 {
   "name": "@mangata-finance/sdk",
   "version": "1.20.1",
-  "description": "SDK for communication with Mangata node",
-  "main": "./index.js",
-  "module": "./index.mjs",
-  "types": "./index.d.ts",
+  "description": "",
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "require": "./index.js",
-      "import": "./index.mjs",
-      "types": "./index.d.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
-  "scripts": {
-    "prepare": "if [ -z \"$SKIP_HUSKY\" ]; then husky install ; fi",
-    "build": "rm -fr build/* && tsc -p tsconfig.json && rollup -c",
-    "test": "vitest --config ./vitest.config.ts --run",
-    "start": "npm run build && node ./index.js",
-    "eslint": "node_modules/.bin/eslint --max-warnings 0 . --ext .ts",
-    "eslint-fix": "npm run eslint --fix"
-  },
-  "files": [
-    "index.js",
-    "index.mjs",
-    "index.d.ts"
-  ],
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/",
-    "tag": "latest"
-  },
   "engines": {
-    "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
+    "node": ">=14.16"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mangata-finance/mangata-SDK.git"
+  "scripts": {
+    "start": "NODE_OPTIONS='--experimental-specifier-resolution=node' node dist/index.js",
+    "build": "tsup",
+    "test": "vitest --config ./vitest.config.ts --run",
+    "eslint": "node_modules/.bin/eslint --max-warnings 0 . --ext .ts",
+    "peer": "add-no-save --peer-deps"
   },
-  "keywords": [
-    "typescript",
-    "mangata",
-    "parachain",
-    "sdk"
-  ],
-  "author": "Mangata Finance",
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/mangata-finance/mangata-SDK/issues"
-  },
-  "homepage": "https://github.com/mangata-finance/mangata-SDK#readme",
-  "devDependencies": {
-    "@babel/preset-env": "^7.16.11",
-    "@babel/preset-react": "^7.16.7",
-    "@commitlint/cli": "^17.0.3",
-    "@commitlint/config-conventional": "^17.0.3",
-    "@semantic-release/changelog": "^6.0.1",
-    "@semantic-release/git": "^10.0.1",
-    "@types/big.js": "^6.1.3",
-    "@types/uuid": "^8.3.1",
-    "@typescript-eslint/eslint-plugin": "^5.23.0",
-    "@typescript-eslint/parser": "^5.23.0",
-    "dotenv": "^10.0.0",
-    "eslint": "^8.15.0",
-    "husky": "^8.0.1",
-    "process": "^0.11.10",
-    "rollup": "^2.70.2",
-    "rollup-plugin-dts": "^4.2.1",
-    "rollup-plugin-terser": "^7.0.2",
-    "semantic-release": "^19.0.3",
-    "ts-node": "^10.5.0",
-    "typescript": "^4.7.4",
-    "vitest": "^0.25.6"
+  "keywords": [],
+  "author": "Michal",
+  "license": "ISC",
+  "peerDependencies": {
+    "@polkadot/api": "^10.7.3"
   },
   "dependencies": {
-    "@mangata-finance/types": "^0.23.0",
-    "@polkadot/api": "^10.7.3",
+    "@mangata-finance/types": "https://github.com/mangata-finance/types#feat/gen-types",
     "big.js": "^6.2.1",
-    "uuid": "^9.0.0"
+    "rambda": "^7.5.0"
+  },
+  "devDependencies": {
+    "@polkadot/types": "^10.7.3",
+    "@types/big.js": "^6.1.6",
+    "@types/uuid": "^9.0.1",
+    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/parser": "^5.59.1",
+    "eslint": "^8.39.0",
+    "eslint-plugin-tsdoc": "^0.2.17",
+    "tsup": "^6.6.3",
+    "type-fest": "^3.6.1",
+    "typedoc": "^0.24.7",
+    "typescript": "^4.7.4",
+    "uuid": "^9.0.0",
+    "vitest": "^0.29.7",
+    "yarn-add-no-save": "^1.0.3"
   }
 }

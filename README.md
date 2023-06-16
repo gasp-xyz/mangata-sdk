@@ -32,19 +32,17 @@ yarn add @mangata-finance/sdk
 Here is a quick example to get you started, **all you need is Mangata instance**:
 
 ```js
-const { Mangata } = require("@mangata-finance/sdk");
+import { Mangata } from "@mangata-finance/sdk";
 
 async function main() {
   // Connect to the mainet (also testnet, mainnet)
-  const mangata = Mangata.getInstance([
-    "wss://mangata-x.api.onfinality.io/public-ws"
-  ]);
+  const mangata = Mangata.instance(["wss://kusama-archive.mangata.online"]);
 
   // Retrieve the chainName, nodeName & nodeVersion information
   const [chain, nodeName, nodeVersion] = await Promise.all([
-    mangata.getChain(),
-    mangata.getNodeName(),
-    mangata.getNodeVersion()
+    mangata.rpc.getChain(),
+    mangata.rpc.getNodeName(),
+    mangata.rpc.getNodeVersion()
   ]);
 
   console.log(
