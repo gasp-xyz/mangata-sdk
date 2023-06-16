@@ -31,6 +31,8 @@ yarn add @mangata-finance/sdk
 
 Here is a quick example to get you started, **all you need is Mangata instance**:
 
+Support: Only ESM
+
 ```js
 import { Mangata } from "@mangata-finance/sdk";
 
