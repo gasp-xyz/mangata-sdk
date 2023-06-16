@@ -8,12 +8,13 @@ env:
   TEST_PALLET_ADDRESS: ${{ secrets.TEST_PALLET_ADDRESS }}
   TEST_SUDO_NAME: ${{ secrets.TEST_SUDO_NAME }}
   TX_VERBOSE: true
-# here is commnet
+
 jobs:
   complete-setup:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Clone mangata node repository
         uses: actions/checkout@v3
         with:
@@ -49,7 +50,7 @@ jobs:
         run: sleep 180s
 
       - name: Install deps
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Install peer deps
         run: yarn peer
