@@ -258,9 +258,10 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@mangata-finance/types@https://github.com/mangata-finance/types#feat/gen-types":
-  version "0.24.0"
-  resolved "https://github.com/mangata-finance/types#aeedb32d0d2f9f900babf582de78b767ee25c086"
+"@mangata-finance/types@1.0.0-rc.1":
+  version "1.0.0-rc.1"
+  resolved "https://registry.npmjs.org/@mangata-finance/types/-/types-1.0.0-rc.1.tgz#55162636cac04ec960c4b602d7a0ef39e68d4148"
+  integrity sha512-WqH0JMy+ldtSIZrOtSn/BXeLSBDb+icJr/ErFTEGzYU9zHij5hL+VUDNumRdh35jlHUAXbUIWcQP/i5FmnN+IQ==
 
 "@microsoft/tsdoc-config@0.16.2":
   version "0.16.2"
