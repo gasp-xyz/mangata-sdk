@@ -3,10 +3,9 @@ name: Release
 on:
   push:
     branches:
-      - "release/**"
+      - "main"
 
-env:
-  SKIP_HUSKY: true
+concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   build:
@@ -19,13 +18,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "16"
-          cache: "npm"
+          cache: "yarn"
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install deps
+        run: yarn install --frozen-lockfile
+
+      - name: Install peer deps
+        run: yarn peer
 
       - name: Build the SDK
-        run: npm run build
+        run: yarn build
 
       - name: create release
         run: npx semantic-release

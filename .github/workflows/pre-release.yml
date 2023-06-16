@@ -1,0 +1,117 @@
+name: Pre-release
+
+on:
+  push:
+    branches:
+      - "rc/*"
+
+env:
+  API_URL: "ws://127.0.0.1:9947"
+  TEST_PALLET_ADDRESS: ${{ secrets.TEST_PALLET_ADDRESS }}
+  TEST_SUDO_NAME: ${{ secrets.TEST_SUDO_NAME }}
+  TX_VERBOSE: true
+
+permissions:
+  contents: write
+  id-token: write
+  deployments: write
+  checks: write
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  dry-run-release-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v3
+
+      - name: Clone mangata node repository
+        uses: actions/checkout@v3
+        with:
+          repository: mangata-finance/mangata-node
+          path: mangata-repo
+          ref: develop
+
+      - name: Setup Node version and cache dependencies
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+          cache: "yarn"
+
+      - name: Install WASM toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          target: wasm32-unknown-unknown
+
+      - name: Replace parachain docker image reference in config
+        working-directory: mangata-repo/launch
+        run: sed -i 's+mangatasolutions/mangata-node:.*+mangatasolutions/mangata-node:develop+g' config.yml
+
+      - name: Run the Node
+        working-directory: mangata-repo/launch
+        run: |
+          yarn install
+          yarn gen
+          yarn up
+          docker ps
+
+      - name: Sleep for 3 minutes
+        run: sleep 180s
+
+      - name: Install deps
+        run: yarn install --frozen-lockfile
+
+      - name: Install peer deps
+        run: yarn peer
+
+      - name: Lint
+        run: yarn eslint
+
+      - name: Build the SDK
+        run: yarn build
+
+      - name: Run tests
+        run: yarn test
+
+      - name: create dry run release
+        run: npx semantic-release --dry-run
+        id: dry-run-release-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.FE_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    outputs:
+      new-release-published: ${{ steps.dry-run-release-version.outputs.new-release-published }}
+      new-release-version: ${{ steps.dry-run-release-version.outputs.new-release-version }}
+
+  release-beta:
+    runs-on: ubuntu-latest
+    needs: dry-run-release-version
+    if: needs.dry-run-release-version.outputs.new-release-published == 'true'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install peer
+        run: yarn peer
+
+      - name: Build SDK
+        run: yarn build
+
+      - name: create release
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.FE_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Invoke workflow in another repo with inputs
+        uses: jonas-schievink/workflow-proxy@v1
+        with:
+          ref: refs/heads/main
+          workflow: pr-ui-tests.yml
+          repo: mangata-finance/microapps
+          token: ${{ secrets.BOT_USER_GITHUB_TOKEN }}
+          inputs: '{"sdkVersion": "${{ needs.dry-run-release-version.outputs.new-release-version }}"}'
