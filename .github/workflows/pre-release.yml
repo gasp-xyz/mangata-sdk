@@ -52,7 +52,8 @@ jobs:
       - name: Run the Node
         working-directory: mangata-repo/launch
         run: |
-          yarn install
+          yarn add --dev detective-postcss@5.1.3
+          yarn install --force --frozen-lockfile
           yarn gen
           yarn up
           docker ps
