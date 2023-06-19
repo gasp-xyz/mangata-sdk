@@ -92,6 +92,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Extract peerDependencies
+        id: extract
+        run: |
+          peerDependencies=$(cat package.json | jq -r '.peerDependencies | to_entries | map(.key + "@" + .value) | join(",")')
+          echo "PEER_DEPENDENCIES=$peerDependencies" >> $GITHUB_ENV
+
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
@@ -114,4 +120,4 @@ jobs:
           workflow: pr-ui-tests.yml
           repo: mangata-finance/microapps
           token: ${{ secrets.BOT_USER_GITHUB_TOKEN }}
-          inputs: '{"sdkVersion": "${{ needs.dry-run-release-version.outputs.new-release-version }}"}'
+          inputs: '{"sdkVersion": "${{ needs.dry-run-release-version.outputs.new-release-version }}", "peerDependencies": "${{ env.PEER_DEPENDENCIES }}"}'
