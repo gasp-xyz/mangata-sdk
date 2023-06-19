@@ -1,3 +1,15 @@
+# [2.0.0-rc.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.20.1...v2.0.0-rc.1) (2023-06-19)
+
+
+### Features
+
+* complete refactoring of sdk ([49bedd8](https://github.com/mangata-finance/mangata-sdk/commit/49bedd887b09caa9d293bcf80e2ff1da8a4d3b09))
+
+
+### BREAKING CHANGES
+
+* support only esm
+
 ## [1.20.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.20.0...v1.20.1) (2023-06-12)
 
 
