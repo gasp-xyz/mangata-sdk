@@ -1,3 +1,10 @@
+## [1.20.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.20.1...v1.20.2) (2023-06-19)
+
+
+### Bug Fixes
+
+* withdraw statemine tokens ([36b1f8b](https://github.com/mangata-finance/mangata-sdk/commit/36b1f8b66d60e3cae0d2aa5ff85f69728b4daa8e))
+
 ## [1.20.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.20.0...v1.20.1) (2023-06-12)
 
 
