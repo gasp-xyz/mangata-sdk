@@ -139,12 +139,18 @@ export class Fee {
       }
     };
 
-    const destWeightLimit = {
-      Limited: {
-        ref_time: new BN(withWeight),
-        proof_size: 0
-      }
-    };
+    let destWeightLimit;
+    const statemineTokens = ["RMRK", "USDT"];
+    if (statemineTokens.includes(tokenSymbol)) {
+      destWeightLimit = "Unlimited";
+    } else {
+      destWeightLimit = {
+        Limited: {
+          ref_time: new BN(withWeight),
+          proof_size: 0
+        }
+      };
+    }
 
     const dispatchInfo = await api.tx.xTokens
       .transfer(tokenId, amount, destination, destWeightLimit)
