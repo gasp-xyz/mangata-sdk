@@ -263,10 +263,10 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@mangata-finance/types@1.0.0-rc.1":
-  version "1.0.0-rc.1"
-  resolved "https://registry.npmjs.org/@mangata-finance/types/-/types-1.0.0-rc.1.tgz#55162636cac04ec960c4b602d7a0ef39e68d4148"
-  integrity sha512-WqH0JMy+ldtSIZrOtSn/BXeLSBDb+icJr/ErFTEGzYU9zHij5hL+VUDNumRdh35jlHUAXbUIWcQP/i5FmnN+IQ==
+"@mangata-finance/types@1.0.0-rc.2":
+  version "1.0.0-rc.2"
+  resolved "https://registry.npmjs.org/@mangata-finance/types/-/types-1.0.0-rc.2.tgz#2fca043395ff58b23ab7d0a9274ef6cb27b5796a"
+  integrity sha512-U+MN/uQcP+Q+/Bf9YUVk5erTK/BsOe4E66wrPVvrevJB59QGTSs5mUPUrMMsMB0TWCIpLWpBuWMlgl3twWgjAg==
 
 "@microsoft/tsdoc-config@0.16.2":
   version "0.16.2"
