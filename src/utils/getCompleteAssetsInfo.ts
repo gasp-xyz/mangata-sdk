@@ -1,6 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 
-import { hexToString } from "@polkadot/util";
+import { hexToString, isHex } from "@polkadot/util";
 import { TokenId } from "../types/common";
 import { TTokenInfo } from "../types/query";
 
@@ -18,8 +18,8 @@ export const getCompleteAssetsInfo = async (api: ApiPromise) => {
     const assetInfo = {
       id: tokenId,
       decimals: Number(decimals.toString()),
-      name: hexToString(name.toString()),
-      symbol: hexToString(symbol.toString())
+      name: isHex(name) ? hexToString(name.toString()) : name,
+      symbol: isHex(name) ? hexToString(symbol.toString()) : name
     };
 
     obj[tokenId] = assetInfo;
