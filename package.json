@@ -15,7 +15,6 @@
     "node": ">=16.0.0"
   },
   "scripts": {
-    "start": "NODE_OPTIONS='--experimental-specifier-resolution=node' node dist/index.js",
     "build": "tsup",
     "test": "vitest --config ./vitest.config.ts --run",
     "eslint": "node_modules/.bin/eslint --max-warnings 0 . --ext .ts",
