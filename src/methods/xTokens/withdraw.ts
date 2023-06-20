@@ -1,7 +1,6 @@
 import { encodeAddress } from "@polkadot/util-crypto";
 import { BN } from "@polkadot/util";
 import { ApiPromise } from "@polkadot/api";
-import { getWeightXTokens } from "../../utils/getWeightXTokens";
 import { signTx } from "../../utils/signTx";
 import { Withdraw } from "../../types/xTokens";
 
@@ -56,12 +55,18 @@ export const withdraw = async (
       }
     };
 
-    const destWeightLimit = {
-      Limited: {
-        ref_time: new BN(withWeight),
-        proof_size: 0
-      }
-    };
+    let destWeightLimit;
+    const statemineTokens = ["RMRK", "USDT"];
+    if (statemineTokens.includes(tokenSymbol)) {
+      destWeightLimit = "Unlimited";
+    } else {
+      destWeightLimit = {
+        Limited: {
+          ref_time: new BN(withWeight),
+          proof_size: 0
+        }
+      };
+    }
 
     await signTx(
       api,
