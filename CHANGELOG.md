@@ -1,3 +1,11 @@
+# [2.0.0-rc.3](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.2...v2.0.0-rc.3) (2023-06-20)
+
+
+### Bug Fixes
+
+* get assetinfo hex problem ([81607ad](https://github.com/mangata-finance/mangata-sdk/commit/81607adff1b4436519c126ad6193d3eada63fdc6))
+* typo in get invested pool ([9283999](https://github.com/mangata-finance/mangata-sdk/commit/9283999122ba37065b4e3cabcfe93d0bb02dd040))
+
 # [2.0.0-rc.2](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.1...v2.0.0-rc.2) (2023-06-20)
 
 
