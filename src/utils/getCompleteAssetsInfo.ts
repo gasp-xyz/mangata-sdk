@@ -19,7 +19,7 @@ export const getCompleteAssetsInfo = async (api: ApiPromise) => {
       id: tokenId,
       decimals: Number(decimals.toString()),
       name: isHex(name) ? hexToString(name.toString()) : name,
-      symbol: isHex(name) ? hexToString(symbol.toString()) : name
+      symbol: isHex(symbol) ? hexToString(symbol.toString()) : symbol
     };
 
     obj[tokenId] = assetInfo;
