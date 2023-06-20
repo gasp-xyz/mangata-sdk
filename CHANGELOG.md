@@ -1,3 +1,10 @@
+# [2.0.0-rc.2](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.1...v2.0.0-rc.2) (2023-06-20)
+
+
+### Bug Fixes
+
+* update withdraw methods ([4d4e599](https://github.com/mangata-finance/mangata-sdk/commit/4d4e599058c01d299dc526ce48fe8b648a7546ef))
+
 # [2.0.0-rc.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.20.1...v2.0.0-rc.1) (2023-06-19)
 
 
