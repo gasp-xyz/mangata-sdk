@@ -56,8 +56,7 @@ export const withdraw = async (
     };
 
     let destWeightLimit;
-    const statemineTokens = ["RMRK", "USDT"];
-    if (statemineTokens.includes(tokenSymbol)) {
+    if (withWeight === "Unlimited") {
       destWeightLimit = "Unlimited";
     } else {
       destWeightLimit = {
