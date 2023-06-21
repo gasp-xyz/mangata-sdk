@@ -1,3 +1,10 @@
+# [2.0.0-rc.4](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.3...v2.0.0-rc.4) (2023-06-21)
+
+
+### Bug Fixes
+
+* change weight limit for withdraw to number or Unlimited ([1fff8c5](https://github.com/mangata-finance/mangata-sdk/commit/1fff8c52ad940fd67f24238d2e53f410ecee3732))
+
 # [2.0.0-rc.3](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.2...v2.0.0-rc.3) (2023-06-20)
 
 
