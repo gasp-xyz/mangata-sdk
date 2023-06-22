@@ -27,6 +27,63 @@ npm i @mangata-finance/sdk
 yarn add @mangata-finance/sdk
 ```
 
+# Migration from v1 to v2
+
+To migrate from v1 to v2, certain modifications need to be made. This guide aims to help you refactor your codebase. We have divided the methods into specific groups:
+
+1. xTokens
+2. xyk
+3. rpc
+4. tokens
+5. submitableExtrinsic
+6. query
+7. fee
+8. util
+
+The **buyAsset** and **sellAsset** methods have been removed and replaced by **multiswapBuyAsset** and **multiswapSellAsset** respectively.
+
+```js
+V1:
+const mangata = Mangata.getInstance(["wss://kusama-archive.mangata.online"]);
+
+V2:
+import { MangataInstance } from "@mangata-finance/sdk"
+const mangata: MangataInstance = Mangata.instance(["wss://kusama-archive.mangata.online"]);
+```
+
+```js
+V1:
+const mangata = Mangata.getInstance(["wss://kusama-archive.mangata.online"]);
+const amount = await mangata.getAmountOfTokenIdInPool("0", "4")
+
+V2:
+import { MangataInstance } from "@mangata-finance/sdk"
+const mangata: MangataInstance = Mangata.instance(["wss://kusama-archive.mangata.online"]);
+const amount = await mangata.query.getAmountOfTokensInPool("0", "4")
+```
+
+```js
+V1:
+await mangata.buyAsset(
+    account: string | KeyringPair,
+    soldAssetId: string,
+    boughtAssetId: string,
+    amount: BN,
+    maxAmountIn: BN,
+    txOptions?: TxOptions
+  )
+
+V2:
+const args: MultiswapBuyAsset = {
+    account: Account;
+    tokenIds: TokenId[];
+    amount: TokenAmount;
+    maxAmountIn: TokenAmount;
+    txOptions?: Partial<TxOptions> | undefined;
+}
+await mangata.xyk.multiswapBuyAsset(args)
+```
+
 # Basic use case
 
 Here is a quick example to get you started, **all you need is Mangata instance**:
