@@ -1,7 +1,7 @@
 <h2 align="center">Mangata Finance SDK</h2>
 
 <p align="center">
-    Mangata SDK is a toolset for convenient communication with Mangata Substrate node.
+    The Mangata SDK is a comprehensive toolset designed for facilitating seamless communication with the Mangata Substrate node.
 </p>
 
 ![Artwork](https://blog.mangata.finance/assets/posts/themis-cover.png)
@@ -15,7 +15,7 @@
 
 # Getting Started
 
-Mangata SDK is a first library, built in typescript that provides easy methods for buying and selling assets on Mangata DEX. The main purpose is to save time for builders of client applications, primarily for algorithmic traders and frontend interface builders.
+The Mangata SDK is the TypeScript library that offers a wide range of convenient methods for effortlessly buying and selling assets on the Mangata DEX. Its primary objective is to streamline the development process for client applications, specifically targeting algorithmic traders and frontend interface builders. By utilizing the Mangata SDK, developers can significantly reduce time and effort required to integrate with the platform.
 
 ## Installation
 
@@ -42,6 +42,10 @@ To migrate from v1 to v2, certain modifications need to be made. This guide aims
 
 The **buyAsset** and **sellAsset** methods have been removed and replaced by **multiswapBuyAsset** and **multiswapSellAsset** respectively.
 
+We no longer support the implementation of depositing to Mangata within the SDK. However, we do provide the necessary raw methods for depositing, which should be implemented separately outside of the SDK. For specific examples of how to deposit to Mangata using the SDK, please refer to the provided examples.
+
+To obtain an instance of the Mangata node, please follow this step:
+
 ```js
 V1:
 const mangata = Mangata.getInstance(["wss://kusama-archive.mangata.online"]);
@@ -51,16 +55,17 @@ import { MangataInstance } from "@mangata-finance/sdk"
 const mangata: MangataInstance = Mangata.instance(["wss://kusama-archive.mangata.online"]);
 ```
 
+Method **getAmountOfTokenIdInPool** has been renamed to **getAmountOfTokensInPool**
+
 ```js
 V1:
-const mangata = Mangata.getInstance(["wss://kusama-archive.mangata.online"]);
 const amount = await mangata.getAmountOfTokenIdInPool("0", "4")
 
 V2:
-import { MangataInstance } from "@mangata-finance/sdk"
-const mangata: MangataInstance = Mangata.instance(["wss://kusama-archive.mangata.online"]);
 const amount = await mangata.query.getAmountOfTokensInPool("0", "4")
 ```
+
+Please replace the existing "buyAsset" and "sellAsset" methods with the newly introduced "multiswapBuyAsset" and "multiswapSellAsset" methods.
 
 ```js
 V1:
@@ -82,6 +87,16 @@ const args: MultiswapBuyAsset = {
     txOptions?: Partial<TxOptions> | undefined;
 }
 await mangata.xyk.multiswapBuyAsset(args)
+```
+
+To illustrate how to retrieve asset information, you need to determine its corresponding section within the SDK. The method **getAssetInfo** is located within the query block.
+
+```js
+V1:
+const assetInfo = await mangata.getAssetInfo()
+
+V2:
+const assetInfo = await mangata.query.getAssetInfo()
 ```
 
 # Basic use case
@@ -115,3 +130,7 @@ main()
 ```
 
 For available methods please visit [docs](https://docs.mangata.finance/sdk/)
+
+```
+
+```
