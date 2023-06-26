@@ -1,3 +1,11 @@
+import {
+  moonriver,
+  mangataKusama,
+  movr,
+  mgx
+} from "@moonbeam-network/xcm-config";
+import { Sdk } from "@moonbeam-network/xcm-sdk";
+import { Signer } from "ethers";
 import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { WsProvider } from "@polkadot/rpc-provider/ws";
@@ -21,6 +29,7 @@ import {
 import { MangataGenericEvent } from "./types/MangataGenericEvent";
 import { TxOptions, XcmTxOptions } from "./types/TxOptions";
 import { calculateFutureRewardsAmountForMinting } from "./utils/calculateFutureRewardsAmount";
+import { fromBN } from "./utils/BNutility";
 
 /**
  * @class Mangata
@@ -152,6 +161,44 @@ export class Mangata {
   public async disconnect(): Promise<void> {
     const api = await this.getApi();
     await api.disconnect();
+  }
+
+  public async sendTokenFromMoonriverToMangata(
+    tokenSymbol: "MOVR" | "MGX",
+    amount: BN,
+    sourceEthAddress: string,
+    destinationAddress: string,
+    accountEthSigner: Signer
+  ) {
+    const data = await Sdk()
+      .assets()
+      .asset(tokenSymbol === "MOVR" ? movr : mgx)
+      .source(moonriver)
+      .destination(mangataKusama)
+      .accounts(sourceEthAddress, destinationAddress, {
+        ethersSigner: accountEthSigner
+      });
+
+    const correctAmount = fromBN(amount);
+    await data.transfer(correctAmount);
+  }
+
+  public async sendTokenFromMangataToMoonriver(
+    tokenSymbol: string,
+    account: string | KeyringPair,
+    moonriverAddress: string,
+    amount: BN,
+    txOptions?: XcmTxOptions
+  ) {
+    const api = await this.getApi();
+    return await Tx.sendTokenFromMangataToMoonriver(
+      api,
+      account,
+      tokenSymbol,
+      moonriverAddress,
+      amount,
+      txOptions
+    );
   }
 
   public async sendTokenFromStatemineToMangataFee(
