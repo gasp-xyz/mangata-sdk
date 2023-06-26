@@ -1,3 +1,11 @@
+# [1.21.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.20.2...v1.21.0) (2023-06-26)
+
+
+### Features
+
+* add deposit and withdraw for moonriver ([31c4710](https://github.com/mangata-finance/mangata-sdk/commit/31c471045d4a2eb62fe9187f64ba2ef136fb4f30))
+* add fee methods for moonriver ([585fd1f](https://github.com/mangata-finance/mangata-sdk/commit/585fd1fcfaf495276ece86a3e31dec67d4b7cd57))
+
 ## [1.20.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.20.1...v1.20.2) (2023-06-19)
 
 
