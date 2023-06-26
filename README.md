@@ -42,6 +42,41 @@ To migrate from v1 to v2, certain modifications need to be made. This guide aims
 
 The **buyAsset** and **sellAsset** methods have been removed and replaced by **multiswapBuyAsset** and **multiswapSellAsset** respectively.
 
+We also made a change by transitioning from using arguments for functions to using objects as parameters.
+Example:
+
+```js
+V1:
+await instance.createPool(
+    testUser,
+    firstTokenId,
+    new BN("10000000000000000000000"),
+    secondTokenId,
+    new BN("10000000000000000000000"),
+    txOptions: {
+      extrinsicStatus: (data) => {
+        console.log(data)
+      }
+    }
+  );
+
+
+V2:
+const args: CreatePool = {
+    account: testUser,
+    firstTokenId: firstTokenId!,
+    secondTokenId: secondTokenId!,
+    firstTokenAmount: new BN("10000000000000000000000"),
+    secondTokenAmount: new BN("10000000000000000000000"),
+    txOptions: {
+      extrinsicStatus: (data) => {
+        console.log(data)
+      }
+    }
+  };
+  await instance.xyk.createPool(args);
+```
+
 We no longer support the implementation of depositing to Mangata within the SDK. However, we do provide the necessary raw methods for depositing, which should be implemented separately outside of the SDK. For specific examples of how to deposit to Mangata using the SDK, please refer to the provided examples.
 
 To obtain an instance of the Mangata node, please follow this step:
