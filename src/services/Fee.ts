@@ -10,6 +10,57 @@ import { getWeightXTokens } from "../utils/getWeightXTokens";
 import { getCorrectLocation } from "../utils/getCorrectLocation";
 
 export class Fee {
+  static async sendTokenFromMangataToMoonriverFee(
+    api: ApiPromise,
+    account: string | KeyringPair,
+    tokenSymbol: string,
+    moonriverAddress: string,
+    amount: BN
+  ) {
+    const assetRegistryMetadata =
+      await api.query.assetRegistry.metadata.entries();
+
+    const assetFiltered = assetRegistryMetadata.filter((el) =>
+      JSON.stringify(el[1].toHuman()).includes(tokenSymbol)
+    )[0];
+
+    const tokenId = (assetFiltered[0].toHuman() as string[])[0].replace(
+      /[, ]/g,
+      ""
+    );
+
+    const destination = {
+      V3: {
+        parents: 1,
+        interior: {
+          X2: [
+            {
+              Parachain: 2023
+            },
+            {
+              AccountKey20: {
+                key: api.createType("AccountId20", moonriverAddress).toHex()
+              }
+            }
+          ]
+        }
+      }
+    };
+
+    const destWeightLimit = {
+      Limited: {
+        ref_time: new BN("1000000000"),
+        proof_size: 0
+      }
+    };
+
+    const dispatchInfo = await api.tx.xTokens
+      .transfer(tokenId, amount, destination, destWeightLimit)
+      .paymentInfo(account);
+
+    return fromBN(new BN(dispatchInfo.partialFee.toString()));
+  }
+
   static async sendTokenFromParachainToMangataFee(...args: DepositXcmTuple) {
     const [
       mangataApi,

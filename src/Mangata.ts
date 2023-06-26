@@ -183,6 +183,26 @@ export class Mangata {
     await data.transfer(correctAmount);
   }
 
+  public async sendTokenFromMoonriverToMangataFee(
+    tokenSymbol: "MOVR" | "MGX",
+    amount: BN,
+    sourceEthAddress: string,
+    destinationAddress: string,
+    accountEthSigner: Signer
+  ) {
+    const data = await Sdk()
+      .assets()
+      .asset(tokenSymbol === "MOVR" ? movr : mgx)
+      .source(moonriver)
+      .destination(mangataKusama)
+      .accounts(sourceEthAddress, destinationAddress, {
+        ethersSigner: accountEthSigner
+      });
+
+    const correctAmount = fromBN(amount);
+    return fromBN(new BN(data.source.fee.amount.toString()));
+  }
+
   public async sendTokenFromMangataToMoonriver(
     tokenSymbol: string,
     account: string | KeyringPair,
@@ -198,6 +218,22 @@ export class Mangata {
       moonriverAddress,
       amount,
       txOptions
+    );
+  }
+
+  public async sendTokenFromMangataToMoonriverFee(
+    tokenSymbol: string,
+    account: string | KeyringPair,
+    moonriverAddress: string,
+    amount: BN
+  ) {
+    const api = await this.getApi();
+    return await Fee.sendTokenFromMangataToMoonriverFee(
+      api,
+      account,
+      tokenSymbol,
+      moonriverAddress,
+      amount
     );
   }
 
