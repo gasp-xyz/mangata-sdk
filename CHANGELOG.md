@@ -1,3 +1,10 @@
+# [2.0.0-rc.6](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.5...v2.0.0-rc.6) (2023-06-27)
+
+
+### Features
+
+* add implementation for withdraw from mangata to moonriver ([26e63b7](https://github.com/mangata-finance/mangata-sdk/commit/26e63b796fe6ec98798aeea51214e6a15b9dd647))
+
 # [2.0.0-rc.5](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.4...v2.0.0-rc.5) (2023-06-27)
 
 
