@@ -4,13 +4,13 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { it, expect, beforeEach } from "vitest";
 
 import { instance, SUDO_USER_NAME } from "./instance";
+import { signTx, type Batch, type CreatePool, type Liquidity } from "../src";
 import {
   createMangataToken,
   createToken,
   createUser,
   getExtrinsicData
 } from "./utility";
-import { Batch, BurnLiquidity, CreatePool } from "../src";
 
 let testUser: KeyringPair;
 let sudoUser: KeyringPair;
@@ -53,15 +53,13 @@ beforeEach(async () => {
   secondTokenId = extrinsicData[1].eventData[0].data.toString();
 });
 
-it("should burn liquidity", async () => {
-  const beforePools = await instance.query.getPools();
-
-  const argsPool: CreatePool = {
+it("should create pool", async () => {
+  const args: CreatePool = {
     account: testUser,
     firstTokenId: firstTokenId!,
     secondTokenId: secondTokenId!,
-    firstTokenAmount: new BN(50000),
-    secondTokenAmount: new BN(25000),
+    firstTokenAmount: new BN("10000000000000000000000"),
+    secondTokenAmount: new BN("10000000000000000000000"),
     txOptions: {
       extrinsicStatus: (data) => {
         const searchTerms = ["xyk", "PoolCreated", testUser.address];
@@ -70,38 +68,29 @@ it("should burn liquidity", async () => {
       }
     }
   };
-  await instance.xyk.createPool(argsPool);
+  await instance.xyk.createPool(args);
 
-  const liquidityTokenId = await instance.query.getLiquidityTokenId(
+  await instance.rpc.waitForNewBlock(2);
+
+  const liqtoken = await instance.query.getLiquidityTokenId(
     firstTokenId!,
     secondTokenId!
   );
-
-  const investedPools = await instance.query.getInvestedPools(testUser.address);
-
-  const investedPool = investedPools.find(
-    (investedPool) =>
-      investedPool.liquidityTokenId === liquidityTokenId.toString()
+  const api = await instance.api();
+  await signTx(
+    api,
+    api.tx.sudo.sudo(
+      api.tx.proofOfStake.updatePoolPromotion(liqtoken.toNumber(), 100)
+    ),
+    sudoUser
   );
 
   await instance.rpc.waitForNewBlock(2);
 
-  const amountToBurn =
-    investedPool &&
-    investedPool.nonActivatedLPTokens.add(investedPool.activatedLPTokens);
-
-  const argsBurnLiquidity: BurnLiquidity = {
+  const argsLiq: Liquidity = {
     account: testUser,
-    firstTokenId: firstTokenId!,
-    secondTokenId: secondTokenId!,
-    amount: amountToBurn!
+    liquidityTokenId: liqtoken.toString(),
+    amount: new BN(100)
   };
-
-  await instance.xyk.burnLiquidity(argsBurnLiquidity);
-
-  await instance.rpc.waitForNewBlock(2);
-
-  const afterPools = await instance.query.getPools();
-
-  expect(beforePools.length).not.to.equal(afterPools);
+  await instance.xyk.activateLiquidity(argsLiq, "AvailableBalance");
 });
