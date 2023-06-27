@@ -21,6 +21,7 @@ import {
   DepositFromKusamaFee,
   DepositFromParachainFee,
   DepositFromStatemineFee,
+  MoonriverWithdraw,
   RelayDeposit,
   RelayWithdraw,
   Withdraw,
@@ -140,6 +141,8 @@ export interface MangataInstance {
      * @returns A promise that resolves with void.
      */
     withdrawKsm: (args: RelayWithdraw) => Promise<void>;
+
+    withdrawFromMoonriver: (args: MoonriverWithdraw) => Promise<void>;
   };
 
   /**
@@ -544,6 +547,8 @@ export interface MangataInstance {
      * Calculates the fee for withdrawing KSM (Kusama) tokens.
      */
     withdrawKsm: (args: WithdrawKsmFee) => Promise<string>;
+
+    withdrawFromMoonriver: (args: MoonriverWithdraw) => Promise<string>;
 
     /**
      * Calculates the fee for activating liquidity in a pool.

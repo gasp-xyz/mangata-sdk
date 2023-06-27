@@ -34,6 +34,15 @@ export type Withdraw = Merge<
   }
 >;
 
+export type MoonriverWithdraw = Merge<
+  ExtrinsicCommon,
+  {
+    tokenSymbol: string;
+    moonriverAddress: string;
+    amount: TokenAmount;
+  }
+>;
+
 export type RelayDeposit<
   A = unknown,
   D = unknown,

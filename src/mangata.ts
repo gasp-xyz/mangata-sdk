@@ -34,11 +34,13 @@ import {
   TransferTokens
 } from "./types/tokens";
 import {
+  Account,
   Address,
   MangataInstance,
   Prettify,
   TokenAmount,
-  TokenId
+  TokenId,
+  TxOptions
 } from "./types/common";
 import { mintLiquidity } from "./methods/xyk/mintLiquidity";
 import { depositFromParachain } from "./methods/xTokens/depositFromParachain";
@@ -47,6 +49,7 @@ import {
   DepositFromKusamaFee,
   DepositFromParachainFee,
   DepositFromStatemineFee,
+  MoonriverWithdraw,
   RelayDeposit,
   RelayWithdraw,
   Withdraw,
@@ -114,6 +117,8 @@ import { getDepositFromStatemineFee } from "./methods/fee/getDepositFromStatemin
 import { getFeeLockMetadata } from "./methods/query/getFeeLockMetadata";
 import { isBuyAssetLockFree } from "./methods/rpc/isBuyAssetLockFree";
 import { isSellAssetLockFree } from "./methods/rpc/isSellAssetLockFree";
+import { withdrawFromMoonriver } from "./methods/xTokens/withdrawFromMoonriver";
+import { getWithdrawFromMoonriverFee } from "./methods/fee/getWithdrawFromMoonriverFee";
 
 /**
  * Creates a MangataInstance object with various methods for interacting with the Mangata node.
@@ -137,7 +142,9 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await depositFromStatemine(args),
       withdraw: async (args: Withdraw) => await withdraw(instancePromise, args),
       withdrawKsm: async (args: RelayWithdraw) =>
-        await withdrawKsm(instancePromise, args)
+        await withdrawKsm(instancePromise, args),
+      withdrawFromMoonriver: async (args: MoonriverWithdraw) =>
+        await withdrawFromMoonriver(instancePromise, args)
     },
     xyk: {
       deactivateLiquidity: async (args: Liquidity) =>
@@ -292,6 +299,8 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await getWithdrawFee(instancePromise, args),
       withdrawKsm: async (args: WithdrawKsmFee) =>
         await getWithdrawKsmFee(instancePromise, args),
+      withdrawFromMoonriver: async (args: MoonriverWithdraw) =>
+        await getWithdrawFromMoonriverFee(instancePromise, args),
       activateLiquidity: async (args: ActivateLiquidityFee) =>
         await getActivateLiquidityFee(instancePromise, args),
       deactivateLiquidity: async (args: DeactivateLiquidityFee) =>
