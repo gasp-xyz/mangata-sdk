@@ -1,3 +1,10 @@
+# [2.0.0-rc.5](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.4...v2.0.0-rc.5) (2023-06-27)
+
+
+### Features
+
+* add new rpc methods ([87f9557](https://github.com/mangata-finance/mangata-sdk/commit/87f9557a22bc90b2930097cf48a33b0774efca26))
+
 # [2.0.0-rc.4](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.3...v2.0.0-rc.4) (2023-06-21)
 
 
