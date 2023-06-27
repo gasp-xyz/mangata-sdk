@@ -158,7 +158,13 @@ export interface MangataInstance {
      * @param args - The liquidity parameters.
      * @returns A promise that resolves with an array of MangataGenericEvent objects.
      */
-    activateLiquidity: (args: Liquidity) => Promise<MangataGenericEvent[]>;
+    activateLiquidity: (
+      args: Liquidity,
+      balanceFrom:
+        | "AvailableBalance"
+        | "StakedUnactivatedReserves"
+        | "UnspentReserves"
+    ) => Promise<MangataGenericEvent[]>;
 
     /**
      * Burns liquidity tokens.
@@ -226,6 +232,8 @@ export interface MangataInstance {
    * rpc methods for interacting with various RPC operations.
    */
   rpc: {
+    isSellAssetLockFree: (tokendIds: number[], amount: BN) => Promise<Boolean>;
+    isBuyAssetLockFree: (tokendIds: number[], amount: BN) => Promise<Boolean>;
     /**
      * Calculates the buy price based on the asset's ID.
      * @param args - The price parameters.
@@ -379,7 +387,11 @@ export interface MangataInstance {
      * @returns A promise that resolves with a MangataSubmittableExtrinsic object.
      */
     activateLiquidity: (
-      args: Liquidity
+      args: Liquidity,
+      balanceFrom:
+        | "AvailableBalance"
+        | "StakedUnactivatedReserves"
+        | "UnspentReserves"
     ) => Promise<MangataSubmittableExtrinsic>;
 
     /**

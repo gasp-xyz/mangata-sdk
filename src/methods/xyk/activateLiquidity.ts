@@ -8,12 +8,20 @@ import { Liquidity } from "../../types/xyk";
 async function activateLiquidity(
   instancePromise: Promise<ApiPromise>,
   args: Liquidity,
+  balanceFrom:
+    | "AvailableBalance"
+    | "StakedUnactivatedReserves"
+    | "UnspentReserves",
   isForBatch: false
 ): Promise<MangataGenericEvent[]>;
 
 async function activateLiquidity(
   instancePromise: Promise<ApiPromise>,
   args: Liquidity,
+  balanceFrom:
+    | "AvailableBalance"
+    | "StakedUnactivatedReserves"
+    | "UnspentReserves",
   isForBatch: true
 ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
 
@@ -33,6 +41,10 @@ async function activateLiquidity(
 async function activateLiquidity(
   instancePromise: Promise<ApiPromise>,
   args: Liquidity,
+  balanceFrom:
+    | "AvailableBalance"
+    | "StakedUnactivatedReserves"
+    | "UnspentReserves",
   isForBatch: boolean
 ) {
   const api = await instancePromise;
@@ -40,7 +52,7 @@ async function activateLiquidity(
   const tx = api.tx.proofOfStake.activateLiquidity(
     liquidityTokenId,
     amount,
-    null
+    balanceFrom
   );
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }

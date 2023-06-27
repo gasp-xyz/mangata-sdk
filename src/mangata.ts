@@ -33,7 +33,13 @@ import {
   TransferTokenFee,
   TransferTokens
 } from "./types/tokens";
-import { Address, MangataInstance, TokenAmount, TokenId } from "./types/common";
+import {
+  Address,
+  MangataInstance,
+  Prettify,
+  TokenAmount,
+  TokenId
+} from "./types/common";
 import { mintLiquidity } from "./methods/xyk/mintLiquidity";
 import { depositFromParachain } from "./methods/xTokens/depositFromParachain";
 import {
@@ -106,6 +112,8 @@ import { getPriceImpact } from "./utils/getPriceImpact";
 import { getDepositFromKusamaFee } from "./methods/fee/getDepositFromKusamaFee";
 import { getDepositFromStatemineFee } from "./methods/fee/getDepositFromStatemineFee";
 import { getFeeLockMetadata } from "./methods/query/getFeeLockMetadata";
+import { isBuyAssetLockFree } from "./methods/rpc/isBuyAssetLockFree";
+import { isSellAssetLockFree } from "./methods/rpc/isSellAssetLockFree";
 
 /**
  * Creates a MangataInstance object with various methods for interacting with the Mangata node.
@@ -134,8 +142,13 @@ function createMangataInstance(urls: string[]): MangataInstance {
     xyk: {
       deactivateLiquidity: async (args: Liquidity) =>
         await deactivateLiquidity(instancePromise, args, false),
-      activateLiquidity: async (args: Liquidity) =>
-        await activateLiquidity(instancePromise, args, false),
+      activateLiquidity: async (
+        args: Liquidity,
+        balanceFrom:
+          | "AvailableBalance"
+          | "StakedUnactivatedReserves"
+          | "UnspentReserves" = "AvailableBalance"
+      ) => await activateLiquidity(instancePromise, args, balanceFrom, false),
       burnLiquidity: async (args: BurnLiquidity) =>
         await burnLiquidity(instancePromise, args, false),
       mintLiquidity: async (args: MintLiquidity) =>
@@ -146,7 +159,7 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await sellAsset(instancePromise, args, false),
       createPool: async (args: CreatePool) =>
         await createPool(instancePromise, args, false),
-      claimRewards: async (args: Omit<Liquidity, "amount">) =>
+      claimRewards: async (args: Prettify<Omit<Liquidity, "amount">>) =>
         await claimRewards(instancePromise, args, false),
       multiswapBuyAsset: async (args: MultiswapBuyAsset) =>
         await multiswapBuyAsset(instancePromise, args, false),
@@ -154,6 +167,10 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await multiswapSellAsset(instancePromise, args, false)
     },
     rpc: {
+      isBuyAssetLockFree: async (tokenIds: number[], amount: BN) =>
+        await isBuyAssetLockFree(instancePromise, tokenIds, amount),
+      isSellAssetLockFree: async (tokenIds: number[], amount: BN) =>
+        await isSellAssetLockFree(instancePromise, tokenIds, amount),
       calculateBuyPriceId: async (
         soldTokenId: TokenId,
         boughtTokenId: TokenId,
@@ -209,8 +226,13 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await mintLiquidity(instancePromise, args, true),
       burnLiquidity: async (args: BurnLiquidity) =>
         await burnLiquidity(instancePromise, args, true),
-      activateLiquidity: async (args: Liquidity) =>
-        await activateLiquidity(instancePromise, args, true),
+      activateLiquidity: async (
+        args: Liquidity,
+        balanceFrom:
+          | "AvailableBalance"
+          | "StakedUnactivatedReserves"
+          | "UnspentReserves" = "AvailableBalance"
+      ) => await activateLiquidity(instancePromise, args, balanceFrom, true),
       deactivateLiquidity: async (args: Liquidity) =>
         await deactivateLiquidity(instancePromise, args, true),
       transferAllTokens: async (args: Transfer) =>
