@@ -1,3 +1,10 @@
+## [1.21.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.21.0...v1.21.1) (2023-06-28)
+
+
+### Bug Fixes
+
+* rewrite deposit from moonriver without moonbeam sdk ([8228a9e](https://github.com/mangata-finance/mangata-sdk/commit/8228a9ee3549a71bc68955e9d1891d21969ace56))
+
 # [1.21.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.20.2...v1.21.0) (2023-06-26)
 
 
