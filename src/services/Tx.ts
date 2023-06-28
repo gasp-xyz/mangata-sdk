@@ -3,7 +3,7 @@ import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { WsProvider } from "@polkadot/rpc-provider/ws";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { GenericExtrinsic, GenericEvent } from "@polkadot/types";
+import { GenericExtrinsic } from "@polkadot/types";
 import { AnyTuple } from "@polkadot/types-codec/types";
 import { BN, isHex, hexToU8a } from "@polkadot/util";
 import { encodeAddress } from "@polkadot/util-crypto";
@@ -670,6 +670,75 @@ export class Tx {
       mangataAccount,
       txOptions
     );
+  }
+
+  static async sendTokenFromMoonriverToMangata(
+    account: string | KeyringPair,
+    tokenSymbol: string,
+    url: string,
+    mangataAddress: string,
+    amount: BN
+  ) {
+    const provider = new WsProvider(url);
+    const api = await new ApiPromise({ provider, noInitWarn: true }).isReady;
+    const correctAddress = encodeAddress(mangataAddress, 42);
+    let interior = null;
+    if (tokenSymbol === "MOVR") {
+      interior = {
+        X1: {
+          PalletInstance: 10
+        }
+      };
+    } else {
+      interior = {
+        X2: [
+          {
+            Parachain: 2110
+          },
+          {
+            GeneralKey: {
+              length: 4,
+              data: "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          }
+        ]
+      };
+    }
+    const asset = {
+      V3: {
+        id: {
+          Concrete: {
+            parents: 1,
+            interior
+          }
+        },
+        fun: {
+          Fungible: amount
+        }
+      }
+    };
+
+    const destination = {
+      V3: {
+        parents: 1,
+        interior: {
+          X2: [
+            {
+              Parachain: 2110
+            },
+            {
+              AccountId32: {
+                id: api.createType("AccountId32", correctAddress).toHex()
+              }
+            }
+          ]
+        }
+      }
+    };
+
+    await api.tx.xTokens
+      .transferMultiasset(asset, destination, "Unlimited")
+      .signAndSend(account);
   }
 
   static async sendTokenFromMangataToMoonriver(

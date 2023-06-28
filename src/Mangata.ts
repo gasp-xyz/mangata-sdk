@@ -1,11 +1,3 @@
-import {
-  moonriver,
-  mangataKusama,
-  movr,
-  mgx
-} from "@moonbeam-network/xcm-config";
-import { Sdk } from "@moonbeam-network/xcm-sdk";
-import { Signer } from "ethers";
 import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { WsProvider } from "@polkadot/rpc-provider/ws";
@@ -29,7 +21,6 @@ import {
 import { MangataGenericEvent } from "./types/MangataGenericEvent";
 import { TxOptions, XcmTxOptions } from "./types/TxOptions";
 import { calculateFutureRewardsAmountForMinting } from "./utils/calculateFutureRewardsAmount";
-import { fromBN } from "./utils/BNutility";
 
 /**
  * @class Mangata
@@ -164,43 +155,35 @@ export class Mangata {
   }
 
   public async sendTokenFromMoonriverToMangata(
+    account: string | KeyringPair,
     tokenSymbol: "MOVR" | "MGX",
-    amount: BN,
-    sourceEthAddress: string,
-    destinationAddress: string,
-    accountEthSigner: Signer
+    url: string,
+    mangataAddress: string,
+    amount: BN
   ) {
-    const data = await Sdk()
-      .assets()
-      .asset(tokenSymbol === "MOVR" ? movr : mgx)
-      .source(moonriver)
-      .destination(mangataKusama)
-      .accounts(sourceEthAddress, destinationAddress, {
-        ethersSigner: accountEthSigner
-      });
-
-    const correctAmount = fromBN(amount);
-    await data.transfer(correctAmount);
+    return await Tx.sendTokenFromMoonriverToMangata(
+      account,
+      tokenSymbol,
+      url,
+      mangataAddress,
+      amount
+    );
   }
 
   public async sendTokenFromMoonriverToMangataFee(
+    account: string | KeyringPair,
     tokenSymbol: "MOVR" | "MGX",
-    amount: BN,
-    sourceEthAddress: string,
-    destinationAddress: string,
-    accountEthSigner: Signer
+    url: string,
+    mangataAddress: string,
+    amount: BN
   ) {
-    const data = await Sdk()
-      .assets()
-      .asset(tokenSymbol === "MOVR" ? movr : mgx)
-      .source(moonriver)
-      .destination(mangataKusama)
-      .accounts(sourceEthAddress, destinationAddress, {
-        ethersSigner: accountEthSigner
-      });
-
-    const correctAmount = fromBN(amount);
-    return fromBN(new BN(data.source.fee.amount.toString()));
+    return await Fee.sendTokenFromMoonriverToMangataFee(
+      account,
+      tokenSymbol,
+      url,
+      mangataAddress,
+      amount
+    );
   }
 
   public async sendTokenFromMangataToMoonriver(
