@@ -73,11 +73,8 @@
   },
   "dependencies": {
     "@mangata-finance/types": "^0.23.0",
-    "@moonbeam-network/xcm-config": "^1.0.3",
-    "@moonbeam-network/xcm-sdk": "^1.0.3",
     "@polkadot/api": "^10.7.3",
     "big.js": "^6.2.1",
-    "uuid": "^9.0.0",
-    "ethers": "^5.7.2"
+    "uuid": "^9.0.0"
   }
 }
