@@ -46,7 +46,7 @@ export class Fee {
       V3: {
         id: {
           Concrete: {
-            parents: 1,
+            parents: tokenSymbol === "MOVR" ? 0 : 1,
             interior
           }
         },
