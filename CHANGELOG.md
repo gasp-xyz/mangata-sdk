@@ -1,3 +1,10 @@
+# [2.0.0-rc.8](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.7...v2.0.0-rc.8) (2023-06-29)
+
+
+### Bug Fixes
+
+* correct files in package ([ea722b7](https://github.com/mangata-finance/mangata-sdk/commit/ea722b7e6f51a530033796f722c6390473a53af6))
+
 # [2.0.0-rc.7](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.6...v2.0.0-rc.7) (2023-06-29)
 
 
