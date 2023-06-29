@@ -1,3 +1,10 @@
+# [2.0.0-rc.9](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.8...v2.0.0-rc.9) (2023-06-29)
+
+
+### Bug Fixes
+
+* init mangata ([c3ae2f5](https://github.com/mangata-finance/mangata-sdk/commit/c3ae2f59ad069cb1fcf85616b02baf9bf28a4f02))
+
 # [2.0.0-rc.8](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.7...v2.0.0-rc.8) (2023-06-29)
 
 
