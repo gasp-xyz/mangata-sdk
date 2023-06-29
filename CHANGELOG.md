@@ -1,3 +1,10 @@
+## [1.21.3](https://github.com/mangata-finance/mangata-sdk/compare/v1.21.2...v1.21.3) (2023-06-29)
+
+
+### Bug Fixes
+
+* deposit movr to mangata fee method ([856a602](https://github.com/mangata-finance/mangata-sdk/commit/856a6026f1c85bed08f1d9c5779c08dc20e110cf))
+
 ## [1.21.2](https://github.com/mangata-finance/mangata-sdk/compare/v1.21.1...v1.21.2) (2023-06-29)
 
 
