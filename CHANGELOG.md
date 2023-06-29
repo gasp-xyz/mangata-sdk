@@ -1,3 +1,10 @@
+# [2.0.0-rc.7](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.6...v2.0.0-rc.7) (2023-06-29)
+
+
+### Bug Fixes
+
+* init api promise ([cad64d1](https://github.com/mangata-finance/mangata-sdk/commit/cad64d100b9363e71510d71fb5c70c4e447b308f))
+
 # [2.0.0-rc.6](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.5...v2.0.0-rc.6) (2023-06-27)
 
 
