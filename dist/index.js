@@ -3400,13 +3400,13 @@ async function deactivateLiquidity(instancePromise, args, isForBatch) {
 }
 
 // src/methods/xyk/activateLiquidity.ts
-async function activateLiquidity(instancePromise, args, isForBatch) {
+async function activateLiquidity(instancePromise, args, balanceFrom, isForBatch) {
   const api = await instancePromise;
   const { account, liquidityTokenId, amount, txOptions } = args;
   const tx = api.tx.proofOfStake.activateLiquidity(
     liquidityTokenId,
     amount,
-    null
+    balanceFrom
   );
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }
@@ -3639,8 +3639,8 @@ var getCompleteAssetsInfo = async (api) => {
     const assetInfo = {
       id: tokenId,
       decimals: Number(decimals.toString()),
-      name: hexToString(name.toString()),
-      symbol: hexToString(symbol.toString())
+      name: isHex(name) ? hexToString(name.toString()) : name,
+      symbol: isHex(symbol) ? hexToString(symbol.toString()) : symbol
     };
     obj[tokenId] = assetInfo;
     return obj;
@@ -7688,8 +7688,7 @@ var withdraw = async (instancePromise, args) => {
       }
     };
     let destWeightLimit;
-    const statemineTokens = ["RMRK", "USDT"];
-    if (statemineTokens.includes(tokenSymbol)) {
+    if (withWeight === "Unlimited") {
       destWeightLimit = "Unlimited";
     } else {
       destWeightLimit = {
@@ -7764,11 +7763,11 @@ var forceBatch = async (instancePromise, args) => {
 import { ApiPromise as ApiPromise2, WsProvider as WsProvider2 } from "@polkadot/api";
 import { options } from "@mangata-finance/types";
 var instanceMap = {};
-var getOrCreateInstance = (urls) => {
+var getOrCreateInstance = async (urls) => {
   const key = JSON.stringify(urls.sort());
   if (!instanceMap[key]) {
     const provider = new WsProvider2(urls);
-    instanceMap[key] = ApiPromise2.create(
+    instanceMap[key] = await ApiPromise2.create(
       options({
         provider,
         throwOnConnect: true,
@@ -8248,6 +8247,110 @@ var getFeeLockMetadata = async (instancePromise) => {
   };
 };
 
+// src/methods/rpc/isBuyAssetLockFree.ts
+var isBuyAssetLockFree = async (instancePromise, tokenIds, amount) => {
+  const api = await instancePromise;
+  const result = await api.rpc.xyk.is_buy_asset_lock_free(
+    tokenIds,
+    amount
+  );
+  return result.toPrimitive();
+};
+
+// src/methods/rpc/isSellAssetLockFree.ts
+var isSellAssetLockFree = async (instancePromise, tokenIds, amount) => {
+  const api = await instancePromise;
+  const result = await api.rpc.xyk.is_sell_asset_lock_free(
+    tokenIds,
+    amount
+  );
+  return result.toPrimitive();
+};
+
+// src/methods/xTokens/withdrawToMoonriver.ts
+var withdrawToMoonriver = async (instancePromise, args) => {
+  const api = await instancePromise;
+  const { account, tokenSymbol, moonriverAddress, amount, txOptions } = args;
+  const assetRegistryMetadata = await api.query.assetRegistry.metadata.entries();
+  const assetFiltered = assetRegistryMetadata.filter((metadata) => {
+    const symbol = metadata[1].value.symbol.toPrimitive();
+    return symbol === tokenSymbol;
+  })[0];
+  const tokenId = assetFiltered[0].toHuman()[0].replace(
+    /[, ]/g,
+    ""
+  );
+  const destination = {
+    V3: {
+      parents: 1,
+      interior: {
+        X2: [
+          {
+            Parachain: 2023
+          },
+          {
+            AccountKey20: {
+              key: api.createType("AccountId20", moonriverAddress).toHex()
+            }
+          }
+        ]
+      }
+    }
+  };
+  const destWeightLimit = {
+    Limited: {
+      ref_time: new import_bn.default("1000000000"),
+      proof_size: 0
+    }
+  };
+  await signTx(
+    api,
+    api.tx.xTokens.transfer(tokenId, amount, destination, destWeightLimit),
+    account,
+    txOptions
+  );
+};
+
+// src/methods/fee/getWithdrawFromMoonriverFee.ts
+var getWithdrawFromMoonriverFee = async (instancePromise, args) => {
+  const api = await instancePromise;
+  const { account, tokenSymbol, moonriverAddress, amount, txOptions } = args;
+  const assetRegistryMetadata = await api.query.assetRegistry.metadata.entries();
+  const assetFiltered = assetRegistryMetadata.filter((metadata) => {
+    const symbol = metadata[1].value.symbol.toPrimitive();
+    return symbol === tokenSymbol;
+  })[0];
+  const tokenId = assetFiltered[0].toHuman()[0].replace(
+    /[, ]/g,
+    ""
+  );
+  const destination = {
+    V3: {
+      parents: 1,
+      interior: {
+        X2: [
+          {
+            Parachain: 2023
+          },
+          {
+            AccountKey20: {
+              key: api.createType("AccountId20", moonriverAddress).toHex()
+            }
+          }
+        ]
+      }
+    }
+  };
+  const destWeightLimit = {
+    Limited: {
+      ref_time: new import_bn.default("1000000000"),
+      proof_size: 0
+    }
+  };
+  const dispatchInfo = await api.tx.xTokens.transfer(tokenId, amount, destination, destWeightLimit).paymentInfo(account);
+  return fromBN(new import_bn.default(dispatchInfo.partialFee.toString()));
+};
+
 // src/mangata.ts
 function createMangataInstance(urls) {
   const instancePromise = getOrCreateInstance(urls);
@@ -8261,11 +8364,12 @@ function createMangataInstance(urls) {
       depositFromKusama: async (args) => await depositFromKusama(args),
       depositFromStatemine: async (args) => await depositFromStatemine(args),
       withdraw: async (args) => await withdraw(instancePromise, args),
-      withdrawKsm: async (args) => await withdrawKsm(instancePromise, args)
+      withdrawKsm: async (args) => await withdrawKsm(instancePromise, args),
+      withdrawToMoonriver: async (args) => await withdrawToMoonriver(instancePromise, args)
     },
     xyk: {
       deactivateLiquidity: async (args) => await deactivateLiquidity(instancePromise, args, false),
-      activateLiquidity: async (args) => await activateLiquidity(instancePromise, args, false),
+      activateLiquidity: async (args, balanceFrom = "AvailableBalance") => await activateLiquidity(instancePromise, args, balanceFrom, false),
       burnLiquidity: async (args) => await burnLiquidity(instancePromise, args, false),
       mintLiquidity: async (args) => await mintLiquidity(instancePromise, args, false),
       buyAsset: async (args) => await buyAsset(instancePromise, args, false),
@@ -8276,6 +8380,8 @@ function createMangataInstance(urls) {
       multiswapSellAsset: async (args) => await multiswapSellAsset(instancePromise, args, false)
     },
     rpc: {
+      isBuyAssetLockFree: async (tokenIds, amount) => await isBuyAssetLockFree(instancePromise, tokenIds, amount),
+      isSellAssetLockFree: async (tokenIds, amount) => await isSellAssetLockFree(instancePromise, tokenIds, amount),
       calculateBuyPriceId: async (soldTokenId, boughtTokenId, amount) => await calculateBuyPriceId(
         instancePromise,
         soldTokenId,
@@ -8308,7 +8414,7 @@ function createMangataInstance(urls) {
       buyAsset: async (args) => await buyAsset(instancePromise, args, true),
       mintLiquidity: async (args) => await mintLiquidity(instancePromise, args, true),
       burnLiquidity: async (args) => await burnLiquidity(instancePromise, args, true),
-      activateLiquidity: async (args) => await activateLiquidity(instancePromise, args, true),
+      activateLiquidity: async (args, balanceFrom = "AvailableBalance") => await activateLiquidity(instancePromise, args, balanceFrom, true),
       deactivateLiquidity: async (args) => await deactivateLiquidity(instancePromise, args, true),
       transferAllTokens: async (args) => await transferAllTokens(instancePromise, args, true),
       transferTokens: async (args) => await transferTokens(instancePromise, args, true)
@@ -8342,6 +8448,7 @@ function createMangataInstance(urls) {
       depositFromStatemine: (args) => getDepositFromStatemineFee(args),
       withdraw: async (args) => await getWithdrawFee(instancePromise, args),
       withdrawKsm: async (args) => await getWithdrawKsmFee(instancePromise, args),
+      withdrawFromMoonriver: async (args) => await getWithdrawFromMoonriverFee(instancePromise, args),
       activateLiquidity: async (args) => await getActivateLiquidityFee(instancePromise, args),
       deactivateLiquidity: async (args) => await getDeactivateLiquidityFee(instancePromise, args),
       claimRewards: async (args) => await getClaimRewardsFee(instancePromise, args),

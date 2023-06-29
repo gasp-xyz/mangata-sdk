@@ -115,9 +115,14 @@ type Deposit<A = unknown, D = unknown, W = unknown> = Prettify<Merge<ExtrinsicCo
 }>>;
 type Withdraw = Merge<ExtrinsicCommon, {
     tokenSymbol: string;
-    withWeight: string;
+    withWeight: number | "Unlimited";
     parachainId: number;
     destinationAddress: Address;
+    amount: TokenAmount;
+}>;
+type MoonriverWithdraw = Merge<ExtrinsicCommon, {
+    tokenSymbol: string;
+    moonriverAddress: string;
     amount: TokenAmount;
 }>;
 type RelayDeposit<A = unknown, D = unknown, F = number, B = unknown, W = unknown> = Prettify<Merge<ExtrinsicCommon, {
@@ -245,6 +250,7 @@ interface MangataInstance {
          * @returns A promise that resolves with void.
          */
         withdrawKsm: (args: RelayWithdraw) => Promise<void>;
+        withdrawToMoonriver: (args: MoonriverWithdraw) => Promise<void>;
     };
     /**
      * xyk methods for interacting with XYK (Automated Market Maker) operations.
@@ -261,7 +267,7 @@ interface MangataInstance {
          * @param args - The liquidity parameters.
          * @returns A promise that resolves with an array of MangataGenericEvent objects.
          */
-        activateLiquidity: (args: Liquidity) => Promise<MangataGenericEvent[]>;
+        activateLiquidity: (args: Liquidity, balanceFrom: "AvailableBalance" | "StakedUnactivatedReserves" | "UnspentReserves") => Promise<MangataGenericEvent[]>;
         /**
          * Burns liquidity tokens.
          * @param args - The burn liquidity parameters.
@@ -315,6 +321,8 @@ interface MangataInstance {
      * rpc methods for interacting with various RPC operations.
      */
     rpc: {
+        isSellAssetLockFree: (tokendIds: number[], amount: BN) => Promise<Boolean>;
+        isBuyAssetLockFree: (tokendIds: number[], amount: BN) => Promise<Boolean>;
         /**
          * Calculates the buy price based on the asset's ID.
          * @param args - The price parameters.
@@ -437,7 +445,7 @@ interface MangataInstance {
          * @param args - The liquidity parameters for activation.
          * @returns A promise that resolves with a MangataSubmittableExtrinsic object.
          */
-        activateLiquidity: (args: Liquidity) => Promise<MangataSubmittableExtrinsic>;
+        activateLiquidity: (args: Liquidity, balanceFrom: "AvailableBalance" | "StakedUnactivatedReserves" | "UnspentReserves") => Promise<MangataSubmittableExtrinsic>;
         /**
          * Deactivates liquidity based on the provided parameters.
          * @param args - The liquidity parameters for deactivation.
@@ -555,6 +563,7 @@ interface MangataInstance {
          * Calculates the fee for withdrawing KSM (Kusama) tokens.
          */
         withdrawKsm: (args: WithdrawKsmFee) => Promise<string>;
+        withdrawFromMoonriver: (args: MoonriverWithdraw) => Promise<string>;
         /**
          * Calculates the fee for activating liquidity in a pool.
          */
@@ -686,4 +695,4 @@ declare const isBuyAssetTransactionSuccessful: (events: MangataGenericEvent[]) =
 
 declare const isSellAssetTransactionSuccessful: (events: MangataGenericEvent[]) => boolean;
 
-export { Account, ActivateLiquidityFee, Address, Asset, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Batch, BurnLiquidity, BurnLiquidityFee, BuyAsset, BuyAssetFee, ClaimRewardsFee, CreatePool, CreatePoolFee, Database, DeactivateLiquidityFee, Deposit, DepositFromKusamaFee, DepositFromParachainFee, DepositFromStatemineFee, ErrorData, ExtrinsicCommon, FeeLockType, Liquidity, Mangata, MangataEventData, MangataGenericEvent, MangataInstance, MangataSubmittableExtrinsic, MaxAmountIn, MinAmountOut, MintLiquidity, MintLiquidityFee, MultiSwapBase, MultiswapBuyAsset, MultiswapSellAsset, Pool, PoolBase, PoolReserves, Prettify, Price, PriceImpact, RelayDeposit, RelayWithdraw, Reserve, Rewards, SellAsset, SellAssetFee, TBalances, TMainTokens, TPoolWithRatio, TPoolWithShare, TTokenInfo, Token, TokenAmount, TokenAmounts, TokenBalance, TokenDecimals, TokenId, TokenSymbol, Transfer, TransferAllFee, TransferTokenFee, TransferTokens, TxOptions, Withdraw, WithdrawFee, WithdrawKsmFee, XcmTxOptions, fromBN, isBuyAssetTransactionSuccessful, isSellAssetTransactionSuccessful, signTx, toBN, toFixed };
+export { Account, ActivateLiquidityFee, Address, Asset, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Batch, BurnLiquidity, BurnLiquidityFee, BuyAsset, BuyAssetFee, ClaimRewardsFee, CreatePool, CreatePoolFee, Database, DeactivateLiquidityFee, Deposit, DepositFromKusamaFee, DepositFromParachainFee, DepositFromStatemineFee, ErrorData, ExtrinsicCommon, FeeLockType, Liquidity, Mangata, MangataEventData, MangataGenericEvent, MangataInstance, MangataSubmittableExtrinsic, MaxAmountIn, MinAmountOut, MintLiquidity, MintLiquidityFee, MoonriverWithdraw, MultiSwapBase, MultiswapBuyAsset, MultiswapSellAsset, Pool, PoolBase, PoolReserves, Prettify, Price, PriceImpact, RelayDeposit, RelayWithdraw, Reserve, Rewards, SellAsset, SellAssetFee, TBalances, TMainTokens, TPoolWithRatio, TPoolWithShare, TTokenInfo, Token, TokenAmount, TokenAmounts, TokenBalance, TokenDecimals, TokenId, TokenSymbol, Transfer, TransferAllFee, TransferTokenFee, TransferTokens, TxOptions, Withdraw, WithdrawFee, WithdrawKsmFee, XcmTxOptions, fromBN, isBuyAssetTransactionSuccessful, isSellAssetTransactionSuccessful, signTx, toBN, toFixed };
