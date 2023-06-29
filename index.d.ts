@@ -8,7 +8,6 @@ export { BN } from '@polkadot/util';
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { Event, Phase } from '@polkadot/types/interfaces';
-import { Signer as Signer$1 } from 'ethers';
 import { KeypairType } from '@polkadot/util-crypto/types';
 import Big from 'big.js';
 
@@ -171,8 +170,10 @@ declare class Mangata {
      * Disconnect from the node
      */
     disconnect(): Promise<void>;
-    sendTokenFromMoonriverToMangata(tokenSymbol: "MOVR" | "MGX", amount: BN, sourceEthAddress: string, destinationAddress: string, accountEthSigner: Signer$1): Promise<void>;
+    sendTokenFromMoonriverToMangata(account: string | KeyringPair, tokenSymbol: "MOVR" | "MGX", url: string, mangataAddress: string, amount: BN): Promise<void>;
+    sendTokenFromMoonriverToMangataFee(account: string | KeyringPair, tokenSymbol: "MOVR" | "MGX", url: string, mangataAddress: string, amount: BN): Promise<string>;
     sendTokenFromMangataToMoonriver(tokenSymbol: string, account: string | KeyringPair, moonriverAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
+    sendTokenFromMangataToMoonriverFee(tokenSymbol: string, account: string | KeyringPair, moonriverAddress: string, amount: BN): Promise<string>;
     sendTokenFromStatemineToMangataFee(url: string, tokenSymbol: string, destWeight: string, account: string | KeyringPair, mangataAddress: string, amount: BN): Promise<string>;
     sendTokenFromStatemineToMangata(url: string, tokenSymbol: string, destWeight: string, account: string | KeyringPair, mangataAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
     sendTokenFromParachainToMangata(url: string, tokenSymbol: string, destWeight: string, account: string | KeyringPair, mangataAddress: string, amount: BN, txOptions?: XcmTxOptions): Promise<void>;
