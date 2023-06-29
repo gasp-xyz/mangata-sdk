@@ -142,7 +142,7 @@ export interface MangataInstance {
      */
     withdrawKsm: (args: RelayWithdraw) => Promise<void>;
 
-    withdrawFromMoonriver: (args: MoonriverWithdraw) => Promise<void>;
+    withdrawToMoonriver: (args: MoonriverWithdraw) => Promise<void>;
   };
 
   /**

@@ -117,7 +117,7 @@ import { getDepositFromStatemineFee } from "./methods/fee/getDepositFromStatemin
 import { getFeeLockMetadata } from "./methods/query/getFeeLockMetadata";
 import { isBuyAssetLockFree } from "./methods/rpc/isBuyAssetLockFree";
 import { isSellAssetLockFree } from "./methods/rpc/isSellAssetLockFree";
-import { withdrawFromMoonriver } from "./methods/xTokens/withdrawFromMoonriver";
+import { withdrawToMoonriver } from "./methods/xTokens/withdrawToMoonriver";
 import { getWithdrawFromMoonriverFee } from "./methods/fee/getWithdrawFromMoonriverFee";
 
 /**
@@ -143,8 +143,8 @@ function createMangataInstance(urls: string[]): MangataInstance {
       withdraw: async (args: Withdraw) => await withdraw(instancePromise, args),
       withdrawKsm: async (args: RelayWithdraw) =>
         await withdrawKsm(instancePromise, args),
-      withdrawFromMoonriver: async (args: MoonriverWithdraw) =>
-        await withdrawFromMoonriver(instancePromise, args)
+      withdrawToMoonriver: async (args: MoonriverWithdraw) =>
+        await withdrawToMoonriver(instancePromise, args)
     },
     xyk: {
       deactivateLiquidity: async (args: Liquidity) =>

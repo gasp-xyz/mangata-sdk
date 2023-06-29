@@ -3,7 +3,7 @@ import { BN } from "@polkadot/util";
 import { signTx } from "src/utils/signTx";
 import { MoonriverWithdraw } from "../../types/xTokens";
 
-export const withdrawFromMoonriver = async (
+export const withdrawToMoonriver = async (
   instancePromise: Promise<ApiPromise>,
   args: MoonriverWithdraw
 ) => {
