@@ -2,14 +2,12 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import { options } from "@mangata-finance/types";
 
 interface MangataInstanceMap {
-  [key: string]: ApiPromise;
+  [key: string]: Promise<ApiPromise>;
 }
 
 const instanceMap: MangataInstanceMap = {};
 
-export const getOrCreateInstance = async (
-  urls: string[]
-): Promise<ApiPromise> => {
+export const getOrCreateInstance = (urls: string[]): Promise<ApiPromise> => {
   /**
    * Generate a unique key for the given array of URLs.
    * Sort the URLs alphabetically before creating the key.
@@ -20,7 +18,7 @@ export const getOrCreateInstance = async (
 
   if (!instanceMap[key]) {
     const provider = new WsProvider(urls);
-    instanceMap[key] = await ApiPromise.create(
+    instanceMap[key] = ApiPromise.create(
       options({
         provider,
         throwOnConnect: true,
