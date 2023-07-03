@@ -74,7 +74,7 @@ export type ErrorData = {
 };
 export type Account = string | KeyringPair;
 export type TokenSymbol = string;
-export type TokenId = string;
+export type TokenId = string | number;
 export type TokenAmount = BN;
 export type Address = string;
 export type MangataEventData = {
@@ -460,7 +460,7 @@ export interface MangataInstance {
     /**
      * Retrieves the liquidity token IDs.
      */
-    getLiquidityTokenIds: () => Promise<string[]>;
+    getLiquidityTokenIds: () => Promise<TokenId[]>;
 
     /**
      * Retrieves the liquidity tokens.

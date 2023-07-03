@@ -1,5 +1,5 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import { options } from "@mangata-finance/types";
+import { options } from "./options";
 
 interface MangataInstanceMap {
   [key: string]: Promise<ApiPromise>;

@@ -16,7 +16,7 @@ export const getAssetsInfo = async (
   // then we need to display symbol for liquidity token
   return pipe(
     filter(
-      (assetsInfo: TTokenInfo) => !["1", "3", "6"].includes(assetsInfo.id)
+      (assetsInfo: TTokenInfo) => !["1", "3"].includes(assetsInfo.id.toString())
     ),
     reduce((obj, item) => {
       const asset = {
