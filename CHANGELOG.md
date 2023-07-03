@@ -1,3 +1,10 @@
+# [2.0.0-rc.10](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.9...v2.0.0-rc.10) (2023-07-03)
+
+
+### Features
+
+* add options for ApiPromise ([2d518f8](https://github.com/mangata-finance/mangata-sdk/commit/2d518f82bd107688a5a3e3600192780d4b7f7753))
+
 # [2.0.0-rc.9](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.8...v2.0.0-rc.9) (2023-06-29)
 
 
