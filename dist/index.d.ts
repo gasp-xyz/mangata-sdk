@@ -189,7 +189,7 @@ type ErrorData = {
 };
 type Account = string | KeyringPair;
 type TokenSymbol = string;
-type TokenId = string;
+type TokenId = string | number;
 type TokenAmount = BN;
 type Address = string;
 type MangataEventData = {
@@ -494,7 +494,7 @@ interface MangataInstance {
         /**
          * Retrieves the liquidity token IDs.
          */
-        getLiquidityTokenIds: () => Promise<string[]>;
+        getLiquidityTokenIds: () => Promise<TokenId[]>;
         /**
          * Retrieves the liquidity tokens.
          */

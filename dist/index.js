@@ -3388,9 +3388,6 @@ var signTx = async (api, tx, account, txOptions) => {
   });
 };
 
-// src/mangata.ts
-import "@mangata-finance/types";
-
 // src/methods/xyk/deactivateLiquidity.ts
 async function deactivateLiquidity(instancePromise, args, isForBatch) {
   const api = await instancePromise;
@@ -3921,7 +3918,7 @@ var getAssetsInfo = async (instancePromise) => {
   const completeAssetsInfo = await getCompleteAssetsInfo(api);
   return pipe4(
     filter3(
-      (assetsInfo) => !["1", "3", "6"].includes(assetsInfo.id)
+      (assetsInfo) => !["1", "3"].includes(assetsInfo.id.toString())
     ),
     reduce2((obj, item) => {
       const asset = {
@@ -6821,6 +6818,19 @@ var esm_default = [
     "website": "https://sora.org"
   },
   {
+    "prefix": 440,
+    "network": "allfeat_network",
+    "displayName": "Allfeat Network",
+    "symbols": [
+      "AFT"
+    ],
+    "decimals": [
+      12
+    ],
+    "standardAccount": "*25519",
+    "website": "https://allfeat.network"
+  },
+  {
     "prefix": 789,
     "network": "geek",
     "displayName": "GEEK Network",
@@ -7055,6 +7065,19 @@ var esm_default = [
     "website": "https://chainflip.io/"
   },
   {
+    "prefix": 2199,
+    "network": "moonsama",
+    "displayName": "Moonsama",
+    "symbols": [
+      "SAMA"
+    ],
+    "decimals": [
+      18
+    ],
+    "standardAccount": "secp256k1",
+    "website": "https://moonsama.com"
+  },
+  {
     "prefix": 2206,
     "network": "ICE",
     "displayName": "ICE Network",
@@ -7187,6 +7210,19 @@ var esm_default = [
     ],
     "standardAccount": "*25519",
     "website": "https://unique.network"
+  },
+  {
+    "prefix": 8866,
+    "network": "golden_gate",
+    "displayName": "Golden Gate",
+    "symbols": [
+      "GGX"
+    ],
+    "decimals": [
+      18
+    ],
+    "standardAccount": "*25519",
+    "website": "https://ggxchain.io/"
   },
   {
     "prefix": 8883,
@@ -7761,13 +7797,32 @@ var forceBatch = async (instancePromise, args) => {
 
 // src/utils/getOrCreateInstance.ts
 import { ApiPromise as ApiPromise2, WsProvider as WsProvider2 } from "@polkadot/api";
-import { options } from "@mangata-finance/types";
+
+// src/utils/options.ts
+import { mTypes, mRpc } from "@mangata-finance/type-definitions";
+var options = ({
+  types = {},
+  rpc = {},
+  ...otherOptions
+} = {}) => ({
+  types: {
+    ...mTypes,
+    ...types
+  },
+  rpc: {
+    ...mRpc,
+    ...rpc
+  },
+  ...otherOptions
+});
+
+// src/utils/getOrCreateInstance.ts
 var instanceMap = {};
-var getOrCreateInstance = async (urls) => {
+var getOrCreateInstance = (urls) => {
   const key = JSON.stringify(urls.sort());
   if (!instanceMap[key]) {
     const provider = new WsProvider2(urls);
-    instanceMap[key] = await ApiPromise2.create(
+    instanceMap[key] = ApiPromise2.create(
       options({
         provider,
         throwOnConnect: true,
