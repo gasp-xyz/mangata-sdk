@@ -77,7 +77,6 @@ type Token = {
     balance: TokenBalance;
 };
 type TTokenInfo = Omit<Token, "balance">;
-type TBalances = Record<TokenId, BN>;
 type TMainTokens = Record<TokenId, TTokenInfo>;
 type TokenBalance = {
     free: BN;
@@ -189,7 +188,7 @@ type ErrorData = {
 };
 type Account = string | KeyringPair;
 type TokenSymbol = string;
-type TokenId = string | number;
+type TokenId = number;
 type TokenAmount = BN;
 type Address = string;
 type MangataEventData = {
@@ -512,7 +511,7 @@ interface MangataInstance {
         /**
          * Retrieves information about the main assets.
          */
-        getAssetsInfo: () => Promise<TMainTokens>;
+        getAssetsInfo: () => Promise<Record<string, TTokenInfo>>;
         /**
          * Retrieves the pools in which the specified address has invested.
          */
@@ -524,7 +523,7 @@ interface MangataInstance {
         /**
          * Retrieves the liquidity pool information for a specific liquidity token ID.
          */
-        getLiquidityPool: (liquidityTokenId: TokenId) => Promise<BN[]>;
+        getLiquidityPool: (liquidityTokenId: TokenId) => Promise<TokenId[]>;
         /**
          * Retrieves the detailed information about a specific pool.
          */
@@ -536,8 +535,7 @@ interface MangataInstance {
         /**
          * Retrieves the total issuance of all tokens.
          */
-        getTotalIssuanceOfTokens: () => Promise<TBalances>;
-        getFeeLockMetadata: () => Promise<FeeLockType>;
+        getTotalIssuanceOfTokens: () => Promise<Record<string, BN>>;
     };
     /**
      * Represents a collection of fee calculation functions for different operations.
@@ -695,4 +693,4 @@ declare const isBuyAssetTransactionSuccessful: (events: MangataGenericEvent[]) =
 
 declare const isSellAssetTransactionSuccessful: (events: MangataGenericEvent[]) => boolean;
 
-export { Account, ActivateLiquidityFee, Address, Asset, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Batch, BurnLiquidity, BurnLiquidityFee, BuyAsset, BuyAssetFee, ClaimRewardsFee, CreatePool, CreatePoolFee, Database, DeactivateLiquidityFee, Deposit, DepositFromKusamaFee, DepositFromParachainFee, DepositFromStatemineFee, ErrorData, ExtrinsicCommon, FeeLockType, Liquidity, Mangata, MangataEventData, MangataGenericEvent, MangataInstance, MangataSubmittableExtrinsic, MaxAmountIn, MinAmountOut, MintLiquidity, MintLiquidityFee, MoonriverWithdraw, MultiSwapBase, MultiswapBuyAsset, MultiswapSellAsset, Pool, PoolBase, PoolReserves, Prettify, Price, PriceImpact, RelayDeposit, RelayWithdraw, Reserve, Rewards, SellAsset, SellAssetFee, TBalances, TMainTokens, TPoolWithRatio, TPoolWithShare, TTokenInfo, Token, TokenAmount, TokenAmounts, TokenBalance, TokenDecimals, TokenId, TokenSymbol, Transfer, TransferAllFee, TransferTokenFee, TransferTokens, TxOptions, Withdraw, WithdrawFee, WithdrawKsmFee, XcmTxOptions, fromBN, isBuyAssetTransactionSuccessful, isSellAssetTransactionSuccessful, signTx, toBN, toFixed };
+export { Account, ActivateLiquidityFee, Address, Asset, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Batch, BurnLiquidity, BurnLiquidityFee, BuyAsset, BuyAssetFee, ClaimRewardsFee, CreatePool, CreatePoolFee, Database, DeactivateLiquidityFee, Deposit, DepositFromKusamaFee, DepositFromParachainFee, DepositFromStatemineFee, ErrorData, ExtrinsicCommon, FeeLockType, Liquidity, Mangata, MangataEventData, MangataGenericEvent, MangataInstance, MangataSubmittableExtrinsic, MaxAmountIn, MinAmountOut, MintLiquidity, MintLiquidityFee, MoonriverWithdraw, MultiSwapBase, MultiswapBuyAsset, MultiswapSellAsset, Pool, PoolBase, PoolReserves, Prettify, Price, PriceImpact, RelayDeposit, RelayWithdraw, Reserve, Rewards, SellAsset, SellAssetFee, TMainTokens, TPoolWithRatio, TPoolWithShare, TTokenInfo, Token, TokenAmount, TokenAmounts, TokenBalance, TokenDecimals, TokenId, TokenSymbol, Transfer, TransferAllFee, TransferTokenFee, TransferTokens, TxOptions, Withdraw, WithdrawFee, WithdrawKsmFee, XcmTxOptions, fromBN, isBuyAssetTransactionSuccessful, isSellAssetTransactionSuccessful, signTx, toBN, toFixed };

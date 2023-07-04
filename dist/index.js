@@ -2605,7 +2605,7 @@ var require_bn = __commonJS({
         }
         return r;
       };
-      MPrime.prototype.split = function split3(input, out) {
+      MPrime.prototype.split = function split2(input, out) {
         input.iushrn(this.n, 0, out);
       };
       MPrime.prototype.imulK = function imulK(num) {
@@ -2619,7 +2619,7 @@ var require_bn = __commonJS({
         );
       }
       inherits(K256, MPrime);
-      K256.prototype.split = function split3(input, output2) {
+      K256.prototype.split = function split2(input, output2) {
         var mask = 4194303;
         var outLen = Math.min(input.length, 9);
         for (var i = 0; i < outLen; i++) {
@@ -3219,11 +3219,6 @@ function hexToBn(value, { isLe = false, isNegative = false } = {}) {
   return isNegative ? bn.fromTwos(stripped.length * 4) : bn;
 }
 
-// node_modules/@polkadot/util/hex/toString.js
-function hexToString(_value) {
-  return u8aToString(hexToU8a(_value));
-}
-
 // src/utils/getTxError.ts
 var getTxError = (api, method, eventData) => {
   const failedEvent = method === "ExtrinsicFailed";
@@ -3630,16 +3625,15 @@ var getChain = async (instancePromise) => {
 var getCompleteAssetsInfo = async (api) => {
   const assets = await api.query.assetRegistry.metadata.entries();
   return assets.reduce((obj, [key, value]) => {
-    const tokenId = key.toHuman()[0].replace(/[, ]/g, "");
-    const v = value.toHuman();
-    const { name, decimals, symbol } = v;
+    const [tokenId] = key.args;
+    const { name, decimals, symbol } = value.unwrap();
     const assetInfo = {
-      id: tokenId,
-      decimals: Number(decimals.toString()),
-      name: isHex(name) ? hexToString(name.toString()) : name,
-      symbol: isHex(symbol) ? hexToString(symbol.toString()) : symbol
+      id: tokenId.toNumber(),
+      decimals: decimals.toNumber(),
+      name: name.toPrimitive(),
+      symbol: symbol.toPrimitive()
     };
-    obj[tokenId] = assetInfo;
+    obj[tokenId.toString()] = assetInfo;
     return obj;
   }, {});
 };
@@ -3647,10 +3641,10 @@ var getCompleteAssetsInfo = async (api) => {
 // src/utils/getAssetsInfoWithIds.ts
 var getAssetsInfoWithIds = async (api) => {
   const completeAssetsInfo = await getCompleteAssetsInfo(api);
-  return Object.values(completeAssetsInfo).filter((assetsInfo) => assetsInfo.id !== "1" && assetsInfo.id !== "3").reduce((obj, item) => {
+  return Object.values(completeAssetsInfo).filter((assetsInfo) => ![1, 3].includes(assetsInfo.id)).reduce((obj, item) => {
     const asset = {
       ...item,
-      name: item.name.replace(/0x\w+/, "").replace(/[A-Z]/g, "$&").trim(),
+      name: item.name.replace(/(LiquidityPoolToken)0x[a-fA-F0-9]+/, "$1").replace(/([a-z])([A-Z])/g, "$1 $2"),
       symbol: item.symbol.includes("TKN") ? item.symbol.split("-").reduce((acc, curr) => {
         const currentValue = curr.replace("TKN", "");
         const tokenId = currentValue.startsWith("0x") ? hexToBn(currentValue).toString() : currentValue;
@@ -3667,9 +3661,8 @@ var getAssetsInfoWithIds = async (api) => {
 var getLiquidityAssets = async (api) => {
   const liquidityAssetsResponse = await api.query.xyk.liquidityAssets.entries();
   return liquidityAssetsResponse.reduce((acc, [key, value]) => {
-    const identificator = key.args.map((k) => k.toHuman())[0];
-    const liquidityAssetId = value.toString().replace(/[, ]/g, "");
-    acc[identificator] = liquidityAssetId;
+    const [identificator] = key.args;
+    acc[identificator.toHex()] = value.unwrap().toNumber();
     return acc;
   }, {});
 };
@@ -3678,8 +3671,7 @@ var getLiquidityAssets = async (api) => {
 var getLiquidityPromotedPools = async (api) => {
   try {
     const promotedPoolRewards = await api.query.proofOfStake.promotedPoolRewards();
-    const promotedPoolInfos = promotedPoolRewards.toHuman();
-    return Object.keys(promotedPoolInfos);
+    return Object.keys(promotedPoolRewards.toHuman()).map((id) => +id);
   } catch (error) {
     return [];
   }
@@ -3689,12 +3681,10 @@ var getLiquidityPromotedPools = async (api) => {
 var getPoolsBalance = async (api, liquidityAssets) => {
   const poolsBalanceResponse = await api.query.xyk.pools.entries();
   return poolsBalanceResponse.reduce((acc, [key, value]) => {
-    const identificator = key.args.map((k) => k.toHuman())[0];
-    const balancesResponse = JSON.parse(JSON.stringify(value));
-    const balances = balancesResponse.map(
-      (balance) => isHex(balance) ? hexToBn(balance) : new import_bn.default(balance)
+    const [identificator] = key.args;
+    acc[liquidityAssets[identificator.toHex()]] = value.map(
+      (balance) => new import_bn.default(balance)
     );
-    acc[liquidityAssets[identificator]] = balances;
     return acc;
   }, {});
 };
@@ -3738,7 +3728,6 @@ var getRatio = (left, right) => {
 };
 
 // src/methods/query/getPools.ts
-import { pipe, filter, map } from "rambda";
 var getPools = async (instancePromise) => {
   const api = await instancePromise;
   const [assetsInfo, liquidityAssets, liquidityTokensPromoted] = await Promise.all([
@@ -3747,28 +3736,23 @@ var getPools = async (instancePromise) => {
     getLiquidityPromotedPools(api)
   ]);
   const poolBalances = await getPoolsBalance(api, liquidityAssets);
-  return pipe(
-    filter(
-      (asset) => Object.values(liquidityAssets).includes(asset.id)
-    ),
-    map((asset) => {
-      const [firstTokenAmount, secondTokenAmount] = poolBalances[asset.id];
-      const [firstTokenId, secondTokenId] = asset.symbol.split("-");
-      const firstTokenRatio = getRatio(firstTokenAmount, secondTokenAmount);
-      const secondTokenRatio = getRatio(secondTokenAmount, firstTokenAmount);
-      const isPromoted = liquidityTokensPromoted.includes(asset.id);
-      return {
-        firstTokenId,
-        secondTokenId,
-        firstTokenAmount,
-        secondTokenAmount,
-        liquidityTokenId: asset.id,
-        firstTokenRatio,
-        secondTokenRatio,
-        isPromoted
-      };
-    })
-  )(Object.values(assetsInfo));
+  return Object.values(assetsInfo).filter((asset) => Object.values(liquidityAssets).includes(asset.id)).map((asset) => {
+    const [firstTokenAmount, secondTokenAmount] = poolBalances[asset.id];
+    const [firstTokenId, secondTokenId] = asset.symbol.split("-");
+    const firstTokenRatio = getRatio(firstTokenAmount, secondTokenAmount);
+    const secondTokenRatio = getRatio(secondTokenAmount, firstTokenAmount);
+    const isPromoted = liquidityTokensPromoted.includes(asset.id);
+    return {
+      firstTokenId: +firstTokenId,
+      secondTokenId: +secondTokenId,
+      firstTokenAmount,
+      secondTokenAmount,
+      liquidityTokenId: asset.id,
+      firstTokenRatio,
+      secondTokenRatio,
+      isPromoted
+    };
+  });
 };
 
 // src/methods/query/getLiquidityPool.ts
@@ -3776,43 +3760,38 @@ var getLiquidityPool = async (instancePromise, liquidityTokenId) => {
   const api = await instancePromise;
   const liquidityPool = await api.query.xyk.liquidityPools(liquidityTokenId);
   if (!liquidityPool.isSome)
-    return [new import_bn.default(-1), new import_bn.default(-1)];
-  return liquidityPool.unwrap().map((num) => new import_bn.default(num));
+    return [-1, -1];
+  return liquidityPool.unwrap().map((num) => num.toNumber());
 };
 
 // src/methods/query/getAmountOfTokensInPool.ts
 var getAmountOfTokensInPool = async (instancePromise, firstTokenId, secondTokenId) => {
   const api = await instancePromise;
   const balance = await api.query.xyk.pools([firstTokenId, secondTokenId]);
-  const tokenValue1 = balance[0].toString();
-  const tokenValue2 = balance[1].toString();
-  const token1 = isHex(tokenValue1) ? hexToBn(tokenValue1) : new import_bn.default(tokenValue1);
-  const token2 = isHex(tokenValue2) ? hexToBn(tokenValue2) : new import_bn.default(tokenValue2);
-  return [token1, token2];
+  return [new import_bn.default(balance[0]), new import_bn.default(balance[1])];
 };
 
 // src/methods/query/getPool.ts
 var getPool = async (instancePromise, liquidityTokenId) => {
   const api = await instancePromise;
-  const [liquidityPoolTokens, promotedPoolRewardsV2] = await Promise.all([
+  const [liquidityPoolTokens, promotedPoolRewards] = await Promise.all([
     getLiquidityPool(instancePromise, liquidityTokenId),
-    api.query.proofOfStake.promotedPoolRewards()
+    getLiquidityPromotedPools(api)
   ]);
-  const promotedPoolInfos = promotedPoolRewardsV2.toHuman();
-  const isPoolPromoted = promotedPoolInfos[liquidityTokenId];
+  const isPoolPromoted = promotedPoolRewards.includes(liquidityTokenId);
   const [firstTokenId, secondTokenId] = liquidityPoolTokens;
   const [firstTokenAmount, secondTokenAmount] = await getAmountOfTokensInPool(
     instancePromise,
-    firstTokenId.toString(),
-    secondTokenId.toString()
+    firstTokenId,
+    secondTokenId
   );
   return {
-    firstTokenId: firstTokenId.toString(),
-    secondTokenId: secondTokenId.toString(),
+    firstTokenId,
+    secondTokenId,
     firstTokenAmount,
     secondTokenAmount,
     liquidityTokenId,
-    isPromoted: isPoolPromoted === void 0 ? false : new import_bn.default(isPoolPromoted.rewards.replace(/[, ]/g, "")).gt(BN_ZERO),
+    isPromoted: isPoolPromoted,
     firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
     secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount)
   };
@@ -3823,7 +3802,7 @@ var calculateLiquidityShare = async (api, liquidityAssetId, userLiquidityTokenAm
   if (userLiquidityTokenAmount.isZero())
     return BN_ZERO;
   const tokenSupply = await api.query.tokens.totalIssuance(liquidityAssetId);
-  const totalLiquidityAsset = new import_bn.default(tokenSupply.toString());
+  const totalLiquidityAsset = new import_bn.default(tokenSupply);
   const share = userLiquidityTokenAmount.mul(BN_DIV_NUMERATOR_MULTIPLIER).div(totalLiquidityAsset);
   return share;
 };
@@ -3833,19 +3812,12 @@ var getAccountBalances = async (api, address) => {
   const ownedAssetsResponse = await api.query.tokens.accounts.entries(address);
   return ownedAssetsResponse.reduce(
     (acc, [key, value]) => {
-      const free = JSON.parse(JSON.stringify(value)).free.toString();
-      const frozen = JSON.parse(JSON.stringify(value)).frozen.toString();
-      const reserved = JSON.parse(JSON.stringify(value)).reserved.toString();
-      const freeBN = isHex(free) ? hexToBn(free) : new import_bn.default(free);
-      const frozenBN = isHex(frozen) ? hexToBn(frozen) : new import_bn.default(frozen);
-      const reservedBN = isHex(reserved) ? hexToBn(reserved) : new import_bn.default(reserved);
-      const id = key.toHuman()[1].replace(/[, ]/g, "");
-      const balance = {
-        free: freeBN,
-        frozen: frozenBN,
-        reserved: reservedBN
+      const [_, id] = key.args;
+      acc[id.toString()] = {
+        free: value.free,
+        frozen: value.frozen,
+        reserved: value.reserved
       };
-      acc[id] = balance;
       return acc;
     },
     {}
@@ -3853,7 +3825,6 @@ var getAccountBalances = async (api, address) => {
 };
 
 // src/methods/query/getInvestedPools.ts
-import { pipe as pipe2, filter as filter2, map as map2 } from "rambda";
 var getInvestedPools = async (instancePromise, address) => {
   const api = await instancePromise;
   const [assetsInfo, accountBalances, liquidityTokensPromoted] = await Promise.all([
@@ -3861,93 +3832,71 @@ var getInvestedPools = async (instancePromise, address) => {
     getAccountBalances(api, address),
     getLiquidityPromotedPools(api)
   ]);
-  const poolsInfo = pipe2(
-    filter2(
-      (asset) => Object.keys(accountBalances).includes(asset.id) && asset.name.includes("LiquidityPoolToken")
-    ),
-    map2(async (asset) => {
-      const userLiquidityBalance = accountBalances[asset.id];
-      const [firstTokenId, secondTokenId] = asset.symbol.split("-");
-      const [firstTokenAmount, secondTokenAmount] = await getAmountOfTokensInPool(
-        instancePromise,
-        firstTokenId.toString(),
-        secondTokenId.toString()
-      );
-      const share = await calculateLiquidityShare(
-        api,
-        asset.id,
-        userLiquidityBalance.free.add(userLiquidityBalance.reserved)
-      );
-      return {
-        firstTokenId,
-        secondTokenId,
-        firstTokenAmount,
-        secondTokenAmount,
-        liquidityTokenId: asset.id,
-        isPromoted: liquidityTokensPromoted.includes(asset.id),
-        share,
-        firstTokenRatio: share.eq(BN_ZERO) ? BN_ZERO : getRatio(firstTokenAmount, secondTokenAmount),
-        secondTokenRatio: share.eq(BN_ZERO) ? BN_ZERO : getRatio(secondTokenAmount, firstTokenAmount),
-        activatedLPTokens: userLiquidityBalance.reserved,
-        nonActivatedLPTokens: userLiquidityBalance.free
-      };
-    })
-  )(Object.values(assetsInfo));
+  const poolsInfo = Object.values(assetsInfo).filter(
+    (asset) => Object.keys(accountBalances).includes(asset.id.toString()) && asset.name.includes("Liquidity Pool Token")
+  ).map(async (asset) => {
+    const userLiquidityBalance = accountBalances[asset.id];
+    const [firstTokenId, secondTokenId] = asset.symbol.split("-");
+    const [firstTokenAmount, secondTokenAmount] = await getAmountOfTokensInPool(
+      instancePromise,
+      +firstTokenId,
+      +secondTokenId
+    );
+    const share = await calculateLiquidityShare(
+      api,
+      asset.id,
+      userLiquidityBalance.free.add(userLiquidityBalance.reserved)
+    );
+    return {
+      firstTokenId: +firstTokenId,
+      secondTokenId: +secondTokenId,
+      firstTokenAmount,
+      secondTokenAmount,
+      liquidityTokenId: asset.id,
+      isPromoted: liquidityTokensPromoted.includes(asset.id),
+      share,
+      firstTokenRatio: share.eq(BN_ZERO) ? BN_ZERO : getRatio(firstTokenAmount, secondTokenAmount),
+      secondTokenRatio: share.eq(BN_ZERO) ? BN_ZERO : getRatio(secondTokenAmount, firstTokenAmount),
+      activatedLPTokens: userLiquidityBalance.reserved,
+      nonActivatedLPTokens: userLiquidityBalance.free
+    };
+  });
   return Promise.all(poolsInfo);
 };
 
 // src/methods/query/getTotalIssuanceOfTokens.ts
-import { pipe as pipe3, reduce } from "rambda";
 var getTotalIssuanceOfTokens = async (instancePromise) => {
   const api = await instancePromise;
   const balancesResponse = await api.query.tokens.totalIssuance.entries();
-  return pipe3(
-    reduce((acc, [key, value]) => {
-      const id = key.toHuman()[0].replace(/[, ]/g, "");
-      const balance = new import_bn.default(value.toString());
-      acc[id] = balance;
-      return acc;
-    }, {})
-  )(balancesResponse);
+  return balancesResponse.reduce((acc, [key, value]) => {
+    const [id] = key.args;
+    acc[id.toString()] = new import_bn.default(value);
+    return acc;
+  }, {});
 };
 
 // src/methods/query/getAssetsInfo.ts
-import { pipe as pipe4, filter as filter3, reduce as reduce2, replace, trim, split, join } from "rambda";
 var getAssetsInfo = async (instancePromise) => {
   const api = await instancePromise;
   const completeAssetsInfo = await getCompleteAssetsInfo(api);
-  return pipe4(
-    filter3(
-      (assetsInfo) => !["1", "3"].includes(assetsInfo.id.toString())
-    ),
-    reduce2((obj, item) => {
-      const asset = {
-        ...item,
-        name: pipe4(
-          replace(/0x\w+/, ""),
-          replace(/[A-Z]/g, "$&"),
-          trim
-        )(item.name),
-        symbol: item.symbol.includes("TKN") ? pipe4(
-          split("-"),
-          reduce2((acc, curr) => {
-            const currentValue = curr.replace("TKN", "");
-            const tokenId = currentValue.startsWith("0x") ? hexToBn(currentValue).toString() : currentValue;
-            const symbol = completeAssetsInfo[tokenId].symbol;
-            acc.push(symbol);
-            return acc;
-          }, []),
-          join("-")
-        )(item.symbol) : item.symbol
-      };
-      obj[asset.id] = asset;
-      return obj;
-    }, {})
-  )(Object.values(completeAssetsInfo));
+  return Object.values(completeAssetsInfo).filter((assetsInfo) => ![1, 3].includes(assetsInfo.id)).reduce((obj, item) => {
+    const asset = {
+      ...item,
+      name: item.name.replace(/(LiquidityPoolToken)0x[a-fA-F0-9]+/, "$1").replace(/([a-z])([A-Z])/g, "$1 $2"),
+      symbol: item.symbol.includes("TKN") ? item.symbol.split("-").reduce((acc, curr) => {
+        const currentValue = curr.replace("TKN", "");
+        const tokenId = currentValue.startsWith("0x") ? hexToBn(currentValue).toString() : currentValue;
+        const symbol = completeAssetsInfo[tokenId].symbol;
+        acc.push(symbol);
+        return acc;
+      }, []).join("-") : item.symbol
+    };
+    obj[asset.id] = asset;
+    return obj;
+  }, {});
 };
 
 // src/methods/query/getOwnedTokens.ts
-import { pipe as pipe5, filter as filter4, map as map3 } from "rambda";
 var getOwnedTokens = async (instancePromise, address) => {
   const api = await instancePromise;
   const [assetsInfo, accountBalances] = await Promise.all([
@@ -3955,17 +3904,13 @@ var getOwnedTokens = async (instancePromise, address) => {
     getAccountBalances(api, address)
   ]);
   const ownedTokens = Object.fromEntries(
-    pipe5(
-      Object.entries,
-      filter4(([id]) => Object.keys(accountBalances).includes(id)),
-      map3(([id, assetInfo]) => [
-        id,
-        {
-          ...assetInfo,
-          balance: accountBalances[id]
-        }
-      ])
-    )(assetsInfo)
+    Object.entries(assetsInfo).filter(([id]) => Object.keys(accountBalances).includes(id)).map(([id, assetInfo]) => [
+      id,
+      {
+        ...assetInfo,
+        balance: accountBalances[id]
+      }
+    ])
   );
   return ownedTokens;
 };
@@ -3978,23 +3923,21 @@ var getBlockNumber = async (instancePromise) => {
 };
 
 // src/methods/query/getLiquidityTokens.ts
-import { pipe as pipe6, filter as filter5, reduce as reduce3 } from "rambda";
 var getLiquidityTokens = async (instancePromise) => {
   const assetsInfo = await getAssetsInfo(instancePromise);
-  return pipe6(
-    filter5((asset) => asset.name.includes("LiquidityPoolToken")),
-    reduce3((acc, curr) => {
-      acc[curr.id] = curr;
-      return acc;
-    }, {})
-  )(Object.values(assetsInfo));
+  return Object.values(assetsInfo).filter((asset) => asset.name.includes("Liquidity Pool Token")).reduce((acc, curr) => {
+    acc[curr.id] = curr;
+    return acc;
+  }, {});
 };
 
 // src/methods/query/getLiquidityTokenIds.ts
 var getLiquidityTokenIds = async (instancePromise) => {
   const api = await instancePromise;
   const liquidityTokens = await api.query.xyk.liquidityAssets.entries();
-  return liquidityTokens.map((liquidityToken) => liquidityToken[1].toString());
+  return liquidityTokens.map(
+    (liquidityToken) => liquidityToken[1].unwrap().toNumber()
+  );
 };
 
 // src/methods/query/getTokenInfo.ts
@@ -4011,9 +3954,9 @@ var getTokenBalance = async (instancePromise, tokenId, address) => {
     tokenId
   );
   return {
-    free: isHex(free.toString()) ? hexToBn(free.toString()) : new import_bn.default(free.toString()),
-    reserved: isHex(reserved.toString()) ? hexToBn(reserved.toString()) : new import_bn.default(reserved.toString()),
-    frozen: isHex(frozen.toString()) ? hexToBn(frozen.toString()) : new import_bn.default(frozen.toString())
+    free: new import_bn.default(free),
+    reserved: new import_bn.default(reserved),
+    frozen: new import_bn.default(frozen)
   };
 };
 
@@ -4033,7 +3976,7 @@ var getLiquidityTokenId = async (instancePromise, firstTokenId, secondTokenId) =
   ]);
   if (!liquidityAssetId.isSome)
     return BN_ZERO;
-  return new import_bn.default(liquidityAssetId.toString());
+  return new import_bn.default(liquidityAssetId.unwrap().toString());
 };
 
 // node_modules/@polkadot/x-randomvalues/node.js
@@ -4261,16 +4204,16 @@ function createWasmFn(root, wasmBytes2, asmFn) {
 
 // node_modules/@polkadot/wasm-util/base64.js
 var chr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-var map4 = new Array(256);
+var map = new Array(256);
 for (let i = 0, count = chr.length; i < count; i++) {
-  map4[chr.charCodeAt(i)] = i;
+  map[chr.charCodeAt(i)] = i;
 }
 function base64Decode(data, out) {
   let byte = 0;
   let bits2 = 0;
   let pos = -1;
   for (let i = 0, count = out.length; pos < count; i++) {
-    byte = byte << 6 | map4[data.charCodeAt(i)];
+    byte = byte << 6 | map[data.charCodeAt(i)];
     if ((bits2 += 6) >= 8) {
       out[++pos] = byte >>> (bits2 -= 8) & 255;
     }
@@ -4655,7 +4598,7 @@ function alphabet(alphabet2) {
     }
   };
 }
-function join2(separator = "") {
+function join(separator = "") {
   if (typeof separator !== "string")
     throw new Error("join separator should be string");
   return {
@@ -4837,13 +4780,13 @@ function unsafeWrapper(fn) {
     }
   };
 }
-var base16 = chain(radix2(4), alphabet("0123456789ABCDEF"), join2(""));
-var base32 = chain(radix2(5), alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"), padding(5), join2(""));
-var base32hex = chain(radix2(5), alphabet("0123456789ABCDEFGHIJKLMNOPQRSTUV"), padding(5), join2(""));
-var base32crockford = chain(radix2(5), alphabet("0123456789ABCDEFGHJKMNPQRSTVWXYZ"), join2(""), normalize((s) => s.toUpperCase().replace(/O/g, "0").replace(/[IL]/g, "1")));
-var base64 = chain(radix2(6), alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"), padding(6), join2(""));
-var base64url = chain(radix2(6), alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"), padding(6), join2(""));
-var genBase58 = (abc) => chain(radix(58), alphabet(abc), join2(""));
+var base16 = chain(radix2(4), alphabet("0123456789ABCDEF"), join(""));
+var base32 = chain(radix2(5), alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"), padding(5), join(""));
+var base32hex = chain(radix2(5), alphabet("0123456789ABCDEFGHIJKLMNOPQRSTUV"), padding(5), join(""));
+var base32crockford = chain(radix2(5), alphabet("0123456789ABCDEFGHJKMNPQRSTVWXYZ"), join(""), normalize((s) => s.toUpperCase().replace(/O/g, "0").replace(/[IL]/g, "1")));
+var base64 = chain(radix2(6), alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"), padding(6), join(""));
+var base64url = chain(radix2(6), alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"), padding(6), join(""));
+var genBase58 = (abc) => chain(radix(58), alphabet(abc), join(""));
 var base58 = genBase58("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
 var base58flickr = genBase58("123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ");
 var base58xrp = genBase58("rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz");
@@ -4872,7 +4815,7 @@ var base58xmr = {
     return Uint8Array.from(res);
   }
 };
-var BECH_ALPHABET = chain(alphabet("qpzry9x8gf2tvdw0s3jn54khce6mua7l"), join2(""));
+var BECH_ALPHABET = chain(alphabet("qpzry9x8gf2tvdw0s3jn54khce6mua7l"), join(""));
 var POLYMOD_GENERATORS = [996825010, 642813549, 513874426, 1027748829, 705979059];
 function bech32Polymod(pre) {
   const b = pre >> 25;
@@ -4954,7 +4897,7 @@ var utf8 = {
   encode: (data) => new TextDecoder().decode(data),
   decode: (str) => new TextEncoder().encode(str)
 };
-var hex = chain(radix2(4), alphabet("0123456789abcdef"), join2(""), normalize((s) => {
+var hex = chain(radix2(4), alphabet("0123456789abcdef"), join(""), normalize((s) => {
   if (typeof s !== "string" || s.length % 2)
     throw new TypeError(`hex.decode: expected string, got ${typeof s} with length ${s.length}`);
   return s.toLowerCase();
@@ -5385,7 +5328,7 @@ function fromBig(n, le = false) {
     return { h: Number(n & U32_MASK64), l: Number(n >> _32n & U32_MASK64) };
   return { h: Number(n >> _32n & U32_MASK64) | 0, l: Number(n & U32_MASK64) | 0 };
 }
-function split2(lst, le = false) {
+function split(lst, le = false) {
   let Ah = new Uint32Array(lst.length);
   let Al = new Uint32Array(lst.length);
   for (let i = 0; i < lst.length; i++) {
@@ -5419,7 +5362,7 @@ var add5L = (Al, Bl, Cl, Dl, El) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >
 var add5H = (low, Ah, Bh, Ch, Dh, Eh) => Ah + Bh + Ch + Dh + Eh + (low / 2 ** 32 | 0) | 0;
 var u64 = {
   fromBig,
-  split: split2,
+  split,
   toBig,
   shrSH,
   shrSL,
@@ -8290,18 +8233,6 @@ var getDepositFromStatemineFee = async (args) => {
   return fromBN(new import_bn.default(dispatchInfo.partialFee.toString()));
 };
 
-// src/methods/query/getFeeLockMetadata.ts
-var getFeeLockMetadata = async (instancePromise) => {
-  const api = await instancePromise;
-  const feeLockMetadata = (await api.query.feeLock.feeLockMetadata()).toHuman();
-  return {
-    periodLength: feeLockMetadata.periodLength.replace(/[,]/g, ""),
-    feeLockAmount: feeLockMetadata.feeLockAmount.replace(/[,]/g, ""),
-    swapValueThreshold: feeLockMetadata.swapValueThreshold.replace(/[,]/g, ""),
-    whitelistedTokens: feeLockMetadata.whitelistedTokens
-  };
-};
-
 // src/methods/rpc/isBuyAssetLockFree.ts
 var isBuyAssetLockFree = async (instancePromise, tokenIds, amount) => {
   const api = await instancePromise;
@@ -8494,8 +8425,7 @@ function createMangataInstance(urls) {
       getLiquidityPool: async (liquidityTokenId) => await getLiquidityPool(instancePromise, liquidityTokenId),
       getPool: async (liquidityTokenId) => await getPool(instancePromise, liquidityTokenId),
       getPools: async () => await getPools(instancePromise),
-      getTotalIssuanceOfTokens: async () => await getTotalIssuanceOfTokens(instancePromise),
-      getFeeLockMetadata: async () => await getFeeLockMetadata(instancePromise)
+      getTotalIssuanceOfTokens: async () => await getTotalIssuanceOfTokens(instancePromise)
     },
     fee: {
       depositFromParachain: async (args) => await getDepositFromParachainFee(args),
