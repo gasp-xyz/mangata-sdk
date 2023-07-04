@@ -3,26 +3,22 @@ import { ApiPromise } from "@polkadot/api";
 import { hexToString, isHex } from "@polkadot/util";
 import { TokenId } from "../types/common";
 import { TTokenInfo } from "../types/query";
+import { OrmlTraitsAssetRegistryAssetMetadata } from "@polkadot/types/lookup";
 
 export const getCompleteAssetsInfo = async (api: ApiPromise) => {
   const assets = await api.query.assetRegistry.metadata.entries();
 
   return assets.reduce((obj, [key, value]) => {
-    const tokenId = (key.toHuman() as string[])[0].replace(/[, ]/g, "");
-    const v = value.toHuman() as {
-      name: string;
-      decimals: string;
-      symbol: string;
-    };
-    const { name, decimals, symbol } = v;
+    const [tokenId] = key.args;
+    const { name, decimals, symbol } = value.unwrap();
     const assetInfo = {
-      id: tokenId,
-      decimals: Number(decimals.toString()),
-      name: isHex(name) ? hexToString(name.toString()) : name,
-      symbol: isHex(symbol) ? hexToString(symbol.toString()) : symbol
+      id: tokenId.toNumber(),
+      decimals: decimals.toNumber(),
+      name: name.toPrimitive() as string,
+      symbol: symbol.toPrimitive() as string
     };
 
-    obj[tokenId] = assetInfo;
+    obj[tokenId.toString()] = assetInfo;
     return obj;
-  }, {} as { [id: TokenId]: TTokenInfo });
+  }, {} as { [id: string]: TTokenInfo });
 };

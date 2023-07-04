@@ -5,7 +5,7 @@ import { BN_DIV_NUMERATOR_MULTIPLIER, BN_ZERO } from "./bnConstants";
 
 export const calculateLiquidityShare = async (
   api: ApiPromise,
-  liquidityAssetId: string,
+  liquidityAssetId: number,
   userLiquidityTokenAmount: BN
 ) => {
   // userLiquidityTokenAmount is the amount of liquidity token the user has but FREE ..
@@ -14,7 +14,7 @@ export const calculateLiquidityShare = async (
 
   const tokenSupply = await api.query.tokens.totalIssuance(liquidityAssetId);
 
-  const totalLiquidityAsset = new BN(tokenSupply.toString());
+  const totalLiquidityAsset = new BN(tokenSupply);
   const share = userLiquidityTokenAmount
     .mul(BN_DIV_NUMERATOR_MULTIPLIER)
     .div(totalLiquidityAsset);

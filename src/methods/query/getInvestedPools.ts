@@ -1,5 +1,5 @@
 import { ApiPromise } from "@polkadot/api";
-import { TPoolWithShare, TTokenInfo } from "../../types/query";
+import { TPoolWithShare } from "../../types/query";
 import { BN_ZERO } from "../../utils/bnConstants";
 import { calculateLiquidityShare } from "../../utils/calculateLiquidityShare";
 import { getAccountBalances } from "../../utils/getAccountBalances";
@@ -8,7 +8,6 @@ import { getLiquidityPromotedPools } from "../../utils/getLiquidityPromotedPools
 import { getRatio } from "../../utils/getRatio";
 import { Address } from "../../types/common";
 import { getAmountOfTokensInPool } from "./getAmountOfTokensInPool";
-import { pipe, filter, map } from "rambda";
 
 /**
  * @since 2.0.0
@@ -25,20 +24,20 @@ export const getInvestedPools = async (
       getLiquidityPromotedPools(api)
     ]);
 
-  const poolsInfo = pipe(
-    filter(
-      (asset: TTokenInfo) =>
-        Object.keys(accountBalances).includes(asset.id) &&
-        asset.name.includes("LiquidityPoolToken")
-    ),
-    map(async (asset: TTokenInfo) => {
+  const poolsInfo = Object.values(assetsInfo)
+    .filter(
+      (asset) =>
+        Object.keys(accountBalances).includes(asset.id.toString()) &&
+        asset.name.includes("Liquidity Pool Token")
+    )
+    .map(async (asset) => {
       const userLiquidityBalance = accountBalances[asset.id];
       const [firstTokenId, secondTokenId] = asset.symbol.split("-");
       const [firstTokenAmount, secondTokenAmount] =
         await getAmountOfTokensInPool(
           instancePromise,
-          firstTokenId.toString(),
-          secondTokenId.toString()
+          +firstTokenId,
+          +secondTokenId
         );
       const share = await calculateLiquidityShare(
         api,
@@ -47,8 +46,8 @@ export const getInvestedPools = async (
       );
 
       return {
-        firstTokenId,
-        secondTokenId,
+        firstTokenId: +firstTokenId,
+        secondTokenId: +secondTokenId,
         firstTokenAmount,
         secondTokenAmount,
         liquidityTokenId: asset.id,
@@ -63,8 +62,7 @@ export const getInvestedPools = async (
         activatedLPTokens: userLiquidityBalance.reserved,
         nonActivatedLPTokens: userLiquidityBalance.free
       } as TPoolWithShare;
-    })
-  )(Object.values(assetsInfo));
+    });
 
   return Promise.all(poolsInfo);
 };

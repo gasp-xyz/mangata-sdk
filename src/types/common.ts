@@ -7,7 +7,6 @@ import type { Event, Phase } from "@polkadot/types/interfaces";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 
 import {
-  TBalances,
   TMainTokens,
   TokenBalance,
   TPoolWithRatio,
@@ -74,7 +73,7 @@ export type ErrorData = {
 };
 export type Account = string | KeyringPair;
 export type TokenSymbol = string;
-export type TokenId = string | number;
+export type TokenId = number;
 export type TokenAmount = BN;
 export type Address = string;
 export type MangataEventData = {
@@ -482,7 +481,7 @@ export interface MangataInstance {
     /**
      * Retrieves information about the main assets.
      */
-    getAssetsInfo: () => Promise<TMainTokens>;
+    getAssetsInfo: () => Promise<Record<string, TTokenInfo>>;
 
     /**
      * Retrieves the pools in which the specified address has invested.
@@ -500,7 +499,7 @@ export interface MangataInstance {
     /**
      * Retrieves the liquidity pool information for a specific liquidity token ID.
      */
-    getLiquidityPool: (liquidityTokenId: TokenId) => Promise<BN[]>;
+    getLiquidityPool: (liquidityTokenId: TokenId) => Promise<TokenId[]>;
 
     /**
      * Retrieves the detailed information about a specific pool.
@@ -515,9 +514,7 @@ export interface MangataInstance {
     /**
      * Retrieves the total issuance of all tokens.
      */
-    getTotalIssuanceOfTokens: () => Promise<TBalances>;
-
-    getFeeLockMetadata: () => Promise<FeeLockType>;
+    getTotalIssuanceOfTokens: () => Promise<Record<string, BN>>;
   };
   /**
    * Represents a collection of fee calculation functions for different operations.

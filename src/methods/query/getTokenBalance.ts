@@ -18,14 +18,8 @@ export const getTokenBalance = async (
   );
 
   return {
-    free: isHex(free.toString())
-      ? hexToBn(free.toString())
-      : new BN(free.toString()),
-    reserved: isHex(reserved.toString())
-      ? hexToBn(reserved.toString())
-      : new BN(reserved.toString()),
-    frozen: isHex(frozen.toString())
-      ? hexToBn(frozen.toString())
-      : new BN(frozen.toString())
+    free: new BN(free),
+    reserved: new BN(reserved),
+    frozen: new BN(frozen)
   };
 };

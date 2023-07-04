@@ -1,12 +1,11 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { Pool, TPoolWithRatio, TTokenInfo } from "../../types/query";
+import { Pool, TPoolWithRatio } from "../../types/query";
 import { getAssetsInfoWithIds } from "../../utils/getAssetsInfoWithIds";
 import { getLiquidityAssets } from "../../utils/getLiquidityAssets";
 import { getLiquidityPromotedPools } from "../../utils/getLiquidityPromotedPools";
 import { getPoolsBalance } from "../../utils/getPoolsBalance";
 import { getRatio } from "../../utils/getRatio";
-import { pipe, filter, map } from "rambda";
 
 /**
  * @since 2.0.0
@@ -23,19 +22,17 @@ export const getPools = async (
     ]);
   const poolBalances = await getPoolsBalance(api, liquidityAssets);
 
-  return pipe(
-    filter((asset: TTokenInfo) =>
-      Object.values(liquidityAssets).includes(asset.id)
-    ),
-    map((asset: TTokenInfo) => {
+  return Object.values(assetsInfo)
+    .filter((asset) => Object.values(liquidityAssets).includes(asset.id))
+    .map((asset) => {
       const [firstTokenAmount, secondTokenAmount] = poolBalances[asset.id];
       const [firstTokenId, secondTokenId] = asset.symbol.split("-");
       const firstTokenRatio = getRatio(firstTokenAmount, secondTokenAmount);
       const secondTokenRatio = getRatio(secondTokenAmount, firstTokenAmount);
       const isPromoted = liquidityTokensPromoted.includes(asset.id);
       return {
-        firstTokenId,
-        secondTokenId,
+        firstTokenId: +firstTokenId,
+        secondTokenId: +secondTokenId,
         firstTokenAmount,
         secondTokenAmount,
         liquidityTokenId: asset.id,
@@ -43,6 +40,5 @@ export const getPools = async (
         secondTokenRatio,
         isPromoted
       } as Pool & { firstTokenRatio: BN; secondTokenRatio: BN };
-    })
-  )(Object.values(assetsInfo));
+    });
 };

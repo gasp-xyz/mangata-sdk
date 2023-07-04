@@ -114,7 +114,6 @@ import { multiswapSellAsset } from "./methods/xyk/multiswapSellAsset";
 import { getPriceImpact } from "./utils/getPriceImpact";
 import { getDepositFromKusamaFee } from "./methods/fee/getDepositFromKusamaFee";
 import { getDepositFromStatemineFee } from "./methods/fee/getDepositFromStatemineFee";
-import { getFeeLockMetadata } from "./methods/query/getFeeLockMetadata";
 import { isBuyAssetLockFree } from "./methods/rpc/isBuyAssetLockFree";
 import { isSellAssetLockFree } from "./methods/rpc/isSellAssetLockFree";
 import { withdrawToMoonriver } from "./methods/xTokens/withdrawToMoonriver";
@@ -285,8 +284,7 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await getPool(instancePromise, liquidityTokenId),
       getPools: async () => await getPools(instancePromise),
       getTotalIssuanceOfTokens: async () =>
-        await getTotalIssuanceOfTokens(instancePromise),
-      getFeeLockMetadata: async () => await getFeeLockMetadata(instancePromise)
+        await getTotalIssuanceOfTokens(instancePromise)
     },
     fee: {
       depositFromParachain: async (args: DepositFromParachainFee) =>

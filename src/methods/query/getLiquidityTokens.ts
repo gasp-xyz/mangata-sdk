@@ -2,7 +2,6 @@ import { ApiPromise } from "@polkadot/api";
 import { TokenId } from "../../types/common";
 import { TMainTokens, TTokenInfo } from "../../types/query";
 import { getAssetsInfo } from "./getAssetsInfo";
-import { pipe, filter, reduce } from "rambda";
 
 /**
  * @since 2.0.0
@@ -12,11 +11,10 @@ export const getLiquidityTokens = async (
 ): Promise<TMainTokens> => {
   const assetsInfo = await getAssetsInfo(instancePromise);
 
-  return pipe(
-    filter((asset: TTokenInfo) => asset.name.includes("LiquidityPoolToken")),
-    reduce((acc, curr) => {
+  return Object.values(assetsInfo)
+    .filter((asset) => asset.name.includes("Liquidity Pool Token"))
+    .reduce((acc, curr) => {
       acc[curr.id] = curr;
       return acc;
-    }, {} as TMainTokens)
-  )(Object.values(assetsInfo));
+    }, {} as TMainTokens);
 };

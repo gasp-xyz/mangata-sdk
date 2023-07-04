@@ -17,5 +17,5 @@ export const getLiquidityTokenId = async (
     secondTokenId
   ]);
   if (!liquidityAssetId.isSome) return BN_ZERO;
-  return new BN(liquidityAssetId.toString());
+  return new BN(liquidityAssetId.unwrap().toString());
 };

@@ -12,7 +12,6 @@ export type Token = {
 };
 
 export type TTokenInfo = Omit<Token, "balance">;
-export type TBalances = Record<TokenId, BN>;
 export type TMainTokens = Record<TokenId, TTokenInfo>;
 export type TokenBalance = {
   free: BN;

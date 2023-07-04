@@ -1,24 +1,20 @@
 import { ApiPromise } from "@polkadot/api";
-import { hexToBn, isHex, BN } from "@polkadot/util";
-
-type TLiquidityTokens = {
-  [identificator: string]: string;
-};
+import { BN } from "@polkadot/util";
 
 export const getPoolsBalance = async (
   api: ApiPromise,
-  liquidityAssets: TLiquidityTokens
+  liquidityAssets: {
+    [identificator: string]: number;
+  }
 ) => {
   const poolsBalanceResponse = await api.query.xyk.pools.entries();
 
   return poolsBalanceResponse.reduce((acc, [key, value]) => {
-    const identificator = key.args.map((k) => k.toHuman())[0] as string;
-    const balancesResponse = JSON.parse(JSON.stringify(value)) as string[];
-    const balances = balancesResponse.map((balance) =>
-      isHex(balance) ? hexToBn(balance) : new BN(balance)
-    );
+    const [identificator] = key.args;
 
-    acc[liquidityAssets[identificator]] = balances;
+    acc[liquidityAssets[identificator.toHex()]] = value.map(
+      (balance) => new BN(balance)
+    );
     return acc;
   }, {} as { [identificator: string]: BN[] });
 };

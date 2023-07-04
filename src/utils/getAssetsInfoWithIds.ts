@@ -9,11 +9,13 @@ export const getAssetsInfoWithIds = async (api: ApiPromise) => {
   // we need to filter out ETH and Dummy liquidity token
   // then we need to display symbol for liquidity token
   return Object.values(completeAssetsInfo)
-    .filter((assetsInfo) => assetsInfo.id !== "1" && assetsInfo.id !== "3")
+    .filter((assetsInfo) => ![1, 3].includes(assetsInfo.id))
     .reduce((obj, item) => {
       const asset = {
         ...item,
-        name: item.name.replace(/0x\w+/, "").replace(/[A-Z]/g, "$&").trim(),
+        name: item.name
+          .replace(/(LiquidityPoolToken)0x[a-fA-F0-9]+/, "$1")
+          .replace(/([a-z])([A-Z])/g, "$1 $2"),
         symbol: item.symbol.includes("TKN")
           ? item.symbol
               .split("-")
