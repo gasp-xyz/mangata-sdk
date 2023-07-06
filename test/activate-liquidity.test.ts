@@ -79,9 +79,7 @@ it("should create pool", async () => {
   const api = await instance.api();
   await signTx(
     api,
-    api.tx.sudo.sudo(
-      api.tx.proofOfStake.updatePoolPromotion(liqtoken.toNumber(), 100)
-    ),
+    api.tx.sudo.sudo(api.tx.proofOfStake.updatePoolPromotion(liqtoken, 100)),
     sudoUser
   );
 

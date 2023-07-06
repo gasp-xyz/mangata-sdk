@@ -4,7 +4,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { it, expect, beforeEach } from "vitest";
 
 import { instance, SUDO_USER_NAME } from "./instance";
-import type { Batch, CreatePool, MultiswapSellAsset, SellAsset } from "../src";
+import type { Batch, CreatePool, MultiswapSellAsset } from "../src";
 import {
   createMangataToken,
   createToken,

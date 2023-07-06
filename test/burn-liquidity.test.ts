@@ -80,8 +80,7 @@ it("should burn liquidity", async () => {
   const investedPools = await instance.query.getInvestedPools(testUser.address);
 
   const investedPool = investedPools.find(
-    (investedPool) =>
-      investedPool.liquidityTokenId === liquidityTokenId.toString()
+    (investedPool) => investedPool.liquidityTokenId === liquidityTokenId
   );
 
   await instance.rpc.waitForNewBlock(2);
