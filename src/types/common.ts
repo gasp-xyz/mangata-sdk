@@ -31,8 +31,6 @@ import {
   ActivateLiquidityFee,
   BurnLiquidity,
   BurnLiquidityFee,
-  BuyAsset,
-  BuyAssetFee,
   ClaimRewardsFee,
   CreatePool,
   CreatePoolFee,
@@ -44,9 +42,7 @@ import {
   MultiswapSellAsset,
   Price,
   Reserve,
-  Rewards,
-  SellAsset,
-  SellAssetFee
+  Rewards
 } from "../types/xyk";
 import { Transfer, TransferAllFee, TransferTokenFee } from "../types/tokens";
 import { Batch } from "./utility";
@@ -180,20 +176,6 @@ export interface MangataInstance {
      * @returns A promise that resolves with an array of MangataGenericEvent objects.
      */
     mintLiquidity: (args: MintLiquidity) => Promise<MangataGenericEvent[]>;
-
-    /**
-     * Buys an asset from a pool.
-     * @param args - The buy asset parameters.
-     * @returns A promise that resolves with an array of MangataGenericEvent objects.
-     */
-    buyAsset: (args: BuyAsset) => Promise<MangataGenericEvent[]>;
-
-    /**
-     * Sells an asset to a pool.
-     * @param args - The sell asset parameters.
-     * @returns A promise that resolves with an array of MangataGenericEvent objects.
-     */
-    sellAsset: (args: SellAsset) => Promise<MangataGenericEvent[]>;
 
     /**
      * Creates a new pool.
@@ -351,20 +333,6 @@ export interface MangataInstance {
     ) => Promise<MangataSubmittableExtrinsic>;
 
     /**
-     * Sells an asset based on the provided parameters.
-     * @param args - The sell asset parameters.
-     * @returns A promise that resolves with a MangataSubmittableExtrinsic object.
-     */
-    sellAsset: (args: SellAsset) => Promise<MangataSubmittableExtrinsic>;
-
-    /**
-     * Buys an asset based on the provided parameters.
-     * @param args - The buy asset parameters.
-     * @returns A promise that resolves with a MangataSubmittableExtrinsic object.
-     */
-    buyAsset: (args: BuyAsset) => Promise<MangataSubmittableExtrinsic>;
-
-    /**
      * Mints liquidity based on the provided parameters.
      * @param args - The mint liquidity parameters.
      * @returns A promise that resolves with a MangataSubmittableExtrinsic object.
@@ -418,6 +386,26 @@ export interface MangataInstance {
      */
     transferTokens: (
       args: Transfer & { amount: TokenAmount }
+    ) => Promise<MangataSubmittableExtrinsic>;
+
+    /**
+     * Executes a multiswap transaction to buy assets.
+     *
+     * @param args - The arguments for the multiswap transaction.
+     * @returns A Promise that resolves to a `MangataSubmittableExtrinsic` representing the multiswap transaction.
+     */
+    multiswapBuyAsset: (
+      args: MultiswapBuyAsset
+    ) => Promise<MangataSubmittableExtrinsic>;
+
+    /**
+     * Executes a multiswap transaction to sell assets.
+     *
+     * @param args - The arguments for the multiswap transaction.
+     * @returns A Promise that resolves to a `MangataSubmittableExtrinsic` representing the multiswap transaction.
+     */
+    multiswapSellAsset: (
+      args: MultiswapSellAsset
     ) => Promise<MangataSubmittableExtrinsic>;
   };
   /**
@@ -563,16 +551,6 @@ export interface MangataInstance {
      * Calculates the fee for creating a new pool.
      */
     createPool: (args: CreatePoolFee) => Promise<string>;
-
-    /**
-     * Calculates the fee for selling an asset.
-     */
-    sellAsset: (args: SellAssetFee) => Promise<string>;
-
-    /**
-     * Calculates the fee for buying an asset.
-     */
-    buyAsset: (args: BuyAssetFee) => Promise<string>;
 
     /**
      * Calculates the fee for minting liquidity in a pool.

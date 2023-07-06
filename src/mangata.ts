@@ -5,8 +5,6 @@ import {
   ActivateLiquidityFee,
   BurnLiquidity,
   BurnLiquidityFee,
-  BuyAsset,
-  BuyAssetFee,
   ClaimRewardsFee,
   CreatePool,
   CreatePoolFee,
@@ -18,9 +16,7 @@ import {
   MultiswapSellAsset,
   Price,
   Reserve,
-  Rewards,
-  SellAsset,
-  SellAssetFee
+  Rewards
 } from "./types/xyk";
 import { activateLiquidity } from "./methods/xyk/activateLiquidity";
 import { burnLiquidity } from "./methods/xyk/burnLiquidity";
@@ -54,8 +50,6 @@ import {
   WithdrawFee,
   WithdrawKsmFee
 } from "./types/xTokens";
-import { buyAsset } from "./methods/xyk/buyAsset";
-import { sellAsset } from "./methods/xyk/sellAsset";
 import { createPool } from "./methods/xyk/createPool";
 import { claimRewards } from "./methods/xyk/claimRewards";
 import { calculateBuyPriceId } from "./methods/rpc/calculateBuyPriceId";
@@ -157,10 +151,6 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await burnLiquidity(instancePromise, args, false),
       mintLiquidity: async (args: MintLiquidity) =>
         await mintLiquidity(instancePromise, args, false),
-      buyAsset: async (args: BuyAsset) =>
-        await buyAsset(instancePromise, args, false),
-      sellAsset: async (args: SellAsset) =>
-        await sellAsset(instancePromise, args, false),
       createPool: async (args: CreatePool) =>
         await createPool(instancePromise, args, false),
       claimRewards: async (args: Prettify<Omit<Liquidity, "amount">>) =>
@@ -222,10 +212,6 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await createPool(instancePromise, args, true),
       claimRewards: async (args: Omit<Liquidity, "amount">) =>
         await claimRewards(instancePromise, args, true),
-      sellAsset: async (args: SellAsset) =>
-        await sellAsset(instancePromise, args, true),
-      buyAsset: async (args: BuyAsset) =>
-        await buyAsset(instancePromise, args, true),
       mintLiquidity: async (args: MintLiquidity) =>
         await mintLiquidity(instancePromise, args, true),
       burnLiquidity: async (args: BurnLiquidity) =>
@@ -242,7 +228,11 @@ function createMangataInstance(urls: string[]): MangataInstance {
       transferAllTokens: async (args: Transfer) =>
         await transferAllTokens(instancePromise, args, true),
       transferTokens: async (args: Transfer & { amount: TokenAmount }) =>
-        await transferTokens(instancePromise, args, true)
+        await transferTokens(instancePromise, args, true),
+      multiswapBuyAsset: async (args: MultiswapBuyAsset) =>
+        await multiswapBuyAsset(instancePromise, args, true),
+      multiswapSellAsset: async (args: MultiswapSellAsset) =>
+        await multiswapSellAsset(instancePromise, args, true)
     },
     query: {
       getNonce: async (address: Address) =>
@@ -305,10 +295,6 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await getClaimRewardsFee(instancePromise, args),
       createPool: async (args: CreatePoolFee) =>
         await getCreatePoolFee(instancePromise, args),
-      sellAsset: async (args: SellAssetFee) =>
-        await getSellAssetFee(instancePromise, args),
-      buyAsset: async (args: BuyAssetFee) =>
-        await getBuyAssetFee(instancePromise, args),
       mintLiquidity: async (args: MintLiquidityFee) =>
         await getMintLiquidityFee(instancePromise, args),
       burnLiquidity: async (args: BurnLiquidityFee) =>
