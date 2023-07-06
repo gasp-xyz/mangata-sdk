@@ -4,7 +4,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { it, expect, beforeEach } from "vitest";
 
 import { instance, SUDO_USER_NAME } from "./instance";
-import type { Batch, CreatePool, SellAsset } from "../src";
+import type { Batch, CreatePool, MultiswapSellAsset } from "../src";
 import {
   createMangataToken,
   createToken,
@@ -72,10 +72,9 @@ it("should sell asset", async () => {
 
   await instance.rpc.waitForNewBlock(2);
 
-  const argsSellAsset: SellAsset = {
+  const argsMultiSellAsset: MultiswapSellAsset = {
     account: testUser,
-    soldTokenId: firstTokenId!,
-    boughtTokenId: secondTokenId!,
+    tokenIds: [firstTokenId!, secondTokenId!],
     amount: new BN(10000),
     minAmountOut: new BN(100),
     txOptions: {
@@ -86,5 +85,5 @@ it("should sell asset", async () => {
       }
     }
   };
-  await instance.xyk.sellAsset(argsSellAsset);
+  await instance.xyk.multiswapSellAsset(argsMultiSellAsset);
 });
