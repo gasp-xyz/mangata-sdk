@@ -1,3 +1,10 @@
+# [2.0.0-rc.13](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.12...v2.0.0-rc.13) (2023-07-06)
+
+
+### Features
+
+* remove buyasset and sellasset ([4318faa](https://github.com/mangata-finance/mangata-sdk/commit/4318faa38a612db41093f045afdcba1943566ea5))
+
 # [2.0.0-rc.12](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.11...v2.0.0-rc.12) (2023-07-06)
 
 
