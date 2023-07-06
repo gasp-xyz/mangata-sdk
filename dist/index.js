@@ -3628,7 +3628,7 @@ var getCompleteAssetsInfo = async (api) => {
     const [tokenId] = key.args;
     const { name, decimals, symbol } = value.unwrap();
     const assetInfo = {
-      id: tokenId.toNumber(),
+      id: tokenId.toString(),
       decimals: decimals.toNumber(),
       name: name.toPrimitive(),
       symbol: symbol.toPrimitive()
@@ -3641,7 +3641,7 @@ var getCompleteAssetsInfo = async (api) => {
 // src/utils/getAssetsInfoWithIds.ts
 var getAssetsInfoWithIds = async (api) => {
   const completeAssetsInfo = await getCompleteAssetsInfo(api);
-  return Object.values(completeAssetsInfo).filter((assetsInfo) => ![1, 3].includes(assetsInfo.id)).reduce((obj, item) => {
+  return Object.values(completeAssetsInfo).filter((assetsInfo) => !["1", "3"].includes(assetsInfo.id)).reduce((obj, item) => {
     const asset = {
       ...item,
       name: item.name.replace(/(LiquidityPoolToken)0x[a-fA-F0-9]+/, "$1").replace(/([a-z])([A-Z])/g, "$1 $2"),
@@ -3662,7 +3662,7 @@ var getLiquidityAssets = async (api) => {
   const liquidityAssetsResponse = await api.query.xyk.liquidityAssets.entries();
   return liquidityAssetsResponse.reduce((acc, [key, value]) => {
     const [identificator] = key.args;
-    acc[identificator.toHex()] = value.unwrap().toNumber();
+    acc[identificator.toHex()] = value.unwrap().toString();
     return acc;
   }, {});
 };
@@ -3671,7 +3671,7 @@ var getLiquidityAssets = async (api) => {
 var getLiquidityPromotedPools = async (api) => {
   try {
     const promotedPoolRewards = await api.query.proofOfStake.promotedPoolRewards();
-    return Object.keys(promotedPoolRewards.toHuman()).map((id) => +id);
+    return Object.keys(promotedPoolRewards.toHuman());
   } catch (error) {
     return [];
   }
@@ -3743,8 +3743,8 @@ var getPools = async (instancePromise) => {
     const secondTokenRatio = getRatio(secondTokenAmount, firstTokenAmount);
     const isPromoted = liquidityTokensPromoted.includes(asset.id);
     return {
-      firstTokenId: +firstTokenId,
-      secondTokenId: +secondTokenId,
+      firstTokenId,
+      secondTokenId,
       firstTokenAmount,
       secondTokenAmount,
       liquidityTokenId: asset.id,
@@ -3760,8 +3760,8 @@ var getLiquidityPool = async (instancePromise, liquidityTokenId) => {
   const api = await instancePromise;
   const liquidityPool = await api.query.xyk.liquidityPools(liquidityTokenId);
   if (!liquidityPool.isSome)
-    return [-1, -1];
-  return liquidityPool.unwrap().map((num) => num.toNumber());
+    return ["-1", "-1"];
+  return liquidityPool.unwrap().map((num) => num.toString());
 };
 
 // src/methods/query/getAmountOfTokensInPool.ts
@@ -3839,8 +3839,8 @@ var getInvestedPools = async (instancePromise, address) => {
     const [firstTokenId, secondTokenId] = asset.symbol.split("-");
     const [firstTokenAmount, secondTokenAmount] = await getAmountOfTokensInPool(
       instancePromise,
-      +firstTokenId,
-      +secondTokenId
+      firstTokenId,
+      secondTokenId
     );
     const share = await calculateLiquidityShare(
       api,
@@ -3848,8 +3848,8 @@ var getInvestedPools = async (instancePromise, address) => {
       userLiquidityBalance.free.add(userLiquidityBalance.reserved)
     );
     return {
-      firstTokenId: +firstTokenId,
-      secondTokenId: +secondTokenId,
+      firstTokenId,
+      secondTokenId,
       firstTokenAmount,
       secondTokenAmount,
       liquidityTokenId: asset.id,
@@ -3879,7 +3879,7 @@ var getTotalIssuanceOfTokens = async (instancePromise) => {
 var getAssetsInfo = async (instancePromise) => {
   const api = await instancePromise;
   const completeAssetsInfo = await getCompleteAssetsInfo(api);
-  return Object.values(completeAssetsInfo).filter((assetsInfo) => ![1, 3].includes(assetsInfo.id)).reduce((obj, item) => {
+  return Object.values(completeAssetsInfo).filter((assetsInfo) => !["1", "3"].includes(assetsInfo.id)).reduce((obj, item) => {
     const asset = {
       ...item,
       name: item.name.replace(/(LiquidityPoolToken)0x[a-fA-F0-9]+/, "$1").replace(/([a-z])([A-Z])/g, "$1 $2"),
@@ -3936,7 +3936,7 @@ var getLiquidityTokenIds = async (instancePromise) => {
   const api = await instancePromise;
   const liquidityTokens = await api.query.xyk.liquidityAssets.entries();
   return liquidityTokens.map(
-    (liquidityToken) => liquidityToken[1].unwrap().toNumber()
+    (liquidityToken) => liquidityToken[1].unwrap().toString()
   );
 };
 
@@ -3974,9 +3974,7 @@ var getLiquidityTokenId = async (instancePromise, firstTokenId, secondTokenId) =
     firstTokenId,
     secondTokenId
   ]);
-  if (!liquidityAssetId.isSome)
-    return BN_ZERO;
-  return new import_bn.default(liquidityAssetId.unwrap().toString());
+  return liquidityAssetId.unwrap().toString();
 };
 
 // node_modules/@polkadot/x-randomvalues/node.js
