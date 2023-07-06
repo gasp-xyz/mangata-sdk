@@ -41,8 +41,6 @@ type MaxAmountIn = Merge<Asset, {
 type MinAmountOut = Merge<Asset, {
     minAmountOut: TokenAmount;
 }>;
-type BuyAsset = Prettify<Merge<ExtrinsicCommon, MaxAmountIn>>;
-type SellAsset = Prettify<Merge<ExtrinsicCommon, MinAmountOut>>;
 type PoolBase = {
     firstTokenId: TokenId;
     firstTokenAmount: TokenAmount;
@@ -50,12 +48,10 @@ type PoolBase = {
     secondTokenAmount: TokenAmount;
 };
 type CreatePool = Merge<ExtrinsicCommon, PoolBase>;
-type SellAssetFee = Except<SellAsset, "txOptions">;
 type MintLiquidityFee = Except<MintLiquidity, "txOptions">;
 type DeactivateLiquidityFee = Except<Liquidity, "txOptions">;
 type CreatePoolFee = Except<CreatePool, "txOptions">;
 type ClaimRewardsFee = Except<Omit<Liquidity, "amount">, "txOptions">;
-type BuyAssetFee = Except<BuyAsset, "txOptions">;
 type BurnLiquidityFee = Except<BurnLiquidity, "txOptions">;
 type ActivateLiquidityFee = Except<Liquidity, "txOptions">;
 type MultiSwapBase = Merge<ExtrinsicCommon, {
@@ -280,18 +276,6 @@ interface MangataInstance {
          */
         mintLiquidity: (args: MintLiquidity) => Promise<MangataGenericEvent[]>;
         /**
-         * Buys an asset from a pool.
-         * @param args - The buy asset parameters.
-         * @returns A promise that resolves with an array of MangataGenericEvent objects.
-         */
-        buyAsset: (args: BuyAsset) => Promise<MangataGenericEvent[]>;
-        /**
-         * Sells an asset to a pool.
-         * @param args - The sell asset parameters.
-         * @returns A promise that resolves with an array of MangataGenericEvent objects.
-         */
-        sellAsset: (args: SellAsset) => Promise<MangataGenericEvent[]>;
-        /**
          * Creates a new pool.
          * @param args - The create pool parameters.
          * @returns A promise that resolves with an array of MangataGenericEvent objects.
@@ -416,18 +400,6 @@ interface MangataInstance {
          */
         claimRewards: (args: Omit<Liquidity, "amount">) => Promise<MangataSubmittableExtrinsic>;
         /**
-         * Sells an asset based on the provided parameters.
-         * @param args - The sell asset parameters.
-         * @returns A promise that resolves with a MangataSubmittableExtrinsic object.
-         */
-        sellAsset: (args: SellAsset) => Promise<MangataSubmittableExtrinsic>;
-        /**
-         * Buys an asset based on the provided parameters.
-         * @param args - The buy asset parameters.
-         * @returns A promise that resolves with a MangataSubmittableExtrinsic object.
-         */
-        buyAsset: (args: BuyAsset) => Promise<MangataSubmittableExtrinsic>;
-        /**
          * Mints liquidity based on the provided parameters.
          * @param args - The mint liquidity parameters.
          * @returns A promise that resolves with a MangataSubmittableExtrinsic object.
@@ -465,6 +437,20 @@ interface MangataInstance {
         transferTokens: (args: Transfer & {
             amount: TokenAmount;
         }) => Promise<MangataSubmittableExtrinsic>;
+        /**
+         * Executes a multiswap transaction to buy assets.
+         *
+         * @param args - The arguments for the multiswap transaction.
+         * @returns A Promise that resolves to a `MangataSubmittableExtrinsic` representing the multiswap transaction.
+         */
+        multiswapBuyAsset: (args: MultiswapBuyAsset) => Promise<MangataSubmittableExtrinsic>;
+        /**
+         * Executes a multiswap transaction to sell assets.
+         *
+         * @param args - The arguments for the multiswap transaction.
+         * @returns A Promise that resolves to a `MangataSubmittableExtrinsic` representing the multiswap transaction.
+         */
+        multiswapSellAsset: (args: MultiswapSellAsset) => Promise<MangataSubmittableExtrinsic>;
     };
     /**
      * Represents a set of query functions for retrieving information from the blockchain.
@@ -579,14 +565,6 @@ interface MangataInstance {
          */
         createPool: (args: CreatePoolFee) => Promise<string>;
         /**
-         * Calculates the fee for selling an asset.
-         */
-        sellAsset: (args: SellAssetFee) => Promise<string>;
-        /**
-         * Calculates the fee for buying an asset.
-         */
-        buyAsset: (args: BuyAssetFee) => Promise<string>;
-        /**
          * Calculates the fee for minting liquidity in a pool.
          */
         mintLiquidity: (args: MintLiquidityFee) => Promise<string>;
@@ -693,4 +671,4 @@ declare const isBuyAssetTransactionSuccessful: (events: MangataGenericEvent[]) =
 
 declare const isSellAssetTransactionSuccessful: (events: MangataGenericEvent[]) => boolean;
 
-export { Account, ActivateLiquidityFee, Address, Asset, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Batch, BurnLiquidity, BurnLiquidityFee, BuyAsset, BuyAssetFee, ClaimRewardsFee, CreatePool, CreatePoolFee, Database, DeactivateLiquidityFee, Deposit, DepositFromKusamaFee, DepositFromParachainFee, DepositFromStatemineFee, ErrorData, ExtrinsicCommon, FeeLockType, Liquidity, Mangata, MangataEventData, MangataGenericEvent, MangataInstance, MangataSubmittableExtrinsic, MaxAmountIn, MinAmountOut, MintLiquidity, MintLiquidityFee, MoonriverWithdraw, MultiSwapBase, MultiswapBuyAsset, MultiswapSellAsset, Pool, PoolBase, PoolReserves, Prettify, Price, PriceImpact, RelayDeposit, RelayWithdraw, Reserve, Rewards, SellAsset, SellAssetFee, TMainTokens, TPoolWithRatio, TPoolWithShare, TTokenInfo, Token, TokenAmount, TokenAmounts, TokenBalance, TokenDecimals, TokenId, TokenSymbol, Transfer, TransferAllFee, TransferTokenFee, TransferTokens, TxOptions, Withdraw, WithdrawFee, WithdrawKsmFee, XcmTxOptions, fromBN, isBuyAssetTransactionSuccessful, isSellAssetTransactionSuccessful, signTx, toBN, toFixed };
+export { Account, ActivateLiquidityFee, Address, Asset, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Batch, BurnLiquidity, BurnLiquidityFee, ClaimRewardsFee, CreatePool, CreatePoolFee, Database, DeactivateLiquidityFee, Deposit, DepositFromKusamaFee, DepositFromParachainFee, DepositFromStatemineFee, ErrorData, ExtrinsicCommon, FeeLockType, Liquidity, Mangata, MangataEventData, MangataGenericEvent, MangataInstance, MangataSubmittableExtrinsic, MaxAmountIn, MinAmountOut, MintLiquidity, MintLiquidityFee, MoonriverWithdraw, MultiSwapBase, MultiswapBuyAsset, MultiswapSellAsset, Pool, PoolBase, PoolReserves, Prettify, Price, PriceImpact, RelayDeposit, RelayWithdraw, Reserve, Rewards, TMainTokens, TPoolWithRatio, TPoolWithShare, TTokenInfo, Token, TokenAmount, TokenAmounts, TokenBalance, TokenDecimals, TokenId, TokenSymbol, Transfer, TransferAllFee, TransferTokenFee, TransferTokens, TxOptions, Withdraw, WithdrawFee, WithdrawKsmFee, XcmTxOptions, fromBN, isBuyAssetTransactionSuccessful, isSellAssetTransactionSuccessful, signTx, toBN, toFixed };

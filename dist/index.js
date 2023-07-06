@@ -3461,46 +3461,6 @@ var depositFromParachain = async (args) => {
   });
 };
 
-// src/methods/xyk/buyAsset.ts
-async function buyAsset(instancePromise, args, isForBatch) {
-  const api = await instancePromise;
-  const {
-    account,
-    txOptions,
-    soldTokenId,
-    boughtTokenId,
-    amount,
-    maxAmountIn
-  } = args;
-  const tx = api.tx.xyk.buyAsset(
-    soldTokenId,
-    boughtTokenId,
-    amount,
-    maxAmountIn
-  );
-  return isForBatch ? tx : await signTx(api, tx, account, txOptions);
-}
-
-// src/methods/xyk/sellAsset.ts
-async function sellAsset(instancePromise, args, isForBatch) {
-  const api = await instancePromise;
-  const {
-    account,
-    txOptions,
-    soldTokenId,
-    boughtTokenId,
-    amount,
-    minAmountOut
-  } = args;
-  const tx = api.tx.xyk.sellAsset(
-    soldTokenId,
-    boughtTokenId,
-    amount,
-    minAmountOut
-  );
-  return isForBatch ? tx : await signTx(api, tx, account, txOptions);
-}
-
 // src/methods/xyk/createPool.ts
 async function createPool(instancePromise, args, isForBatch) {
   const api = await instancePromise;
@@ -8063,22 +8023,6 @@ var getCreatePoolFee = async (instancePromise, args) => {
   return fromBN(new import_bn.default(dispatchInfo.partialFee.toString()));
 };
 
-// src/methods/fee/getSellAssetFee.ts
-var getSellAssetFee = async (instancePromise, args) => {
-  const api = await instancePromise;
-  const { soldTokenId, boughtTokenId, amount, minAmountOut, account } = args;
-  const dispatchInfo = await api.tx.xyk.sellAsset(soldTokenId, boughtTokenId, amount, minAmountOut).paymentInfo(account);
-  return fromBN(new import_bn.default(dispatchInfo.partialFee.toString()));
-};
-
-// src/methods/fee/getBuyAssetFee.ts
-var getBuyAssetFee = async (instancePromise, args) => {
-  const api = await instancePromise;
-  const { soldTokenId, boughtTokenId, amount, maxAmountIn, account } = args;
-  const dispatchInfo = await api.tx.xyk.buyAsset(soldTokenId, boughtTokenId, amount, maxAmountIn).paymentInfo(account);
-  return fromBN(new import_bn.default(dispatchInfo.partialFee.toString()));
-};
-
 // src/methods/fee/getMintLiquidityFee.ts
 var getMintLiquidityFee = async (instancePromise, args) => {
   const api = await instancePromise;
@@ -8356,8 +8300,6 @@ function createMangataInstance(urls) {
       activateLiquidity: async (args, balanceFrom = "AvailableBalance") => await activateLiquidity(instancePromise, args, balanceFrom, false),
       burnLiquidity: async (args) => await burnLiquidity(instancePromise, args, false),
       mintLiquidity: async (args) => await mintLiquidity(instancePromise, args, false),
-      buyAsset: async (args) => await buyAsset(instancePromise, args, false),
-      sellAsset: async (args) => await sellAsset(instancePromise, args, false),
       createPool: async (args) => await createPool(instancePromise, args, false),
       claimRewards: async (args) => await claimRewards(instancePromise, args, false),
       multiswapBuyAsset: async (args) => await multiswapBuyAsset(instancePromise, args, false),
@@ -8394,14 +8336,14 @@ function createMangataInstance(urls) {
     submitableExtrinsic: {
       createPool: async (args) => await createPool(instancePromise, args, true),
       claimRewards: async (args) => await claimRewards(instancePromise, args, true),
-      sellAsset: async (args) => await sellAsset(instancePromise, args, true),
-      buyAsset: async (args) => await buyAsset(instancePromise, args, true),
       mintLiquidity: async (args) => await mintLiquidity(instancePromise, args, true),
       burnLiquidity: async (args) => await burnLiquidity(instancePromise, args, true),
       activateLiquidity: async (args, balanceFrom = "AvailableBalance") => await activateLiquidity(instancePromise, args, balanceFrom, true),
       deactivateLiquidity: async (args) => await deactivateLiquidity(instancePromise, args, true),
       transferAllTokens: async (args) => await transferAllTokens(instancePromise, args, true),
-      transferTokens: async (args) => await transferTokens(instancePromise, args, true)
+      transferTokens: async (args) => await transferTokens(instancePromise, args, true),
+      multiswapBuyAsset: async (args) => await multiswapBuyAsset(instancePromise, args, true),
+      multiswapSellAsset: async (args) => await multiswapSellAsset(instancePromise, args, true)
     },
     query: {
       getNonce: async (address) => await getNonce(instancePromise, address),
@@ -8436,8 +8378,6 @@ function createMangataInstance(urls) {
       deactivateLiquidity: async (args) => await getDeactivateLiquidityFee(instancePromise, args),
       claimRewards: async (args) => await getClaimRewardsFee(instancePromise, args),
       createPool: async (args) => await getCreatePoolFee(instancePromise, args),
-      sellAsset: async (args) => await getSellAssetFee(instancePromise, args),
-      buyAsset: async (args) => await getBuyAssetFee(instancePromise, args),
       mintLiquidity: async (args) => await getMintLiquidityFee(instancePromise, args),
       burnLiquidity: async (args) => await getBurnLiquidityFee(instancePromise, args),
       transferAllToken: async (args) => await getTransferAllTokenFee(instancePromise, args),
