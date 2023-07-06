@@ -1,3 +1,10 @@
+# [2.0.0-rc.12](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.11...v2.0.0-rc.12) (2023-07-06)
+
+
+### Features
+
+* unique token id type across sdk ([62906d3](https://github.com/mangata-finance/mangata-sdk/commit/62906d31451d4d97939337ffa73ee2ca1cb4cfd0))
+
 # [2.0.0-rc.11](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.10...v2.0.0-rc.11) (2023-07-04)
 
 
