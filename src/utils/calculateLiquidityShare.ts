@@ -5,7 +5,7 @@ import { BN_DIV_NUMERATOR_MULTIPLIER, BN_ZERO } from "./bnConstants";
 
 export const calculateLiquidityShare = async (
   api: ApiPromise,
-  liquidityAssetId: number,
+  liquidityAssetId: string,
   userLiquidityTokenAmount: BN
 ) => {
   // userLiquidityTokenAmount is the amount of liquidity token the user has but FREE ..

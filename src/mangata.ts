@@ -34,13 +34,11 @@ import {
   TransferTokens
 } from "./types/tokens";
 import {
-  Account,
   Address,
   MangataInstance,
   Prettify,
   TokenAmount,
-  TokenId,
-  TxOptions
+  TokenId
 } from "./types/common";
 import { mintLiquidity } from "./methods/xyk/mintLiquidity";
 import { depositFromParachain } from "./methods/xTokens/depositFromParachain";
@@ -173,9 +171,9 @@ function createMangataInstance(urls: string[]): MangataInstance {
         await multiswapSellAsset(instancePromise, args, false)
     },
     rpc: {
-      isBuyAssetLockFree: async (tokenIds: number[], amount: BN) =>
+      isBuyAssetLockFree: async (tokenIds: TokenId[], amount: BN) =>
         await isBuyAssetLockFree(instancePromise, tokenIds, amount),
-      isSellAssetLockFree: async (tokenIds: number[], amount: BN) =>
+      isSellAssetLockFree: async (tokenIds: TokenId[], amount: BN) =>
         await isSellAssetLockFree(instancePromise, tokenIds, amount),
       calculateBuyPriceId: async (
         soldTokenId: TokenId,

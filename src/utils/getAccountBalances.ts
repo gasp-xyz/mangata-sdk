@@ -1,5 +1,5 @@
 import { ApiPromise } from "@polkadot/api";
-import { BN, isHex, hexToBn } from "@polkadot/util";
+import { BN } from "@polkadot/util";
 
 export const getAccountBalances = async (api: ApiPromise, address: string) => {
   const ownedAssetsResponse = await api.query.tokens.accounts.entries(address);

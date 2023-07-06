@@ -12,8 +12,7 @@ import {
   TPoolWithRatio,
   Token,
   TTokenInfo,
-  TPoolWithShare,
-  FeeLockType
+  TPoolWithShare
 } from "../types/query";
 import {
   Deposit,
@@ -73,7 +72,7 @@ export type ErrorData = {
 };
 export type Account = string | KeyringPair;
 export type TokenSymbol = string;
-export type TokenId = number;
+export type TokenId = string;
 export type TokenAmount = BN;
 export type Address = string;
 export type MangataEventData = {
@@ -209,7 +208,7 @@ export interface MangataInstance {
      * @returns A promise that resolves with an array of MangataGenericEvent objects.
      */
     claimRewards: (
-      args: Omit<Liquidity, "amount">
+      args: Prettify<Omit<Liquidity, "amount">>
     ) => Promise<MangataGenericEvent[]>;
 
     /**
@@ -234,8 +233,8 @@ export interface MangataInstance {
    * rpc methods for interacting with various RPC operations.
    */
   rpc: {
-    isSellAssetLockFree: (tokendIds: number[], amount: BN) => Promise<Boolean>;
-    isBuyAssetLockFree: (tokendIds: number[], amount: BN) => Promise<Boolean>;
+    isSellAssetLockFree: (tokendIds: TokenId[], amount: BN) => Promise<Boolean>;
+    isBuyAssetLockFree: (tokendIds: TokenId[], amount: BN) => Promise<Boolean>;
     /**
      * Calculates the buy price based on the asset's ID.
      * @param args - The price parameters.
@@ -436,7 +435,7 @@ export interface MangataInstance {
     getLiquidityTokenId: (
       firstTokenId: TokenId,
       secondTokenId: TokenId
-    ) => Promise<BN>;
+    ) => Promise<TokenId>;
 
     /**
      * Retrieves the total issuance of a specific token.
@@ -474,14 +473,12 @@ export interface MangataInstance {
     /**
      * Retrieves the tokens owned by a specific address.
      */
-    getOwnedTokens: (
-      address: Address
-    ) => Promise<{ [id: TokenId]: Token } | null>;
+    getOwnedTokens: (address: Address) => Promise<{ [id: TokenId]: Token }>;
 
     /**
      * Retrieves information about the main assets.
      */
-    getAssetsInfo: () => Promise<Record<string, TTokenInfo>>;
+    getAssetsInfo: () => Promise<TMainTokens>;
 
     /**
      * Retrieves the pools in which the specified address has invested.

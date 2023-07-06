@@ -31,8 +31,8 @@ export const getPools = async (
       const secondTokenRatio = getRatio(secondTokenAmount, firstTokenAmount);
       const isPromoted = liquidityTokensPromoted.includes(asset.id);
       return {
-        firstTokenId: +firstTokenId,
-        secondTokenId: +secondTokenId,
+        firstTokenId,
+        secondTokenId,
         firstTokenAmount,
         secondTokenAmount,
         liquidityTokenId: asset.id,

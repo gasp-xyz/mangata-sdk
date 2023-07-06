@@ -5,7 +5,7 @@ export const getLiquidityAssets = async (api: ApiPromise) => {
 
   return liquidityAssetsResponse.reduce((acc, [key, value]) => {
     const [identificator] = key.args;
-    acc[identificator.toHex()] = value.unwrap().toNumber();
+    acc[identificator.toHex()] = value.unwrap().toString();
     return acc;
-  }, {} as { [identificator: string]: number });
+  }, {} as { [identificator: string]: string });
 };

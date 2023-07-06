@@ -4,7 +4,7 @@ import { BN } from "@polkadot/util";
 export const getPoolsBalance = async (
   api: ApiPromise,
   liquidityAssets: {
-    [identificator: string]: number;
+    [identificator: string]: string;
   }
 ) => {
   const poolsBalanceResponse = await api.query.xyk.pools.entries();

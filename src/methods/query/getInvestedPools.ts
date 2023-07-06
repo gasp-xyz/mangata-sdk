@@ -36,8 +36,8 @@ export const getInvestedPools = async (
       const [firstTokenAmount, secondTokenAmount] =
         await getAmountOfTokensInPool(
           instancePromise,
-          +firstTokenId,
-          +secondTokenId
+          firstTokenId,
+          secondTokenId
         );
       const share = await calculateLiquidityShare(
         api,
@@ -46,8 +46,8 @@ export const getInvestedPools = async (
       );
 
       return {
-        firstTokenId: +firstTokenId,
-        secondTokenId: +secondTokenId,
+        firstTokenId,
+        secondTokenId,
         firstTokenAmount,
         secondTokenAmount,
         liquidityTokenId: asset.id,

@@ -1,6 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { hexToBn } from "@polkadot/util";
-import { TTokenInfo } from "../../types/query";
+import { TMainTokens } from "../../types/query";
 import { getCompleteAssetsInfo } from "../../utils/getCompleteAssetsInfo";
 
 /**
@@ -8,13 +8,13 @@ import { getCompleteAssetsInfo } from "../../utils/getCompleteAssetsInfo";
  */
 export const getAssetsInfo = async (
   instancePromise: Promise<ApiPromise>
-): Promise<Record<string, TTokenInfo>> => {
+): Promise<TMainTokens> => {
   const api = await instancePromise;
   const completeAssetsInfo = await getCompleteAssetsInfo(api);
   // we need to filter out ETH and Dummy liquidity token
   // then we need to display symbol for liquidity token
   return Object.values(completeAssetsInfo)
-    .filter((assetsInfo) => ![1, 3].includes(assetsInfo.id))
+    .filter((assetsInfo) => !["1", "3"].includes(assetsInfo.id))
     .reduce((obj, item) => {
       const asset = {
         ...item,
@@ -38,5 +38,5 @@ export const getAssetsInfo = async (
       };
       obj[asset.id] = asset;
       return obj;
-    }, {} as Record<string, TTokenInfo>);
+    }, {} as TMainTokens);
 };

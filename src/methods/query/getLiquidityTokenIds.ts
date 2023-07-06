@@ -10,6 +10,6 @@ export const getLiquidityTokenIds = async (
   const api = await instancePromise;
   const liquidityTokens = await api.query.xyk.liquidityAssets.entries();
   return liquidityTokens.map((liquidityToken) =>
-    liquidityToken[1].unwrap().toNumber()
+    liquidityToken[1].unwrap().toString()
   );
 };

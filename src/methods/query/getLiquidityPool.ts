@@ -10,6 +10,6 @@ export const getLiquidityPool = async (
 ): Promise<TokenId[]> => {
   const api = await instancePromise;
   const liquidityPool = await api.query.xyk.liquidityPools(liquidityTokenId);
-  if (!liquidityPool.isSome) return [-1, -1];
-  return liquidityPool.unwrap().map((num) => num.toNumber());
+  if (!liquidityPool.isSome) return ["-1", "-1"];
+  return liquidityPool.unwrap().map((num) => num.toString());
 };

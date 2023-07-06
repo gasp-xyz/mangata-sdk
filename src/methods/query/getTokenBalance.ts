@@ -1,7 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { Address, TokenId } from "../../types/common";
 import { TokenBalance } from "../../types/query";
-import { hexToBn, isHex, BN } from "@polkadot/util";
+import { BN } from "@polkadot/util";
 
 /**
  * @since 2.0.0

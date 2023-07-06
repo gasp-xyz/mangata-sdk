@@ -1,6 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
-import { TokenId } from "../../types/common";
-import { TMainTokens, TTokenInfo } from "../../types/query";
+
+import { TMainTokens } from "../../types/query";
 import { getAssetsInfo } from "./getAssetsInfo";
 
 /**
