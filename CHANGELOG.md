@@ -1,3 +1,10 @@
+## [1.21.4](https://github.com/mangata-finance/mangata-sdk/compare/v1.21.3...v1.21.4) (2023-07-09)
+
+
+### Bug Fixes
+
+* asset info token without name and symbol ([494d893](https://github.com/mangata-finance/mangata-sdk/commit/494d8930f12d8cdc9d2915743c04a5df5048aba7))
+
 ## [1.21.3](https://github.com/mangata-finance/mangata-sdk/compare/v1.21.2...v1.21.3) (2023-06-29)
 
 
