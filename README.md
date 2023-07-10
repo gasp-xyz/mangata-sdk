@@ -166,6 +166,168 @@ main()
 
 For available methods please visit [docs](https://docs.mangata.finance/sdk/)
 
-```
+# Documentation
 
+```js
+import {
+  Mangata,
+  MangataInstance,
+  TMainTokens,
+  TPoolWithShare,
+  TokenId,
+  Token,
+  TPoolWithRatio,
+  TokenBalance,
+  TTokenInfo
+} from "../";
+import { BN } from "@polkadot/util";
+
+const ENDPOINT = "wss://kusama-archive.mangata.online";
+const mangata: MangataInstance = Mangata.instance([ENDPOINT]);
+
+const KSM_TOKEN = "4";
+const MGX_TOKEN = "0";
+const ADDRESS = "5CP5sgWw94GoQCGvm4qeNgKTw41Scnk2F41uPe4SSAPVPoCU";
+const LPTOKENKSMANDMGX = "5";
+
+const main = async () => {
+  /**
+   * Retrieves the amount of tokens in a liquidity pool for a given pair of
+   * tokens.
+   * @param {string} firstTokenId
+   * @param {string} secondTokenId
+   *
+   * @returns {BN | Array}
+   */
+
+  const amountOfTokens: BN[] = await mangata.query.getAmountOfTokensInPool(
+    KSM_TOKEN,
+    MGX_TOKEN
+  );
+
+  /**
+   * Retrieves information about the assets.
+   *
+   * @returns {TMainTokens}
+   */
+  const assetInfo: TMainTokens = await mangata.query.getAssetsInfo();
+
+  /**
+   * Retrieves the current block number.
+   *
+   * @returns {string}
+   */
+  const blockNumber: string = await mangata.query.getBlockNumber();
+
+  /**
+   * Retrieves the pools in which the specified address has invested
+   *
+   * @returns {TPoolWithShare | Array}
+   */
+
+  const investedPools: TPoolWithShare[] = await mangata.query.getInvestedPools(
+    ADDRESS
+  );
+
+  /**
+   * Retrieves the liquidity pool information for a specific liquidity token * ID.
+   *
+   * @returns {TokenId | Array}
+   */
+
+  const liquidityPool: TokenId[] = await mangata.query.getLiquidityPool(
+    LPTOKENKSMANDMGX
+  );
+
+  /**
+   * Retrieves the liquidity token ID for a given pair of tokens.
+   *
+   * @returns {TokenId}
+   */
+  const liquidityTokenId: TokenId = await mangata.query.getLiquidityTokenId(
+    KSM_TOKEN,
+    MGX_TOKEN
+  );
+
+  /**
+   * Retrieves the liquidity token IDs.
+   *
+   * @returns {TokenId | Array}
+   */
+  const liquidityTokenIds: TokenId[] =
+    await mangata.query.getLiquidityTokenIds();
+
+  /**
+   * Retrieves the liquidity tokens.
+   *
+   * @returns {TMainTokens}
+   */
+  const liquidityTokens: TMainTokens = await mangata.query.getLiquidityTokens();
+
+  /**
+   * Retrieves the nonce of the specified address.
+   *
+   * @returns {BN}
+   */
+  const nonce: BN = await mangata.query.getNonce(ADDRESS);
+
+  /**
+   * Retrieves the tokens owned by a specific address.
+   *
+   * @returns {[id: TokenId]: Token}}
+   */
+  const ownedTokens: {
+    [id: TokenId]: Token
+  } = await mangata.query.getOwnedTokens(ADDRESS);
+
+  /**
+   * Retrieves the detailed information about a specific pool.
+   *
+   * @returns {TPoolWithRatio}
+   */
+  const pool: TPoolWithRatio = await mangata.query.getPool(LPTOKENKSMANDMGX);
+
+  /**
+   * Retrieves information about all the available pools.
+   *
+   * @returns {TPoolWithRatio | Array}
+   */
+  const pools: TPoolWithRatio[] = await mangata.query.getPools();
+
+  /**
+   * Retrieves the token balance for a specific address and token ID.
+   *
+   * @returns {TokenBalance}
+   */
+  const tokenBalance: TokenBalance = await mangata.query.getTokenBalance(
+    MGX_TOKEN,
+    ADDRESS
+  );
+
+  /**
+   * Retrieves detailed information about a specific token.
+   *
+   * @returns {TTokenInfo}
+   */
+  const tokenInfo: TTokenInfo = await mangata.query.getTokenInfo(MGX_TOKEN);
+
+  /**
+   * Retrieves the total issuance of a specific token.
+   *
+   * @returns {BN}
+   */
+  const issuance: BN = await mangata.query.getTotalIssuance(MGX_TOKEN);
+
+  /**
+   * Retrieves the total issuance of all tokens.
+   *
+   * @returns {Record<string, BN>}
+   */
+  const totalIssuanceOfTokens: Record<string, BN> =
+    await mangata.query.getTotalIssuanceOfTokens();
+};
+
+main()
+  .catch(console.error)
+  .finally(() => process.exit());
 ```
