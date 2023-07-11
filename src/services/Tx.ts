@@ -677,7 +677,8 @@ export class Tx {
     tokenSymbol: string,
     url: string,
     mangataAddress: string,
-    amount: BN
+    amount: BN,
+    txOptions?: XcmTxOptions
   ) {
     const provider = new WsProvider(url);
     const api = await new ApiPromise({ provider, noInitWarn: true }).isReady;
@@ -738,7 +739,10 @@ export class Tx {
 
     await api.tx.xTokens
       .transferMultiasset(asset, destination, "Unlimited")
-      .signAndSend(account);
+      .signAndSend(account, {
+        signer: txOptions?.signer,
+        nonce: txOptions?.nonce
+      });
   }
 
   static async sendTokenFromMangataToMoonriver(

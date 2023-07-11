@@ -156,23 +156,25 @@ export class Mangata {
 
   public async sendTokenFromMoonriverToMangata(
     account: string | KeyringPair,
-    tokenSymbol: "MOVR" | "MGX",
+    tokenSymbol: string,
     url: string,
     mangataAddress: string,
-    amount: BN
+    amount: BN,
+    txOptions?: XcmTxOptions
   ) {
     return await Tx.sendTokenFromMoonriverToMangata(
       account,
       tokenSymbol,
       url,
       mangataAddress,
-      amount
+      amount,
+      txOptions
     );
   }
 
   public async sendTokenFromMoonriverToMangataFee(
     account: string | KeyringPair,
-    tokenSymbol: "MOVR" | "MGX",
+    tokenSymbol: string,
     url: string,
     mangataAddress: string,
     amount: BN
