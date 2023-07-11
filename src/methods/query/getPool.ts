@@ -1,7 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { getRatio } from "../../utils/getRatio";
 import { TokenId } from "../../types/common";
-import { TPoolWithRatio } from "../../types/query";
+import { PoolWithRatio } from "../../types/query";
 import { getLiquidityPool } from "./getLiquidityPool";
 import { getAmountOfTokensInPool } from "./getAmountOfTokensInPool";
 import { getLiquidityPromotedPools } from "src/utils/getLiquidityPromotedPools";
@@ -36,5 +36,5 @@ export const getPool = async (
     isPromoted: isPoolPromoted,
     firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
     secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount)
-  } as TPoolWithRatio;
+  } as PoolWithRatio;
 };

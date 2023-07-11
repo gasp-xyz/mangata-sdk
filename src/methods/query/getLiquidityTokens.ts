@@ -1,6 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 
-import { TMainTokens } from "../../types/query";
+import { MainTokens } from "../../types/query";
 import { getAssetsInfo } from "./getAssetsInfo";
 
 /**
@@ -8,7 +8,7 @@ import { getAssetsInfo } from "./getAssetsInfo";
  */
 export const getLiquidityTokens = async (
   instancePromise: Promise<ApiPromise>
-): Promise<TMainTokens> => {
+): Promise<MainTokens> => {
   const assetsInfo = await getAssetsInfo(instancePromise);
 
   return Object.values(assetsInfo)
@@ -16,5 +16,5 @@ export const getLiquidityTokens = async (
     .reduce((acc, curr) => {
       acc[curr.id] = curr;
       return acc;
-    }, {} as TMainTokens);
+    }, {} as MainTokens);
 };

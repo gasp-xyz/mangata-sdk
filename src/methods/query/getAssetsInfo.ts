@@ -1,6 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { hexToBn } from "@polkadot/util";
-import { TMainTokens } from "../../types/query";
+import { MainTokens } from "../../types/query";
 import { getCompleteAssetsInfo } from "../../utils/getCompleteAssetsInfo";
 
 /**
@@ -8,7 +8,7 @@ import { getCompleteAssetsInfo } from "../../utils/getCompleteAssetsInfo";
  */
 export const getAssetsInfo = async (
   instancePromise: Promise<ApiPromise>
-): Promise<TMainTokens> => {
+): Promise<MainTokens> => {
   const api = await instancePromise;
   const completeAssetsInfo = await getCompleteAssetsInfo(api);
   // we need to filter out ETH and Dummy liquidity token
@@ -39,5 +39,5 @@ export const getAssetsInfo = async (
       };
       obj[asset.id] = asset;
       return obj;
-    }, {} as TMainTokens);
+    }, {} as MainTokens);
 };

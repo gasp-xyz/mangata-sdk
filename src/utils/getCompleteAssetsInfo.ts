@@ -1,7 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 
 import { TokenId } from "../types/common";
-import { TTokenInfo } from "../types/query";
+import { TokenInfo } from "../types/query";
 
 export const getCompleteAssetsInfo = async (api: ApiPromise) => {
   const assets = await api.query.assetRegistry.metadata.entries();
@@ -18,5 +18,5 @@ export const getCompleteAssetsInfo = async (api: ApiPromise) => {
 
     obj[tokenId.toString()] = assetInfo;
     return obj;
-  }, {} as { [id: TokenId]: TTokenInfo });
+  }, {} as { [id: TokenId]: TokenInfo });
 };

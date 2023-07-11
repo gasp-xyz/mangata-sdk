@@ -1,5 +1,5 @@
 import { ApiPromise } from "@polkadot/api";
-import { Price } from "../../types/xyk";
+import { BurnAmount, Price } from "../../types/xyk";
 
 /**
  * @since 2.0.0
@@ -16,5 +16,5 @@ export const getBurnAmount = async (
     amount
   );
   const resultAsJson = JSON.parse(result.toString());
-  return resultAsJson;
+  return resultAsJson as BurnAmount;
 };

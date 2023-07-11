@@ -8,6 +8,11 @@ import {
 
 import { Merge, Except } from "type-fest";
 
+export type BurnAmount = {
+  firstAssetAmount: TokenAmount;
+  secondAssetAmount: TokenAmount;
+};
+
 export type Rewards = {
   address: Address;
   liquidityTokenId: TokenId;

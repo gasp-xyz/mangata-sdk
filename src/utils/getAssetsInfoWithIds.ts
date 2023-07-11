@@ -1,6 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { hexToBn } from "@polkadot/util";
-import { TTokenInfo } from "../types/query";
+import { TokenInfo } from "../types/query";
 
 import { getCompleteAssetsInfo } from "./getCompleteAssetsInfo";
 
@@ -33,5 +33,5 @@ export const getAssetsInfoWithIds = async (api: ApiPromise) => {
       };
       obj[asset.id] = asset;
       return obj;
-    }, {} as { [id: string]: TTokenInfo });
+    }, {} as { [id: string]: TokenInfo });
 };

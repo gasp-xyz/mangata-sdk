@@ -7,12 +7,12 @@ import type { Event, Phase } from "@polkadot/types/interfaces";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 
 import {
-  TMainTokens,
+  MainTokens,
   TokenBalance,
-  TPoolWithRatio,
+  PoolWithRatio,
   Token,
-  TTokenInfo,
-  TPoolWithShare
+  TokenInfo,
+  PoolWithShare
 } from "../types/query";
 import {
   Deposit,
@@ -29,6 +29,7 @@ import {
 
 import {
   ActivateLiquidityFee,
+  BurnAmount,
   BurnLiquidity,
   BurnLiquidityFee,
   ClaimRewardsFee,
@@ -44,7 +45,12 @@ import {
   Reserve,
   Rewards
 } from "../types/xyk";
-import { Transfer, TransferAllFee, TransferTokenFee } from "../types/tokens";
+import {
+  Transfer,
+  TransferAllFee,
+  TransferTokenFee,
+  TransferTokens
+} from "../types/tokens";
 import { Batch } from "./utility";
 
 export type Prettify<T> = {
@@ -244,7 +250,7 @@ export interface MangataInstance {
      * @param args - The price parameters.
      * @returns A promise that resolves with any type of value.
      */
-    getBurnAmount: (args: Price) => Promise<any>;
+    getBurnAmount: (args: Price) => Promise<BurnAmount>;
 
     /**
      * Calculates the sell price based on the reserve parameters.
@@ -308,9 +314,7 @@ export interface MangataInstance {
      * @param args - The transfer parameters, including the amount of tokens to transfer.
      * @returns A promise that resolves with an array of MangataGenericEvent objects.
      */
-    transferTokens: (
-      args: Transfer & { amount: TokenAmount }
-    ) => Promise<MangataGenericEvent[]>;
+    transferTokens: (args: TransferTokens) => Promise<MangataGenericEvent[]>;
   };
   /**
    * Methods for submitting extrinsics that perform actions on the blockchain. This methods are useful when using batch methods
@@ -441,7 +445,7 @@ export interface MangataInstance {
     /**
      * Retrieves detailed information about a specific token.
      */
-    getTokenInfo: (tokenId: TokenId) => Promise<TTokenInfo>;
+    getTokenInfo: (tokenId: TokenId) => Promise<TokenInfo>;
 
     /**
      * Retrieves the liquidity token IDs.
@@ -451,7 +455,7 @@ export interface MangataInstance {
     /**
      * Retrieves the liquidity tokens.
      */
-    getLiquidityTokens: () => Promise<TMainTokens>;
+    getLiquidityTokens: () => Promise<MainTokens>;
 
     /**
      * Retrieves the current block number.
@@ -466,12 +470,12 @@ export interface MangataInstance {
     /**
      * Retrieves information about the main assets.
      */
-    getAssetsInfo: () => Promise<TMainTokens>;
+    getAssetsInfo: () => Promise<MainTokens>;
 
     /**
      * Retrieves the pools in which the specified address has invested.
      */
-    getInvestedPools: (address: Address) => Promise<TPoolWithShare[]>;
+    getInvestedPools: (address: Address) => Promise<PoolWithShare[]>;
 
     /**
      * Retrieves the amount of tokens in a liquidity pool for a given pair of tokens.
@@ -489,12 +493,12 @@ export interface MangataInstance {
     /**
      * Retrieves the detailed information about a specific pool.
      */
-    getPool: (liquidityTokenId: TokenId) => Promise<TPoolWithRatio>;
+    getPool: (liquidityTokenId: TokenId) => Promise<PoolWithRatio>;
 
     /**
      * Retrieves information about all the available pools.
      */
-    getPools: () => Promise<TPoolWithRatio[]>;
+    getPools: () => Promise<PoolWithRatio[]>;
 
     /**
      * Retrieves the total issuance of all tokens.

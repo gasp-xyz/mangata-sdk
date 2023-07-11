@@ -1,6 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { Pool, TPoolWithRatio } from "../../types/query";
+import { Pool, PoolWithRatio } from "../../types/query";
 import { getAssetsInfoWithIds } from "../../utils/getAssetsInfoWithIds";
 import { getLiquidityAssets } from "../../utils/getLiquidityAssets";
 import { getLiquidityPromotedPools } from "../../utils/getLiquidityPromotedPools";
@@ -12,7 +12,7 @@ import { getRatio } from "../../utils/getRatio";
  */
 export const getPools = async (
   instancePromise: Promise<ApiPromise>
-): Promise<TPoolWithRatio[]> => {
+): Promise<PoolWithRatio[]> => {
   const api = await instancePromise;
   const [assetsInfo, liquidityAssets, liquidityTokensPromoted] =
     await Promise.all([
