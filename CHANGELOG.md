@@ -1,3 +1,10 @@
+# [2.0.0-rc.15](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.14...v2.0.0-rc.15) (2023-07-11)
+
+
+### Bug Fixes
+
+* update types without prefix T ([0143484](https://github.com/mangata-finance/mangata-sdk/commit/01434846ad0c302c1a990dc010bdaeb9ad5ba91c))
+
 # [2.0.0-rc.14](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.13...v2.0.0-rc.14) (2023-07-09)
 
 
