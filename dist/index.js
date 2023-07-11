@@ -3601,7 +3601,7 @@ var getCompleteAssetsInfo = async (api) => {
 // src/utils/getAssetsInfoWithIds.ts
 var getAssetsInfoWithIds = async (api) => {
   const completeAssetsInfo = await getCompleteAssetsInfo(api);
-  return Object.values(completeAssetsInfo).filter((assetsInfo) => !["1", "3"].includes(assetsInfo.id)).reduce((obj, item) => {
+  return Object.values(completeAssetsInfo).filter((asset) => asset.name || asset.symbol).filter((assetsInfo) => !["1", "3"].includes(assetsInfo.id)).reduce((obj, item) => {
     const asset = {
       ...item,
       name: item.name.replace(/(LiquidityPoolToken)0x[a-fA-F0-9]+/, "$1").replace(/([a-z])([A-Z])/g, "$1 $2"),
@@ -3839,7 +3839,7 @@ var getTotalIssuanceOfTokens = async (instancePromise) => {
 var getAssetsInfo = async (instancePromise) => {
   const api = await instancePromise;
   const completeAssetsInfo = await getCompleteAssetsInfo(api);
-  return Object.values(completeAssetsInfo).filter((assetsInfo) => !["1", "3"].includes(assetsInfo.id)).reduce((obj, item) => {
+  return Object.values(completeAssetsInfo).filter((asset) => asset.name || asset.symbol).filter((assetsInfo) => !["1", "3"].includes(assetsInfo.id)).reduce((obj, item) => {
     const asset = {
       ...item,
       name: item.name.replace(/(LiquidityPoolToken)0x[a-fA-F0-9]+/, "$1").replace(/([a-z])([A-Z])/g, "$1 $2"),
