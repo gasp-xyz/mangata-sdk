@@ -172,13 +172,13 @@ For available methods please visit [docs](https://docs.mangata.finance/sdk/)
 import {
   Mangata,
   MangataInstance,
-  TMainTokens,
-  TPoolWithShare,
+  MainTokens,
+  PoolWithShare,
   TokenId,
   Token,
-  TPoolWithRatio,
+  PoolWithRatio,
   TokenBalance,
-  TTokenInfo
+  TokenInfo
 } from "../";
 import { BN } from "@polkadot/util";
 
@@ -207,9 +207,9 @@ const main = async () => {
   /**
    * Retrieves information about the assets.
    *
-   * @returns {TMainTokens}
+   * @returns {MainTokens}
    */
-  const assetInfo: TMainTokens = await mangata.query.getAssetsInfo();
+  const assetInfo: MainTokens = await mangata.query.getAssetsInfo();
 
   /**
    * Retrieves the current block number.
@@ -221,10 +221,10 @@ const main = async () => {
   /**
    * Retrieves the pools in which the specified address has invested
    *
-   * @returns {TPoolWithShare | Array}
+   * @returns {PoolWithShare | Array}
    */
 
-  const investedPools: TPoolWithShare[] = await mangata.query.getInvestedPools(
+  const investedPools: PoolWithShare[] = await mangata.query.getInvestedPools(
     ADDRESS
   );
 
@@ -259,9 +259,9 @@ const main = async () => {
   /**
    * Retrieves the liquidity tokens.
    *
-   * @returns {TMainTokens}
+   * @returns {MainTokens}
    */
-  const liquidityTokens: TMainTokens = await mangata.query.getLiquidityTokens();
+  const liquidityTokens: MainTokens = await mangata.query.getLiquidityTokens();
 
   /**
    * Retrieves the nonce of the specified address.
@@ -282,16 +282,16 @@ const main = async () => {
   /**
    * Retrieves the detailed information about a specific pool.
    *
-   * @returns {TPoolWithRatio}
+   * @returns {PoolWithRatio}
    */
-  const pool: TPoolWithRatio = await mangata.query.getPool(LPTOKENKSMANDMGX);
+  const pool: PoolWithRatio = await mangata.query.getPool(LPTOKENKSMANDMGX);
 
   /**
    * Retrieves information about all the available pools.
    *
-   * @returns {TPoolWithRatio | Array}
+   * @returns {PoolWithRatio | Array}
    */
-  const pools: TPoolWithRatio[] = await mangata.query.getPools();
+  const pools: PoolWithRatio[] = await mangata.query.getPools();
 
   /**
    * Retrieves the token balance for a specific address and token ID.
@@ -306,9 +306,9 @@ const main = async () => {
   /**
    * Retrieves detailed information about a specific token.
    *
-   * @returns {TTokenInfo}
+   * @returns {TokenInfo}
    */
-  const tokenInfo: TTokenInfo = await mangata.query.getTokenInfo(MGX_TOKEN);
+  const tokenInfo: TokenInfo = await mangata.query.getTokenInfo(MGX_TOKEN);
 
   /**
    * Retrieves the total issuance of a specific token.
