@@ -183,14 +183,13 @@ import {
 import { BN } from "@polkadot/util";
 
 const ENDPOINT = "wss://kusama-archive.mangata.online";
-const mangata: MangataInstance = Mangata.instance([ENDPOINT]);
-
 const KSM_TOKEN = "4";
 const MGX_TOKEN = "0";
 const ADDRESS = "5CP5sgWw94GoQCGvm4qeNgKTw41Scnk2F41uPe4SSAPVPoCU";
 const LPTOKENKSMANDMGX = "5";
 
 const main = async () => {
+  const mangata: MangataInstance = Mangata.instance([ENDPOINT]);
   /**
    * Retrieves the amount of tokens in a liquidity pool for a given pair of
    * tokens.
@@ -325,6 +324,63 @@ const main = async () => {
    */
   const totalIssuanceOfTokens: Record<string, BN> =
     await mangata.query.getTotalIssuanceOfTokens();
+
+  /**
+   * Calculates the buy price based on the reserve parameters
+   *
+   * @returns {BN}
+   */
+  const argsReserve: Reserve = {
+    inputReserve: new BN("1000000000000000000"),
+    outputReserve: new BN("10000000000000000000"),
+    amount: new BN("10000")
+  };
+  const price: BN = await mangata.rpc.calculateBuyPrice(argsReserve);
+
+  /**
+   * Calculates the buy price based on the asset's ID.
+   *
+   * @returns {BN}
+   */
+  const price: BN = await mangata.rpc.calculateBuyPriceId(
+    KSM_TOKEN,
+    MGX_TOKEN,
+    new BN("10000")
+  );
+
+  /**
+   * Calculates the rewards amount based on the rewards parameters.
+   *
+   * @returns {BN}
+   */
+  const argsRewards: Rewards = {
+    address: ADDRESS,
+    liquidityTokenId: LPTOKENKSMANDMGX
+  };
+  const rewards: BN = await mangata.rpc.calculateRewardsAmount(argsRewards);
+
+  /**
+   * Calculates the sell price based on the reserve parameters.
+   *
+   * @returns {BN}
+   */
+  const argsReserve: Reserve = {
+    inputReserve: new BN("1000000000000000000"),
+    outputReserve: new BN("10000000000000000000"),
+    amount: new BN("10000")
+  };
+  const price: BN = await mangata.rpc.calculateSellPrice(argsReserve);
+
+  /**
+   * Calculates the sell price based on the asset's ID.
+   *
+   * @returns {BN}
+   */
+  const price: BN = await mangata.rpc.calculateSellPriceId(
+    KSM_TOKEN,
+    MGX_TOKEN,
+    new BN("10000")
+  );
 };
 
 main()
