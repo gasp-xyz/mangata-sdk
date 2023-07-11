@@ -387,3 +387,98 @@ main()
   .catch(console.error)
   .finally(() => process.exit());
 ```
+
+# Transactions
+
+```js
+import {
+  Mangata,
+  MangataInstance
+  TransferTokens,
+  MangataGenericEvent,
+  MangataGenericEvent,
+  MultiswapBuyAsset,
+  Batch,
+  MintLiquidity
+} from "@mangata-finance/sdk";
+import { BN } from "@polkadot/util";
+import { Keyring } from "@polkadot/api";
+import { v4 as uuidv4 } from "uuid";
+import { ISubmittableResult } from "@polkadot/types/types";
+const mangata: MangataInstance = Mangata.instance([ENDPOINT]);
+
+const keyring = new Keyring({ type: "sr25519" });
+const testUser = "//testUser_" + uuidv4();
+const account = keyring.createFromUri(testUser);
+keyring.addPair(account);
+
+const args: TransferTokens = {
+  account: account,
+  tokenId: MGX_TOKEN,
+  address: ADDRESS,
+  amount: new BN(100e18), // 100 MGX
+  txOptions: {
+    statusCallback: (status: ISubmittableResult) => {
+      // Here you can check for status of your transaction
+      console.log(status);
+    },
+    extrinsicStatus: (result: MangataGenericEvent[]) => {
+      // here will be the result of your transaction
+      console.log(result);
+    }
+  }
+};
+await mangata.tokens.transferTokens(args);
+
+const args: MultiswapBuyAsset = {
+    account,
+    tokenIds: [MGX_TOKEN, KSM_TOKEN],
+    amount: new BN(1000e18), // 100 MGX
+    maxAmountIn: new BN(60000e18),
+    txOptions: {
+      statusCallback: (status: ISubmittableResult) => {
+        // Here you can check for status of your transaction
+        console.log(status);
+      },
+      extrinsicStatus: (result: MangataGenericEvent[]) => {
+        // here will be the result of your transaction
+        console.log(result);
+      }
+    }
+  };
+  await mangata.xyk.multiswapBuyAsset(args);
+
+  const argsBuy: MultiswapBuyAsset = {
+    account,
+    tokenIds: [MGX_TOKEN, KSM_TOKEN],
+    amount: new BN(1000e18), // 100 MGX
+    maxAmountIn: new BN(60000e18)
+  };
+  const tx1 = await mangata.submitableExtrinsic.multiswapBuyAsset(argsBuy);
+
+  const argsMint: MintLiquidity = {
+    account,
+    firstTokenId: KSM_TOKEN,
+    secondTokenId: MGX_TOKEN,
+    firstTokenAmount: new BN(100e12),
+    expectedSecondTokenAmount: new BN(1000e18)
+  };
+
+  const tx2 = await mangata.submitableExtrinsic.mintLiquidity(argsMint);
+
+  const args: Batch = {
+    account,
+    calls: [tx1, tx2],
+    txOptions: {
+      statusCallback: (status: ISubmittableResult) => {
+        // Here you can check for status of your transaction
+        console.log(status);
+      },
+      extrinsicStatus: (result: MangataGenericEvent[]) => {
+        // here will be the result of your transaction
+        console.log(result);
+      }
+    }
+  };
+  await mangata.batch(args);
+```
