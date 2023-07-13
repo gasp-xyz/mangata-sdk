@@ -4,6 +4,7 @@ import { BN } from '@polkadot/util';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { Codec, ISubmittableResult } from '@polkadot/types/types';
 import { Event, Phase } from '@polkadot/types/interfaces';
+import { ISettingsParam, ILogObj } from 'tslog';
 import { Merge, Except } from 'type-fest';
 import Big from 'big.js';
 
@@ -214,6 +215,7 @@ type TxOptions = {
     extrinsicStatus: (events: MangataGenericEvent[]) => void;
 };
 type MangataSubmittableExtrinsic = SubmittableExtrinsic<"promise">;
+type MangataLoggerOptions = ISettingsParam<ILogObj>;
 interface MangataInstance {
     /**
      * xTokens methods for interacting with various token-related operations.
@@ -627,6 +629,7 @@ declare const signTx: (api: ApiPromise, tx: SubmittableExtrinsic<"promise">, acc
  * @returns A MangataInstance object.
  */
 declare function createMangataInstance(urls: string[]): MangataInstance;
+
 declare const Mangata: {
     instance: typeof createMangataInstance;
     getPriceImpact: (args: PriceImpact) => string | undefined;
@@ -673,4 +676,6 @@ declare const isBuyAssetTransactionSuccessful: (events: MangataGenericEvent[]) =
 
 declare const isSellAssetTransactionSuccessful: (events: MangataGenericEvent[]) => boolean;
 
-export { Account, ActivateLiquidityFee, Address, Asset, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Batch, BurnAmount, BurnLiquidity, BurnLiquidityFee, ClaimRewardsFee, CreatePool, CreatePoolFee, Database, DeactivateLiquidityFee, Deposit, DepositFromKusamaFee, DepositFromParachainFee, DepositFromStatemineFee, ErrorData, ExtrinsicCommon, FeeLockType, Liquidity, MainTokens, Mangata, MangataEventData, MangataGenericEvent, MangataInstance, MangataSubmittableExtrinsic, MaxAmountIn, MinAmountOut, MintLiquidity, MintLiquidityFee, MoonriverWithdraw, MultiSwapBase, MultiswapBuyAsset, MultiswapSellAsset, Pool, PoolBase, PoolReserves, PoolWithRatio, PoolWithShare, Prettify, Price, PriceImpact, RelayDeposit, RelayWithdraw, Reserve, Rewards, Token, TokenAmount, TokenAmounts, TokenBalance, TokenDecimals, TokenId, TokenInfo, TokenSymbol, Transfer, TransferAllFee, TransferTokenFee, TransferTokens, TxOptions, Withdraw, WithdrawFee, WithdrawKsmFee, XcmTxOptions, fromBN, isBuyAssetTransactionSuccessful, isSellAssetTransactionSuccessful, signTx, toBN, toFixed };
+declare const setLoggerOptions: (options?: ISettingsParam<ILogObj>) => void;
+
+export { Account, ActivateLiquidityFee, Address, Asset, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Batch, BurnAmount, BurnLiquidity, BurnLiquidityFee, ClaimRewardsFee, CreatePool, CreatePoolFee, Database, DeactivateLiquidityFee, Deposit, DepositFromKusamaFee, DepositFromParachainFee, DepositFromStatemineFee, ErrorData, ExtrinsicCommon, FeeLockType, Liquidity, MainTokens, Mangata, MangataEventData, MangataGenericEvent, MangataInstance, MangataLoggerOptions, MangataSubmittableExtrinsic, MaxAmountIn, MinAmountOut, MintLiquidity, MintLiquidityFee, MoonriverWithdraw, MultiSwapBase, MultiswapBuyAsset, MultiswapSellAsset, Pool, PoolBase, PoolReserves, PoolWithRatio, PoolWithShare, Prettify, Price, PriceImpact, RelayDeposit, RelayWithdraw, Reserve, Rewards, Token, TokenAmount, TokenAmounts, TokenBalance, TokenDecimals, TokenId, TokenInfo, TokenSymbol, Transfer, TransferAllFee, TransferTokenFee, TransferTokens, TxOptions, Withdraw, WithdrawFee, WithdrawKsmFee, XcmTxOptions, fromBN, isBuyAssetTransactionSuccessful, isSellAssetTransactionSuccessful, setLoggerOptions, signTx, toBN, toFixed };

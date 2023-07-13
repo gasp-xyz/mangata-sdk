@@ -2998,8 +2998,31 @@ var serializeTx = (api, tx) => {
   }
 };
 
+// src/utils/mangataLogger.ts
+import { Logger } from "tslog";
+var logger = {};
+var setLoggerOptions = (options2 = {}) => {
+  logger = new Logger({
+    ...{
+      name: "MangataLogger",
+      type: "hidden",
+      prettyLogTimeZone: "UTC",
+      hideLogPositionForProduction: true,
+      stylePrettyLogs: true,
+      prettyLogStyles: {
+        dateIsoStr: "blue",
+        filePathWithLine: "yellow",
+        fileName: ["yellow"]
+      }
+    },
+    ...options2
+  });
+};
+setLoggerOptions({});
+
 // src/methods/query/getNonce.ts
 var getNonce = async (instancePromise, address) => {
+  logger.info("getNonce", { address });
   const api = await instancePromise;
   const nonce = await api.rpc.system.accountNextIndex(address);
   return nonce.toBn();
@@ -3266,12 +3289,12 @@ var signTx = async (api, tx, account, txOptions) => {
     } catch (error) {
       reject(error);
     }
-    console.info(
+    logger.trace(
       `submitting Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} `
     );
     try {
       const unsub = await tx.send(async (result) => {
-        console.info(
+        logger.trace(
           `Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} => ${result.status.type}(${result.status.value.toString()})${serializeTx(api, tx)}`
         );
         txOptions?.statusCallback?.(result);
@@ -3320,7 +3343,7 @@ var signTx = async (api, tx, account, txOptions) => {
                   return extrinsic.hash.toString() === tx.hash.toString();
                 });
                 if (index < 0) {
-                  console.info(
+                  logger.trace(
                     `Tx([${tx.hash.toString()}]) not found in block ${executionBlockNr} $([${truncatedString(
                       blockHash.toString()
                     )}])`
@@ -3328,7 +3351,7 @@ var signTx = async (api, tx, account, txOptions) => {
                   return;
                 } else {
                   unsubscribeNewHeads();
-                  console.info(
+                  logger.trace(
                     `Tx[${tx.hash.toString()}]who:${extractedAccount} nonce:${nonce.toString()} => Executed(${blockHash.toString()})`
                   );
                 }
@@ -3362,7 +3385,7 @@ var signTx = async (api, tx, account, txOptions) => {
             }
           );
         } else if (result.isError) {
-          console.info(
+          logger.trace(
             "Transaction Error Result",
             JSON.stringify(result, null, 2)
           );
@@ -3383,18 +3406,146 @@ var signTx = async (api, tx, account, txOptions) => {
   });
 };
 
+// src/utils/getPriceImpact.ts
+import Big3 from "big.js";
+
+// src/utils/bigConstants.ts
+import Big from "big.js";
+var BIG_ZERO = Big("0");
+var BIG_ONE = Big("1");
+var BIG_TEN = Big("10");
+var BIG_HUNDRED = Big("100");
+var BIG_THOUSAND = Big("1000");
+var BIG_TEN_THOUSAND = Big("10000");
+var BIG_HUNDRED_THOUSAND = Big("100000");
+var BIG_MILLION = Big("1000000");
+var BIG_TEN_MILLIONS = Big("10000000");
+var BIG_HUNDRED_MILLIONS = Big("100000000");
+var BIG_BILLION = Big("1000000000");
+var BIG_TEN_BILLIONS = Big("10000000000");
+var BIG_HUNDRED_BILLIONS = Big("100000000000");
+var BIG_TRILLION = Big("1000000000000");
+
+// src/utils/bnConstants.ts
+var BN_ZERO = new import_bn.default("0");
+var BN_ONE = new import_bn.default("1");
+var BN_TEN = new import_bn.default("10");
+var BN_HUNDRED = new import_bn.default("100");
+var BN_THOUSAND = new import_bn.default("1000");
+var BN_TEN_THOUSAND = new import_bn.default("10000");
+var BN_HUNDRED_THOUSAND = new import_bn.default("100000");
+var BN_MILLION = new import_bn.default("1000000");
+var BN_TEN_MILLIONS = new import_bn.default("10000000");
+var BN_HUNDRED_MILLIONS = new import_bn.default("100000000");
+var BN_BILLION = new import_bn.default("1000000000");
+var BN_TEN_BILLIONS = new import_bn.default("10000000000");
+var BN_HUNDRED_BILLIONS = new import_bn.default("100000000000");
+var BN_TRILLION = new import_bn.default("1000000000000");
+var BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS = 18;
+var BN_DIV_NUMERATOR_MULTIPLIER = new import_bn.default("10").pow(
+  new import_bn.default(BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS)
+);
+
+// src/utils/bnUtility.ts
+import Big2 from "big.js";
+Big2.PE = 256;
+Big2.NE = -256;
+Big2.DP = 40;
+Big2.RM = Big2.roundUp;
+var DEFAULT_TOKEN_DECIMALS = 18;
+var DEFAULT_DECIMAL_MULTIPLIER = BIG_TEN.pow(DEFAULT_TOKEN_DECIMALS);
+var toBN = (value, exponent) => {
+  if (!value)
+    return BN_ZERO;
+  try {
+    const inputNumber = Big2(value);
+    const decimalMultiplier = !exponent || exponent === DEFAULT_TOKEN_DECIMALS ? DEFAULT_DECIMAL_MULTIPLIER : BIG_TEN.pow(exponent);
+    const res = inputNumber.mul(decimalMultiplier);
+    const resStr = res.toString();
+    if (/\D/gm.test(resStr))
+      return BN_ZERO;
+    return new import_bn.default(resStr);
+  } catch (err) {
+    return BN_ZERO;
+  }
+};
+var fromBN = (value, exponent) => {
+  if (!value)
+    return "0";
+  try {
+    const inputNumber = Big2(value.toString());
+    const decimalMultiplier = !exponent || exponent === DEFAULT_TOKEN_DECIMALS ? DEFAULT_DECIMAL_MULTIPLIER : BIG_TEN.pow(exponent);
+    const res = inputNumber.div(decimalMultiplier);
+    const resStr = res.toString();
+    return resStr;
+  } catch (err) {
+    return "0";
+  }
+};
+
+// src/utils/isInputValid.ts
+var isInputValid = (value) => {
+  const valueNum = +value;
+  return !(!value || isNaN(Number(value)) || isNaN(valueNum) || valueNum < 0);
+};
+
+// src/utils/toFixed.ts
+var toFixed = (value, decimals) => {
+  const decimalsRegex = new RegExp(`^-?\\d+(?:\\.\\d{0,${decimals}})?`, "gm");
+  const withDesiredDecimalPlaces = value.match(decimalsRegex);
+  const trailingZeroesRegex = /^-?0*(\d+(?:\.(?:(?!0+$)\d)+)?)/gm;
+  const withoutTrailingZeroes = (withDesiredDecimalPlaces?.[0] || value).match(
+    trailingZeroesRegex
+  );
+  return withoutTrailingZeroes?.[0] ?? value;
+};
+
+// src/utils/getPriceImpact.ts
+var getPriceImpact = (args) => {
+  const { poolReserves, decimals, tokenAmounts } = args;
+  if (!poolReserves || !decimals || !isInputValid(tokenAmounts[0]) || !isInputValid(tokenAmounts[1])) {
+    return;
+  }
+  const firstReserveBefore = poolReserves[0];
+  const secondReserveBefore = poolReserves[1];
+  const soldAmount = toBN(tokenAmounts[0].toString(), decimals[0]);
+  const boughtAmount = toBN(tokenAmounts[1].toString(), decimals[1]);
+  if (boughtAmount.gte(secondReserveBefore))
+    return "";
+  const numerator = firstReserveBefore.add(soldAmount).mul(BN_TEN_THOUSAND).mul(secondReserveBefore);
+  const denominator = secondReserveBefore.sub(boughtAmount).mul(firstReserveBefore);
+  const res = numerator.div(denominator).sub(BN_TEN_THOUSAND);
+  const resStr = res.toString();
+  const resBig = Big3(resStr);
+  const resFormatted = toFixed(resBig.div(BIG_HUNDRED).toString(), 2);
+  return resFormatted;
+};
+
 // src/methods/xyk/deactivateLiquidity.ts
 async function deactivateLiquidity(instancePromise, args, isForBatch) {
+  logger.info("Deactivate Liquidity operation started ...");
   const api = await instancePromise;
   const { account, liquidityTokenId, amount, txOptions } = args;
+  logger.info("deactivateLiquidity", {
+    liquidityTokenId,
+    amount: amount.toString(),
+    isBatch: isForBatch
+  });
   const tx = api.tx.proofOfStake.deactivateLiquidity(liquidityTokenId, amount);
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }
 
 // src/methods/xyk/activateLiquidity.ts
 async function activateLiquidity(instancePromise, args, balanceFrom, isForBatch) {
+  logger.info("Active Liquidity operation started ...");
   const api = await instancePromise;
   const { account, liquidityTokenId, amount, txOptions } = args;
+  logger.info("activateLiquidity", {
+    liquidityTokenId,
+    amount: amount.toString(),
+    balanceFrom,
+    isBatch: isForBatch
+  });
   const tx = api.tx.proofOfStake.activateLiquidity(
     liquidityTokenId,
     amount,
@@ -3405,8 +3556,15 @@ async function activateLiquidity(instancePromise, args, balanceFrom, isForBatch)
 
 // src/methods/xyk/burnLiquidity.ts
 async function burnLiquidity(instancePromise, args, isForBatch) {
+  logger.info("Burn Liquidity operation started ...");
   const api = await instancePromise;
   const { account, firstTokenId, secondTokenId, amount, txOptions } = args;
+  logger.info("burnLiquidity", {
+    firstTokenId,
+    secondTokenId,
+    amount: amount.toString(),
+    isBatch: isForBatch
+  });
   const tx = api.tx.xyk.burnLiquidity(firstTokenId, secondTokenId, amount);
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }
@@ -3415,6 +3573,11 @@ async function burnLiquidity(instancePromise, args, isForBatch) {
 async function transferAllTokens(instancePromise, args, isForBatch) {
   const api = await instancePromise;
   const { account, tokenId, address, txOptions } = args;
+  logger.info("transferAllTokens", {
+    tokenId,
+    address,
+    isBatch: isForBatch
+  });
   const tx = api.tx.tokens.transferAll(address, tokenId, true);
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }
@@ -3423,12 +3586,18 @@ async function transferAllTokens(instancePromise, args, isForBatch) {
 async function transferTokens(instancePromise, args, isForBatch) {
   const api = await instancePromise;
   const { account, tokenId, address, txOptions, amount } = args;
+  logger.info("transferTokens", {
+    tokenId,
+    address,
+    isBatch: isForBatch
+  });
   const tx = api.tx.tokens.transfer(address, tokenId, amount);
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }
 
 // src/methods/xyk/mintLiquidity.ts
 async function mintLiquidity(instancePromise, args, isForBatch) {
+  logger.info("Mint Liquidity operation started ...");
   const api = await instancePromise;
   const {
     account,
@@ -3438,6 +3607,13 @@ async function mintLiquidity(instancePromise, args, isForBatch) {
     expectedSecondTokenAmount,
     txOptions
   } = args;
+  logger.info("mintLiquidity", {
+    firstTokenId,
+    secondTokenId,
+    firstTokenAmount: firstTokenAmount.toString(),
+    expectedSecondTokenAmount: expectedSecondTokenAmount.toString(),
+    isBatch: isForBatch
+  });
   const tx = api.tx.xyk.mintLiquidity(
     firstTokenId,
     secondTokenId,
@@ -3450,7 +3626,14 @@ async function mintLiquidity(instancePromise, args, isForBatch) {
 // src/methods/xTokens/depositFromParachain.ts
 import { ApiPromise, WsProvider } from "@polkadot/api";
 var depositFromParachain = async (args) => {
+  logger.info("Deposit From Parachain started ...");
   const { url, asset, destination, weightLimit, account, txOptions } = args;
+  logger.info("depositFromParachain", {
+    url,
+    asset,
+    destination,
+    weightLimit
+  });
   const api = await new ApiPromise({
     provider: new WsProvider(url),
     noInitWarn: true
@@ -3463,6 +3646,7 @@ var depositFromParachain = async (args) => {
 
 // src/methods/xyk/createPool.ts
 async function createPool(instancePromise, args, isForBatch) {
+  logger.info("Create Pool Operation started ...");
   const api = await instancePromise;
   const {
     account,
@@ -3472,6 +3656,13 @@ async function createPool(instancePromise, args, isForBatch) {
     secondTokenId,
     secondTokenAmount
   } = args;
+  logger.info("createPool", {
+    firstTokenId,
+    firstTokenAmount: firstTokenAmount.toString(),
+    secondTokenId,
+    secondTokenAmount: secondTokenAmount.toString(),
+    isBatch: isForBatch
+  });
   const tx = api.tx.xyk.createPool(
     firstTokenId,
     firstTokenAmount,
@@ -3483,14 +3674,24 @@ async function createPool(instancePromise, args, isForBatch) {
 
 // src/methods/xyk/claimRewards.ts
 async function claimRewards(instancePromise, args, isForBatch) {
+  logger.info("Claim Rewards operation started ...");
   const api = await instancePromise;
   const { account, txOptions, liquidityTokenId } = args;
+  logger.info("claimRewards", {
+    liquidityTokenId,
+    isBatch: isForBatch
+  });
   const tx = api.tx.proofOfStake.claimRewardsAll(liquidityTokenId);
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }
 
 // src/methods/rpc/calculateBuyPriceId.ts
 var calculateBuyPriceId = async (instancePromise, soldTokenId, boughtTokenId, amount) => {
+  logger.info("calculateBuyPriceId", {
+    soldTokenId,
+    boughtTokenId,
+    amount: amount.toString()
+  });
   const api = await instancePromise;
   const result = await api.rpc.xyk.calculate_buy_price_id(
     soldTokenId,
@@ -3502,6 +3703,11 @@ var calculateBuyPriceId = async (instancePromise, soldTokenId, boughtTokenId, am
 
 // src/methods/rpc/calculateSellPriceId.ts
 var calculateSellPriceId = async (instancePromise, soldTokenId, boughtTokenId, amount) => {
+  logger.info("calculateSellPriceId", {
+    soldTokenId,
+    boughtTokenId,
+    amount: amount.toString()
+  });
   const api = await instancePromise;
   const result = await api.rpc.xyk.calculate_sell_price_id(
     soldTokenId,
@@ -3513,6 +3719,11 @@ var calculateSellPriceId = async (instancePromise, soldTokenId, boughtTokenId, a
 
 // src/methods/rpc/getBurnAmount.ts
 var getBurnAmount = async (instancePromise, args) => {
+  logger.info("getBurnAmount", {
+    firstTokenId: args.firstTokenId,
+    secondTokenId: args.secondTokenId,
+    amount: args.amount.toString()
+  });
   const api = await instancePromise;
   const { firstTokenId, secondTokenId, amount } = args;
   const result = await api.rpc.xyk.get_burn_amount(
@@ -3526,6 +3737,11 @@ var getBurnAmount = async (instancePromise, args) => {
 
 // src/methods/rpc/calculateSellPrice.ts
 var calculateSellPrice = async (instancePromise, args) => {
+  logger.info("calculateSellPrice", {
+    inputReserve: args.inputReserve.toString(),
+    outputReserve: args.outputReserve.toString(),
+    amount: args.amount.toString()
+  });
   const api = await instancePromise;
   const { inputReserve, outputReserve, amount } = args;
   const result = await api.rpc.xyk.calculate_sell_price(
@@ -3538,6 +3754,11 @@ var calculateSellPrice = async (instancePromise, args) => {
 
 // src/methods/rpc/calculateBuyPrice.ts
 var calculateBuyPrice = async (instancePromise, args) => {
+  logger.info("calculateBuyPrice", {
+    inputReserve: args.inputReserve.toString(),
+    outputReserve: args.outputReserve.toString(),
+    amount: args.amount.toString()
+  });
   const api = await instancePromise;
   const { inputReserve, outputReserve, amount } = args;
   const result = await api.rpc.xyk.calculate_buy_price(
@@ -3550,6 +3771,10 @@ var calculateBuyPrice = async (instancePromise, args) => {
 
 // src/methods/rpc/calculateRewardsAmount.ts
 var calculateRewardsAmount = async (instancePromise, args) => {
+  logger.info("calculateRewardsAmount", {
+    address: args.address,
+    liquidityTokenId: args.liquidityTokenId
+  });
   const api = await instancePromise;
   const { address, liquidityTokenId } = args;
   const rewards = await api.rpc.xyk.calculate_rewards_amount(
@@ -3649,26 +3874,6 @@ var getPoolsBalance = async (api, liquidityAssets) => {
   }, {});
 };
 
-// src/utils/bnConstants.ts
-var BN_ZERO = new import_bn.default("0");
-var BN_ONE = new import_bn.default("1");
-var BN_TEN = new import_bn.default("10");
-var BN_HUNDRED = new import_bn.default("100");
-var BN_THOUSAND = new import_bn.default("1000");
-var BN_TEN_THOUSAND = new import_bn.default("10000");
-var BN_HUNDRED_THOUSAND = new import_bn.default("100000");
-var BN_MILLION = new import_bn.default("1000000");
-var BN_TEN_MILLIONS = new import_bn.default("10000000");
-var BN_HUNDRED_MILLIONS = new import_bn.default("100000000");
-var BN_BILLION = new import_bn.default("1000000000");
-var BN_TEN_BILLIONS = new import_bn.default("10000000000");
-var BN_HUNDRED_BILLIONS = new import_bn.default("100000000000");
-var BN_TRILLION = new import_bn.default("1000000000000");
-var BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS = 18;
-var BN_DIV_NUMERATOR_MULTIPLIER = new import_bn.default("10").pow(
-  new import_bn.default(BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS)
-);
-
 // src/utils/getRatio.ts
 var getGcd = (a, b) => {
   return b.gt(BN_ZERO) ? getGcd(b, a.mod(b)) : a;
@@ -3717,22 +3922,29 @@ var getPools = async (instancePromise) => {
 
 // src/methods/query/getLiquidityPool.ts
 var getLiquidityPool = async (instancePromise, liquidityTokenId) => {
+  logger.info("getLiquidityPool", { liquidityTokenId });
   const api = await instancePromise;
   const liquidityPool = await api.query.xyk.liquidityPools(liquidityTokenId);
-  if (!liquidityPool.isSome)
+  if (liquidityPool.isNone)
     return ["-1", "-1"];
   return liquidityPool.unwrap().map((num) => num.toString());
 };
 
 // src/methods/query/getAmountOfTokensInPool.ts
 var getAmountOfTokensInPool = async (instancePromise, firstTokenId, secondTokenId) => {
+  logger.info("getAmountOfTokensInPool", { firstTokenId, secondTokenId });
   const api = await instancePromise;
   const balance = await api.query.xyk.pools([firstTokenId, secondTokenId]);
+  if (balance[0].eq(0) && balance[1].eq(0)) {
+    const balance2 = await api.query.xyk.pools([secondTokenId, firstTokenId]);
+    return [new import_bn.default(balance2[0]), new import_bn.default(balance2[1])];
+  }
   return [new import_bn.default(balance[0]), new import_bn.default(balance[1])];
 };
 
 // src/methods/query/getPool.ts
 var getPool = async (instancePromise, liquidityTokenId) => {
+  logger.info("getPool", { liquidityTokenId });
   const api = await instancePromise;
   const [liquidityPoolTokens, promotedPoolRewards] = await Promise.all([
     getLiquidityPool(instancePromise, liquidityTokenId),
@@ -3786,6 +3998,7 @@ var getAccountBalances = async (api, address) => {
 
 // src/methods/query/getInvestedPools.ts
 var getInvestedPools = async (instancePromise, address) => {
+  logger.info("getInvestedPools", { address });
   const api = await instancePromise;
   const [assetsInfo, accountBalances, liquidityTokensPromoted] = await Promise.all([
     getAssetsInfoWithIds(api),
@@ -3858,6 +4071,7 @@ var getAssetsInfo = async (instancePromise) => {
 
 // src/methods/query/getOwnedTokens.ts
 var getOwnedTokens = async (instancePromise, address) => {
+  logger.info("getOwnedTokens", { address });
   const api = await instancePromise;
   const [assetsInfo, accountBalances] = await Promise.all([
     getAssetsInfo(instancePromise),
@@ -3902,12 +4116,14 @@ var getLiquidityTokenIds = async (instancePromise) => {
 
 // src/methods/query/getTokenInfo.ts
 var getTokenInfo = async (instancePromise, tokenId) => {
+  logger.info("getTokenInfo", { tokenId });
   const assetsInfo = await getAssetsInfo(instancePromise);
   return assetsInfo[tokenId];
 };
 
 // src/methods/query/getTokenBalance.ts
 var getTokenBalance = async (instancePromise, tokenId, address) => {
+  logger.info("getTokenBalance", { tokenId, address });
   const api = await instancePromise;
   const { free, reserved, frozen } = await api.query.tokens.accounts(
     address,
@@ -3922,6 +4138,7 @@ var getTokenBalance = async (instancePromise, tokenId, address) => {
 
 // src/methods/query/getTotalIssuance.ts
 var getTotalIssuance = async (instancePromise, tokenId) => {
+  logger.info("getTotalIssuance", { tokenId });
   const api = await instancePromise;
   const tokenSupply = await api.query.tokens.totalIssuance(tokenId);
   return new import_bn.default(tokenSupply);
@@ -3930,10 +4147,18 @@ var getTotalIssuance = async (instancePromise, tokenId) => {
 // src/methods/query/getLiquidityTokenId.ts
 var getLiquidityTokenId = async (instancePromise, firstTokenId, secondTokenId) => {
   const api = await instancePromise;
+  logger.info("getLiquidityTokenId", { firstTokenId, secondTokenId });
   const liquidityAssetId = await api.query.xyk.liquidityAssets([
     firstTokenId,
     secondTokenId
   ]);
+  if (liquidityAssetId.isNone) {
+    const liquidityAssetId2 = await api.query.xyk.liquidityAssets([
+      secondTokenId,
+      firstTokenId
+    ]);
+    return liquidityAssetId2.unwrap().toString();
+  }
   return liquidityAssetId.unwrap().toString();
 };
 
@@ -7586,6 +7811,7 @@ function encodeAddress(key, ss58Format = defaults.prefix) {
 
 // src/methods/xTokens/withdraw.ts
 var withdraw = async (instancePromise, args) => {
+  logger.info("Withdraw method started ...");
   const {
     tokenSymbol,
     withWeight,
@@ -7595,6 +7821,13 @@ var withdraw = async (instancePromise, args) => {
     amount,
     txOptions
   } = args;
+  logger.info("withdraw", {
+    tokenSymbol,
+    withWeight,
+    parachainId,
+    destinationAddress,
+    amount: amount.toString()
+  });
   const api = await instancePromise;
   const correctAddress = encodeAddress(destinationAddress, 42);
   const assetRegistryMetadata = await api.query.assetRegistry.metadata.entries();
@@ -7646,8 +7879,13 @@ var withdraw = async (instancePromise, args) => {
 
 // src/methods/xTokens/withdrawKsm.ts
 var withdrawKsm = async (instancePromise, args) => {
+  logger.info("Withdraw KSM started ...");
   const api = await instancePromise;
   const { account, kusamaAddress, amount, txOptions } = args;
+  logger.info("withdrawKsm", {
+    kusamaAddress,
+    amount: amount.toString()
+  });
   const destination = {
     V3: {
       parents: 1,
@@ -7674,24 +7912,39 @@ var withdrawKsm = async (instancePromise, args) => {
 
 // src/methods/utility/batch.ts
 var batch = async (instancePromise, args) => {
+  logger.info("Batch operation started ...");
   const api = await instancePromise;
   const { account, txOptions, calls } = args;
   const tx = api.tx.utility.batch(calls);
+  logger.info("batch", {
+    nonce: txOptions?.nonce?.toString(),
+    numberOfTxs: calls.length
+  });
   return await signTx(api, tx, account, txOptions);
 };
 
 // src/methods/utility/batchAll.ts
 var batchAll = async (instancePromise, args) => {
+  logger.info("BatchAll operation started ...");
   const api = await instancePromise;
   const { account, txOptions, calls } = args;
+  logger.info("batchAll", {
+    nonce: txOptions?.nonce?.toString(),
+    numberOfTxs: calls.length
+  });
   const tx = api.tx.utility.batchAll(calls);
   return await signTx(api, tx, account, txOptions);
 };
 
 // src/methods/utility/forceBatch.ts
 var forceBatch = async (instancePromise, args) => {
+  logger.info("ForceBatch operation started ...");
   const api = await instancePromise;
   const { account, txOptions, calls } = args;
+  logger.info("forceBatch", {
+    nonce: txOptions?.nonce?.toString(),
+    numberOfTxs: calls.length
+  });
   const tx = api.tx.utility.forceBatch(calls);
   return await signTx(api, tx, account, txOptions);
 };
@@ -7740,6 +7993,9 @@ var waitForNewBlock = async (instancePromise, blockCount) => {
   let count = 0;
   const api = await instancePromise;
   const numberOfBlocks = blockCount || 1;
+  logger.info("waitForNewBlock", {
+    numberOfBlocks
+  });
   return new Promise(async (resolve) => {
     const unsubscribe = await api.rpc.chain.subscribeNewHeads(() => {
       if (++count === numberOfBlocks) {
@@ -7753,6 +8009,7 @@ var waitForNewBlock = async (instancePromise, blockCount) => {
 // src/methods/xTokens/depositFromKusama.ts
 import { ApiPromise as ApiPromise3, WsProvider as WsProvider3 } from "@polkadot/api";
 var depositFromKusama = async (args) => {
+  logger.info("Deposit From Kusama started ...");
   const {
     url,
     destination,
@@ -7763,6 +8020,14 @@ var depositFromKusama = async (args) => {
     txOptions,
     account
   } = args;
+  logger.info("depositFromKusama", {
+    url,
+    destination,
+    beneficiary,
+    assets,
+    feeAssetItem,
+    weightLimit
+  });
   const api = await new ApiPromise3({
     provider: new WsProvider3(url),
     noInitWarn: true
@@ -7782,6 +8047,7 @@ var depositFromKusama = async (args) => {
 // src/methods/xTokens/depositFromStatemine.ts
 import { ApiPromise as ApiPromise4, WsProvider as WsProvider4 } from "@polkadot/api";
 var depositFromStatemine = async (args) => {
+  logger.info("Deposit From Statemine started ...");
   const {
     url,
     destination,
@@ -7792,6 +8058,14 @@ var depositFromStatemine = async (args) => {
     txOptions,
     account
   } = args;
+  logger.info("depositFromStatemine", {
+    url,
+    destination,
+    beneficiary,
+    assets,
+    feeAssetItem,
+    weightLimit
+  });
   const api = await new ApiPromise4({
     provider: new WsProvider4(url),
     noInitWarn: true
@@ -7826,62 +8100,6 @@ var calculateMintingFutureRewards = async (apiPromise, liquidityTokenId, minting
   const rewardsMintedForPool = totalRewardsMinted.mul(poolWeight).div(totalWeight);
   const totalActivatedLiquidityInPool = await api.query.proofOfStake.totalActivatedLiquidity(liquidityTokenId);
   return rewardsMintedForPool.mul(mintingAmount).div(new import_bn.default(totalActivatedLiquidityInPool.toString()).add(mintingAmount));
-};
-
-// src/utils/bnUtility.ts
-import Big2 from "big.js";
-
-// src/utils/bigConstants.ts
-import Big from "big.js";
-var BIG_ZERO = Big("0");
-var BIG_ONE = Big("1");
-var BIG_TEN = Big("10");
-var BIG_HUNDRED = Big("100");
-var BIG_THOUSAND = Big("1000");
-var BIG_TEN_THOUSAND = Big("10000");
-var BIG_HUNDRED_THOUSAND = Big("100000");
-var BIG_MILLION = Big("1000000");
-var BIG_TEN_MILLIONS = Big("10000000");
-var BIG_HUNDRED_MILLIONS = Big("100000000");
-var BIG_BILLION = Big("1000000000");
-var BIG_TEN_BILLIONS = Big("10000000000");
-var BIG_HUNDRED_BILLIONS = Big("100000000000");
-var BIG_TRILLION = Big("1000000000000");
-
-// src/utils/bnUtility.ts
-Big2.PE = 256;
-Big2.NE = -256;
-Big2.DP = 40;
-Big2.RM = Big2.roundUp;
-var DEFAULT_TOKEN_DECIMALS = 18;
-var DEFAULT_DECIMAL_MULTIPLIER = BIG_TEN.pow(DEFAULT_TOKEN_DECIMALS);
-var toBN = (value, exponent) => {
-  if (!value)
-    return BN_ZERO;
-  try {
-    const inputNumber = Big2(value);
-    const decimalMultiplier = !exponent || exponent === DEFAULT_TOKEN_DECIMALS ? DEFAULT_DECIMAL_MULTIPLIER : BIG_TEN.pow(exponent);
-    const res = inputNumber.mul(decimalMultiplier);
-    const resStr = res.toString();
-    if (/\D/gm.test(resStr))
-      return BN_ZERO;
-    return new import_bn.default(resStr);
-  } catch (err) {
-    return BN_ZERO;
-  }
-};
-var fromBN = (value, exponent) => {
-  if (!value)
-    return "0";
-  try {
-    const inputNumber = Big2(value.toString());
-    const decimalMultiplier = !exponent || exponent === DEFAULT_TOKEN_DECIMALS ? DEFAULT_DECIMAL_MULTIPLIER : BIG_TEN.pow(exponent);
-    const res = inputNumber.div(decimalMultiplier);
-    const resStr = res.toString();
-    return resStr;
-  } catch (err) {
-    return "0";
-  }
 };
 
 // src/methods/fee/getActivateLiquidityFee.ts
@@ -8068,60 +8286,33 @@ var getTransferTokenFee = async (instancePromise, args) => {
 
 // src/methods/xyk/multiswapBuyAsset.ts
 async function multiswapBuyAsset(instancePromise, args, isForBatch) {
+  logger.info("Multiswap Buy Asset operation started ...");
   const api = await instancePromise;
   const { account, tokenIds, amount, maxAmountIn, txOptions } = args;
+  logger.info("multiswapBuyAsset", {
+    tokenIds,
+    amount: amount.toString(),
+    maxAmountIn: maxAmountIn.toString(),
+    isBatch: isForBatch
+  });
   const tx = api.tx.xyk.multiswapBuyAsset(tokenIds, amount, maxAmountIn);
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }
 
 // src/methods/xyk/multiswapSellAsset.ts
 async function multiswapSellAsset(instancePromise, args, isForBatch) {
+  logger.info("Multiswap Sell Asset operation started ...");
   const api = await instancePromise;
   const { account, tokenIds, amount, minAmountOut, txOptions } = args;
+  logger.info("multiswapSellAsset", {
+    tokenIds,
+    amount: amount.toString(),
+    minAmountOut: minAmountOut.toString(),
+    isBatch: isForBatch
+  });
   const tx = api.tx.xyk.multiswapSellAsset(tokenIds, amount, minAmountOut);
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }
-
-// src/utils/getPriceImpact.ts
-import Big3 from "big.js";
-
-// src/utils/isInputValid.ts
-var isInputValid = (value) => {
-  const valueNum = +value;
-  return !(!value || isNaN(Number(value)) || isNaN(valueNum) || valueNum < 0);
-};
-
-// src/utils/toFixed.ts
-var toFixed = (value, decimals) => {
-  const decimalsRegex = new RegExp(`^-?\\d+(?:\\.\\d{0,${decimals}})?`, "gm");
-  const withDesiredDecimalPlaces = value.match(decimalsRegex);
-  const trailingZeroesRegex = /^-?0*(\d+(?:\.(?:(?!0+$)\d)+)?)/gm;
-  const withoutTrailingZeroes = (withDesiredDecimalPlaces?.[0] || value).match(
-    trailingZeroesRegex
-  );
-  return withoutTrailingZeroes?.[0] ?? value;
-};
-
-// src/utils/getPriceImpact.ts
-var getPriceImpact = (args) => {
-  const { poolReserves, decimals, tokenAmounts } = args;
-  if (!poolReserves || !decimals || !isInputValid(tokenAmounts[0]) || !isInputValid(tokenAmounts[1])) {
-    return;
-  }
-  const firstReserveBefore = poolReserves[0];
-  const secondReserveBefore = poolReserves[1];
-  const soldAmount = toBN(tokenAmounts[0].toString(), decimals[0]);
-  const boughtAmount = toBN(tokenAmounts[1].toString(), decimals[1]);
-  if (boughtAmount.gte(secondReserveBefore))
-    return "";
-  const numerator = firstReserveBefore.add(soldAmount).mul(BN_TEN_THOUSAND).mul(secondReserveBefore);
-  const denominator = secondReserveBefore.sub(boughtAmount).mul(firstReserveBefore);
-  const res = numerator.div(denominator).sub(BN_TEN_THOUSAND);
-  const resStr = res.toString();
-  const resBig = Big3(resStr);
-  const resFormatted = toFixed(resBig.div(BIG_HUNDRED).toString(), 2);
-  return resFormatted;
-};
 
 // src/methods/fee/getDepositFromKusamaFee.ts
 import { ApiPromise as ApiPromise6, WsProvider as WsProvider6 } from "@polkadot/api";
@@ -8177,6 +8368,10 @@ var getDepositFromStatemineFee = async (args) => {
 
 // src/methods/rpc/isBuyAssetLockFree.ts
 var isBuyAssetLockFree = async (instancePromise, tokenIds, amount) => {
+  logger.info("isBuyAssetLockFree", {
+    tokenIds,
+    amount: amount.toString()
+  });
   const api = await instancePromise;
   const result = await api.rpc.xyk.is_buy_asset_lock_free(
     tokenIds,
@@ -8187,6 +8382,10 @@ var isBuyAssetLockFree = async (instancePromise, tokenIds, amount) => {
 
 // src/methods/rpc/isSellAssetLockFree.ts
 var isSellAssetLockFree = async (instancePromise, tokenIds, amount) => {
+  logger.info("isSellAssetLockFree", {
+    tokenIds,
+    amount: amount.toString()
+  });
   const api = await instancePromise;
   const result = await api.rpc.xyk.is_sell_asset_lock_free(
     tokenIds,
@@ -8197,8 +8396,14 @@ var isSellAssetLockFree = async (instancePromise, tokenIds, amount) => {
 
 // src/methods/xTokens/withdrawToMoonriver.ts
 var withdrawToMoonriver = async (instancePromise, args) => {
+  logger.info("Withdraw To Moonriver started ...");
   const api = await instancePromise;
   const { account, tokenSymbol, moonriverAddress, amount, txOptions } = args;
+  logger.info("withdrawToMoonriver", {
+    tokenSymbol,
+    moonriverAddress,
+    amount: amount.toString()
+  });
   const assetRegistryMetadata = await api.query.assetRegistry.metadata.entries();
   const assetFiltered = assetRegistryMetadata.filter((metadata) => {
     const symbol = metadata[1].value.symbol.toPrimitive();
@@ -8279,9 +8484,10 @@ var getWithdrawFromMoonriverFee = async (instancePromise, args) => {
   return fromBN(new import_bn.default(dispatchInfo.partialFee.toString()));
 };
 
-// src/mangata.ts
+// src/mangataInstance.ts
 function createMangataInstance(urls) {
   const instancePromise = getOrCreateInstance(urls);
+  logger.info("Endpoints: ", urls);
   return {
     api: async () => await instancePromise,
     batch: async (args) => await batch(instancePromise, args),
@@ -8394,6 +8600,8 @@ function createMangataInstance(urls) {
     }
   };
 }
+
+// src/mangata.ts
 var Mangata = {
   instance: createMangataInstance,
   getPriceImpact: (args) => getPriceImpact(args)
@@ -8451,6 +8659,7 @@ export {
   fromBN,
   isBuyAssetTransactionSuccessful,
   isSellAssetTransactionSuccessful,
+  setLoggerOptions,
   signTx,
   toBN,
   toFixed
