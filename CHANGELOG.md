@@ -1,3 +1,10 @@
+# [2.0.0-rc.16](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.15...v2.0.0-rc.16) (2023-07-13)
+
+
+### Features
+
+* add logger to sdk ([e5040f5](https://github.com/mangata-finance/mangata-sdk/commit/e5040f5fe6184ff9cee0cef07f393701c2a76ab2))
+
 # [2.0.0-rc.15](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.14...v2.0.0-rc.15) (2023-07-11)
 
 
