@@ -3,6 +3,7 @@ import { BN } from "@polkadot/util";
 import { ApiPromise } from "@polkadot/api";
 import { signTx } from "../../utils/signTx";
 import { Withdraw } from "../../types/xTokens";
+import { logger } from "../../utils/mangataLogger";
 
 /**
  * @since 2.0.0
@@ -11,6 +12,7 @@ export const withdraw = async (
   instancePromise: Promise<ApiPromise>,
   args: Withdraw
 ) => {
+  logger.info("Withdraw method started ...");
   const {
     tokenSymbol,
     withWeight,
@@ -20,6 +22,13 @@ export const withdraw = async (
     amount,
     txOptions
   } = args;
+  logger.info("withdraw", {
+    tokenSymbol,
+    withWeight,
+    parachainId,
+    destinationAddress,
+    amount: amount.toString()
+  });
   const api = await instancePromise;
   const correctAddress = encodeAddress(destinationAddress, 42);
 

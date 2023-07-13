@@ -2,13 +2,20 @@ import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
 import { signTx } from "src/utils/signTx";
 import { MoonriverWithdraw } from "../../types/xTokens";
+import { logger } from "../../utils/mangataLogger";
 
 export const withdrawToMoonriver = async (
   instancePromise: Promise<ApiPromise>,
   args: MoonriverWithdraw
 ) => {
+  logger.info("Withdraw To Moonriver started ...");
   const api = await instancePromise;
   const { account, tokenSymbol, moonriverAddress, amount, txOptions } = args;
+  logger.info("withdrawToMoonriver", {
+    tokenSymbol,
+    moonriverAddress,
+    amount: amount.toString()
+  });
 
   const assetRegistryMetadata =
     await api.query.assetRegistry.metadata.entries();

@@ -4,6 +4,7 @@ import { signTx } from "../../utils/signTx";
 import { CreatePool } from "../../types/xyk";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
+import { logger } from "../../utils/mangataLogger";
 
 async function createPool(
   instancePromise: Promise<ApiPromise>,
@@ -29,6 +30,7 @@ async function createPool(
   args: CreatePool,
   isForBatch: boolean
 ) {
+  logger.info("Create Pool Operation started ...");
   const api = await instancePromise;
   const {
     account,
@@ -38,6 +40,13 @@ async function createPool(
     secondTokenId,
     secondTokenAmount
   } = args;
+  logger.info("createPool", {
+    firstTokenId,
+    firstTokenAmount: firstTokenAmount.toString(),
+    secondTokenId,
+    secondTokenAmount: secondTokenAmount.toString(),
+    isBatch: isForBatch
+  });
   const tx = api.tx.xyk.createPool(
     firstTokenId,
     firstTokenAmount,

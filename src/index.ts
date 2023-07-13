@@ -8,6 +8,7 @@ export * from "./utils/bnUtility";
 export * from "./utils/toFixed";
 export * from "./utils/isBuyAssetTransactionSuccessful";
 export * from "./utils/isSellAssetTransactionSuccessful";
+export { setLoggerOptions } from "./utils/mangataLogger";
 
 export * from "./types/xTokens";
 export * from "./types/common";

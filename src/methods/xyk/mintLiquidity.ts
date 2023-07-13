@@ -4,6 +4,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { MangataGenericEvent } from "../../types/common";
 import { signTx } from "../../utils/signTx";
 import { MintLiquidity } from "../../types/xyk";
+import { logger } from "../../utils/mangataLogger";
 
 async function mintLiquidity(
   instancePromise: Promise<ApiPromise>,
@@ -44,6 +45,7 @@ async function mintLiquidity(
   args: MintLiquidity,
   isForBatch: boolean
 ) {
+  logger.info("Mint Liquidity operation started ...");
   const api = await instancePromise;
   const {
     account,
@@ -53,6 +55,13 @@ async function mintLiquidity(
     expectedSecondTokenAmount,
     txOptions
   } = args;
+  logger.info("mintLiquidity", {
+    firstTokenId,
+    secondTokenId,
+    firstTokenAmount: firstTokenAmount.toString(),
+    expectedSecondTokenAmount: expectedSecondTokenAmount.toString(),
+    isBatch: isForBatch
+  });
   const tx = api.tx.xyk.mintLiquidity(
     firstTokenId,
     secondTokenId,

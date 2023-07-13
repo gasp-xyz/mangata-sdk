@@ -1,6 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
 import { RelayWithdraw } from "../../types/xTokens";
+import { logger } from "../../utils/mangataLogger";
 
 /**
  * @since 2.0.0
@@ -9,8 +10,13 @@ export const withdrawKsm = async (
   instancePromise: Promise<ApiPromise>,
   args: RelayWithdraw
 ) => {
+  logger.info("Withdraw KSM started ...");
   const api = await instancePromise;
   const { account, kusamaAddress, amount, txOptions } = args;
+  logger.info("withdrawKsm", {
+    kusamaAddress,
+    amount: amount.toString()
+  });
   const destination = {
     V3: {
       parents: 1,

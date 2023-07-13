@@ -8,6 +8,7 @@ import { getLiquidityPromotedPools } from "../../utils/getLiquidityPromotedPools
 import { getRatio } from "../../utils/getRatio";
 import { Address } from "../../types/common";
 import { getAmountOfTokensInPool } from "./getAmountOfTokensInPool";
+import { logger } from "../../utils/mangataLogger";
 
 /**
  * @since 2.0.0
@@ -16,6 +17,7 @@ export const getInvestedPools = async (
   instancePromise: Promise<ApiPromise>,
   address: Address
 ): Promise<PoolWithShare[]> => {
+  logger.info("getInvestedPools", { address });
   const api = await instancePromise;
   const [assetsInfo, accountBalances, liquidityTokensPromoted] =
     await Promise.all([

@@ -5,6 +5,7 @@ import { Signer } from "@polkadot/api/types";
 import type { ISubmittableResult, Codec } from "@polkadot/types/types";
 import type { Event, Phase } from "@polkadot/types/interfaces";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
+import { ILogObj, ISettingsParam } from "tslog";
 
 import {
   MainTokens,
@@ -101,6 +102,7 @@ export type TxOptions = {
 };
 
 export type MangataSubmittableExtrinsic = SubmittableExtrinsic<"promise">;
+export type MangataLoggerOptions = ISettingsParam<ILogObj>;
 
 export interface MangataInstance {
   /**

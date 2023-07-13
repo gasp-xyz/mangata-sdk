@@ -5,6 +5,7 @@ import { PoolWithRatio } from "../../types/query";
 import { getLiquidityPool } from "./getLiquidityPool";
 import { getAmountOfTokensInPool } from "./getAmountOfTokensInPool";
 import { getLiquidityPromotedPools } from "src/utils/getLiquidityPromotedPools";
+import { logger } from "../../utils/mangataLogger";
 
 /**
  * @since 2.0.0
@@ -13,6 +14,7 @@ export const getPool = async (
   instancePromise: Promise<ApiPromise>,
   liquidityTokenId: TokenId
 ) => {
+  logger.info("getPool", { liquidityTokenId });
   const api = await instancePromise;
   const [liquidityPoolTokens, promotedPoolRewards] = await Promise.all([
     getLiquidityPool(instancePromise, liquidityTokenId),

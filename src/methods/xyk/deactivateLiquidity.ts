@@ -4,6 +4,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { MangataGenericEvent } from "../../types/common";
 import { signTx } from "../../utils/signTx";
 import { Liquidity } from "../../types/xyk";
+import { logger } from "../../utils/mangataLogger";
 
 async function deactivateLiquidity(
   instancePromise: Promise<ApiPromise>,
@@ -30,8 +31,14 @@ async function deactivateLiquidity(
   args: Liquidity,
   isForBatch: boolean
 ) {
+  logger.info("Deactivate Liquidity operation started ...");
   const api = await instancePromise;
   const { account, liquidityTokenId, amount, txOptions } = args;
+  logger.info("deactivateLiquidity", {
+    liquidityTokenId,
+    amount: amount.toString(),
+    isBatch: isForBatch
+  });
   const tx = api.tx.proofOfStake.deactivateLiquidity(liquidityTokenId, amount);
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }
