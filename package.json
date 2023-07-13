@@ -31,7 +31,8 @@
   },
   "dependencies": {
     "@mangata-finance/type-definitions": "^1.0.0",
-    "big.js": "^6.2.1"
+    "big.js": "^6.2.1",
+    "tslog": "^4.8.2"
   },
   "devDependencies": {
     "@mangata-finance/types": "1.0.0-rc.13",
