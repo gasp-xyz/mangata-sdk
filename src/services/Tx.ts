@@ -786,7 +786,7 @@ export class Tx {
     const destWeightLimit = {
       Limited: {
         ref_time: new BN("1000000000"),
-        proof_size: 0
+        proof_size: new BN("50000")
       }
     };
 
