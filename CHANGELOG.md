@@ -1,3 +1,10 @@
+## [1.21.5](https://github.com/mangata-finance/mangata-sdk/compare/v1.21.4...v1.21.5) (2023-07-11)
+
+
+### Bug Fixes
+
+* moonriver tx options ([2ad0c51](https://github.com/mangata-finance/mangata-sdk/commit/2ad0c510a5f21c497ef219d9ee5d42dda51cebd0))
+
 ## [1.21.4](https://github.com/mangata-finance/mangata-sdk/compare/v1.21.3...v1.21.4) (2023-07-09)
 
 
