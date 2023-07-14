@@ -71,7 +71,7 @@ export const withdraw = async (
       destWeightLimit = {
         Limited: {
           ref_time: new BN(withWeight),
-          proof_size: 0
+          proof_size: new BN("50000")
         }
       };
     }
