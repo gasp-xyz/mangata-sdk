@@ -1,3 +1,10 @@
+## [1.21.6](https://github.com/mangata-finance/mangata-sdk/compare/v1.21.5...v1.21.6) (2023-07-14)
+
+
+### Bug Fixes
+
+* update proofsize for withdraw to moonriver ([bdc089b](https://github.com/mangata-finance/mangata-sdk/commit/bdc089b99b886f05979f94092d4158e0fa145b93))
+
 ## [1.21.5](https://github.com/mangata-finance/mangata-sdk/compare/v1.21.4...v1.21.5) (2023-07-11)
 
 
