@@ -51,7 +51,7 @@ export const withdrawToMoonriver = async (
   const destWeightLimit = {
     Limited: {
       ref_time: new BN("1000000000"),
-      proof_size: new BN("50000")
+      proof_size: new BN("100000")
     }
   };
 
