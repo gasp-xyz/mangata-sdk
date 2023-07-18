@@ -1,3 +1,10 @@
+# [2.0.0-rc.18](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.17...v2.0.0-rc.18) (2023-07-18)
+
+
+### Bug Fixes
+
+* proof size for withdraw ([766423e](https://github.com/mangata-finance/mangata-sdk/commit/766423e82ab61be065ec4f7724ff58bc2b43ec3a))
+
 # [2.0.0-rc.17](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.16...v2.0.0-rc.17) (2023-07-14)
 
 
