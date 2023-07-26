@@ -1,3 +1,10 @@
+# [2.0.0-rc.19](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.18...v2.0.0-rc.19) (2023-07-26)
+
+
+### Bug Fixes
+
+* flip balance args for getAmountOfTokensInPool ([e0f1532](https://github.com/mangata-finance/mangata-sdk/commit/e0f1532fca38e4edc1c5cd6c44833afd9c354517))
+
 # [2.0.0-rc.18](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.17...v2.0.0-rc.18) (2023-07-18)
 
 
