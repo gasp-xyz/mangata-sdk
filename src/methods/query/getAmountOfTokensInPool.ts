@@ -17,7 +17,7 @@ export const getAmountOfTokensInPool = async (
 
   if (balance[0].eq(0) && balance[1].eq(0)) {
     const balance = await api.query.xyk.pools([secondTokenId, firstTokenId]);
-    return [new BN(balance[0]), new BN(balance[1])];
+    return [new BN(balance[1]), new BN(balance[0])];
   }
 
   return [new BN(balance[0]), new BN(balance[1])];
