@@ -14,7 +14,9 @@ export const getAssetsInfoWithIds = async (api: ApiPromise) => {
     .reduce((obj, item) => {
       const asset = {
         ...item,
-        name: item.name.replace(/0x\w+/, "").replace(/[A-Z]/g, " $&").trim(),
+        name: item.name
+          .replace(/(LiquidityPoolToken)0x[a-fA-F0-9]+/, "$1")
+          .replace(/([a-z])([A-Z])/g, "$1 $2"),
         symbol: item.symbol.includes("TKN")
           ? item.symbol
               .split("-")
@@ -27,7 +29,7 @@ export const getAssetsInfoWithIds = async (api: ApiPromise) => {
                 return acc;
               }, [] as string[])
               .join("-")
-          : item.symbol
+          : item.symbol,
       };
       obj[asset.id] = asset;
       return obj;

@@ -10,7 +10,7 @@ import {
   TPool,
   TTokenAddress,
   TTokenId,
-  TPoolWithRatio
+  TPoolWithRatio,
 } from "../types/AssetInfo";
 import { getCompleteAssetsInfo } from "../utils/getCompleteAssetsInfo";
 import { getLiquidityAssets } from "../utils/getLiquidityAssets";
@@ -52,7 +52,7 @@ export class Query {
   ): Promise<BN> {
     const liquidityAssetId = await api.query.xyk.liquidityAssets([
       firstTokenId,
-      secondTokenId
+      secondTokenId,
     ]);
     if (!liquidityAssetId) return BN_ZERO;
     return new BN(liquidityAssetId.toString());
@@ -95,7 +95,7 @@ export class Query {
         : new BN(reserved.toString()),
       frozen: isHex(frozen.toString())
         ? hexToBn(frozen.toString())
-        : new BN(frozen.toString())
+        : new BN(frozen.toString()),
     };
   }
 
@@ -140,7 +140,9 @@ export class Query {
       .reduce((obj, item) => {
         const asset = {
           ...item,
-          name: item.name.replace(/0x\w+/, "").replace(/[A-Z]/g, "$&").trim(),
+          name: item.name
+            .replace(/(LiquidityPoolToken)0x[a-fA-F0-9]+/, "$1")
+            .replace(/([a-z])([A-Z])/g, "$1 $2"),
           symbol: item.symbol.includes("TKN")
             ? item.symbol
                 .split("-")
@@ -154,7 +156,7 @@ export class Query {
                   return acc;
                 }, [] as string[])
                 .join("-")
-            : item.symbol
+            : item.symbol,
         };
         obj[asset.id] = asset;
         return obj;
@@ -174,14 +176,14 @@ export class Query {
 
     const [assetsInfo, accountBalances] = await Promise.all([
       this.getAssetsInfo(api),
-      getAccountBalances(api, address)
+      getAccountBalances(api, address),
     ]);
 
     return Object.values(assetsInfo).reduce((acc, assetInfo) => {
       if (Object.keys(accountBalances).includes(assetInfo.id)) {
         acc[assetInfo.id] = {
           ...assetInfo,
-          balance: accountBalances[assetInfo.id]
+          balance: accountBalances[assetInfo.id],
         };
       }
       return acc;
@@ -206,20 +208,16 @@ export class Query {
       await Promise.all([
         getAssetsInfoWithIds(api),
         getAccountBalances(api, address),
-        getLiquidityPromotedPools(api)
+        getLiquidityPromotedPools(api),
       ]);
 
     const poolsInfo = Object.values(assetsInfo)
-      .reduce((acc, asset) => {
-        if (
+      .filter(
+        (asset) =>
           Object.keys(accountBalances).includes(asset.id) &&
           asset.name.includes("Liquidity Pool Token")
-        ) {
-          acc.push(asset);
-        }
-        return acc;
-      }, [] as TTokenInfo[])
-      .map(async (asset: TTokenInfo) => {
+      )
+      .map(async (asset) => {
         const userLiquidityBalance = accountBalances[asset.id];
         const firstTokenId = asset.symbol.split("-")[0];
         const secondTokenId = asset.symbol.split("-")[1];
@@ -250,7 +248,7 @@ export class Query {
             ? BN_ZERO
             : getRatio(secondTokenAmount, firstTokenAmount),
           activatedLPTokens: userLiquidityBalance.reserved,
-          nonActivatedLPTokens: userLiquidityBalance.free
+          nonActivatedLPTokens: userLiquidityBalance.free,
         } as TPool & {
           share: BN;
           firstTokenRatio: BN;
@@ -295,14 +293,14 @@ export class Query {
       liquidityTokenId,
       isPromoted: !!isPoolPromoted,
       firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
-      secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount)
+      secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount),
     } as TPoolWithRatio;
   }
 
   static async getPools(api: ApiPromise): Promise<TPoolWithRatio[]> {
     const [assetsInfo, liquidityAssets] = await Promise.all([
       getAssetsInfoWithIds(api),
-      getLiquidityAssets(api)
+      getLiquidityAssets(api),
     ]);
     const poolBalances = await getPoolsBalance(api, liquidityAssets);
     const liquidityTokensPromoted = await getLiquidityPromotedPools(api);
@@ -325,7 +323,7 @@ export class Query {
           liquidityTokenId: asset.id,
           firstTokenRatio: getRatio(firstTokenAmount, secondTokenAmount),
           secondTokenRatio: getRatio(secondTokenAmount, firstTokenAmount),
-          isPromoted: liquidityTokensPromoted.includes(asset.id)
+          isPromoted: liquidityTokensPromoted.includes(asset.id),
         } as TPool & { firstTokenRatio: BN; secondTokenRatio: BN };
       });
   }
