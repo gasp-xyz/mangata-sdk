@@ -1,3 +1,10 @@
+## [1.21.9](https://github.com/mangata-finance/mangata-sdk/compare/v1.21.8...v1.21.9) (2023-08-01)
+
+
+### Bug Fixes
+
+* liquidity pool token name ([4628b32](https://github.com/mangata-finance/mangata-sdk/commit/4628b322e1cff95f2681ab06630898daf176a643))
+
 ## [1.21.8](https://github.com/mangata-finance/mangata-sdk/compare/v1.21.7...v1.21.8) (2023-07-18)
 
 
