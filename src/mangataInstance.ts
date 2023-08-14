@@ -31,6 +31,7 @@ import {
 import {
   Address,
   MangataInstance,
+  ExtrinsicCommon,
   Prettify,
   TokenAmount,
   TokenId
@@ -51,6 +52,7 @@ import {
 } from "./types/xTokens";
 import { createPool } from "./methods/xyk/createPool";
 import { claimRewards } from "./methods/xyk/claimRewards";
+import { claimRewardsAll } from "./methods/xyk/claimRewardsAll";
 import { calculateBuyPriceId } from "./methods/rpc/calculateBuyPriceId";
 import { calculateSellPriceId } from "./methods/rpc/calculateSellPriceId";
 import { getBurnAmount } from "./methods/rpc/getBurnAmount";
@@ -151,6 +153,8 @@ export function createMangataInstance(urls: string[]): MangataInstance {
         await mintLiquidity(instancePromise, args, false),
       createPool: async (args: CreatePool) =>
         await createPool(instancePromise, args, false),
+      claimRewardsAll: async (args: ExtrinsicCommon) =>
+        await claimRewardsAll(instancePromise, args, false),
       claimRewards: async (args: Prettify<Omit<Liquidity, "amount">>) =>
         await claimRewards(instancePromise, args, false),
       multiswapBuyAsset: async (args: MultiswapBuyAsset) =>

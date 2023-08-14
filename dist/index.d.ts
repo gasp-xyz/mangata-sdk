@@ -294,6 +294,12 @@ interface MangataInstance {
          */
         claimRewards: (args: Prettify<Omit<Liquidity, "amount">>) => Promise<MangataGenericEvent[]>;
         /**
+         * Claims rewards from a pool.
+         * @param args - The liquidity parameters.
+         * @returns A promise that resolves with an array of MangataGenericEvent objects.
+         */
+        claimRewardsAll: (args: ExtrinsicCommon) => Promise<MangataGenericEvent[]>;
+        /**
          * Executes a multiswap sell asset operation.
          * @param args - The multiswap sell asset parameters.
          * @returns A promise that resolves with an array of MangataGenericEvent objects.
