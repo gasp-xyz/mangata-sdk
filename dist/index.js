@@ -3685,6 +3685,56 @@ async function claimRewards(instancePromise, args, isForBatch) {
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }
 
+// src/methods/rpc/calculateRewardsAmount.ts
+var calculateRewardsAmount = async (instancePromise, args) => {
+  logger.info("calculateRewardsAmount", {
+    address: args.address,
+    liquidityTokenId: args.liquidityTokenId
+  });
+  const api = await instancePromise;
+  const { address, liquidityTokenId } = args;
+  const rewards = await api.rpc.xyk.calculate_rewards_amount(
+    address,
+    liquidityTokenId
+  );
+  const price = isHex(rewards.price.toString()) ? hexToBn(rewards.price.toString()) : new import_bn.default(rewards.price);
+  return price;
+};
+
+// src/methods/xyk/claimRewardsAll.ts
+var TOKENS_CLAIM_LIMIT = 10;
+async function claimRewardsAll(instancePromise, args, isForBatch) {
+  logger.info("Claim Rewards operation started ...");
+  const api = await instancePromise;
+  const { account, txOptions } = args;
+  let rewardsAddr;
+  if (typeof account === "string") {
+    rewardsAddr = account;
+  } else {
+    rewardsAddr = account.address;
+  }
+  logger.info("claimRewardsAll", { isBatch: isForBatch });
+  const promotedPools = await api.query.proofOfStake.promotedPoolRewards();
+  const liquidityTokens = Object.entries(promotedPools.toHuman()).map(([token, _]) => {
+    return Promise.all([
+      Promise.resolve(token),
+      calculateRewardsAmount(instancePromise, {
+        address: rewardsAddr,
+        liquidityTokenId: token
+      })
+    ]);
+  });
+  const txs = (await Promise.all(liquidityTokens)).filter(([_, rewards]) => rewards.gtn(0)).map(([pool, rewards]) => {
+    const claimRewardsArgs = { ...args, ...{ amount: rewards, liquidityTokenId: pool } };
+    return claimRewards(instancePromise, claimRewardsArgs, true);
+  });
+  if (txs.length > TOKENS_CLAIM_LIMIT) {
+    throw new Error(`Only up to ${TOKENS_CLAIM_LIMIT} can be claimed automatically, consider claiming rewards separately for each liquidity pool`);
+  }
+  const claimAllTx = api.tx.utility.batchAll(await Promise.all(txs));
+  return isForBatch ? claimAllTx : await signTx(api, claimAllTx, account, txOptions);
+}
+
 // src/methods/rpc/calculateBuyPriceId.ts
 var calculateBuyPriceId = async (instancePromise, soldTokenId, boughtTokenId, amount) => {
   logger.info("calculateBuyPriceId", {
@@ -3767,22 +3817,6 @@ var calculateBuyPrice = async (instancePromise, args) => {
     amount
   );
   return new import_bn.default(result.price);
-};
-
-// src/methods/rpc/calculateRewardsAmount.ts
-var calculateRewardsAmount = async (instancePromise, args) => {
-  logger.info("calculateRewardsAmount", {
-    address: args.address,
-    liquidityTokenId: args.liquidityTokenId
-  });
-  const api = await instancePromise;
-  const { address, liquidityTokenId } = args;
-  const rewards = await api.rpc.xyk.calculate_rewards_amount(
-    address,
-    liquidityTokenId
-  );
-  const price = isHex(rewards.price.toString()) ? hexToBn(rewards.price.toString()) : new import_bn.default(rewards.price);
-  return price;
 };
 
 // src/methods/rpc/getNodeVersion.ts
@@ -3937,7 +3971,7 @@ var getAmountOfTokensInPool = async (instancePromise, firstTokenId, secondTokenI
   const balance = await api.query.xyk.pools([firstTokenId, secondTokenId]);
   if (balance[0].eq(0) && balance[1].eq(0)) {
     const balance2 = await api.query.xyk.pools([secondTokenId, firstTokenId]);
-    return [new import_bn.default(balance2[0]), new import_bn.default(balance2[1])];
+    return [new import_bn.default(balance2[1]), new import_bn.default(balance2[0])];
   }
   return [new import_bn.default(balance[0]), new import_bn.default(balance[1])];
 };
@@ -5997,15 +6031,13 @@ var esm_default = [
     "network": "darwinia",
     "displayName": "Darwinia Network",
     "symbols": [
-      "RING",
-      "KTON"
+      "RING"
     ],
     "decimals": [
-      9,
-      9
+      18
     ],
-    "standardAccount": "*25519",
-    "website": "https://darwinia.network/"
+    "standardAccount": "secp256k1",
+    "website": "https://darwinia.network"
   },
   {
     "prefix": 19,
@@ -6489,6 +6521,19 @@ var esm_default = [
     "website": "https://hydradx.io"
   },
   {
+    "prefix": 64,
+    "network": "ewx",
+    "displayName": "Energy Web X",
+    "symbols": [
+      "EWT"
+    ],
+    "decimals": [
+      18
+    ],
+    "standardAccount": "*25519",
+    "website": "https://www.energyweb.org"
+  },
+  {
     "prefix": 65,
     "network": "aventus",
     "displayName": "Aventus Mainnet",
@@ -6957,6 +7002,19 @@ var esm_default = [
     "website": "https://allfeat.network"
   },
   {
+    "prefix": 666,
+    "network": "metaquity_network",
+    "displayName": "Metaquity Network",
+    "symbols": [
+      "MQTY"
+    ],
+    "decimals": [
+      18
+    ],
+    "standardAccount": "*25519",
+    "website": "https://metaquity.xyz/"
+  },
+  {
     "prefix": 789,
     "network": "geek",
     "displayName": "GEEK Network",
@@ -7362,6 +7420,19 @@ var esm_default = [
     ],
     "standardAccount": "*25519",
     "website": "https://unique.network"
+  },
+  {
+    "prefix": 8886,
+    "network": "golden_gate_sydney",
+    "displayName": "Golden Gate Sydney",
+    "symbols": [
+      "GGXT"
+    ],
+    "decimals": [
+      18
+    ],
+    "standardAccount": "*25519",
+    "website": "https://ggxchain.io/"
   },
   {
     "prefix": 9072,
@@ -7864,7 +7935,7 @@ var withdraw = async (instancePromise, args) => {
       destWeightLimit = {
         Limited: {
           ref_time: new import_bn.default(withWeight),
-          proof_size: 0
+          proof_size: new import_bn.default("100000")
         }
       };
     }
@@ -8433,7 +8504,7 @@ var withdrawToMoonriver = async (instancePromise, args) => {
   const destWeightLimit = {
     Limited: {
       ref_time: new import_bn.default("1000000000"),
-      proof_size: 0
+      proof_size: new import_bn.default("100000")
     }
   };
   await signTx(
@@ -8507,6 +8578,7 @@ function createMangataInstance(urls) {
       burnLiquidity: async (args) => await burnLiquidity(instancePromise, args, false),
       mintLiquidity: async (args) => await mintLiquidity(instancePromise, args, false),
       createPool: async (args) => await createPool(instancePromise, args, false),
+      claimRewardsAll: async (args) => await claimRewardsAll(instancePromise, args, false),
       claimRewards: async (args) => await claimRewards(instancePromise, args, false),
       multiswapBuyAsset: async (args) => await multiswapBuyAsset(instancePromise, args, false),
       multiswapSellAsset: async (args) => await multiswapSellAsset(instancePromise, args, false)
