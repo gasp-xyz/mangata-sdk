@@ -1,3 +1,15 @@
+# [2.0.0-rc.20](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.19...v2.0.0-rc.20) (2023-08-16)
+
+
+### Bug Fixes
+
+* use 'fast-runtime' in pre-release pipline ([50c2d2f](https://github.com/mangata-finance/mangata-sdk/commit/50c2d2fdb0d505cec898c61082ecf47579ec316d))
+
+
+### Features
+
+* add claimRewardsAll method to sdk ([1c8666d](https://github.com/mangata-finance/mangata-sdk/commit/1c8666d430ac6c965ba96940f9e35cb5036509a9))
+
 # [2.0.0-rc.19](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.18...v2.0.0-rc.19) (2023-07-26)
 
 
