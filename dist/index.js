@@ -3084,7 +3084,7 @@ var truncatedString = (str) => {
 // node_modules/@polkadot/x-textdecoder/node.js
 import util from "node:util";
 
-// node_modules/@polkadot/x-global/index.js
+// node_modules/@polkadot/x-textdecoder/node_modules/@polkadot/x-global/index.js
 function evaluateThis(fn) {
   return fn("return this");
 }
@@ -3098,6 +3098,17 @@ var TextDecoder2 = /* @__PURE__ */ extractGlobal("TextDecoder", util.TextDecoder
 
 // node_modules/@polkadot/x-textencoder/node.js
 import util2 from "node:util";
+
+// node_modules/@polkadot/x-textencoder/node_modules/@polkadot/x-global/index.js
+function evaluateThis2(fn) {
+  return fn("return this");
+}
+var xglobal2 = typeof globalThis !== "undefined" ? globalThis : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : evaluateThis2(Function);
+function extractGlobal2(name, fallback) {
+  return typeof xglobal2[name] === "undefined" ? fallback : xglobal2[name];
+}
+
+// node_modules/@polkadot/x-textencoder/node.js
 var Fallback = class {
   constructor() {
     this.__internal__encoder = new util2.TextEncoder();
@@ -3107,18 +3118,33 @@ var Fallback = class {
     return Uint8Array.from(this.__internal__encoder.encode(value));
   }
 };
-var TextEncoder2 = /* @__PURE__ */ extractGlobal("TextEncoder", Fallback);
+var TextEncoder2 = /* @__PURE__ */ extractGlobal2("TextEncoder", Fallback);
+
+// node_modules/@polkadot/util/node_modules/@polkadot/x-global/index.js
+function evaluateThis3(fn) {
+  return fn("return this");
+}
+var xglobal3 = typeof globalThis !== "undefined" ? globalThis : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : evaluateThis3(Function);
 
 // node_modules/@polkadot/util/is/function.js
 function isFunction(value) {
   return typeof value === "function";
 }
 
+// node_modules/@polkadot/x-bigint/node_modules/@polkadot/x-global/index.js
+function evaluateThis4(fn) {
+  return fn("return this");
+}
+var xglobal4 = typeof globalThis !== "undefined" ? globalThis : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : evaluateThis4(Function);
+function extractGlobal3(name, fallback) {
+  return typeof xglobal4[name] === "undefined" ? fallback : xglobal4[name];
+}
+
 // node_modules/@polkadot/x-bigint/index.js
 function invalidFallback() {
   return Number.NaN;
 }
-var BigInt2 = /* @__PURE__ */ extractGlobal("BigInt", invalidFallback);
+var BigInt2 = /* @__PURE__ */ extractGlobal3("BigInt", invalidFallback);
 
 // node_modules/@polkadot/util/hex/toU8a.js
 var CHR = "0123456789abcdef";
@@ -3163,12 +3189,12 @@ function isHex(value, bitLength = -1, ignoreLength) {
 
 // node_modules/@polkadot/util/has.js
 var hasBigInt = typeof BigInt2 === "function" && typeof BigInt2.asIntN === "function";
-var hasBuffer = typeof xglobal.Buffer === "function" && typeof xglobal.Buffer.isBuffer === "function";
-var hasProcess = typeof xglobal.process === "object";
+var hasBuffer = typeof xglobal3.Buffer === "function" && typeof xglobal3.Buffer.isBuffer === "function";
+var hasProcess = typeof xglobal3.process === "object";
 
 // node_modules/@polkadot/util/is/buffer.js
 function isBuffer(value) {
-  return hasBuffer && !!value && isFunction(value.readDoubleLE) && xglobal.Buffer.isBuffer(value);
+  return hasBuffer && !!value && isFunction(value.readDoubleLE) && xglobal3.Buffer.isBuffer(value);
 }
 
 // node_modules/@polkadot/util/is/u8a.js
@@ -4198,7 +4224,18 @@ var getLiquidityTokenId = async (instancePromise, firstTokenId, secondTokenId) =
 
 // node_modules/@polkadot/x-randomvalues/node.js
 import nodeCrypto from "node:crypto";
-var crypto = /* @__PURE__ */ extractGlobal("crypto", nodeCrypto.webcrypto);
+
+// node_modules/@polkadot/x-randomvalues/node_modules/@polkadot/x-global/index.js
+function evaluateThis5(fn) {
+  return fn("return this");
+}
+var xglobal5 = typeof globalThis !== "undefined" ? globalThis : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : evaluateThis5(Function);
+function extractGlobal4(name, fallback) {
+  return typeof xglobal5[name] === "undefined" ? fallback : xglobal5[name];
+}
+
+// node_modules/@polkadot/x-randomvalues/node.js
+var crypto = /* @__PURE__ */ extractGlobal4("crypto", nodeCrypto.webcrypto);
 function getRandomValues(output2) {
   return crypto.getRandomValues(output2);
 }
@@ -8679,20 +8716,11 @@ var Mangata = {
   getPriceImpact: (args) => getPriceImpact(args)
 };
 
-// src/utils/isBuyAssetTransactionSuccessful.ts
-var isBuyAssetTransactionSuccessful = (events) => {
+// src/utils/isMultiSwapAssetTransactionSuccessful.ts
+var isMultiSwapAssetTransactionSuccessful = (events) => {
   const hasSuccess = events.some((item) => item.method === "ExtrinsicSuccess");
   const hasFailed = events.some(
-    (item) => item.method === "BuyAssetFailedDueToSlippage" || item.method === "MultiSwapAssetFailedOnAtomicSwap"
-  );
-  return hasSuccess && !hasFailed;
-};
-
-// src/utils/isSellAssetTransactionSuccessful.ts
-var isSellAssetTransactionSuccessful = (events) => {
-  const hasSuccess = events.some((item) => item.method === "ExtrinsicSuccess");
-  const hasFailed = events.some(
-    (item) => item.method === "SellAssetFailedDueToSlippage" || item.method === "MultiSwapAssetFailedOnAtomicSwap"
+    (item) => item.method === "BuyAssetFailedDueToSlippage" || item.method === "SellAssetFailedDueToSlippage" || item.method === "MultiSwapAssetFailedOnAtomicSwap"
   );
   return hasSuccess && !hasFailed;
 };
@@ -8729,8 +8757,7 @@ export {
   BN_ZERO,
   Mangata,
   fromBN,
-  isBuyAssetTransactionSuccessful,
-  isSellAssetTransactionSuccessful,
+  isMultiSwapAssetTransactionSuccessful,
   setLoggerOptions,
   signTx,
   toBN,
