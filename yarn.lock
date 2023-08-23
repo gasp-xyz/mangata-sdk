@@ -268,10 +268,10 @@
   resolved "https://registry.npmjs.org/@mangata-finance/type-definitions/-/type-definitions-1.0.0.tgz"
   integrity sha512-WfEEtddpPEXrYhsA77aPWdgbjh660lAEv7bRa9U6AUk4fmN57YaQhnwp3o2X9/NgG1+UChsbttCxoa1QkFfV+w==
 
-"@mangata-finance/types@1.0.0-rc.13":
-  version "1.0.0-rc.13"
-  resolved "https://registry.npmjs.org/@mangata-finance/types/-/types-1.0.0-rc.13.tgz"
-  integrity sha512-tlOMWIXg64inhQMF5O6itwgpKDSO+0Pse3O0niE9KXTXJqJ0XExxAjD9LjXMjwZtU3hPLupYvUjKqLvc9lPl+Q==
+"@mangata-finance/types@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@mangata-finance/types/-/types-1.0.0.tgz#845773b608601212a14805c045ff1835860c25dc"
+  integrity sha512-S/6Fa/PVM4BwG7LD0xIF8M/vl0K2p3y1luHi6ZnmXD13pU5yKsJjVVQf1HmXIKxskkv6E+8V3QXpCsvGbKSraw==
 
 "@microsoft/tsdoc-config@0.16.2":
   version "0.16.2"
