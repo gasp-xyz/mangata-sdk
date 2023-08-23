@@ -1,3 +1,10 @@
+# [2.0.0-rc.21](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.20...v2.0.0-rc.21) (2023-08-23)
+
+
+### Bug Fixes
+
+* add only one method for tx success ([084a378](https://github.com/mangata-finance/mangata-sdk/commit/084a37888f1af865bff69d52dee875bde9a95f5c))
+
 # [2.0.0-rc.20](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.19...v2.0.0-rc.20) (2023-08-16)
 
 
