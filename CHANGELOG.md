@@ -1,3 +1,10 @@
+# [2.0.0-rc.22](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.21...v2.0.0-rc.22) (2023-08-23)
+
+
+### Bug Fixes
+
+* add back two utils methods ([ded9cef](https://github.com/mangata-finance/mangata-sdk/commit/ded9cef2503c167803d8df44c2b3d7a8d4665a48))
+
 # [2.0.0-rc.21](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.20...v2.0.0-rc.21) (2023-08-23)
 
 
