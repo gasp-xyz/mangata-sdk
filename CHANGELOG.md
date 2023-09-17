@@ -1,3 +1,10 @@
+# [2.0.0-rc.23](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.22...v2.0.0-rc.23) (2023-09-17)
+
+
+### Bug Fixes
+
+* remove async await from root ([6b99ef9](https://github.com/mangata-finance/mangata-sdk/commit/6b99ef9744c1e0d3a53462d7afa73d452dbfb7d2))
+
 # [2.0.0-rc.22](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.21...v2.0.0-rc.22) (2023-08-23)
 
 
