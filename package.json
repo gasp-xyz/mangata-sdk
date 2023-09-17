@@ -36,7 +36,6 @@
   },
   "devDependencies": {
     "@mangata-finance/types": "1.0.0",
-    "@polkadot/types": "10.7.3",
     "@semantic-release/changelog": "6.0.1",
     "@semantic-release/git": "10.0.1",
     "@types/big.js": "6.1.6",
