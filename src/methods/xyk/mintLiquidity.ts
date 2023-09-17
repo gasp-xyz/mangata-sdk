@@ -16,7 +16,7 @@ async function mintLiquidity(
   instancePromise: Promise<ApiPromise>,
   args: MintLiquidity,
   isForBatch: true
-): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
+): Promise<SubmittableExtrinsic<"promise">>;
 
 /**
  * Mint liquidity tokens by providing two assets

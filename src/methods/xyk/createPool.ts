@@ -15,7 +15,7 @@ async function createPool(
   instancePromise: Promise<ApiPromise>,
   args: CreatePool,
   isForBatch: true
-): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
+): Promise<SubmittableExtrinsic<"promise">>;
 
 /**
  * @since 2.0.0

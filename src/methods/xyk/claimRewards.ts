@@ -16,7 +16,7 @@ async function claimRewards(
   instancePromise: Promise<ApiPromise>,
   args: Omit<Liquidity, "amount">,
   isForBatch: true
-): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
+): Promise<SubmittableExtrinsic<"promise">>;
 
 /**
  *@since 2.0.0

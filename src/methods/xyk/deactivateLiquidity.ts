@@ -16,7 +16,7 @@ async function deactivateLiquidity(
   instancePromise: Promise<ApiPromise>,
   args: Liquidity,
   isForBatch: true
-): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
+): Promise<SubmittableExtrinsic<"promise">>;
 
 /**
 * @since 2.0.0

@@ -120,200 +120,200 @@ export function createMangataInstance(urls: string[]): MangataInstance {
   logger.info("Endpoints: ", urls);
 
   return {
-    api: async () => await instancePromise,
-    batch: async (args: Batch) => await batch(instancePromise, args),
-    batchAll: async (args: Batch) => await batchAll(instancePromise, args),
-    forceBatch: async (args: Batch) => await forceBatch(instancePromise, args),
+    api:  () => instancePromise,
+    batch:  (args: Batch) =>  batch(instancePromise, args),
+    batchAll:  (args: Batch) =>  batchAll(instancePromise, args),
+    forceBatch:  (args: Batch) =>  forceBatch(instancePromise, args),
     xTokens: {
-      depositFromParachain: async (args: Deposit) =>
-        await depositFromParachain(args),
-      depositFromKusama: async (args: RelayDeposit) =>
-        await depositFromKusama(args),
-      depositFromStatemine: async (args: RelayDeposit) =>
-        await depositFromStatemine(args),
-      withdraw: async (args: Withdraw) => await withdraw(instancePromise, args),
-      withdrawKsm: async (args: RelayWithdraw) =>
-        await withdrawKsm(instancePromise, args),
-      withdrawToMoonriver: async (args: MoonriverWithdraw) =>
-        await withdrawToMoonriver(instancePromise, args)
+      depositFromParachain:  (args: Deposit) =>
+         depositFromParachain(args),
+      depositFromKusama:  (args: RelayDeposit) =>
+         depositFromKusama(args),
+      depositFromStatemine:  (args: RelayDeposit) =>
+         depositFromStatemine(args),
+      withdraw:  (args: Withdraw) =>  withdraw(instancePromise, args),
+      withdrawKsm:  (args: RelayWithdraw) =>
+         withdrawKsm(instancePromise, args),
+      withdrawToMoonriver:  (args: MoonriverWithdraw) =>
+         withdrawToMoonriver(instancePromise, args)
     },
     xyk: {
-      deactivateLiquidity: async (args: Liquidity) =>
-        await deactivateLiquidity(instancePromise, args, false),
-      activateLiquidity: async (
+      deactivateLiquidity:  (args: Liquidity) =>
+         deactivateLiquidity(instancePromise, args, false),
+      activateLiquidity: (
         args: Liquidity,
         balanceFrom:
           | "AvailableBalance"
           | "StakedUnactivatedReserves"
           | "UnspentReserves" = "AvailableBalance"
-      ) => await activateLiquidity(instancePromise, args, balanceFrom, false),
-      burnLiquidity: async (args: BurnLiquidity) =>
-        await burnLiquidity(instancePromise, args, false),
-      mintLiquidity: async (args: MintLiquidity) =>
-        await mintLiquidity(instancePromise, args, false),
-      createPool: async (args: CreatePool) =>
-        await createPool(instancePromise, args, false),
-      claimRewardsAll: async (args: ExtrinsicCommon) =>
-        await claimRewardsAll(instancePromise, args, false),
-      claimRewards: async (args: Prettify<Omit<Liquidity, "amount">>) =>
-        await claimRewards(instancePromise, args, false),
-      multiswapBuyAsset: async (args: MultiswapBuyAsset) =>
-        await multiswapBuyAsset(instancePromise, args, false),
-      multiswapSellAsset: async (args: MultiswapSellAsset) =>
-        await multiswapSellAsset(instancePromise, args, false)
+      ) => activateLiquidity(instancePromise, args, balanceFrom, false),
+      burnLiquidity:  (args: BurnLiquidity) =>
+         burnLiquidity(instancePromise, args, false),
+      mintLiquidity:  (args: MintLiquidity) =>
+         mintLiquidity(instancePromise, args, false),
+      createPool:  (args: CreatePool) =>
+         createPool(instancePromise, args, false),
+      claimRewardsAll:  (args: ExtrinsicCommon) =>
+         claimRewardsAll(instancePromise, args, false),
+      claimRewards:  (args: Prettify<Omit<Liquidity, "amount">>) =>
+         claimRewards(instancePromise, args, false),
+      multiswapBuyAsset:  (args: MultiswapBuyAsset) =>
+         multiswapBuyAsset(instancePromise, args, false),
+      multiswapSellAsset:  (args: MultiswapSellAsset) =>
+         multiswapSellAsset(instancePromise, args, false)
     },
     rpc: {
-      isBuyAssetLockFree: async (tokenIds: TokenId[], amount: BN) =>
-        await isBuyAssetLockFree(instancePromise, tokenIds, amount),
-      isSellAssetLockFree: async (tokenIds: TokenId[], amount: BN) =>
-        await isSellAssetLockFree(instancePromise, tokenIds, amount),
-      calculateBuyPriceId: async (
+      isBuyAssetLockFree:  (tokenIds: TokenId[], amount: BN) =>
+         isBuyAssetLockFree(instancePromise, tokenIds, amount),
+      isSellAssetLockFree:  (tokenIds: TokenId[], amount: BN) =>
+         isSellAssetLockFree(instancePromise, tokenIds, amount),
+      calculateBuyPriceId:  (
         soldTokenId: TokenId,
         boughtTokenId: TokenId,
         amount: TokenAmount
       ) =>
-        await calculateBuyPriceId(
+         calculateBuyPriceId(
           instancePromise,
           soldTokenId,
           boughtTokenId,
           amount
         ),
-      calculateSellPriceId: async (
+      calculateSellPriceId:  (
         soldTokenId: TokenId,
         boughtTokenId: TokenId,
         amount: TokenAmount
       ) =>
-        await calculateSellPriceId(
+         calculateSellPriceId(
           instancePromise,
           soldTokenId,
           boughtTokenId,
           amount
         ),
-      getBurnAmount: async (args: Price) =>
-        await getBurnAmount(instancePromise, args),
-      calculateSellPrice: async (args: Reserve) =>
-        await calculateSellPrice(instancePromise, args),
-      calculateBuyPrice: async (args: Reserve) =>
-        await calculateBuyPrice(instancePromise, args),
-      calculateRewardsAmount: async (args: Rewards) =>
-        await calculateRewardsAmount(instancePromise, args),
-      getNodeVersion: async () => await getNodeVersion(instancePromise),
-      getNodeName: async () => await getNodeName(instancePromise),
-      getChain: async () => await getChain(instancePromise),
-      waitForNewBlock: async (blockNumber?: number) =>
-        await waitForNewBlock(instancePromise, blockNumber)
+      getBurnAmount:  (args: Price) =>
+         getBurnAmount(instancePromise, args),
+      calculateSellPrice:  (args: Reserve) =>
+         calculateSellPrice(instancePromise, args),
+      calculateBuyPrice:  (args: Reserve) =>
+         calculateBuyPrice(instancePromise, args),
+      calculateRewardsAmount:  (args: Rewards) =>
+         calculateRewardsAmount(instancePromise, args),
+      getNodeVersion:  () =>  getNodeVersion(instancePromise),
+      getNodeName:  () =>  getNodeName(instancePromise),
+      getChain:  () =>  getChain(instancePromise),
+      waitForNewBlock:  (blockNumber?: number) =>
+         waitForNewBlock(instancePromise, blockNumber)
     },
     tokens: {
-      transferAllTokens: async (args: Transfer) =>
-        await transferAllTokens(instancePromise, args, false),
-      transferTokens: async (args: TransferTokens) =>
-        await transferTokens(instancePromise, args, false)
+      transferAllTokens:  (args: Transfer) =>
+         transferAllTokens(instancePromise, args, false),
+      transferTokens:  (args: TransferTokens) =>
+         transferTokens(instancePromise, args, false)
     },
     submitableExtrinsic: {
-      createPool: async (args: CreatePool) =>
-        await createPool(instancePromise, args, true),
-      claimRewards: async (args: Omit<Liquidity, "amount">) =>
-        await claimRewards(instancePromise, args, true),
-      mintLiquidity: async (args: MintLiquidity) =>
-        await mintLiquidity(instancePromise, args, true),
-      burnLiquidity: async (args: BurnLiquidity) =>
-        await burnLiquidity(instancePromise, args, true),
-      activateLiquidity: async (
+      createPool:  (args: CreatePool) =>
+         createPool(instancePromise, args, true),
+      claimRewards:  (args: Omit<Liquidity, "amount">) =>
+         claimRewards(instancePromise, args, true),
+      mintLiquidity:  (args: MintLiquidity) =>
+         mintLiquidity(instancePromise, args, true),
+      burnLiquidity:  (args: BurnLiquidity) =>
+         burnLiquidity(instancePromise, args, true),
+      activateLiquidity: (
         args: Liquidity,
         balanceFrom:
           | "AvailableBalance"
           | "StakedUnactivatedReserves"
           | "UnspentReserves" = "AvailableBalance"
-      ) => await activateLiquidity(instancePromise, args, balanceFrom, true),
-      deactivateLiquidity: async (args: Liquidity) =>
-        await deactivateLiquidity(instancePromise, args, true),
-      transferAllTokens: async (args: Transfer) =>
-        await transferAllTokens(instancePromise, args, true),
-      transferTokens: async (args: Transfer & { amount: TokenAmount }) =>
-        await transferTokens(instancePromise, args, true),
-      multiswapBuyAsset: async (args: MultiswapBuyAsset) =>
-        await multiswapBuyAsset(instancePromise, args, true),
-      multiswapSellAsset: async (args: MultiswapSellAsset) =>
-        await multiswapSellAsset(instancePromise, args, true)
+      ) =>  activateLiquidity(instancePromise, args, balanceFrom, true),
+      deactivateLiquidity:  (args: Liquidity) =>
+         deactivateLiquidity(instancePromise, args, true),
+      transferAllTokens:  (args: Transfer) =>
+         transferAllTokens(instancePromise, args, true),
+      transferTokens:  (args: Transfer & { amount: TokenAmount }) =>
+         transferTokens(instancePromise, args, true),
+      multiswapBuyAsset:  (args: MultiswapBuyAsset) =>
+         multiswapBuyAsset(instancePromise, args, true),
+      multiswapSellAsset:  (args: MultiswapSellAsset) =>
+         multiswapSellAsset(instancePromise, args, true)
     },
     query: {
-      getNonce: async (address: Address) =>
-        await getNonce(instancePromise, address),
-      getLiquidityTokenId: async (
+      getNonce:  (address: Address) =>
+         getNonce(instancePromise, address),
+      getLiquidityTokenId:  (
         firstTokenId: TokenId,
         secondTokenId: TokenId
       ) =>
-        await getLiquidityTokenId(instancePromise, firstTokenId, secondTokenId),
-      getTotalIssuance: async (tokenId: TokenId) =>
-        await getTotalIssuance(instancePromise, tokenId),
-      getTokenBalance: async (tokenId: TokenId, address: Address) =>
-        await getTokenBalance(instancePromise, tokenId, address),
-      getTokenInfo: async (tokenId: TokenId) =>
-        await getTokenInfo(instancePromise, tokenId),
-      getLiquidityTokenIds: async () =>
-        await getLiquidityTokenIds(instancePromise),
-      getLiquidityTokens: async () => await getLiquidityTokens(instancePromise),
-      getBlockNumber: async () => await getBlockNumber(instancePromise),
-      getOwnedTokens: async (address: Address) =>
-        await getOwnedTokens(instancePromise, address),
-      getAssetsInfo: async () => await getAssetsInfo(instancePromise),
-      getInvestedPools: async (address: Address) =>
-        await getInvestedPools(instancePromise, address),
-      getAmountOfTokensInPool: async (
+         getLiquidityTokenId(instancePromise, firstTokenId, secondTokenId),
+      getTotalIssuance:  (tokenId: TokenId) =>
+         getTotalIssuance(instancePromise, tokenId),
+      getTokenBalance:  (tokenId: TokenId, address: Address) =>
+         getTokenBalance(instancePromise, tokenId, address),
+      getTokenInfo:  (tokenId: TokenId) =>
+         getTokenInfo(instancePromise, tokenId),
+      getLiquidityTokenIds:  () =>
+         getLiquidityTokenIds(instancePromise),
+      getLiquidityTokens:  () =>  getLiquidityTokens(instancePromise),
+      getBlockNumber:  () =>  getBlockNumber(instancePromise),
+      getOwnedTokens:  (address: Address) =>
+         getOwnedTokens(instancePromise, address),
+      getAssetsInfo:  () =>  getAssetsInfo(instancePromise),
+      getInvestedPools:  (address: Address) =>
+         getInvestedPools(instancePromise, address),
+      getAmountOfTokensInPool: (
         firstTokenId: TokenId,
         secondTokenId: TokenId
       ) =>
-        await getAmountOfTokensInPool(
+         getAmountOfTokensInPool(
           instancePromise,
           firstTokenId,
           secondTokenId
         ),
-      getLiquidityPool: async (liquidityTokenId: TokenId) =>
-        await getLiquidityPool(instancePromise, liquidityTokenId),
-      getPool: async (liquidityTokenId: TokenId) =>
-        await getPool(instancePromise, liquidityTokenId),
-      getPools: async () => await getPools(instancePromise),
-      getTotalIssuanceOfTokens: async () =>
-        await getTotalIssuanceOfTokens(instancePromise)
+      getLiquidityPool:  (liquidityTokenId: TokenId) =>
+         getLiquidityPool(instancePromise, liquidityTokenId),
+      getPool:  (liquidityTokenId: TokenId) =>
+         getPool(instancePromise, liquidityTokenId),
+      getPools:  () =>  getPools(instancePromise),
+      getTotalIssuanceOfTokens:  () =>
+         getTotalIssuanceOfTokens(instancePromise)
     },
     fee: {
-      depositFromParachain: async (args: DepositFromParachainFee) =>
-        await getDepositFromParachainFee(args),
+      depositFromParachain:  (args: DepositFromParachainFee) =>
+         getDepositFromParachainFee(args),
       depositFromKusama: (args: DepositFromKusamaFee) =>
         getDepositFromKusamaFee(args),
       depositFromStatemine: (args: DepositFromStatemineFee) =>
         getDepositFromStatemineFee(args),
-      withdraw: async (args: WithdrawFee) =>
-        await getWithdrawFee(instancePromise, args),
-      withdrawKsm: async (args: WithdrawKsmFee) =>
-        await getWithdrawKsmFee(instancePromise, args),
-      withdrawFromMoonriver: async (args: MoonriverWithdraw) =>
-        await getWithdrawFromMoonriverFee(instancePromise, args),
-      activateLiquidity: async (args: ActivateLiquidityFee) =>
-        await getActivateLiquidityFee(instancePromise, args),
-      deactivateLiquidity: async (args: DeactivateLiquidityFee) =>
-        await getDeactivateLiquidityFee(instancePromise, args),
-      claimRewards: async (args: ClaimRewardsFee) =>
-        await getClaimRewardsFee(instancePromise, args),
-      createPool: async (args: CreatePoolFee) =>
-        await getCreatePoolFee(instancePromise, args),
-      mintLiquidity: async (args: MintLiquidityFee) =>
-        await getMintLiquidityFee(instancePromise, args),
-      burnLiquidity: async (args: BurnLiquidityFee) =>
-        await getBurnLiquidityFee(instancePromise, args),
-      transferAllToken: async (args: TransferAllFee) =>
-        await getTransferAllTokenFee(instancePromise, args),
-      transferToken: async (args: TransferTokenFee) =>
-        await getTransferTokenFee(instancePromise, args)
+      withdraw:  (args: WithdrawFee) =>
+         getWithdrawFee(instancePromise, args),
+      withdrawKsm:  (args: WithdrawKsmFee) =>
+         getWithdrawKsmFee(instancePromise, args),
+      withdrawFromMoonriver:  (args: MoonriverWithdraw) =>
+         getWithdrawFromMoonriverFee(instancePromise, args),
+      activateLiquidity:  (args: ActivateLiquidityFee) =>
+         getActivateLiquidityFee(instancePromise, args),
+      deactivateLiquidity:  (args: DeactivateLiquidityFee) =>
+         getDeactivateLiquidityFee(instancePromise, args),
+      claimRewards:  (args: ClaimRewardsFee) =>
+         getClaimRewardsFee(instancePromise, args),
+      createPool:  (args: CreatePoolFee) =>
+         getCreatePoolFee(instancePromise, args),
+      mintLiquidity:  (args: MintLiquidityFee) =>
+         getMintLiquidityFee(instancePromise, args),
+      burnLiquidity:  (args: BurnLiquidityFee) =>
+         getBurnLiquidityFee(instancePromise, args),
+      transferAllToken:  (args: TransferAllFee) =>
+         getTransferAllTokenFee(instancePromise, args),
+      transferToken:  (args: TransferTokenFee) =>
+         getTransferTokenFee(instancePromise, args)
     },
     util: {
       getUrls: () => urls,
-      calculateMintingFutureRewards: async (
+      calculateMintingFutureRewards:  (
         liquidityTokenId: string,
         mintingAmount: BN,
         blocksToPass: BN
       ) =>
-        await calculateMintingFutureRewards(
+         calculateMintingFutureRewards(
           instancePromise,
           liquidityTokenId,
           mintingAmount,

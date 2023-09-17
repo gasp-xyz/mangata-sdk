@@ -16,7 +16,7 @@ async function multiswapSellAsset(
   instancePromise: Promise<ApiPromise>,
   args: MultiswapSellAsset,
   isForBatch: true
-): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
+): Promise<SubmittableExtrinsic<"promise">>;
 
 /**
  * @since 2.0.0
