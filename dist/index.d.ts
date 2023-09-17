@@ -8,124 +8,124 @@ import { ISettingsParam, ILogObj } from 'tslog';
 import { Merge, Except } from 'type-fest';
 import Big from 'big.js';
 
-type BurnAmount = {
+declare type BurnAmount = {
     firstAssetAmount: TokenAmount;
     secondAssetAmount: TokenAmount;
 };
-type Rewards = {
+declare type Rewards = {
     address: Address;
     liquidityTokenId: TokenId;
 };
-type Reserve = {
+declare type Reserve = {
     inputReserve: TokenAmount;
     outputReserve: TokenAmount;
     amount: TokenAmount;
 };
-type Price = {
+declare type Price = {
     firstTokenId: TokenId;
     secondTokenId: TokenId;
     amount: TokenAmount;
 };
-type Liquidity = Merge<ExtrinsicCommon, {
+declare type Liquidity = Merge<ExtrinsicCommon, {
     liquidityTokenId: TokenId;
     amount: TokenAmount;
 }>;
-type BurnLiquidity = Merge<Except<Liquidity, "liquidityTokenId">, Price>;
-type MintLiquidity = Prettify<Merge<Omit<BurnLiquidity, "amount">, {
+declare type BurnLiquidity = Merge<Except<Liquidity, "liquidityTokenId">, Price>;
+declare type MintLiquidity = Prettify<Merge<Omit<BurnLiquidity, "amount">, {
     firstTokenAmount: TokenAmount;
     expectedSecondTokenAmount: TokenAmount;
 }>>;
-type Asset = {
+declare type Asset = {
     soldTokenId: TokenId;
     boughtTokenId: TokenId;
     amount: TokenAmount;
 };
-type MaxAmountIn = Merge<Asset, {
+declare type MaxAmountIn = Merge<Asset, {
     maxAmountIn: TokenAmount;
 }>;
-type MinAmountOut = Merge<Asset, {
+declare type MinAmountOut = Merge<Asset, {
     minAmountOut: TokenAmount;
 }>;
-type PoolBase = {
+declare type PoolBase = {
     firstTokenId: TokenId;
     firstTokenAmount: TokenAmount;
     secondTokenId: TokenId;
     secondTokenAmount: TokenAmount;
 };
-type CreatePool = Merge<ExtrinsicCommon, PoolBase>;
-type MintLiquidityFee = Except<MintLiquidity, "txOptions">;
-type DeactivateLiquidityFee = Except<Liquidity, "txOptions">;
-type CreatePoolFee = Except<CreatePool, "txOptions">;
-type ClaimRewardsFee = Except<Omit<Liquidity, "amount">, "txOptions">;
-type BurnLiquidityFee = Except<BurnLiquidity, "txOptions">;
-type ActivateLiquidityFee = Except<Liquidity, "txOptions">;
-type MultiSwapBase = Merge<ExtrinsicCommon, {
+declare type CreatePool = Merge<ExtrinsicCommon, PoolBase>;
+declare type MintLiquidityFee = Except<MintLiquidity, "txOptions">;
+declare type DeactivateLiquidityFee = Except<Liquidity, "txOptions">;
+declare type CreatePoolFee = Except<CreatePool, "txOptions">;
+declare type ClaimRewardsFee = Except<Omit<Liquidity, "amount">, "txOptions">;
+declare type BurnLiquidityFee = Except<BurnLiquidity, "txOptions">;
+declare type ActivateLiquidityFee = Except<Liquidity, "txOptions">;
+declare type MultiSwapBase = Merge<ExtrinsicCommon, {
     tokenIds: TokenId[];
     amount: TokenAmount;
 }>;
-type MultiswapSellAsset = Merge<MultiSwapBase, {
+declare type MultiswapSellAsset = Merge<MultiSwapBase, {
     minAmountOut: TokenAmount;
 }>;
-type MultiswapBuyAsset = Merge<MultiSwapBase, {
+declare type MultiswapBuyAsset = Merge<MultiSwapBase, {
     maxAmountIn: TokenAmount;
 }>;
 
-type Token = {
+declare type Token = {
     id: TokenId;
     name: string;
     symbol: string;
     decimals: number;
     balance: TokenBalance;
 };
-type TokenInfo = Omit<Token, "balance">;
-type MainTokens = Record<TokenId, TokenInfo>;
-type TokenBalance = {
+declare type TokenInfo = Omit<Token, "balance">;
+declare type MainTokens = Record<TokenId, TokenInfo>;
+declare type TokenBalance = {
     free: BN;
     reserved: BN;
     frozen: BN;
 };
-type Pool = Merge<PoolBase, {
+declare type Pool = Merge<PoolBase, {
     liquidityTokenId: TokenId;
     isPromoted: boolean;
 }>;
-type PoolWithRatio = Merge<Pool, {
+declare type PoolWithRatio = Merge<Pool, {
     firstTokenRatio: BN;
     secondTokenRatio: BN;
 }>;
-type PoolWithShare = Pool & {
+declare type PoolWithShare = Pool & {
     share: BN;
     firstTokenRatio: BN;
     secondTokenRatio: BN;
     activatedLPTokens: BN;
     nonActivatedLPTokens: BN;
 };
-type FeeLockType = {
+declare type FeeLockType = {
     periodLength: string;
     feeLockAmount: string;
     swapValueThreshold: string;
     whitelistedTokens: number[];
 };
 
-type XcmTxOptions = Partial<Omit<TxOptions, "statusCallback" | "extrinsicStatus">>;
-type Deposit<A = unknown, D = unknown, W = unknown> = Prettify<Merge<ExtrinsicCommon, {
+declare type XcmTxOptions = Partial<Omit<TxOptions, "statusCallback" | "extrinsicStatus">>;
+declare type Deposit<A = unknown, D = unknown, W = unknown> = Prettify<Merge<ExtrinsicCommon, {
     url: string;
     asset: A;
     destination: D;
     weightLimit: W;
 }>>;
-type Withdraw = Merge<ExtrinsicCommon, {
+declare type Withdraw = Merge<ExtrinsicCommon, {
     tokenSymbol: string;
     withWeight: number | "Unlimited";
     parachainId: number;
     destinationAddress: Address;
     amount: TokenAmount;
 }>;
-type MoonriverWithdraw = Merge<ExtrinsicCommon, {
+declare type MoonriverWithdraw = Merge<ExtrinsicCommon, {
     tokenSymbol: string;
     moonriverAddress: string;
     amount: TokenAmount;
 }>;
-type RelayDeposit<A = unknown, D = unknown, F = number, B = unknown, W = unknown> = Prettify<Merge<ExtrinsicCommon, {
+declare type RelayDeposit<A = unknown, D = unknown, F = number, B = unknown, W = unknown> = Prettify<Merge<ExtrinsicCommon, {
     url: string;
     assets: A;
     destination: D;
@@ -133,46 +133,46 @@ type RelayDeposit<A = unknown, D = unknown, F = number, B = unknown, W = unknown
     beneficiary: B;
     weightLimit: W;
 }>>;
-type RelayWithdraw = Prettify<Merge<ExtrinsicCommon, {
+declare type RelayWithdraw = Prettify<Merge<ExtrinsicCommon, {
     kusamaAddress: Address;
     amount: TokenAmount;
 }>>;
-type WithdrawKsmFee = Except<RelayWithdraw, "txOptions">;
-type WithdrawFee = Except<Withdraw, "txOptions">;
-type DepositFromParachainFee = Except<Deposit, "txOptions">;
-type DepositFromKusamaFee = Except<RelayDeposit, "txOptions">;
-type DepositFromStatemineFee = Except<RelayDeposit, "txOptions">;
+declare type WithdrawKsmFee = Except<RelayWithdraw, "txOptions">;
+declare type WithdrawFee = Except<Withdraw, "txOptions">;
+declare type DepositFromParachainFee = Except<Deposit, "txOptions">;
+declare type DepositFromKusamaFee = Except<RelayDeposit, "txOptions">;
+declare type DepositFromStatemineFee = Except<RelayDeposit, "txOptions">;
 
-type Transfer = {
+declare type Transfer = {
     account: Account;
     tokenId: TokenId;
     address: Address;
     txOptions?: Partial<TxOptions>;
 };
-type TransferTokens = Merge<Transfer, {
+declare type TransferTokens = Merge<Transfer, {
     amount: TokenAmount;
 }>;
-type TransferTokenFee = Merge<Except<Transfer, "txOptions">, {
+declare type TransferTokenFee = Merge<Except<Transfer, "txOptions">, {
     amount: TokenAmount;
 }>;
-type TransferAllFee = Except<Transfer, "txOptions">;
+declare type TransferAllFee = Except<Transfer, "txOptions">;
 
-type Batch = Merge<ExtrinsicCommon, {
+declare type Batch = Merge<ExtrinsicCommon, {
     calls: MangataSubmittableExtrinsic[];
 }>;
-type PoolReserves = [BN, BN];
-type TokenAmounts = [string, string];
-type TokenDecimals = [number, number];
-type PriceImpact = {
+declare type PoolReserves = [BN, BN];
+declare type TokenAmounts = [string, string];
+declare type TokenDecimals = [number, number];
+declare type PriceImpact = {
     poolReserves: PoolReserves;
     decimals: TokenDecimals;
     tokenAmounts: TokenAmounts;
 };
 
-type Prettify<T> = {
+declare type Prettify<T> = {
     [K in keyof T]: T[K];
 } & {};
-type ExtrinsicCommon = {
+declare type ExtrinsicCommon = {
     account: Account;
     txOptions?: Partial<TxOptions>;
 };
@@ -181,22 +181,22 @@ interface Database {
     setNonce(address: string, nonce: BN): void;
     getNonce(address: string): BN;
 }
-type ErrorData = {
+declare type ErrorData = {
     Module?: {
         index?: string;
         error?: string;
     };
 };
-type Account = string | KeyringPair;
-type TokenSymbol = string;
-type TokenId = string;
-type TokenAmount = BN;
-type Address = string;
-type MangataEventData = {
+declare type Account = string | KeyringPair;
+declare type TokenSymbol = string;
+declare type TokenId = string;
+declare type TokenAmount = BN;
+declare type Address = string;
+declare type MangataEventData = {
     lookupName: string;
     data: Codec;
 };
-type MangataGenericEvent = {
+declare type MangataGenericEvent = {
     event: Event;
     phase: Phase;
     section: string;
@@ -208,14 +208,14 @@ type MangataGenericEvent = {
         name: string;
     } | null;
 };
-type TxOptions = {
+declare type TxOptions = {
     nonce: BN;
     signer: Signer;
     statusCallback: (result: ISubmittableResult) => void;
     extrinsicStatus: (events: MangataGenericEvent[]) => void;
 };
-type MangataSubmittableExtrinsic = SubmittableExtrinsic<"promise">;
-type MangataLoggerOptions = ISettingsParam<ILogObj>;
+declare type MangataSubmittableExtrinsic = SubmittableExtrinsic<"promise">;
+declare type MangataLoggerOptions = ISettingsParam<ILogObj>;
 interface MangataInstance {
     /**
      * xTokens methods for interacting with various token-related operations.
@@ -680,6 +680,10 @@ declare const toFixed: (value: string, decimals: number) => string;
 
 declare const isMultiSwapAssetTransactionSuccessful: (events: MangataGenericEvent[]) => boolean;
 
+declare const isBuyAssetTransactionSuccessful: (events: MangataGenericEvent[]) => boolean;
+
+declare const isSellAssetTransactionSuccessful: (events: MangataGenericEvent[]) => boolean;
+
 declare const setLoggerOptions: (options?: ISettingsParam<ILogObj>) => void;
 
-export { Account, ActivateLiquidityFee, Address, Asset, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Batch, BurnAmount, BurnLiquidity, BurnLiquidityFee, ClaimRewardsFee, CreatePool, CreatePoolFee, Database, DeactivateLiquidityFee, Deposit, DepositFromKusamaFee, DepositFromParachainFee, DepositFromStatemineFee, ErrorData, ExtrinsicCommon, FeeLockType, Liquidity, MainTokens, Mangata, MangataEventData, MangataGenericEvent, MangataInstance, MangataLoggerOptions, MangataSubmittableExtrinsic, MaxAmountIn, MinAmountOut, MintLiquidity, MintLiquidityFee, MoonriverWithdraw, MultiSwapBase, MultiswapBuyAsset, MultiswapSellAsset, Pool, PoolBase, PoolReserves, PoolWithRatio, PoolWithShare, Prettify, Price, PriceImpact, RelayDeposit, RelayWithdraw, Reserve, Rewards, Token, TokenAmount, TokenAmounts, TokenBalance, TokenDecimals, TokenId, TokenInfo, TokenSymbol, Transfer, TransferAllFee, TransferTokenFee, TransferTokens, TxOptions, Withdraw, WithdrawFee, WithdrawKsmFee, XcmTxOptions, fromBN, isMultiSwapAssetTransactionSuccessful, setLoggerOptions, signTx, toBN, toFixed };
+export { Account, ActivateLiquidityFee, Address, Asset, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Batch, BurnAmount, BurnLiquidity, BurnLiquidityFee, ClaimRewardsFee, CreatePool, CreatePoolFee, Database, DeactivateLiquidityFee, Deposit, DepositFromKusamaFee, DepositFromParachainFee, DepositFromStatemineFee, ErrorData, ExtrinsicCommon, FeeLockType, Liquidity, MainTokens, Mangata, MangataEventData, MangataGenericEvent, MangataInstance, MangataLoggerOptions, MangataSubmittableExtrinsic, MaxAmountIn, MinAmountOut, MintLiquidity, MintLiquidityFee, MoonriverWithdraw, MultiSwapBase, MultiswapBuyAsset, MultiswapSellAsset, Pool, PoolBase, PoolReserves, PoolWithRatio, PoolWithShare, Prettify, Price, PriceImpact, RelayDeposit, RelayWithdraw, Reserve, Rewards, Token, TokenAmount, TokenAmounts, TokenBalance, TokenDecimals, TokenId, TokenInfo, TokenSymbol, Transfer, TransferAllFee, TransferTokenFee, TransferTokens, TxOptions, Withdraw, WithdrawFee, WithdrawKsmFee, XcmTxOptions, fromBN, isBuyAssetTransactionSuccessful, isMultiSwapAssetTransactionSuccessful, isSellAssetTransactionSuccessful, setLoggerOptions, signTx, toBN, toFixed };
