@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - "develop"
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: write
+  id-token: write
+  deployments: write
+  checks: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v3
+
+      - name: Setup Node version and cache dependencies
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "yarn"
+
+      - name: Install deps
+        run: yarn install --frozen-lockfile
+
+      - name: Install peer deps
+        run: yarn peer
+
+      - name: Build the SDK
+        run: yarn build
+
+      - name: Generate docs
+        run: npx typedoc src/index.ts --skipErrorChecking
+
+      - name: Deploy github page for doc 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: docs # The folder the action should deploy.
