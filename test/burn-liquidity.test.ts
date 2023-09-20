@@ -80,8 +80,7 @@ it("should burn liquidity", async () => {
   const investedPools = await instance.query.getInvestedPools(testUser.address);
 
   const investedPool = investedPools.find(
-    (investedPool) =>
-      investedPool.liquidityTokenId === liquidityTokenId.toString()
+    (investedPool) => investedPool.liquidityTokenId === liquidityTokenId
   );
 
   await instance.rpc.waitForNewBlock(2);
@@ -94,12 +93,7 @@ it("should burn liquidity", async () => {
     account: testUser,
     firstTokenId: firstTokenId!,
     secondTokenId: secondTokenId!,
-    amount: amountToBurn!,
-    txOptions: {
-      extrinsicStatus: (data) => {
-        console.log(JSON.stringify(data));
-      }
-    }
+    amount: amountToBurn!
   };
 
   await instance.xyk.burnLiquidity(argsBurnLiquidity);

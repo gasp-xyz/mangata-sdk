@@ -1,24 +1,18 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { TokenAmount } from "../../types/common";
-import { TBalances } from "../../types/query";
-import { pipe, reduce } from "rambda";
+import { TokenId } from "../../types/common";
 
 /**
  * @since 2.0.0
  */
 export const getTotalIssuanceOfTokens = async (
   instancePromise: Promise<ApiPromise>
-): Promise<TBalances> => {
+): Promise<Record<TokenId, BN>> => {
   const api = await instancePromise;
   const balancesResponse = await api.query.tokens.totalIssuance.entries();
-
-  return pipe(
-    reduce((acc, [key, value]) => {
-      const id = (key.toHuman() as string[])[0].replace(/[, ]/g, "");
-      const balance = new BN(value.toString());
-      acc[id] = balance;
-      return acc;
-    }, {} as { [id: string]: TokenAmount })
-  )(balancesResponse);
+  return balancesResponse.reduce((acc, [key, value]) => {
+    const [id] = key.args;
+    acc[id.toString()] = new BN(value);
+    return acc;
+  }, {} as Record<TokenId, BN>);
 };

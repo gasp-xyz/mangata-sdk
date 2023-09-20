@@ -4,6 +4,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { MangataGenericEvent } from "../../types/common";
 import { signTx } from "../../utils/signTx";
 import { Liquidity } from "../../types/xyk";
+import { logger } from "../../utils/mangataLogger";
 
 async function claimRewards(
   instancePromise: Promise<ApiPromise>,
@@ -15,7 +16,7 @@ async function claimRewards(
   instancePromise: Promise<ApiPromise>,
   args: Omit<Liquidity, "amount">,
   isForBatch: true
-): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
+): Promise<SubmittableExtrinsic<"promise">>;
 
 /**
  *@since 2.0.0
@@ -31,8 +32,13 @@ async function claimRewards(
   args: Omit<Liquidity, "amount">,
   isForBatch: boolean
 ) {
+  logger.info("Claim Rewards operation started ...");
   const api = await instancePromise;
   const { account, txOptions, liquidityTokenId } = args;
+  logger.info("claimRewards", {
+    liquidityTokenId,
+    isBatch: isForBatch
+  });
   const tx = api.tx.proofOfStake.claimRewardsAll(liquidityTokenId);
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }

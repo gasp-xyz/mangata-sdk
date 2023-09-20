@@ -11,9 +11,8 @@ export type Token = {
   balance: TokenBalance;
 };
 
-export type TTokenInfo = Omit<Token, "balance">;
-export type TBalances = Record<TokenId, BN>;
-export type TMainTokens = Record<TokenId, TTokenInfo>;
+export type TokenInfo = Omit<Token, "balance">;
+export type MainTokens = Record<TokenId, TokenInfo>;
 export type TokenBalance = {
   free: BN;
   reserved: BN;
@@ -24,7 +23,7 @@ export type Pool = Merge<
   { liquidityTokenId: TokenId; isPromoted: boolean }
 >;
 
-export type TPoolWithRatio = Merge<
+export type PoolWithRatio = Merge<
   Pool,
   {
     firstTokenRatio: BN;
@@ -32,7 +31,7 @@ export type TPoolWithRatio = Merge<
   }
 >;
 
-export type TPoolWithShare = Pool & {
+export type PoolWithShare = Pool & {
   share: BN;
   firstTokenRatio: BN;
   secondTokenRatio: BN;

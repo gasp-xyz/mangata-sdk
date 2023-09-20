@@ -4,7 +4,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { it, expect, beforeEach } from "vitest";
 
 import { instance, SUDO_USER_NAME } from "./instance";
-import type { Batch, CreatePool, MultiswapSellAsset, SellAsset } from "../src";
+import type { Batch, CreatePool, MultiswapBuyAsset } from "../src";
 import {
   createMangataToken,
   createToken,
@@ -14,8 +14,8 @@ import {
 
 let testUser: KeyringPair;
 let sudoUser: KeyringPair;
-let firstTokenId: string | undefined;
-let secondTokenId: string | undefined;
+let firstTokenId: string;
+let secondTokenId: string;
 
 beforeEach(async () => {
   const keyring = new Keyring({ type: "sr25519" });
@@ -53,7 +53,7 @@ beforeEach(async () => {
   secondTokenId = extrinsicData[1].eventData[0].data.toString();
 });
 
-it("should sell asset", async () => {
+it("should buy asset", async () => {
   const argsPool: CreatePool = {
     account: testUser,
     firstTokenId: firstTokenId!,
@@ -72,18 +72,28 @@ it("should sell asset", async () => {
 
   await instance.rpc.waitForNewBlock(2);
 
-  const argsMultiswapSellAsset: MultiswapSellAsset = {
+  const argsBuyAsset: MultiswapBuyAsset = {
     account: testUser,
     tokenIds: [firstTokenId!, secondTokenId!],
-    amount: new BN(10000),
-    minAmountOut: new BN(100),
+    amount: new BN(1000),
+    maxAmountIn: new BN(60000)
+  };
+
+  const tx1 = await instance.submitableExtrinsic.multiswapBuyAsset(
+    argsBuyAsset
+  );
+  const tx2 = await instance.submitableExtrinsic.multiswapBuyAsset(
+    argsBuyAsset
+  );
+
+  const argsBatch: Batch = {
+    account: testUser,
+    calls: [tx1, tx2],
     txOptions: {
       extrinsicStatus: (data) => {
-        const searchTerms = ["xyk", "AssetsSwapped", testUser.address];
-        const extrinsicData = getExtrinsicData({ data, searchTerms });
-        return expect(extrinsicData[0].method).toEqual("AssetsSwapped");
+        return expect(data[data.length - 1].method).toEqual("ExtrinsicSuccess");
       }
     }
   };
-  await instance.xyk.multiswapSellAsset(argsMultiswapSellAsset);
+  await instance.batch(argsBatch);
 });

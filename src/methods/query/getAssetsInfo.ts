@@ -1,7 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { hexToBn } from "@polkadot/util";
-import { pipe, filter, reduce, replace, trim, split, join } from "rambda";
-import { TMainTokens, TTokenInfo } from "../../types/query";
+import { MainTokens } from "../../types/query";
 import { getCompleteAssetsInfo } from "../../utils/getCompleteAssetsInfo";
 
 /**
@@ -9,27 +8,24 @@ import { getCompleteAssetsInfo } from "../../utils/getCompleteAssetsInfo";
  */
 export const getAssetsInfo = async (
   instancePromise: Promise<ApiPromise>
-): Promise<TMainTokens> => {
+): Promise<MainTokens> => {
   const api = await instancePromise;
   const completeAssetsInfo = await getCompleteAssetsInfo(api);
   // we need to filter out ETH and Dummy liquidity token
   // then we need to display symbol for liquidity token
-  return pipe(
-    filter(
-      (assetsInfo: TTokenInfo) => !["1", "3", "6"].includes(assetsInfo.id)
-    ),
-    reduce((obj, item) => {
+  return Object.values(completeAssetsInfo)
+    .filter((asset) => asset.name || asset.symbol)
+    .filter((assetsInfo) => !["1", "3"].includes(assetsInfo.id))
+    .reduce((obj, item) => {
       const asset = {
         ...item,
-        name: pipe(
-          replace(/0x\w+/, ""),
-          replace(/[A-Z]/g, "$&"),
-          trim
-        )(item.name),
+        name: item.name
+          .replace(/(LiquidityPoolToken)0x[a-fA-F0-9]+/, "$1")
+          .replace(/([a-z])([A-Z])/g, "$1 $2"),
         symbol: item.symbol.includes("TKN")
-          ? pipe(
-              split("-"),
-              reduce((acc, curr: string) => {
+          ? item.symbol
+              .split("-")
+              .reduce((acc, curr) => {
                 const currentValue = curr.replace("TKN", "");
                 const tokenId = currentValue.startsWith("0x")
                   ? hexToBn(currentValue).toString()
@@ -37,13 +33,11 @@ export const getAssetsInfo = async (
                 const symbol = completeAssetsInfo[tokenId].symbol;
                 acc.push(symbol);
                 return acc;
-              }, [] as string[]),
-              join("-")
-            )(item.symbol)
+              }, [] as string[])
+              .join("-")
           : item.symbol
       };
       obj[asset.id] = asset;
       return obj;
-    }, {} as TMainTokens)
-  )(Object.values(completeAssetsInfo));
+    }, {} as MainTokens);
 };

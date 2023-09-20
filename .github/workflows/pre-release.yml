@@ -46,15 +46,17 @@ jobs:
           target: wasm32-unknown-unknown
 
       - name: Replace parachain docker image reference in config
-        working-directory: mangata-repo/launch
-        run: sed -i 's+mangatasolutions/mangata-node:.*+mangatasolutions/mangata-node:develop+g' config.yml
+        working-directory: mangata-repo/devops/parachain-launch
+        run: sed -i 's+mangatasolutions/mangata-node:.*+mangatasolutions/mangata-node:develop-fast+g' config.yml
+
+      - name: Generate the config
+        working-directory: mangata-repo/devops/parachain-launch
+        run: npx @open-web3/parachain-launch generate config.yml
 
       - name: Run the Node
-        working-directory: mangata-repo/launch
+        working-directory: mangata-repo/devops/parachain-launch/output
         run: |
-          yarn install
-          yarn gen
-          yarn up
+          docker-compose up -d --build
           docker ps
 
       - name: Sleep for 3 minutes
@@ -92,6 +94,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Extract peerDependencies
+        id: extract
+        run: |
+          peerDependencies=$(cat package.json | jq -r '.peerDependencies | to_entries | map(.key + "@" + .value) | join(",")')
+          echo "PEER_DEPENDENCIES=$peerDependencies" >> $GITHUB_ENV
+
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
@@ -114,4 +122,4 @@ jobs:
           workflow: pr-ui-tests.yml
           repo: mangata-finance/microapps
           token: ${{ secrets.BOT_USER_GITHUB_TOKEN }}
-          inputs: '{"sdkVersion": "${{ needs.dry-run-release-version.outputs.new-release-version }}"}'
+          inputs: '{"sdkVersion": "${{ needs.dry-run-release-version.outputs.new-release-version }}", "peerDependencies": "${{ env.PEER_DEPENDENCIES }}"}'

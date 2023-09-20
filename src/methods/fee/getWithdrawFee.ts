@@ -2,7 +2,6 @@ import { WithdrawFee } from "../../types/xTokens";
 import { encodeAddress } from "@polkadot/util-crypto";
 import { BN } from "@polkadot/util";
 import { ApiPromise } from "@polkadot/api";
-import { getWeightXTokens } from "../../utils/getWeightXTokens";
 import { fromBN } from "../../utils/bnUtility";
 
 /**
@@ -38,7 +37,7 @@ export const getWithdrawFee = async (
     );
 
     const destination = {
-      V1: {
+      V3: {
         parents: 1,
         interior: {
           X2: [
@@ -47,7 +46,6 @@ export const getWithdrawFee = async (
             },
             {
               AccountId32: {
-                network: "Any",
                 id: api.createType("AccountId32", correctAddress).toHex()
               }
             }
@@ -56,10 +54,18 @@ export const getWithdrawFee = async (
       }
     };
 
-    const destWeightLimit = getWeightXTokens(
-      new BN(withWeight),
-      api.tx.xTokens.transfer
-    );
+    let destWeightLimit;
+    const statemineTokens = ["RMRK", "USDT"];
+    if (statemineTokens.includes(tokenSymbol)) {
+      destWeightLimit = "Unlimited";
+    } else {
+      destWeightLimit = {
+        Limited: {
+          ref_time: new BN(withWeight),
+          proof_size: 0
+        }
+      };
+    }
 
     const dispatchInfo = await api.tx.xTokens
       .transfer(tokenId, amount, destination, destWeightLimit)

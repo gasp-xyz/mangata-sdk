@@ -1,9 +1,9 @@
 import { encodeAddress } from "@polkadot/util-crypto";
 import { BN } from "@polkadot/util";
 import { ApiPromise } from "@polkadot/api";
-import { getWeightXTokens } from "../../utils/getWeightXTokens";
 import { signTx } from "../../utils/signTx";
 import { Withdraw } from "../../types/xTokens";
+import { logger } from "../../utils/mangataLogger";
 
 /**
  * @since 2.0.0
@@ -12,6 +12,7 @@ export const withdraw = async (
   instancePromise: Promise<ApiPromise>,
   args: Withdraw
 ) => {
+  logger.info("Withdraw method started ...");
   const {
     tokenSymbol,
     withWeight,
@@ -21,6 +22,13 @@ export const withdraw = async (
     amount,
     txOptions
   } = args;
+  logger.info("withdraw", {
+    tokenSymbol,
+    withWeight,
+    parachainId,
+    destinationAddress,
+    amount: amount.toString()
+  });
   const api = await instancePromise;
   const correctAddress = encodeAddress(destinationAddress, 42);
 
@@ -56,12 +64,17 @@ export const withdraw = async (
       }
     };
 
-    const destWeightLimit = {
-      Limited: {
-        ref_time: new BN(withWeight),
-        proof_size: 0
-      }
-    };
+    let destWeightLimit;
+    if (withWeight === "Unlimited") {
+      destWeightLimit = "Unlimited";
+    } else {
+      destWeightLimit = {
+        Limited: {
+          ref_time: new BN(withWeight),
+          proof_size: new BN("100000")
+        }
+      };
+    }
 
     await signTx(
       api,

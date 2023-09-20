@@ -1,4 +1,4 @@
-import { it, expect, afterAll } from "vitest";
+import { it, expect } from "vitest";
 import { BN } from "@polkadot/util";
 import { instance } from "./instance";
 import { Reserve } from "../src";

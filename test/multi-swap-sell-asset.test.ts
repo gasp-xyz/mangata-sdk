@@ -4,7 +4,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { it, expect, beforeEach } from "vitest";
 
 import { instance, SUDO_USER_NAME } from "./instance";
-import type { Batch, BuyAsset, CreatePool } from "../src";
+import type { Batch, CreatePool, MultiswapSellAsset } from "../src";
 import {
   createMangataToken,
   createToken,
@@ -14,8 +14,8 @@ import {
 
 let testUser: KeyringPair;
 let sudoUser: KeyringPair;
-let firstTokenId: string;
-let secondTokenId: string;
+let firstTokenId: string | undefined;
+let secondTokenId: string | undefined;
 
 beforeEach(async () => {
   const keyring = new Keyring({ type: "sr25519" });
@@ -53,7 +53,7 @@ beforeEach(async () => {
   secondTokenId = extrinsicData[1].eventData[0].data.toString();
 });
 
-it("should buy asset", async () => {
+it("should sell asset", async () => {
   const argsPool: CreatePool = {
     account: testUser,
     firstTokenId: firstTokenId!,
@@ -72,25 +72,18 @@ it("should buy asset", async () => {
 
   await instance.rpc.waitForNewBlock(2);
 
-  const argsBuyAsset: BuyAsset = {
+  const argsMultiSellAsset: MultiswapSellAsset = {
     account: testUser,
-    soldTokenId: firstTokenId!,
-    boughtTokenId: secondTokenId!,
-    amount: new BN(1000),
-    maxAmountIn: new BN(60000)
-  };
-
-  const tx1 = await instance.submitableExtrinsic.buyAsset(argsBuyAsset);
-  const tx2 = await instance.submitableExtrinsic.buyAsset(argsBuyAsset);
-
-  const argsBatch: Batch = {
-    account: testUser,
-    calls: [tx1, tx2],
+    tokenIds: [firstTokenId!, secondTokenId!],
+    amount: new BN(10000),
+    minAmountOut: new BN(100),
     txOptions: {
       extrinsicStatus: (data) => {
-        return expect(data[data.length - 1].method).toEqual("ExtrinsicSuccess");
+        const searchTerms = ["xyk", "AssetsSwapped", testUser.address];
+        const extrinsicData = getExtrinsicData({ data, searchTerms });
+        return expect(extrinsicData[0].method).toEqual("AssetsSwapped");
       }
     }
   };
-  await instance.batch(argsBatch);
+  await instance.xyk.multiswapSellAsset(argsMultiSellAsset);
 });

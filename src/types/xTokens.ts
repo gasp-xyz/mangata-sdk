@@ -27,9 +27,18 @@ export type Withdraw = Merge<
   ExtrinsicCommon,
   {
     tokenSymbol: string;
-    withWeight: string;
+    withWeight: number | "Unlimited";
     parachainId: number;
     destinationAddress: Address;
+    amount: TokenAmount;
+  }
+>;
+
+export type MoonriverWithdraw = Merge<
+  ExtrinsicCommon,
+  {
+    tokenSymbol: string;
+    moonriverAddress: string;
     amount: TokenAmount;
   }
 >;

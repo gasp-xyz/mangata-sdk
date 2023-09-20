@@ -8,6 +8,11 @@ import {
 
 import { Merge, Except } from "type-fest";
 
+export type BurnAmount = {
+  firstAssetAmount: TokenAmount;
+  secondAssetAmount: TokenAmount;
+};
+
 export type Rewards = {
   address: Address;
   liquidityTokenId: TokenId;
@@ -54,9 +59,6 @@ export type Asset = {
 export type MaxAmountIn = Merge<Asset, { maxAmountIn: TokenAmount }>;
 export type MinAmountOut = Merge<Asset, { minAmountOut: TokenAmount }>;
 
-export type BuyAsset = Prettify<Merge<ExtrinsicCommon, MaxAmountIn>>;
-export type SellAsset = Prettify<Merge<ExtrinsicCommon, MinAmountOut>>;
-
 export type PoolBase = {
   firstTokenId: TokenId;
   firstTokenAmount: TokenAmount;
@@ -66,12 +68,10 @@ export type PoolBase = {
 
 export type CreatePool = Merge<ExtrinsicCommon, PoolBase>;
 
-export type SellAssetFee = Except<SellAsset, "txOptions">;
 export type MintLiquidityFee = Except<MintLiquidity, "txOptions">;
 export type DeactivateLiquidityFee = Except<Liquidity, "txOptions">;
 export type CreatePoolFee = Except<CreatePool, "txOptions">;
 export type ClaimRewardsFee = Except<Omit<Liquidity, "amount">, "txOptions">;
-export type BuyAssetFee = Except<BuyAsset, "txOptions">;
 export type BurnLiquidityFee = Except<BurnLiquidity, "txOptions">;
 export type ActivateLiquidityFee = Except<Liquidity, "txOptions">;
 export type MultiSwapBase = Merge<
