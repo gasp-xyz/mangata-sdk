@@ -10,7 +10,12 @@ import {
   createUser,
   getExtrinsicData
 } from "./utility";
-import { Batch, CreatePool, MangataGenericEvent, SellAsset } from "../src";
+import {
+  Batch,
+  CreatePool,
+  MangataGenericEvent,
+  MultiswapSellAsset
+} from "../src";
 
 let testUser: KeyringPair;
 let sudoUser: KeyringPair;
@@ -74,10 +79,9 @@ it("should sell asset 4 times", async () => {
   const promises: Promise<MangataGenericEvent[]>[] = [];
   const maxFutureNonce = userNonce[0].toNumber() + 3;
   for (let index = maxFutureNonce; index >= userNonce[0].toNumber(); index--) {
-    const argsSellAsset: SellAsset = {
+    const argsSellAsset: MultiswapSellAsset = {
       account: testUser,
-      soldTokenId: firstTokenId!,
-      boughtTokenId: secondTokenId!,
+      tokenIds: [firstTokenId!, secondTokenId!],
       amount: new BN(1000 + index),
       minAmountOut: new BN(0),
       txOptions: {
@@ -89,7 +93,7 @@ it("should sell asset 4 times", async () => {
         }
       }
     };
-    promises.push(instance.xyk.sellAsset(argsSellAsset));
+    promises.push(instance.xyk.multiswapSellAsset(argsSellAsset));
   }
   const promisesEvents = await Promise.all(promises);
   promisesEvents.forEach((events) => {

@@ -5,14 +5,7 @@ export const getLiquidityPromotedPools = async (api: ApiPromise) => {
     const promotedPoolRewards =
       await api.query.proofOfStake.promotedPoolRewards();
 
-    const promotedPoolInfos = promotedPoolRewards.toHuman() as {
-      [key: string]: {
-        weight: string;
-        rewards: string;
-      };
-    };
-
-    return Object.keys(promotedPoolInfos);
+    return Object.keys(promotedPoolRewards.toHuman());
   } catch (error) {
     return [];
   }

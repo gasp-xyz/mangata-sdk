@@ -1,3 +1,175 @@
+# [2.0.0-rc.23](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.22...v2.0.0-rc.23) (2023-09-17)
+
+
+### Bug Fixes
+
+* remove async await from root ([6b99ef9](https://github.com/mangata-finance/mangata-sdk/commit/6b99ef9744c1e0d3a53462d7afa73d452dbfb7d2))
+
+# [2.0.0-rc.22](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.21...v2.0.0-rc.22) (2023-08-23)
+
+
+### Bug Fixes
+
+* add back two utils methods ([ded9cef](https://github.com/mangata-finance/mangata-sdk/commit/ded9cef2503c167803d8df44c2b3d7a8d4665a48))
+
+# [2.0.0-rc.21](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.20...v2.0.0-rc.21) (2023-08-23)
+
+
+### Bug Fixes
+
+* add only one method for tx success ([084a378](https://github.com/mangata-finance/mangata-sdk/commit/084a37888f1af865bff69d52dee875bde9a95f5c))
+
+# [2.0.0-rc.20](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.19...v2.0.0-rc.20) (2023-08-16)
+
+
+### Bug Fixes
+
+* use 'fast-runtime' in pre-release pipline ([50c2d2f](https://github.com/mangata-finance/mangata-sdk/commit/50c2d2fdb0d505cec898c61082ecf47579ec316d))
+
+
+### Features
+
+* add claimRewardsAll method to sdk ([1c8666d](https://github.com/mangata-finance/mangata-sdk/commit/1c8666d430ac6c965ba96940f9e35cb5036509a9))
+
+# [2.0.0-rc.19](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.18...v2.0.0-rc.19) (2023-07-26)
+
+
+### Bug Fixes
+
+* flip balance args for getAmountOfTokensInPool ([e0f1532](https://github.com/mangata-finance/mangata-sdk/commit/e0f1532fca38e4edc1c5cd6c44833afd9c354517))
+
+# [2.0.0-rc.18](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.17...v2.0.0-rc.18) (2023-07-18)
+
+
+### Bug Fixes
+
+* proof size for withdraw ([766423e](https://github.com/mangata-finance/mangata-sdk/commit/766423e82ab61be065ec4f7724ff58bc2b43ec3a))
+
+# [2.0.0-rc.17](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.16...v2.0.0-rc.17) (2023-07-14)
+
+
+### Bug Fixes
+
+* update proofsize for withdraw ([fd5a2d1](https://github.com/mangata-finance/mangata-sdk/commit/fd5a2d1f35556c0ac42fa9f27632b4d3be336629))
+
+# [2.0.0-rc.16](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.15...v2.0.0-rc.16) (2023-07-13)
+
+
+### Features
+
+* add logger to sdk ([e5040f5](https://github.com/mangata-finance/mangata-sdk/commit/e5040f5fe6184ff9cee0cef07f393701c2a76ab2))
+
+# [2.0.0-rc.15](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.14...v2.0.0-rc.15) (2023-07-11)
+
+
+### Bug Fixes
+
+* update types without prefix T ([0143484](https://github.com/mangata-finance/mangata-sdk/commit/01434846ad0c302c1a990dc010bdaeb9ad5ba91c))
+
+# [2.0.0-rc.14](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.13...v2.0.0-rc.14) (2023-07-09)
+
+
+### Bug Fixes
+
+* asset info token without name and symbol ([c6de094](https://github.com/mangata-finance/mangata-sdk/commit/c6de0947b2c8eabc4615b223fc4311ae5b2422d7))
+
+# [2.0.0-rc.13](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.12...v2.0.0-rc.13) (2023-07-06)
+
+
+### Features
+
+* remove buyasset and sellasset ([4318faa](https://github.com/mangata-finance/mangata-sdk/commit/4318faa38a612db41093f045afdcba1943566ea5))
+
+# [2.0.0-rc.12](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.11...v2.0.0-rc.12) (2023-07-06)
+
+
+### Features
+
+* unique token id type across sdk ([62906d3](https://github.com/mangata-finance/mangata-sdk/commit/62906d31451d4d97939337ffa73ee2ca1cb4cfd0))
+
+# [2.0.0-rc.11](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.10...v2.0.0-rc.11) (2023-07-04)
+
+
+### Features
+
+* update code based on new types ([8143512](https://github.com/mangata-finance/mangata-sdk/commit/81435123a00e299e989dd52cc44598334e37223b))
+
+# [2.0.0-rc.10](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.9...v2.0.0-rc.10) (2023-07-03)
+
+
+### Features
+
+* add options for ApiPromise ([2d518f8](https://github.com/mangata-finance/mangata-sdk/commit/2d518f82bd107688a5a3e3600192780d4b7f7753))
+
+# [2.0.0-rc.9](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.8...v2.0.0-rc.9) (2023-06-29)
+
+
+### Bug Fixes
+
+* init mangata ([c3ae2f5](https://github.com/mangata-finance/mangata-sdk/commit/c3ae2f59ad069cb1fcf85616b02baf9bf28a4f02))
+
+# [2.0.0-rc.8](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.7...v2.0.0-rc.8) (2023-06-29)
+
+
+### Bug Fixes
+
+* correct files in package ([ea722b7](https://github.com/mangata-finance/mangata-sdk/commit/ea722b7e6f51a530033796f722c6390473a53af6))
+
+# [2.0.0-rc.7](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.6...v2.0.0-rc.7) (2023-06-29)
+
+
+### Bug Fixes
+
+* init api promise ([cad64d1](https://github.com/mangata-finance/mangata-sdk/commit/cad64d100b9363e71510d71fb5c70c4e447b308f))
+
+# [2.0.0-rc.6](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.5...v2.0.0-rc.6) (2023-06-27)
+
+
+### Features
+
+* add implementation for withdraw from mangata to moonriver ([26e63b7](https://github.com/mangata-finance/mangata-sdk/commit/26e63b796fe6ec98798aeea51214e6a15b9dd647))
+
+# [2.0.0-rc.5](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.4...v2.0.0-rc.5) (2023-06-27)
+
+
+### Features
+
+* add new rpc methods ([87f9557](https://github.com/mangata-finance/mangata-sdk/commit/87f9557a22bc90b2930097cf48a33b0774efca26))
+
+# [2.0.0-rc.4](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.3...v2.0.0-rc.4) (2023-06-21)
+
+
+### Bug Fixes
+
+* change weight limit for withdraw to number or Unlimited ([1fff8c5](https://github.com/mangata-finance/mangata-sdk/commit/1fff8c52ad940fd67f24238d2e53f410ecee3732))
+
+# [2.0.0-rc.3](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.2...v2.0.0-rc.3) (2023-06-20)
+
+
+### Bug Fixes
+
+* get assetinfo hex problem ([81607ad](https://github.com/mangata-finance/mangata-sdk/commit/81607adff1b4436519c126ad6193d3eada63fdc6))
+* typo in get invested pool ([9283999](https://github.com/mangata-finance/mangata-sdk/commit/9283999122ba37065b4e3cabcfe93d0bb02dd040))
+
+# [2.0.0-rc.2](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0-rc.1...v2.0.0-rc.2) (2023-06-20)
+
+
+### Bug Fixes
+
+* update withdraw methods ([4d4e599](https://github.com/mangata-finance/mangata-sdk/commit/4d4e599058c01d299dc526ce48fe8b648a7546ef))
+
+# [2.0.0-rc.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.20.1...v2.0.0-rc.1) (2023-06-19)
+
+
+### Features
+
+* complete refactoring of sdk ([49bedd8](https://github.com/mangata-finance/mangata-sdk/commit/49bedd887b09caa9d293bcf80e2ff1da8a4d3b09))
+
+
+### BREAKING CHANGES
+
+* support only esm
+
 ## [1.20.1](https://github.com/mangata-finance/mangata-sdk/compare/v1.20.0...v1.20.1) (2023-06-12)
 
 

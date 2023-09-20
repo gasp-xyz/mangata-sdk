@@ -1,6 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
-import { BN, isHex, hexToBn } from "@polkadot/util";
+import { BN } from "@polkadot/util";
 import { TokenId } from "../../types/common";
+import { logger } from "../../utils/mangataLogger";
 
 /**
  * @since 2.0.0
@@ -10,15 +11,14 @@ export const getAmountOfTokensInPool = async (
   firstTokenId: TokenId,
   secondTokenId: TokenId
 ): Promise<BN[]> => {
+  logger.info("getAmountOfTokensInPool", { firstTokenId, secondTokenId });
   const api = await instancePromise;
   const balance = await api.query.xyk.pools([firstTokenId, secondTokenId]);
-  const tokenValue1 = balance[0].toString();
-  const tokenValue2 = balance[1].toString();
-  const token1: BN = isHex(tokenValue1)
-    ? hexToBn(tokenValue1)
-    : new BN(tokenValue1);
-  const token2: BN = isHex(tokenValue2)
-    ? hexToBn(tokenValue2)
-    : new BN(tokenValue2);
-  return [token1, token2];
+
+  if (balance[0].eq(0) && balance[1].eq(0)) {
+    const balance = await api.query.xyk.pools([secondTokenId, firstTokenId]);
+    return [new BN(balance[1]), new BN(balance[0])];
+  }
+
+  return [new BN(balance[0]), new BN(balance[1])];
 };

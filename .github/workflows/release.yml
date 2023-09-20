@@ -7,6 +7,12 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
+permissions:
+  contents: write
+  id-token: write
+  deployments: write
+  checks: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,3 +40,24 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.FE_TOKEN }}
+
+      - name: Generate docs
+        run: npx typedoc src/index.ts
+
+      - name: Deploy github page for doc 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: docs # The folder the action should deploy.
+
+      - name: Sleep for 1 minute
+        run: sleep 60s
+
+      - name: Merge main -> develop
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: main
+          target_branch: develop
+          message: Merge main into develop
+          github_token: ${{ secrets.FE_TOKEN }}

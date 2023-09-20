@@ -16,6 +16,7 @@ import { getTxNonce } from "./getTxNonce";
 import { dbInstance } from "./inMemoryDatabase";
 import { truncatedString } from "./truncatedString";
 import { getTxError } from "./getTxError";
+import { logger } from "./mangataLogger";
 
 export const signTx = async (
   api: ApiPromise,
@@ -34,12 +35,12 @@ export const signTx = async (
     } catch (error: any) {
       reject(error);
     }
-    console.info(
+    logger.trace(
       `submitting Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} `
     );
     try {
       const unsub = await tx.send(async (result: ISubmittableResult) => {
-        console.info(
+        logger.trace(
           `Tx[${tx.hash.toString()}]who: ${extractedAccount} nonce: ${nonce.toString()} => ${
             result.status.type
           }(${result.status.value.toString()})${serializeTx(api, tx)}`
@@ -103,7 +104,7 @@ export const signTx = async (
                 });
 
                 if (index < 0) {
-                  console.info(
+                  logger.trace(
                     `Tx([${tx.hash.toString()}]) not found in block ${executionBlockNr} $([${truncatedString(
                       blockHash.toString()
                     )}])`
@@ -111,7 +112,7 @@ export const signTx = async (
                   return;
                 } else {
                   unsubscribeNewHeads();
-                  console.info(
+                  logger.trace(
                     `Tx[${tx.hash.toString()}]who:${extractedAccount} nonce:${nonce.toString()} => Executed(${blockHash.toString()})`
                   );
                 }
@@ -154,7 +155,7 @@ export const signTx = async (
             }
           );
         } else if (result.isError) {
-          console.info(
+          logger.trace(
             "Transaction Error Result",
             JSON.stringify(result, null, 2)
           );

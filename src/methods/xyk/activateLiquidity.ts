@@ -4,18 +4,27 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { MangataGenericEvent } from "../../types/common";
 import { signTx } from "../../utils/signTx";
 import { Liquidity } from "../../types/xyk";
+import { logger } from "../../utils/mangataLogger";
 
 async function activateLiquidity(
   instancePromise: Promise<ApiPromise>,
   args: Liquidity,
+  balanceFrom:
+    | "AvailableBalance"
+    | "StakedUnactivatedReserves"
+    | "UnspentReserves",
   isForBatch: false
 ): Promise<MangataGenericEvent[]>;
 
 async function activateLiquidity(
   instancePromise: Promise<ApiPromise>,
   args: Liquidity,
+  balanceFrom:
+    | "AvailableBalance"
+    | "StakedUnactivatedReserves"
+    | "UnspentReserves",
   isForBatch: true
-): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>>;
+): Promise<SubmittableExtrinsic<"promise">>;
 
 /**
  * @since 2.0.0
@@ -33,14 +42,25 @@ async function activateLiquidity(
 async function activateLiquidity(
   instancePromise: Promise<ApiPromise>,
   args: Liquidity,
+  balanceFrom:
+    | "AvailableBalance"
+    | "StakedUnactivatedReserves"
+    | "UnspentReserves",
   isForBatch: boolean
 ) {
+  logger.info("Active Liquidity operation started ...");
   const api = await instancePromise;
   const { account, liquidityTokenId, amount, txOptions } = args;
+  logger.info("activateLiquidity", {
+    liquidityTokenId,
+    amount: amount.toString(),
+    balanceFrom,
+    isBatch: isForBatch
+  });
   const tx = api.tx.proofOfStake.activateLiquidity(
     liquidityTokenId,
     amount,
-    null
+    balanceFrom
   );
   return isForBatch ? tx : await signTx(api, tx, account, txOptions);
 }

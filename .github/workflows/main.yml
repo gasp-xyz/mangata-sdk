@@ -25,7 +25,7 @@ jobs:
       - name: Setup Node version and cache dependencies
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "18"
           cache: "yarn"
 
       - name: Install WASM toolchain
@@ -35,15 +35,17 @@ jobs:
           target: wasm32-unknown-unknown
 
       - name: Replace parachain docker image reference in config
-        working-directory: mangata-repo/launch
-        run: sed -i 's+mangatasolutions/mangata-node:.*+mangatasolutions/mangata-node:develop+g' config.yml
+        working-directory: mangata-repo/devops/parachain-launch
+        run: sed -i 's+mangatasolutions/mangata-node:.*+mangatasolutions/mangata-node:develop-fast+g' config.yml
+
+      - name: Generate the config
+        working-directory: mangata-repo/devops/parachain-launch
+        run: npx @open-web3/parachain-launch generate config.yml
 
       - name: Run the Node
-        working-directory: mangata-repo/launch
+        working-directory: mangata-repo/devops/parachain-launch/output
         run: |
-          yarn install
-          yarn gen
-          yarn up
+          docker-compose up -d --build
           docker ps
 
       - name: Sleep for 3 minutes

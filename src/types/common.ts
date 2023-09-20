@@ -5,22 +5,22 @@ import { Signer } from "@polkadot/api/types";
 import type { ISubmittableResult, Codec } from "@polkadot/types/types";
 import type { Event, Phase } from "@polkadot/types/interfaces";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
+import { ILogObj, ISettingsParam } from "tslog";
 
 import {
-  TBalances,
-  TMainTokens,
+  MainTokens,
   TokenBalance,
-  TPoolWithRatio,
+  PoolWithRatio,
   Token,
-  TTokenInfo,
-  TPoolWithShare,
-  FeeLockType
+  TokenInfo,
+  PoolWithShare
 } from "../types/query";
 import {
   Deposit,
   DepositFromKusamaFee,
   DepositFromParachainFee,
   DepositFromStatemineFee,
+  MoonriverWithdraw,
   RelayDeposit,
   RelayWithdraw,
   Withdraw,
@@ -30,10 +30,9 @@ import {
 
 import {
   ActivateLiquidityFee,
+  BurnAmount,
   BurnLiquidity,
   BurnLiquidityFee,
-  BuyAsset,
-  BuyAssetFee,
   ClaimRewardsFee,
   CreatePool,
   CreatePoolFee,
@@ -45,11 +44,14 @@ import {
   MultiswapSellAsset,
   Price,
   Reserve,
-  Rewards,
-  SellAsset,
-  SellAssetFee
+  Rewards
 } from "../types/xyk";
-import { Transfer, TransferAllFee, TransferTokenFee } from "../types/tokens";
+import {
+  Transfer,
+  TransferAllFee,
+  TransferTokenFee,
+  TransferTokens
+} from "../types/tokens";
 import { Batch } from "./utility";
 
 export type Prettify<T> = {
@@ -100,6 +102,7 @@ export type TxOptions = {
 };
 
 export type MangataSubmittableExtrinsic = SubmittableExtrinsic<"promise">;
+export type MangataLoggerOptions = ISettingsParam<ILogObj>;
 
 export interface MangataInstance {
   /**
@@ -140,6 +143,8 @@ export interface MangataInstance {
      * @returns A promise that resolves with void.
      */
     withdrawKsm: (args: RelayWithdraw) => Promise<void>;
+
+    withdrawToMoonriver: (args: MoonriverWithdraw) => Promise<void>;
   };
 
   /**
@@ -158,7 +163,13 @@ export interface MangataInstance {
      * @param args - The liquidity parameters.
      * @returns A promise that resolves with an array of MangataGenericEvent objects.
      */
-    activateLiquidity: (args: Liquidity) => Promise<MangataGenericEvent[]>;
+    activateLiquidity: (
+      args: Liquidity,
+      balanceFrom:
+        | "AvailableBalance"
+        | "StakedUnactivatedReserves"
+        | "UnspentReserves"
+    ) => Promise<MangataGenericEvent[]>;
 
     /**
      * Burns liquidity tokens.
@@ -175,20 +186,6 @@ export interface MangataInstance {
     mintLiquidity: (args: MintLiquidity) => Promise<MangataGenericEvent[]>;
 
     /**
-     * Buys an asset from a pool.
-     * @param args - The buy asset parameters.
-     * @returns A promise that resolves with an array of MangataGenericEvent objects.
-     */
-    buyAsset: (args: BuyAsset) => Promise<MangataGenericEvent[]>;
-
-    /**
-     * Sells an asset to a pool.
-     * @param args - The sell asset parameters.
-     * @returns A promise that resolves with an array of MangataGenericEvent objects.
-     */
-    sellAsset: (args: SellAsset) => Promise<MangataGenericEvent[]>;
-
-    /**
      * Creates a new pool.
      * @param args - The create pool parameters.
      * @returns A promise that resolves with an array of MangataGenericEvent objects.
@@ -201,7 +198,16 @@ export interface MangataInstance {
      * @returns A promise that resolves with an array of MangataGenericEvent objects.
      */
     claimRewards: (
-      args: Omit<Liquidity, "amount">
+      args: Prettify<Omit<Liquidity, "amount">>
+    ) => Promise<MangataGenericEvent[]>;
+
+    /**
+     * Claims rewards from a pool.
+     * @param args - The liquidity parameters.
+     * @returns A promise that resolves with an array of MangataGenericEvent objects.
+     */
+    claimRewardsAll: (
+      args: ExtrinsicCommon,
     ) => Promise<MangataGenericEvent[]>;
 
     /**
@@ -226,6 +232,8 @@ export interface MangataInstance {
    * rpc methods for interacting with various RPC operations.
    */
   rpc: {
+    isSellAssetLockFree: (tokendIds: TokenId[], amount: BN) => Promise<Boolean>;
+    isBuyAssetLockFree: (tokendIds: TokenId[], amount: BN) => Promise<Boolean>;
     /**
      * Calculates the buy price based on the asset's ID.
      * @param args - The price parameters.
@@ -253,7 +261,7 @@ export interface MangataInstance {
      * @param args - The price parameters.
      * @returns A promise that resolves with any type of value.
      */
-    getBurnAmount: (args: Price) => Promise<any>;
+    getBurnAmount: (args: Price) => Promise<BurnAmount>;
 
     /**
      * Calculates the sell price based on the reserve parameters.
@@ -317,9 +325,7 @@ export interface MangataInstance {
      * @param args - The transfer parameters, including the amount of tokens to transfer.
      * @returns A promise that resolves with an array of MangataGenericEvent objects.
      */
-    transferTokens: (
-      args: Transfer & { amount: TokenAmount }
-    ) => Promise<MangataGenericEvent[]>;
+    transferTokens: (args: TransferTokens) => Promise<MangataGenericEvent[]>;
   };
   /**
    * Methods for submitting extrinsics that perform actions on the blockchain. This methods are useful when using batch methods
@@ -340,20 +346,6 @@ export interface MangataInstance {
     claimRewards: (
       args: Omit<Liquidity, "amount">
     ) => Promise<MangataSubmittableExtrinsic>;
-
-    /**
-     * Sells an asset based on the provided parameters.
-     * @param args - The sell asset parameters.
-     * @returns A promise that resolves with a MangataSubmittableExtrinsic object.
-     */
-    sellAsset: (args: SellAsset) => Promise<MangataSubmittableExtrinsic>;
-
-    /**
-     * Buys an asset based on the provided parameters.
-     * @param args - The buy asset parameters.
-     * @returns A promise that resolves with a MangataSubmittableExtrinsic object.
-     */
-    buyAsset: (args: BuyAsset) => Promise<MangataSubmittableExtrinsic>;
 
     /**
      * Mints liquidity based on the provided parameters.
@@ -379,7 +371,11 @@ export interface MangataInstance {
      * @returns A promise that resolves with a MangataSubmittableExtrinsic object.
      */
     activateLiquidity: (
-      args: Liquidity
+      args: Liquidity,
+      balanceFrom:
+        | "AvailableBalance"
+        | "StakedUnactivatedReserves"
+        | "UnspentReserves"
     ) => Promise<MangataSubmittableExtrinsic>;
 
     /**
@@ -406,6 +402,26 @@ export interface MangataInstance {
     transferTokens: (
       args: Transfer & { amount: TokenAmount }
     ) => Promise<MangataSubmittableExtrinsic>;
+
+    /**
+     * Executes a multiswap transaction to buy assets.
+     *
+     * @param args - The arguments for the multiswap transaction.
+     * @returns A Promise that resolves to a `MangataSubmittableExtrinsic` representing the multiswap transaction.
+     */
+    multiswapBuyAsset: (
+      args: MultiswapBuyAsset
+    ) => Promise<MangataSubmittableExtrinsic>;
+
+    /**
+     * Executes a multiswap transaction to sell assets.
+     *
+     * @param args - The arguments for the multiswap transaction.
+     * @returns A Promise that resolves to a `MangataSubmittableExtrinsic` representing the multiswap transaction.
+     */
+    multiswapSellAsset: (
+      args: MultiswapSellAsset
+    ) => Promise<MangataSubmittableExtrinsic>;
   };
   /**
    * Represents a set of query functions for retrieving information from the blockchain.
@@ -422,7 +438,7 @@ export interface MangataInstance {
     getLiquidityTokenId: (
       firstTokenId: TokenId,
       secondTokenId: TokenId
-    ) => Promise<BN>;
+    ) => Promise<TokenId>;
 
     /**
      * Retrieves the total issuance of a specific token.
@@ -440,17 +456,17 @@ export interface MangataInstance {
     /**
      * Retrieves detailed information about a specific token.
      */
-    getTokenInfo: (tokenId: TokenId) => Promise<TTokenInfo>;
+    getTokenInfo: (tokenId: TokenId) => Promise<TokenInfo>;
 
     /**
      * Retrieves the liquidity token IDs.
      */
-    getLiquidityTokenIds: () => Promise<string[]>;
+    getLiquidityTokenIds: () => Promise<TokenId[]>;
 
     /**
      * Retrieves the liquidity tokens.
      */
-    getLiquidityTokens: () => Promise<TMainTokens>;
+    getLiquidityTokens: () => Promise<MainTokens>;
 
     /**
      * Retrieves the current block number.
@@ -460,19 +476,17 @@ export interface MangataInstance {
     /**
      * Retrieves the tokens owned by a specific address.
      */
-    getOwnedTokens: (
-      address: Address
-    ) => Promise<{ [id: TokenId]: Token } | null>;
+    getOwnedTokens: (address: Address) => Promise<{ [id: TokenId]: Token }>;
 
     /**
      * Retrieves information about the main assets.
      */
-    getAssetsInfo: () => Promise<TMainTokens>;
+    getAssetsInfo: () => Promise<MainTokens>;
 
     /**
      * Retrieves the pools in which the specified address has invested.
      */
-    getInvestedPools: (address: Address) => Promise<TPoolWithShare[]>;
+    getInvestedPools: (address: Address) => Promise<PoolWithShare[]>;
 
     /**
      * Retrieves the amount of tokens in a liquidity pool for a given pair of tokens.
@@ -485,24 +499,22 @@ export interface MangataInstance {
     /**
      * Retrieves the liquidity pool information for a specific liquidity token ID.
      */
-    getLiquidityPool: (liquidityTokenId: TokenId) => Promise<BN[]>;
+    getLiquidityPool: (liquidityTokenId: TokenId) => Promise<TokenId[]>;
 
     /**
      * Retrieves the detailed information about a specific pool.
      */
-    getPool: (liquidityTokenId: TokenId) => Promise<TPoolWithRatio>;
+    getPool: (liquidityTokenId: TokenId) => Promise<PoolWithRatio>;
 
     /**
      * Retrieves information about all the available pools.
      */
-    getPools: () => Promise<TPoolWithRatio[]>;
+    getPools: () => Promise<PoolWithRatio[]>;
 
     /**
      * Retrieves the total issuance of all tokens.
      */
-    getTotalIssuanceOfTokens: () => Promise<TBalances>;
-
-    getFeeLockMetadata: () => Promise<FeeLockType>;
+    getTotalIssuanceOfTokens: () => Promise<Record<string, BN>>;
   };
   /**
    * Represents a collection of fee calculation functions for different operations.
@@ -533,6 +545,8 @@ export interface MangataInstance {
      */
     withdrawKsm: (args: WithdrawKsmFee) => Promise<string>;
 
+    withdrawFromMoonriver: (args: MoonriverWithdraw) => Promise<string>;
+
     /**
      * Calculates the fee for activating liquidity in a pool.
      */
@@ -552,16 +566,6 @@ export interface MangataInstance {
      * Calculates the fee for creating a new pool.
      */
     createPool: (args: CreatePoolFee) => Promise<string>;
-
-    /**
-     * Calculates the fee for selling an asset.
-     */
-    sellAsset: (args: SellAssetFee) => Promise<string>;
-
-    /**
-     * Calculates the fee for buying an asset.
-     */
-    buyAsset: (args: BuyAssetFee) => Promise<string>;
 
     /**
      * Calculates the fee for minting liquidity in a pool.
