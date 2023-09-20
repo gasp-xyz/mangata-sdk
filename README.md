@@ -27,7 +27,7 @@ npm i @mangata-finance/sdk
 yarn add @mangata-finance/sdk
 ```
 
-# Migration from v1 to v2
+## Migration from v1 to v2
 
 To migrate from v1 to v2, certain modifications need to be made. This guide aims to help you refactor your codebase. We have divided the methods into specific groups:
 
