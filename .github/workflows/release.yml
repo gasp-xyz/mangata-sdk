@@ -23,7 +23,7 @@ jobs:
       - name: Setup Node version and cache dependencies
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "18"
           cache: "yarn"
 
       - name: Install deps
@@ -42,7 +42,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.FE_TOKEN }}
 
       - name: Generate docs
-        run: npx typedoc src/index.ts
+        run: npx typedoc src/index.ts --skipErrorChecking
 
       - name: Deploy github page for doc 🚀
         uses: JamesIves/github-pages-deploy-action@v4

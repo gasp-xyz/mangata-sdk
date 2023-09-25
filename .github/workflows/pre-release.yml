@@ -74,8 +74,8 @@ jobs:
       - name: Build the SDK
         run: yarn build
 
-#      - name: Run tests
-#        run: yarn test
+      - name: Run tests
+        run: yarn test
 
       - name: create dry run release
         run: npx semantic-release --dry-run
