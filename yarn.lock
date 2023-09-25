@@ -374,15 +374,15 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@mangata-finance/type-definitions@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@mangata-finance/type-definitions/-/type-definitions-1.0.0.tgz#f6acdf660c742980c1334a63878310cc3c1e21ea"
-  integrity sha512-WfEEtddpPEXrYhsA77aPWdgbjh660lAEv7bRa9U6AUk4fmN57YaQhnwp3o2X9/NgG1+UChsbttCxoa1QkFfV+w==
+"@mangata-finance/type-definitions@2.0.0-rc.8":
+  version "2.0.0-rc.8"
+  resolved "https://registry.yarnpkg.com/@mangata-finance/type-definitions/-/type-definitions-2.0.0-rc.8.tgz#6e1824d7adfab3cb8157707ea8ec1f815db7dc7c"
+  integrity sha512-w5JHVpaj2jgoKC1vgiwkfZ69Y53Wekgl9+SLWu8CgNb41QflPtVV04vh0yPS/clHAEwnA8gtkp2noicrsqAH9Q==
 
-"@mangata-finance/types@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@mangata-finance/types/-/types-1.0.0.tgz#845773b608601212a14805c045ff1835860c25dc"
-  integrity sha512-S/6Fa/PVM4BwG7LD0xIF8M/vl0K2p3y1luHi6ZnmXD13pU5yKsJjVVQf1HmXIKxskkv6E+8V3QXpCsvGbKSraw==
+"@mangata-finance/types@2.0.0-rc.3":
+  version "2.0.0-rc.3"
+  resolved "https://registry.yarnpkg.com/@mangata-finance/types/-/types-2.0.0-rc.3.tgz#0f4674ab888e45c84aa4a9ae5370b1b5d5cd9033"
+  integrity sha512-EyWlTe0OvJaBwgyQEQdkD9DMKbuxRrV4goo6QRdGECmO13B2I43KfiiPS44gVU79vU34YQ1QL+e8MYg2IAGS3Q==
 
 "@microsoft/tsdoc-config@0.16.2":
   version "0.16.2"
