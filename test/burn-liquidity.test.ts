@@ -54,7 +54,6 @@ beforeEach(async () => {
 });
 
 it("should burn liquidity", async () => {
-  const beforePools = await instance.query.getPools();
 
   const argsPool: CreatePool = {
     account: testUser,
@@ -100,7 +99,7 @@ it("should burn liquidity", async () => {
 
   await instance.rpc.waitForNewBlock(2);
 
-  const afterPools = await instance.query.getPools();
-
-  expect(beforePools.length).not.to.equal(afterPools);
+  const currentPool = await instance.query.getPool(liquidityTokenId)
+  expect(currentPool.firstTokenAmount.toString()).toEqual("0")
+  expect(currentPool.secondTokenAmount.toString()).toEqual("0")
 });
