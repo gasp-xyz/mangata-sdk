@@ -1,3 +1,21 @@
+# [3.0.0-rc.1](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0...v3.0.0-rc.1) (2023-09-25)
+
+
+### Bug Fixes
+
+* ratio ([da69cdb](https://github.com/mangata-finance/mangata-sdk/commit/da69cdb5387702339a7d5a4895cb4854a3535d8a))
+
+
+### Features
+
+* complete refactoring of sdk ([49bedd8](https://github.com/mangata-finance/mangata-sdk/commit/49bedd887b09caa9d293bcf80e2ff1da8a4d3b09))
+* update rpc methods with new types ([3a13b70](https://github.com/mangata-finance/mangata-sdk/commit/3a13b70bc378ea755aa5e9529013d567bf148fde))
+
+
+### BREAKING CHANGES
+
+* support only esm
+
 # [2.0.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.20.1...v2.0.0) (2023-09-20)
 
 
