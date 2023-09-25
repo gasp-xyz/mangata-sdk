@@ -17,10 +17,10 @@ export const calculateSellPrice = async (
   });
   const api = await instancePromise;
   const { inputReserve, outputReserve, amount } = args;
-  const result = await (api.rpc as any).xyk.calculate_sell_price(
+  const price = await (api.rpc as any).xyk.calculate_sell_price(
     inputReserve,
     outputReserve,
     amount
   );
-  return new BN(result.price);
+  return new BN(price);
 };

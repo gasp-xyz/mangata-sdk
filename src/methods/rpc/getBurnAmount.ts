@@ -1,6 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { BurnAmount, Price } from "../../types/xyk";
 import { logger } from "../../utils/mangataLogger";
+import {BN} from "@polkadot/util";
 
 /**
  * @since 2.0.0
@@ -21,6 +22,8 @@ export const getBurnAmount = async (
     secondTokenId,
     amount
   );
-  const resultAsJson = JSON.parse(result.toString());
-  return resultAsJson as BurnAmount;
+  return {
+    firstAssetAmount: new BN(result[0]),
+    secondAssetAmount: new BN(result[1])
+  } as BurnAmount
 };

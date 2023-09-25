@@ -109,6 +109,8 @@ import { isSellAssetLockFree } from "./methods/rpc/isSellAssetLockFree";
 import { withdrawToMoonriver } from "./methods/xTokens/withdrawToMoonriver";
 import { getWithdrawFromMoonriverFee } from "./methods/fee/getWithdrawFromMoonriverFee";
 import { logger } from "./utils/mangataLogger";
+import {getTradeableTokens} from "./methods/rpc/getTradeableTokens";
+import {getLiquidityTokensForTrading} from "./methods/rpc/getLiquidityTokensForTrading";
 
 /**
  * Creates a MangataInstance object with various methods for interacting with the Mangata node.
@@ -200,6 +202,8 @@ export function createMangataInstance(urls: string[]): MangataInstance {
       getNodeVersion:  () =>  getNodeVersion(instancePromise),
       getNodeName:  () =>  getNodeName(instancePromise),
       getChain:  () =>  getChain(instancePromise),
+      getTradeableTokens: () => getTradeableTokens(instancePromise),
+      getLiquidityTokensForTrading: ()  => getLiquidityTokensForTrading(instancePromise),
       waitForNewBlock:  (blockNumber?: number) =>
          waitForNewBlock(instancePromise, blockNumber)
     },

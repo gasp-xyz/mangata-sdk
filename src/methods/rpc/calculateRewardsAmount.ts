@@ -21,9 +21,7 @@ export const calculateRewardsAmount = async (
     liquidityTokenId
   );
 
-  const price = isHex(rewards.price.toString())
-    ? hexToBn(rewards.price.toString())
-    : new BN(rewards.price);
-
-  return price;
+  return isHex(rewards.toString())
+    ? hexToBn(rewards.toString())
+    : new BN(rewards);
 };

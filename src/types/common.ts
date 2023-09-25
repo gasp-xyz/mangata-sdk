@@ -44,7 +44,7 @@ import {
   MultiswapSellAsset,
   Price,
   Reserve,
-  Rewards
+  Rewards, TradeAbleTokens
 } from "../types/xyk";
 import {
   Transfer,
@@ -53,6 +53,7 @@ import {
   TransferTokens
 } from "../types/tokens";
 import { Batch } from "./utility";
+import {getLiquidityTokensForTrading} from "../methods/rpc/getLiquidityTokensForTrading";
 
 export type Prettify<T> = {
   [K in keyof T]: T[K];
@@ -232,6 +233,8 @@ export interface MangataInstance {
    * rpc methods for interacting with various RPC operations.
    */
   rpc: {
+    getLiquidityTokensForTrading: () => Promise<string[]>,
+    getTradeableTokens: () => Promise<TradeAbleTokens[]>,
     isSellAssetLockFree: (tokendIds: TokenId[], amount: BN) => Promise<Boolean>;
     isBuyAssetLockFree: (tokendIds: TokenId[], amount: BN) => Promise<Boolean>;
     /**
