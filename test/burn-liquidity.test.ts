@@ -47,6 +47,7 @@ beforeEach(async () => {
   };
 
   const data = await instance.batchAll(argsBatchAll);
+
   const searchTerms = ["tokens", "Issued", testUser.address];
   const extrinsicData = getExtrinsicData({ data, searchTerms });
   firstTokenId = extrinsicData[0].eventData[0].data.toString();
@@ -54,8 +55,6 @@ beforeEach(async () => {
 });
 
 it("should burn liquidity", async () => {
-  const beforePools = await instance.query.getPools();
-
   const argsPool: CreatePool = {
     account: testUser,
     firstTokenId: firstTokenId!,
@@ -95,12 +94,11 @@ it("should burn liquidity", async () => {
     secondTokenId: secondTokenId!,
     amount: amountToBurn!
   };
-
   await instance.xyk.burnLiquidity(argsBurnLiquidity);
 
   await instance.rpc.waitForNewBlock(2);
 
-  const afterPools = await instance.query.getPools();
-
-  expect(beforePools.length).not.to.equal(afterPools);
+  const currentPool = await instance.query.getPool(liquidityTokenId)
+  expect(currentPool.firstTokenAmount.toString()).toEqual("0")
+  expect(currentPool.secondTokenAmount.toString()).toEqual("0")
 });
