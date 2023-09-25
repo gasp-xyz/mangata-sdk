@@ -13,6 +13,13 @@ export type BurnAmount = {
   secondAssetAmount: TokenAmount;
 };
 
+export type TradeAbleTokens = {
+    tokenId: string,
+    decimals: number,
+    name: string,
+    symbol: string
+}
+
 export type Rewards = {
   address: Address;
   liquidityTokenId: TokenId;
