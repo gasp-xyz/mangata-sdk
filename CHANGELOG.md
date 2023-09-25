@@ -1,3 +1,11 @@
+# [2.1.0-rc.1](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0...v2.1.0-rc.1) (2023-09-25)
+
+
+### Features
+
+* update packages for types ([b98f348](https://github.com/mangata-finance/mangata-sdk/commit/b98f3486611d8f828f5648adcb8f25564acc4487))
+* update types and rpc ([b4c0d4e](https://github.com/mangata-finance/mangata-sdk/commit/b4c0d4eb56b062e513a78994da35629cf36eda99))
+
 # [2.0.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.20.1...v2.0.0) (2023-09-20)
 
 
