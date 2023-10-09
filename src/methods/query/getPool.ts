@@ -4,7 +4,7 @@ import { TokenId } from "../../types/common";
 import { PoolWithRatio } from "../../types/query";
 import { getLiquidityPool } from "./getLiquidityPool";
 import { getAmountOfTokensInPool } from "./getAmountOfTokensInPool";
-import { getLiquidityPromotedPools } from "src/utils/getLiquidityPromotedPools";
+import { getLiquidityPromotedPools } from "../../utils/getLiquidityPromotedPools";
 import { logger } from "../../utils/mangataLogger";
 
 /**

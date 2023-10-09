@@ -1,6 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { signTx } from "src/utils/signTx";
+import { signTx } from "../../utils/signTx";
 import { MoonriverWithdraw } from "../../types/xTokens";
 import { logger } from "../../utils/mangataLogger";
 

@@ -2,16 +2,13 @@ import { ApiPromise } from "@polkadot/api"
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { KeyringPair } from "@polkadot/keyring/types";
-import { BN } from "@polkadot/util";
 import { calculateRewardsAmount } from "../rpc/calculateRewardsAmount";
-import { Account, MangataGenericEvent, MangataSubmittableExtrinsic } from "../../types/common";
+import { MangataGenericEvent } from "../../types/common";
 import { signTx } from "../../utils/signTx";
 import { ExtrinsicCommon } from "../../types/common";
 import { logger } from "../../utils/mangataLogger";
-import { Liquidity, Rewards } from "src/types/xyk";
+import { Liquidity } from "../../types/xyk";
 import { claimRewards } from "./claimRewards";
-import { batchAll } from "../utility/batchAll";
-import { Batch } from "src/types/utility";
 
 async function claimRewardsAll(
   instancePromise: Promise<ApiPromise>,
@@ -19,6 +16,8 @@ async function claimRewardsAll(
   isForBatch: false
 ): Promise<MangataGenericEvent[]>;
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 async function claimRewardsAll(
   instancePromise: Promise<ApiPromise>,
   args: ExtrinsicCommon,
