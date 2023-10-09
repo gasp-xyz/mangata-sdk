@@ -3697,8 +3697,7 @@ var calculateRewardsAmount = async (instancePromise, args) => {
     address,
     liquidityTokenId
   );
-  const price = isHex(rewards.price.toString()) ? hexToBn(rewards.price.toString()) : new import_bn.default(rewards.price);
-  return price;
+  return isHex(rewards.toString()) ? hexToBn(rewards.toString()) : new import_bn.default(rewards);
 };
 
 // src/methods/xyk/claimRewardsAll.ts
@@ -3743,12 +3742,12 @@ var calculateBuyPriceId = async (instancePromise, soldTokenId, boughtTokenId, am
     amount: amount.toString()
   });
   const api = await instancePromise;
-  const result = await api.rpc.xyk.calculate_buy_price_id(
+  const price = await api.rpc.xyk.calculate_buy_price_id(
     soldTokenId,
     boughtTokenId,
     amount
   );
-  return new import_bn.default(result.price);
+  return new import_bn.default(price);
 };
 
 // src/methods/rpc/calculateSellPriceId.ts
@@ -3759,12 +3758,12 @@ var calculateSellPriceId = async (instancePromise, soldTokenId, boughtTokenId, a
     amount: amount.toString()
   });
   const api = await instancePromise;
-  const result = await api.rpc.xyk.calculate_sell_price_id(
+  const price = await api.rpc.xyk.calculate_sell_price_id(
     soldTokenId,
     boughtTokenId,
     amount
   );
-  return new import_bn.default(result.price);
+  return new import_bn.default(price);
 };
 
 // src/methods/rpc/getBurnAmount.ts
@@ -3781,8 +3780,10 @@ var getBurnAmount = async (instancePromise, args) => {
     secondTokenId,
     amount
   );
-  const resultAsJson = JSON.parse(result.toString());
-  return resultAsJson;
+  return {
+    firstAssetAmount: new import_bn.default(result[0]),
+    secondAssetAmount: new import_bn.default(result[1])
+  };
 };
 
 // src/methods/rpc/calculateSellPrice.ts
@@ -3794,12 +3795,12 @@ var calculateSellPrice = async (instancePromise, args) => {
   });
   const api = await instancePromise;
   const { inputReserve, outputReserve, amount } = args;
-  const result = await api.rpc.xyk.calculate_sell_price(
+  const price = await api.rpc.xyk.calculate_sell_price(
     inputReserve,
     outputReserve,
     amount
   );
-  return new import_bn.default(result.price);
+  return new import_bn.default(price);
 };
 
 // src/methods/rpc/calculateBuyPrice.ts
@@ -3811,12 +3812,12 @@ var calculateBuyPrice = async (instancePromise, args) => {
   });
   const api = await instancePromise;
   const { inputReserve, outputReserve, amount } = args;
-  const result = await api.rpc.xyk.calculate_buy_price(
+  const price = await api.rpc.xyk.calculate_buy_price(
     inputReserve,
     outputReserve,
     amount
   );
-  return new import_bn.default(result.price);
+  return new import_bn.default(price);
 };
 
 // src/methods/rpc/getNodeVersion.ts
@@ -3921,6 +3922,8 @@ var calculateRatio = (numerator, denominator) => {
   return [gcd1, gcd22];
 };
 var getRatio = (left, right) => {
+  if (left.isZero() && right.isZero())
+    return BN_ZERO;
   const ratios = calculateRatio(left, right);
   const res = ratios[1].mul(BN_DIV_NUMERATOR_MULTIPLIER).div(ratios[0]);
   return res;
@@ -8471,6 +8474,29 @@ var getWithdrawFromMoonriverFee = async (instancePromise, args) => {
   return fromBN(new import_bn.default(dispatchInfo.partialFee.toString()));
 };
 
+// src/methods/rpc/getTradeableTokens.ts
+var getTradeableTokens = async (instancePromise) => {
+  logger.info("getTradeableTokens");
+  const api = await instancePromise;
+  const tokens = await api.rpc.xyk.get_tradeable_tokens();
+  const tradeableTokens = tokens.map((item) => ({
+    tokenId: item.tokenId.toString(),
+    decimals: parseInt(item.decimals, 10),
+    name: item.name.toUtf8(),
+    symbol: item.symbol.toUtf8()
+  }));
+  return tradeableTokens;
+};
+
+// src/methods/rpc/getLiquidityTokensForTrading.ts
+var getLiquidityTokensForTrading = async (instancePromise) => {
+  logger.info("getLiquidityTokensForTrading");
+  const api = await instancePromise;
+  const lpTokens = await api.rpc.xyk.get_liq_tokens_for_trading();
+  const lpTokensForTrading = lpTokens.map((item) => item.toString());
+  return lpTokensForTrading;
+};
+
 // src/mangataInstance.ts
 function createMangataInstance(urls) {
   const instancePromise = getOrCreateInstance(urls);
@@ -8500,6 +8526,8 @@ function createMangataInstance(urls) {
       multiswapSellAsset: (args) => multiswapSellAsset(instancePromise, args, false)
     },
     rpc: {
+      getTradeableTokens: () => getTradeableTokens(instancePromise),
+      getLiquidityTokensForTrading: () => getLiquidityTokensForTrading(instancePromise),
       isBuyAssetLockFree: (tokenIds, amount) => isBuyAssetLockFree(instancePromise, tokenIds, amount),
       isSellAssetLockFree: (tokenIds, amount) => isSellAssetLockFree(instancePromise, tokenIds, amount),
       calculateBuyPriceId: (soldTokenId, boughtTokenId, amount) => calculateBuyPriceId(
