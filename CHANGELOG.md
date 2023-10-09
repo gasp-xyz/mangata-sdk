@@ -1,3 +1,10 @@
+# [2.1.0-rc.2](https://github.com/mangata-finance/mangata-sdk/compare/v2.1.0-rc.1...v2.1.0-rc.2) (2023-10-09)
+
+
+### Bug Fixes
+
+* relative paths ([3d404e5](https://github.com/mangata-finance/mangata-sdk/commit/3d404e50078ee0053eefee8751ab408591cbf6e6))
+
 # [2.1.0-rc.1](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0...v2.1.0-rc.1) (2023-09-25)
 
 
