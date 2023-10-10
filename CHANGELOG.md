@@ -1,3 +1,10 @@
+# [2.1.0-rc.3](https://github.com/mangata-finance/mangata-sdk/compare/v2.1.0-rc.2...v2.1.0-rc.3) (2023-10-10)
+
+
+### Bug Fixes
+
+* add logger to withdraw method ([d581e57](https://github.com/mangata-finance/mangata-sdk/commit/d581e5702cfe134f3c5ea7591d839e848da6b78d))
+
 # [2.1.0-rc.2](https://github.com/mangata-finance/mangata-sdk/compare/v2.1.0-rc.1...v2.1.0-rc.2) (2023-10-09)
 
 
