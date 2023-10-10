@@ -35,7 +35,11 @@ export const withdraw = async (
   const assetRegistryMetadata =
     await api.query.assetRegistry.metadata.entries();
 
+  logger.info("LOG-SDK",assetRegistryMetadata.toString());
+
   const assetMetadata = assetRegistryMetadata.find((metadata) => {
+    logger.info("LOG-SDK-METADATA",metadata.toString());
+    logger.info("LOG-SDK-VALUE",metadata[1].value.toString());
     const symbol = metadata[1].value.symbol.toPrimitive();
     return symbol === tokenSymbol;
   });
