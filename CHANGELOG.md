@@ -1,3 +1,10 @@
+# [2.1.0-rc.4](https://github.com/mangata-finance/mangata-sdk/compare/v2.1.0-rc.3...v2.1.0-rc.4) (2023-10-12)
+
+
+### Bug Fixes
+
+* remove testing logs ([970bb67](https://github.com/mangata-finance/mangata-sdk/commit/970bb67f3f6d8e72f971d5a012583daf5e6aa68e))
+
 # [2.1.0-rc.3](https://github.com/mangata-finance/mangata-sdk/compare/v2.1.0-rc.2...v2.1.0-rc.3) (2023-10-10)
 
 
