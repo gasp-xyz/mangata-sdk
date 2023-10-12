@@ -30,12 +30,12 @@
     "@polkadot/api": "10.9.1"
   },
   "dependencies": {
-    "@mangata-finance/type-definitions": "2.0.0-rc.8",
+    "@mangata-finance/type-definitions": "2.0.0",
     "big.js": "6.2.1",
     "tslog": "4.8.2"
   },
   "devDependencies": {
-    "@mangata-finance/types": "2.0.0-rc.3",
+    "@mangata-finance/types": "2.0.0",
     "@semantic-release/changelog": "6.0.1",
     "@semantic-release/git": "10.0.1",
     "@types/big.js": "6.1.6",
