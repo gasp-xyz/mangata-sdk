@@ -49,15 +49,3 @@ jobs:
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: docs # The folder the action should deploy.
-
-      - name: Sleep for 1 minute
-        run: sleep 60s
-
-      - name: Merge main -> develop
-        uses: devmasx/merge-branch@master
-        with:
-          type: now
-          from_branch: main
-          target_branch: develop
-          message: Merge main into develop
-          github_token: ${{ secrets.FE_TOKEN }}
