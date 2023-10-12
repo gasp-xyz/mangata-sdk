@@ -1,3 +1,32 @@
+# [2.1.0-rc.4](https://github.com/mangata-finance/mangata-sdk/compare/v2.1.0-rc.3...v2.1.0-rc.4) (2023-10-12)
+
+
+### Bug Fixes
+
+* remove testing logs ([970bb67](https://github.com/mangata-finance/mangata-sdk/commit/970bb67f3f6d8e72f971d5a012583daf5e6aa68e))
+
+# [2.1.0-rc.3](https://github.com/mangata-finance/mangata-sdk/compare/v2.1.0-rc.2...v2.1.0-rc.3) (2023-10-10)
+
+
+### Bug Fixes
+
+* add logger to withdraw method ([d581e57](https://github.com/mangata-finance/mangata-sdk/commit/d581e5702cfe134f3c5ea7591d839e848da6b78d))
+
+# [2.1.0-rc.2](https://github.com/mangata-finance/mangata-sdk/compare/v2.1.0-rc.1...v2.1.0-rc.2) (2023-10-09)
+
+
+### Bug Fixes
+
+* relative paths ([3d404e5](https://github.com/mangata-finance/mangata-sdk/commit/3d404e50078ee0053eefee8751ab408591cbf6e6))
+
+# [2.1.0-rc.1](https://github.com/mangata-finance/mangata-sdk/compare/v2.0.0...v2.1.0-rc.1) (2023-09-25)
+
+
+### Features
+
+* update packages for types ([b98f348](https://github.com/mangata-finance/mangata-sdk/commit/b98f3486611d8f828f5648adcb8f25564acc4487))
+* update types and rpc ([b4c0d4e](https://github.com/mangata-finance/mangata-sdk/commit/b4c0d4eb56b062e513a78994da35629cf36eda99))
+
 # [2.0.0](https://github.com/mangata-finance/mangata-sdk/compare/v1.20.1...v2.0.0) (2023-09-20)
 
 

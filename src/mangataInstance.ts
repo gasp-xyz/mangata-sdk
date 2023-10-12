@@ -108,6 +108,8 @@ import { isBuyAssetLockFree } from "./methods/rpc/isBuyAssetLockFree";
 import { isSellAssetLockFree } from "./methods/rpc/isSellAssetLockFree";
 import { withdrawToMoonriver } from "./methods/xTokens/withdrawToMoonriver";
 import { getWithdrawFromMoonriverFee } from "./methods/fee/getWithdrawFromMoonriverFee";
+import {getTradeableTokens} from "./methods/rpc/getTradeableTokens";
+import {getLiquidityTokensForTrading} from "./methods/rpc/getLiquidityTokensForTrading";
 import { logger } from "./utils/mangataLogger";
 
 /**
@@ -163,6 +165,8 @@ export function createMangataInstance(urls: string[]): MangataInstance {
          multiswapSellAsset(instancePromise, args, false)
     },
     rpc: {
+      getTradeableTokens: () => getTradeableTokens(instancePromise),
+      getLiquidityTokensForTrading: ()  => getLiquidityTokensForTrading(instancePromise),
       isBuyAssetLockFree:  (tokenIds: TokenId[], amount: BN) =>
          isBuyAssetLockFree(instancePromise, tokenIds, amount),
       isSellAssetLockFree:  (tokenIds: TokenId[], amount: BN) =>

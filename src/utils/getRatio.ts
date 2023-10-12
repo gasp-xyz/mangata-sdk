@@ -18,6 +18,7 @@ const calculateRatio = (numerator: BN, denominator: BN) => {
 };
 
 export const getRatio = (left: BN, right: BN) => {
+  if (left.isZero() && right.isZero()) return BN_ZERO;
   const ratios = calculateRatio(left, right);
 
   const res = ratios[1].mul(BN_DIV_NUMERATOR_MULTIPLIER).div(ratios[0]);

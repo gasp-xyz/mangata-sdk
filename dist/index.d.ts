@@ -12,6 +12,12 @@ declare type BurnAmount = {
     firstAssetAmount: TokenAmount;
     secondAssetAmount: TokenAmount;
 };
+declare type TradeAbleTokens = {
+    tokenId: string;
+    decimals: number;
+    name: string;
+    symbol: string;
+};
 declare type Rewards = {
     address: Address;
     liquidityTokenId: TokenId;
@@ -316,6 +322,8 @@ interface MangataInstance {
      * rpc methods for interacting with various RPC operations.
      */
     rpc: {
+        getLiquidityTokensForTrading: () => Promise<string[]>;
+        getTradeableTokens: () => Promise<TradeAbleTokens[]>;
         isSellAssetLockFree: (tokendIds: TokenId[], amount: BN) => Promise<Boolean>;
         isBuyAssetLockFree: (tokendIds: TokenId[], amount: BN) => Promise<Boolean>;
         /**
@@ -686,4 +694,4 @@ declare const isSellAssetTransactionSuccessful: (events: MangataGenericEvent[]) 
 
 declare const setLoggerOptions: (options?: ISettingsParam<ILogObj>) => void;
 
-export { Account, ActivateLiquidityFee, Address, Asset, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Batch, BurnAmount, BurnLiquidity, BurnLiquidityFee, ClaimRewardsFee, CreatePool, CreatePoolFee, Database, DeactivateLiquidityFee, Deposit, DepositFromKusamaFee, DepositFromParachainFee, DepositFromStatemineFee, ErrorData, ExtrinsicCommon, FeeLockType, Liquidity, MainTokens, Mangata, MangataEventData, MangataGenericEvent, MangataInstance, MangataLoggerOptions, MangataSubmittableExtrinsic, MaxAmountIn, MinAmountOut, MintLiquidity, MintLiquidityFee, MoonriverWithdraw, MultiSwapBase, MultiswapBuyAsset, MultiswapSellAsset, Pool, PoolBase, PoolReserves, PoolWithRatio, PoolWithShare, Prettify, Price, PriceImpact, RelayDeposit, RelayWithdraw, Reserve, Rewards, Token, TokenAmount, TokenAmounts, TokenBalance, TokenDecimals, TokenId, TokenInfo, TokenSymbol, Transfer, TransferAllFee, TransferTokenFee, TransferTokens, TxOptions, Withdraw, WithdrawFee, WithdrawKsmFee, XcmTxOptions, fromBN, isBuyAssetTransactionSuccessful, isMultiSwapAssetTransactionSuccessful, isSellAssetTransactionSuccessful, setLoggerOptions, signTx, toBN, toFixed };
+export { Account, ActivateLiquidityFee, Address, Asset, BIG_BILLION, BIG_HUNDRED, BIG_HUNDRED_BILLIONS, BIG_HUNDRED_MILLIONS, BIG_HUNDRED_THOUSAND, BIG_MILLION, BIG_ONE, BIG_TEN, BIG_TEN_BILLIONS, BIG_TEN_MILLIONS, BIG_TEN_THOUSAND, BIG_THOUSAND, BIG_TRILLION, BIG_ZERO, BN_BILLION, BN_DIV_NUMERATOR_MULTIPLIER, BN_DIV_NUMERATOR_MULTIPLIER_DECIMALS, BN_HUNDRED, BN_HUNDRED_BILLIONS, BN_HUNDRED_MILLIONS, BN_HUNDRED_THOUSAND, BN_MILLION, BN_ONE, BN_TEN, BN_TEN_BILLIONS, BN_TEN_MILLIONS, BN_TEN_THOUSAND, BN_THOUSAND, BN_TRILLION, BN_ZERO, Batch, BurnAmount, BurnLiquidity, BurnLiquidityFee, ClaimRewardsFee, CreatePool, CreatePoolFee, Database, DeactivateLiquidityFee, Deposit, DepositFromKusamaFee, DepositFromParachainFee, DepositFromStatemineFee, ErrorData, ExtrinsicCommon, FeeLockType, Liquidity, MainTokens, Mangata, MangataEventData, MangataGenericEvent, MangataInstance, MangataLoggerOptions, MangataSubmittableExtrinsic, MaxAmountIn, MinAmountOut, MintLiquidity, MintLiquidityFee, MoonriverWithdraw, MultiSwapBase, MultiswapBuyAsset, MultiswapSellAsset, Pool, PoolBase, PoolReserves, PoolWithRatio, PoolWithShare, Prettify, Price, PriceImpact, RelayDeposit, RelayWithdraw, Reserve, Rewards, Token, TokenAmount, TokenAmounts, TokenBalance, TokenDecimals, TokenId, TokenInfo, TokenSymbol, TradeAbleTokens, Transfer, TransferAllFee, TransferTokenFee, TransferTokens, TxOptions, Withdraw, WithdrawFee, WithdrawKsmFee, XcmTxOptions, fromBN, isBuyAssetTransactionSuccessful, isMultiSwapAssetTransactionSuccessful, isSellAssetTransactionSuccessful, setLoggerOptions, signTx, toBN, toFixed };

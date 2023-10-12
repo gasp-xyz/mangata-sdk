@@ -1,9 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { Account, TxOptions } from "../../types/common";
-import { signTx } from "src/utils/signTx";
 import { MoonriverWithdraw } from "../../types/xTokens";
-import { fromBN } from "src/utils/bnUtility";
+import { fromBN } from "../../utils/bnUtility";
 
 export const getWithdrawFromMoonriverFee = async (
   instancePromise: Promise<ApiPromise>,
