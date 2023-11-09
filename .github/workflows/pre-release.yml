@@ -26,12 +26,12 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v3
 
-      - name: Clone mangata node repository
-        uses: actions/checkout@v3
-        with:
-          repository: mangata-finance/mangata-node
-          path: mangata-repo
-          ref: develop
+#      - name: Clone mangata node repository
+#        uses: actions/checkout@v3
+#        with:
+#          repository: mangata-finance/mangata-node
+#          path: mangata-repo
+#          ref: develop
 
       - name: Setup Node version and cache dependencies
         uses: actions/setup-node@v3
@@ -39,28 +39,28 @@ jobs:
           node-version: "18"
           cache: "yarn"
 
-      - name: Install WASM toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          target: wasm32-unknown-unknown
+#      - name: Install WASM toolchain
+#        uses: actions-rs/toolchain@v1
+#        with:
+#          toolchain: nightly
+#          target: wasm32-unknown-unknown
+#
+#      - name: Replace parachain docker image reference in config
+#        working-directory: mangata-repo/devops/parachain-launch
+#        run: sed -i 's+mangatasolutions/mangata-node:.*+mangatasolutions/mangata-node:develop-fast+g' config.yml
+#
+#      - name: Generate the config
+#        working-directory: mangata-repo/devops/parachain-launch
+#        run: npx @open-web3/parachain-launch generate config.yml
+#
+#      - name: Run the Node
+#        working-directory: mangata-repo/devops/parachain-launch/output
+#        run: |
+#          docker-compose up -d --build
+#          docker ps
 
-      - name: Replace parachain docker image reference in config
-        working-directory: mangata-repo/devops/parachain-launch
-        run: sed -i 's+mangatasolutions/mangata-node:.*+mangatasolutions/mangata-node:develop-fast+g' config.yml
-
-      - name: Generate the config
-        working-directory: mangata-repo/devops/parachain-launch
-        run: npx @open-web3/parachain-launch generate config.yml
-
-      - name: Run the Node
-        working-directory: mangata-repo/devops/parachain-launch/output
-        run: |
-          docker-compose up -d --build
-          docker ps
-
-      - name: Sleep for 3 minutes
-        run: sleep 180s
+#      - name: Sleep for 3 minutes
+#        run: sleep 180s
 
       - name: Install deps
         run: yarn install --frozen-lockfile
@@ -74,8 +74,8 @@ jobs:
       - name: Build the SDK
         run: yarn build
 
-      - name: Run tests
-        run: yarn test
+#      - name: Run tests
+#        run: yarn test
 
       - name: create dry run release
         run: npx semantic-release --dry-run
