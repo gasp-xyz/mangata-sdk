@@ -33,7 +33,7 @@ export const withdrawKsm = async (
   const destWeightLimit = {
     Limited: {
       refTime: new BN("6000000000"),
-      proofSize: 0
+      proofSize: new BN("10000")
     }
   };
 
