@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/mangata-finance/mangata-sdk/compare/v2.1.0...v2.1.1) (2023-11-10)
+
+
+### Bug Fixes
+
+* update proof size for ksm withdraw ([1b4a357](https://github.com/mangata-finance/mangata-sdk/commit/1b4a3576fa4ada89bffba034a4ba1c3a4d4c77dd))
+
 ## [2.1.1-rc.1](https://github.com/mangata-finance/mangata-sdk/compare/v2.1.0...v2.1.1-rc.1) (2023-11-09)
 
 
