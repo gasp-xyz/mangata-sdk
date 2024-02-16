@@ -20,10 +20,10 @@ The Mangata SDK is the TypeScript library that offers a wide range of convenient
 ## Installation
 
 ```sh
-// with npm
+# with npm
 npm i @mangata-finance/sdk
 
-// with yarn
+# with yarn
 yarn add @mangata-finance/sdk
 ```
 
@@ -46,35 +46,35 @@ We also made a change by transitioning from using arguments for functions to usi
 Example:
 
 ```js
-V1:
+// V1:
 await instance.createPool(
-    testUser,
-    firstTokenId,
-    new BN("10000000000000000000000"),
-    secondTokenId,
-    new BN("10000000000000000000000"),
-    txOptions: {
-      extrinsicStatus: (data) => {
-        console.log(data)
-      }
+  testUser,
+  firstTokenId,
+  new BN("10000000000000000000000"),
+  secondTokenId,
+  new BN("10000000000000000000000"),
+  txOptions: {
+    extrinsicStatus: (data) => {
+      console.log(data)
     }
-  );
+  }
+);
 
 
-V2:
+// V2:
 const args: CreatePool = {
-    account: testUser,
-    firstTokenId: firstTokenId!,
-    secondTokenId: secondTokenId!,
-    firstTokenAmount: new BN("10000000000000000000000"),
-    secondTokenAmount: new BN("10000000000000000000000"),
-    txOptions: {
-      extrinsicStatus: (data) => {
-        console.log(data)
-      }
+  account: testUser,
+  firstTokenId: firstTokenId!,
+  secondTokenId: secondTokenId!,
+  firstTokenAmount: new BN("10000000000000000000000"),
+  secondTokenAmount: new BN("10000000000000000000000"),
+  txOptions: {
+    extrinsicStatus: (data) => {
+      console.log(data)
     }
-  };
-  await instance.xyk.createPool(args);
+  }
+};
+await instance.xyk.createPool(args);
 ```
 
 We no longer support the implementation of depositing to Mangata within the SDK. However, we do provide the necessary raw methods for depositing, which should be implemented separately outside of the SDK. For specific examples of how to deposit to Mangata using the SDK, please refer to the provided examples.
@@ -82,44 +82,46 @@ We no longer support the implementation of depositing to Mangata within the SDK.
 To obtain an instance of the Mangata node, please follow this step:
 
 ```js
-V1:
+// V1:
 const mangata = Mangata.getInstance(["wss://kusama-archive.mangata.online"]);
 
-V2:
-import { MangataInstance } from "@mangata-finance/sdk"
-const mangata: MangataInstance = Mangata.instance(["wss://kusama-archive.mangata.online"]);
+// V2:
+import { MangataInstance } from "@mangata-finance/sdk";
+const mangata: MangataInstance = Mangata.instance([
+  "wss://kusama-archive.mangata.online",
+]);
 ```
 
 Method **getAmountOfTokenIdInPool** has been renamed to **getAmountOfTokensInPool**
 
 ```js
-V1:
-const amount = await mangata.getAmountOfTokenIdInPool("0", "4")
+// V1:
+const amount = await mangata.getAmountOfTokenIdInPool("0", "4");
 
-V2:
-const amount = await mangata.query.getAmountOfTokensInPool("0", "4")
+// V2:
+const amount = await mangata.query.getAmountOfTokensInPool("0", "4");
 ```
 
 Please replace the existing "buyAsset" and "sellAsset" methods with the newly introduced "multiswapBuyAsset" and "multiswapSellAsset" methods.
 
 ```js
-V1:
+// V1:
 await mangata.buyAsset(
-    account: string | KeyringPair,
-    soldAssetId: string,
-    boughtAssetId: string,
-    amount: BN,
-    maxAmountIn: BN,
-    txOptions?: TxOptions
-  )
+  account: string | KeyringPair,
+  soldAssetId: string,
+  boughtAssetId: string,
+  amount: BN,
+  maxAmountIn: BN,
+  txOptions?: TxOptions
+)
 
-V2:
+// V2:
 const args: MultiswapBuyAsset = {
-    account: Account;
-    tokenIds: TokenId[];
-    amount: TokenAmount;
-    maxAmountIn: TokenAmount;
-    txOptions?: Partial<TxOptions> | undefined;
+  account: Account;
+  tokenIds: TokenId[];
+  amount: TokenAmount;
+  maxAmountIn: TokenAmount;
+  txOptions?: Partial<TxOptions> | undefined;
 }
 await mangata.xyk.multiswapBuyAsset(args)
 ```
@@ -127,11 +129,11 @@ await mangata.xyk.multiswapBuyAsset(args)
 To illustrate how to retrieve asset information, you need to determine its corresponding section within the SDK. The method **getAssetInfo** is located within the query block.
 
 ```js
-V1:
-const assetInfo = await mangata.getAssetInfo()
+// V1:
+const assetInfo = await mangata.getAssetInfo();
 
-V2:
-const assetInfo = await mangata.query.getAssetInfo()
+// V2:
+const assetInfo = await mangata.query.getAssetInfo();
 ```
 
 # Basic use case
@@ -144,14 +146,14 @@ Support: Only ESM
 import { Mangata } from "@mangata-finance/sdk";
 
 async function main() {
-  // Connect to the mainet (also testnet, mainnet)
+  // Connect to the mainnet (also testnet, mainnet)
   const mangata = Mangata.instance(["wss://kusama-archive.mangata.online"]);
 
   // Retrieve the chainName, nodeName & nodeVersion information
   const [chain, nodeName, nodeVersion] = await Promise.all([
     mangata.rpc.getChain(),
     mangata.rpc.getNodeName(),
-    mangata.rpc.getNodeVersion()
+    mangata.rpc.getNodeVersion(),
   ]);
 
   console.log(
@@ -178,7 +180,7 @@ import {
   Token,
   PoolWithRatio,
   TokenBalance,
-  TokenInfo
+  TokenInfo,
 } from "../";
 import { BN } from "@polkadot/util";
 
@@ -276,7 +278,7 @@ const main = async () => {
    * @returns {[id: TokenId]: Token}}
    */
   const ownedTokens: {
-    [id: TokenId]: Token
+    [id: TokenId]: Token,
   } = await mangata.query.getOwnedTokens(ADDRESS);
 
   /**
@@ -333,7 +335,7 @@ const main = async () => {
   const argsReserve: Reserve = {
     inputReserve: new BN("1000000000000000000"),
     outputReserve: new BN("10000000000000000000"),
-    amount: new BN("10000")
+    amount: new BN("10000"),
   };
   const price: BN = await mangata.rpc.calculateBuyPrice(argsReserve);
 
@@ -355,7 +357,7 @@ const main = async () => {
    */
   const argsRewards: Rewards = {
     address: ADDRESS,
-    liquidityTokenId: LPTOKENKSMANDMGX
+    liquidityTokenId: LPTOKENKSMANDMGX,
   };
   const rewards: BN = await mangata.rpc.calculateRewardsAmount(argsRewards);
 
@@ -367,7 +369,7 @@ const main = async () => {
   const argsReserve: Reserve = {
     inputReserve: new BN("1000000000000000000"),
     outputReserve: new BN("10000000000000000000"),
-    amount: new BN("10000")
+    amount: new BN("10000"),
   };
   const price: BN = await mangata.rpc.calculateSellPrice(argsReserve);
 
@@ -431,54 +433,53 @@ const args: TransferTokens = {
 await mangata.tokens.transferTokens(args);
 
 const args: MultiswapBuyAsset = {
-    account,
-    tokenIds: [MGX_TOKEN, KSM_TOKEN],
-    amount: new BN(1000e18), // 100 MGX
-    maxAmountIn: new BN(60000e18),
-    txOptions: {
-      statusCallback: (status: ISubmittableResult) => {
-        // Here you can check for status of your transaction
-        console.log(status);
-      },
-      extrinsicStatus: (result: MangataGenericEvent[]) => {
-        // here will be the result of your transaction
-        console.log(result);
-      }
+  account,
+  tokenIds: [MGX_TOKEN, KSM_TOKEN],
+  amount: new BN(1000e18), // 100 MGX
+  maxAmountIn: new BN(60000e18),
+  txOptions: {
+    statusCallback: (status: ISubmittableResult) => {
+      // Here you can check for status of your transaction
+      console.log(status);
+    },
+    extrinsicStatus: (result: MangataGenericEvent[]) => {
+      // here will be the result of your transaction
+      console.log(result);
     }
-  };
-  await mangata.xyk.multiswapBuyAsset(args);
+  }
+};
+await mangata.xyk.multiswapBuyAsset(args);
 
-  const argsBuy: MultiswapBuyAsset = {
-    account,
-    tokenIds: [MGX_TOKEN, KSM_TOKEN],
-    amount: new BN(1000e18), // 100 MGX
-    maxAmountIn: new BN(60000e18)
-  };
-  const tx1 = await mangata.submitableExtrinsic.multiswapBuyAsset(argsBuy);
+const argsBuy: MultiswapBuyAsset = {
+  account,
+  tokenIds: [MGX_TOKEN, KSM_TOKEN],
+  amount: new BN(1000e18), // 100 MGX
+  maxAmountIn: new BN(60000e18)
+};
+const tx1 = await mangata.submitableExtrinsic.multiswapBuyAsset(argsBuy);
 
-  const argsMint: MintLiquidity = {
-    account,
-    firstTokenId: KSM_TOKEN,
-    secondTokenId: MGX_TOKEN,
-    firstTokenAmount: new BN(100e12),
-    expectedSecondTokenAmount: new BN(1000e18)
-  };
+const argsMint: MintLiquidity = {
+  account,
+  firstTokenId: KSM_TOKEN,
+  secondTokenId: MGX_TOKEN,
+  firstTokenAmount: new BN(100e12),
+  expectedSecondTokenAmount: new BN(1000e18)
+};
+const tx2 = await mangata.submitableExtrinsic.mintLiquidity(argsMint);
 
-  const tx2 = await mangata.submitableExtrinsic.mintLiquidity(argsMint);
-
-  const args: Batch = {
-    account,
-    calls: [tx1, tx2],
-    txOptions: {
-      statusCallback: (status: ISubmittableResult) => {
-        // Here you can check for status of your transaction
-        console.log(status);
-      },
-      extrinsicStatus: (result: MangataGenericEvent[]) => {
-        // here will be the result of your transaction
-        console.log(result);
-      }
+const args: Batch = {
+  account,
+  calls: [tx1, tx2],
+  txOptions: {
+    statusCallback: (status: ISubmittableResult) => {
+      // Here you can check for status of your transaction
+      console.log(status);
+    },
+    extrinsicStatus: (result: MangataGenericEvent[]) => {
+      // here will be the result of your transaction
+      console.log(result);
     }
-  };
-  await mangata.batch(args);
+  }
+};
+await mangata.batch(args);
 ```
